@@ -1,12 +1,11 @@
 ---
+// Re-uses the locale-aware /changelog page; Astro routes /zh-CN/changelog
+// here. Importing the same module would duplicate the route, so we
+// inline the same content with the locale already set by URL.
 import { getCollection, render } from "astro:content";
 import Base from "~/layouts/Base.astro";
 import SiteHeader from "~/components/SiteHeader.astro";
 import SiteFooter from "~/components/SiteFooter.astro";
-import { getLang } from "~/i18n";
-
-const lang = getLang(Astro);
-const isZh = lang === "zh-CN";
 
 const entries = (await getCollection("changelog")).sort(
   (a, b) => b.data.date.getTime() - a.data.date.getTime(),
@@ -19,43 +18,27 @@ const typeStyles: Record<string, string> = {
   security: "bg-pink-500/15 text-pink-300 border-pink-500/30",
 };
 
-const fmt = new Intl.DateTimeFormat(isZh ? "zh-CN" : "en-US", {
+const fmt = new Intl.DateTimeFormat("zh-CN", {
   year: "numeric",
-  month: isZh ? "long" : "short",
+  month: "long",
   day: "numeric",
 });
-
-const labels = isZh
-  ? {
-      eyebrow: "更新日志",
-      title: ["最新", "发布"],
-      sub: "每个发布版本的发布说明。可通过 ",
-      subRss: " 订阅。",
-    }
-  : {
-      eyebrow: "Changelog",
-      title: ["What's", "new"],
-      sub: "Release notes for every shipped version. Subscribe via ",
-      subRss: ".",
-    };
 ---
 
-<Base
-  title={isZh ? "更新日志 · ThinkWatch" : "Changelog · ThinkWatch"}
-  description={isZh ? "ThinkWatch 的发布说明与更新。" : "Release notes and updates for ThinkWatch."}
->
+<Base title="更新日志 · ThinkWatch" description="ThinkWatch 的发布说明与更新。">
   <SiteHeader />
   <main id="main" class="container-page py-20">
     <div class="max-w-3xl">
       <div class="text-xs uppercase tracking-[0.18em] text-[var(--color-brand-1)] font-medium mb-4">
-        {labels.eyebrow}
+        更新日志
       </div>
       <h1 class="text-4xl md:text-5xl font-semibold tracking-tight">
-        {labels.title[0]} <span class="text-gradient">{labels.title[1]}</span>
+        最新 <span class="text-gradient">发布</span>
       </h1>
       <p class="mt-4 text-[var(--color-muted)] text-lg">
-        {labels.sub}
-        <a href="/changelog.xml" class="text-white underline underline-offset-4 hover:text-[var(--color-brand-1)]">RSS</a>{labels.subRss}
+        每个发布版本的发布说明。可通过
+        <a href="/changelog.xml" class="text-white underline underline-offset-4 hover:text-[var(--color-brand-1)]">RSS</a>
+        订阅。
       </p>
     </div>
 
@@ -64,7 +47,7 @@ const labels = isZh
         const { Content } = await render(entry);
         return (
           <li id={`v${entry.data.version}`} class="relative pl-8 border-l border-white/10 scroll-mt-24">
-            <a href={`#v${entry.data.version}`} class="absolute -left-[5px] top-2 w-2.5 h-2.5 rounded-full bg-brand-gradient ring-4 ring-[var(--color-bg)] hover:scale-125 transition-transform" aria-label={`Link to v${entry.data.version}`}></a>
+            <a href={`#v${entry.data.version}`} class="absolute -left-[5px] top-2 w-2.5 h-2.5 rounded-full bg-brand-gradient ring-4 ring-[var(--color-bg)] hover:scale-125 transition-transform" aria-label={`链接到 v${entry.data.version}`}></a>
 
             <div class="flex flex-wrap items-center gap-3 mb-3">
               <span class="font-mono text-sm text-white">v{entry.data.version}</span>

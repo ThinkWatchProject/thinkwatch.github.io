@@ -2,24 +2,30 @@
 import Terminal from "../ui/Terminal.tsx";
 import MagneticButton from "../ui/MagneticButton.tsx";
 import HeroVisual from "../hero/HeroVisual.tsx";
+import { getLang, t } from "~/i18n";
+
+const lang = getLang(Astro);
+const s = t(lang).hero;
+const common = t(lang).common;
 ---
 
 <section class="relative overflow-hidden pt-24 pb-32 min-h-[88vh]">
   <HeroVisual client:load />
+
   <div class="container-page relative z-10 grid lg:grid-cols-[1.1fr_1fr] gap-12 items-center">
     <div>
       <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/[0.03] text-xs text-[var(--color-muted)] mb-6">
         <span class="w-1.5 h-1.5 rounded-full bg-[var(--color-brand-1)] animate-pulse" aria-hidden="true"></span>
-        v0.1.0 — now in public preview
+        {s.badge}
       </div>
 
       <h1 class="text-5xl md:text-7xl font-semibold tracking-tight leading-[1.05]">
-        The secure gateway<br />
-        for <span class="text-gradient">all your AI traffic</span>
+        {s.titleA}<br />
+        {s.titleB}<span class="text-gradient">{s.titleHighlight}</span>
       </h1>
 
       <p class="mt-6 text-lg md:text-xl text-[var(--color-muted)] max-w-2xl leading-relaxed">
-        ThinkWatch is the single control plane through which every model request and every MCP tool call must flow. Authenticated, authorized, rate-limited, logged, and accounted for.
+        {s.sub}
       </p>
 
       <div class="mt-10 flex flex-wrap items-center gap-4">
@@ -28,7 +34,7 @@ import HeroVisual from "../hero/HeroVisual.tsx";
           href="#quickstart"
           className="px-5 py-3 rounded-lg bg-brand-gradient text-black font-medium hover:brightness-110 shadow-lg shadow-cyan-500/20"
         >
-          Get started in 30s
+          {s.ctaPrimary}
         </MagneticButton>
         <MagneticButton
           client:visible
@@ -36,28 +42,25 @@ import HeroVisual from "../hero/HeroVisual.tsx";
           external
           className="px-5 py-3 rounded-lg border border-white/15 hover:border-white/30 hover:bg-white/5 font-medium"
         >
-          View on GitHub →
+          {common.githubLink}
         </MagneticButton>
       </div>
 
       <div class="mt-12 flex flex-wrap gap-x-8 gap-y-3 text-xs text-[var(--color-dim)] uppercase tracking-widest">
-        <span>Rust + Axum</span>
-        <span>·</span>
-        <span>2 MB distroless</span>
-        <span>·</span>
-        <span>OpenAI · Anthropic · Gemini · Bedrock</span>
-        <span>·</span>
-        <span>BSL 1.1</span>
+        {s.stack.map((item, i) => (
+          <>
+            {i > 0 && <span aria-hidden="true">·</span>}
+            <span>{item}</span>
+          </>
+        ))}
       </div>
     </div>
 
     <div class="relative">
       <Terminal client:visible />
-      <!-- Decorative ring -->
       <div class="absolute -inset-6 -z-10 rounded-3xl bg-gradient-to-br from-cyan-500/20 via-violet-500/10 to-pink-500/20 blur-2xl"></div>
     </div>
   </div>
 
-  <!-- Bottom fade so the 3D scene blends into Problem section -->
   <div class="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-b from-transparent to-[var(--color-bg)] pointer-events-none"></div>
 </section>

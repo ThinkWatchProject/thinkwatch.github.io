@@ -1,0 +1,329 @@
+// Single source of truth for all translatable copy.
+// Add new strings here, then reference via `t(lang).section.key`.
+
+export type Lang = "en" | "zh-CN";
+
+const dict = {
+  en: {
+    common: {
+      getStarted: "Get started",
+      githubLink: "View on GitHub →",
+      copy: "Copy",
+      copied: "Copied ✓",
+      skipToContent: "Skip to content",
+    },
+
+    nav: {
+      how: "How it works",
+      features: "Features",
+      console: "Console",
+      quickstart: "Quick start",
+      changelog: "Changelog",
+      githubShort: "GitHub →",
+    },
+
+    hero: {
+      badge: "v0.1.0 — now in public preview",
+      titleA: "The secure gateway",
+      titleB: "for ",
+      titleHighlight: "all your AI traffic",
+      sub: "ThinkWatch is the single control plane through which every model request and every MCP tool call must flow. Authenticated, authorized, rate-limited, logged, and accounted for.",
+      ctaPrimary: "Get started in 30s",
+      stack: ["Rust + Axum", "2 MB distroless", "OpenAI · Anthropic · Gemini · Bedrock", "BSL 1.1"],
+    },
+
+    compatible: {
+      label: "Drop-in compatible with",
+    },
+
+    problem: {
+      eyebrow: "The Problem",
+      title: "AI is everywhere. Governance is ",
+      titleHighlight: "nowhere",
+      sub: "As AI agents proliferate across engineering teams, organizations face a growing governance challenge that gets worse every quarter.",
+      pains: [
+        { icon: "🔑", title: "Keys scattered everywhere", body: "Hardcoded in .env files, shared in Slack, rotated never. One leaked key drains your monthly budget overnight." },
+        { icon: "👁", title: "Zero visibility", body: "Who used which model? How many tokens? Against which project? Nobody knows until the bill arrives." },
+        { icon: "🛡", title: "No access control", body: "Every developer has direct access to every model and every MCP tool. There is no least-privilege story." },
+        { icon: "📜", title: "Compliance gaps", body: "No audit trail for AI-assisted code generation or data access. Legal and security cannot answer basic questions." },
+        { icon: "💸", title: "Cost surprises", body: "Monthly AI bills nobody can explain or attribute. Budget overruns are discovered weeks after the fact." },
+      ],
+      footer: ["ThinkWatch solves all of this with a ", "single deployment", "."],
+    },
+
+    how: {
+      eyebrow: "How it works",
+      title: "Every AI request flows through ",
+      titleHighlight: "one gateway",
+      sub: "Drop-in replacement for the OpenAI and Anthropic SDKs. Your agents keep their existing code — they just point at ThinkWatch instead.",
+      callersLabel: "Callers",
+      upstreamsLabel: "Upstreams",
+      gatewayPort: "Gateway :3000",
+      gatewayName: "ThinkWatch",
+      gatewayTagline: "AI API + MCP proxy",
+      pipelineLabel: "Inside the request lifecycle",
+      pipeline: [
+        { step: "01", label: "Authenticate", body: "Virtual `tw-` API key validated against PG, scoped to user/team/project." },
+        { step: "02", label: "Authorize", body: "5-tier RBAC checks model/tool access against the caller's role." },
+        { step: "03", label: "Rate-limit", body: "Sliding-window RPM/TPM enforced via Redis, per key or per user." },
+        { step: "04", label: "Route & convert", body: "Provider selected; request format converted (Anthropic ⇄ OpenAI ⇄ Bedrock ⇄ Gemini)." },
+        { step: "05", label: "Stream & meter", body: "SSE forwarded with zero overhead; tokens counted in real-time." },
+        { step: "06", label: "Audit", body: "Every call written to ClickHouse and optionally forwarded to your SIEM." },
+      ],
+    },
+
+    features: {
+      eyebrow: "Features",
+      title: "Gateway, MCP proxy, RBAC, analytics — ",
+      titleHighlight: "in one binary",
+      sub: "ThinkWatch is one Rust binary backed by PostgreSQL, Redis, and ClickHouse. No microservice sprawl, no glue code — every concern handled by the same control plane.",
+    },
+
+    live: {
+      eyebrow: "The Console",
+      title: "Every token. Every key. ",
+      titleHighlight: "Every call",
+      sub: "Real-time observability over every AI request flowing through your organization. The panels below are live React components — not screenshots — rendering with mock data so you can see what the console feels like.",
+      overview: "Overview · MTD",
+      logs: "Unified log explorer",
+      health: "Upstream health",
+      rate: "Sliding-window rate limit",
+    },
+
+    quickstart: {
+      eyebrow: "Quick start",
+      title: "Up and running in ",
+      titleHighlight: "under a minute",
+      sub: "Self-host with Docker Compose for a single-node deployment, or use the Helm chart for production Kubernetes. Either way, four commands and you have a working gateway.",
+      pointAt: "Then point your client at the gateway",
+      footer: "Zero code changes required — just swap the base URL and use a virtual ",
+      footerSuffix: " key.",
+      steps: [
+        { title: "Start infrastructure", body: "Bring up PostgreSQL, Redis, and ClickHouse via Docker Compose." },
+        { title: "Start the gateway", body: "Both ports come up: 3000 (gateway) and 3001 (console API)." },
+        { title: "Start the console UI", body: "Vite dev server on :5173 with hot reload." },
+        { title: "Run the setup wizard", body: "Create the super_admin account and add your first provider." },
+      ],
+    },
+
+    license: {
+      eyebrow: "License",
+      title: "Source-available. ",
+      titleHighlight: "Free for most teams",
+      sub: "ThinkWatch is licensed under the Business Source License 1.1. Non-production use is free forever, and production use is free up to generous monthly thresholds — only commercial above that.",
+      mostTeams: "Most teams",
+      footnote: ["\"Billable Token\" and \"MCP Tool Call\" definitions, the tiering model, and the changeover to GPL-2.0-or-later are all detailed in ", "LICENSING.md", "."],
+      tiers: [
+        {
+          name: "Non-production",
+          price: "Free",
+          priceNote: "forever",
+          audience: "Development, staging, evaluation, internal demos.",
+          features: ["Unlimited tokens", "Unlimited MCP tool calls", "All gateway features", "All security features", "Community support"],
+          ctaLabel: "Self-host now",
+        },
+        {
+          name: "Production · Free Tier",
+          price: "Free",
+          priceNote: "up to thresholds",
+          audience: "Small teams running production workloads.",
+          features: ["Up to 10,000,000 billable tokens / month", "Up to 10,000 MCP tool calls / month", "All features included", "BSL 1.1 license", "Auto-converts to GPL-2.0-or-later after change date"],
+          ctaLabel: "Read the license",
+        },
+        {
+          name: "Production · Commercial",
+          price: "Tiered",
+          priceNote: "by usage",
+          audience: "Organizations exceeding the free thresholds.",
+          features: ["Above 10M tokens or 10K MCP calls per UTC month", "Commercial license required", "Priced by usage tiers", "Priority support available", "Custom deployment guidance"],
+          ctaLabel: "Contact sales",
+        },
+      ],
+    },
+
+    star: {
+      eyebrow: "Community",
+      title: "Watch the project ",
+      titleHighlight: "grow",
+      sub: "ThinkWatch is open development. Star the repo to follow releases and shape the roadmap.",
+      cta: "Star on GitHub",
+    },
+
+    footer: {
+      tagline: "The single gateway through which all AI access must flow. Authenticated, authorized, rate-limited, logged, and accounted for.",
+      product: "Product",
+      resources: "Resources",
+      copyright: "Source-available under BSL 1.1.",
+      builtWith: "Built with Astro · Deployed on GitHub Pages",
+    },
+  },
+
+  "zh-CN": {
+    common: {
+      getStarted: "立即开始",
+      githubLink: "查看 GitHub →",
+      copy: "复制",
+      copied: "已复制 ✓",
+      skipToContent: "跳转到正文",
+    },
+
+    nav: {
+      how: "工作原理",
+      features: "功能特性",
+      console: "控制台",
+      quickstart: "快速开始",
+      changelog: "更新日志",
+      githubShort: "GitHub →",
+    },
+
+    hero: {
+      badge: "v0.1.0 — 公开预览",
+      titleA: "面向所有 AI 流量",
+      titleB: "的",
+      titleHighlight: "安全网关",
+      sub: "ThinkWatch 是企业内所有模型请求与 MCP 工具调用的唯一控制平面。每一次访问都被认证、授权、限流、记录和计费。",
+      ctaPrimary: "30 秒上手",
+      stack: ["Rust + Axum", "2 MB Distroless", "OpenAI · Anthropic · Gemini · Bedrock", "BSL 1.1"],
+    },
+
+    compatible: {
+      label: "原生兼容",
+    },
+
+    problem: {
+      eyebrow: "当下的困境",
+      title: "AI 无处不在，治理却",
+      titleHighlight: "无人问津",
+      sub: "随着 AI Agent 在工程团队中爆发，组织面临日益严峻的治理挑战，每个季度都更糟糕。",
+      pains: [
+        { icon: "🔑", title: "密钥四散", body: "硬编码在 .env、在 Slack 里互传、从未轮换。一把泄露的密钥能在一夜之间烧光当月预算。" },
+        { icon: "👁", title: "毫无可见性", body: "谁用了哪个模型？消耗多少 token？归到哪个项目？账单到了才知道。" },
+        { icon: "🛡", title: "无访问控制", body: "每位工程师都能直连任意模型和任意 MCP 工具，根本谈不上最小权限。" },
+        { icon: "📜", title: "合规盲区", body: "AI 辅助代码生成和数据访问没有任何审计轨迹，法务和安全团队连最基本的问题都答不上来。" },
+        { icon: "💸", title: "成本爆雷", body: "每月 AI 账单没人能解释、没人能归因。预算超支几周之后才被发现。" },
+      ],
+      footer: ["ThinkWatch 用", "一次部署", "解决所有这些问题。"],
+    },
+
+    how: {
+      eyebrow: "工作原理",
+      title: "所有 AI 请求都流经",
+      titleHighlight: "同一道网关",
+      sub: "OpenAI 和 Anthropic SDK 的零侵入替代品。你的 Agent 完全不需要改代码，只要把 base URL 指向 ThinkWatch。",
+      callersLabel: "调用方",
+      upstreamsLabel: "上游模型",
+      gatewayPort: "网关 :3000",
+      gatewayName: "ThinkWatch",
+      gatewayTagline: "AI API + MCP 统一代理",
+      pipelineLabel: "请求生命周期内部",
+      pipeline: [
+        { step: "01", label: "身份认证", body: "虚拟 `tw-` API 密钥校验到 PostgreSQL，限定到用户/团队/项目级别。" },
+        { step: "02", label: "权限授权", body: "5 级 RBAC 根据调用方角色检查模型与工具的访问权限。" },
+        { step: "03", label: "限流", body: "Redis 实现的滑动窗口 RPM/TPM 限制，可按密钥或按用户。" },
+        { step: "04", label: "路由与转换", body: "选择 Provider 并自动转换请求格式（Anthropic ⇄ OpenAI ⇄ Bedrock ⇄ Gemini）。" },
+        { step: "05", label: "流式转发与计量", body: "SSE 零开销转发，token 实时计数。" },
+        { step: "06", label: "审计", body: "每次调用写入 ClickHouse，可选转发到你的 SIEM。" },
+      ],
+    },
+
+    features: {
+      eyebrow: "功能特性",
+      title: "网关、MCP 代理、RBAC、分析 —— ",
+      titleHighlight: "全在一个二进制里",
+      sub: "ThinkWatch 是一个 Rust 二进制，依赖 PostgreSQL、Redis、ClickHouse。没有微服务大杂烩，没有粘合代码 —— 所有职责都在同一个控制平面里处理。",
+    },
+
+    live: {
+      eyebrow: "管理控制台",
+      title: "每一个 token、每一把密钥、",
+      titleHighlight: "每一次调用",
+      sub: "对组织内每一个 AI 请求的实时可观测性。下面这些面板是真正的 React 组件 —— 不是截图 —— 用模拟数据渲染，让你直观感受控制台。",
+      overview: "总览 · 当月",
+      logs: "统一日志检索",
+      health: "上游健康",
+      rate: "滑动窗口限流",
+    },
+
+    quickstart: {
+      eyebrow: "快速开始",
+      title: "",
+      titleHighlight: "一分钟内",
+      sub: "用 Docker Compose 单节点自托管，或用 Helm Chart 上生产 Kubernetes。无论哪种方式，4 条命令就能跑起来。",
+      pointAt: "然后把客户端指向网关",
+      footer: "无需修改任何代码 —— 只需替换 base URL 并使用虚拟 ",
+      footerSuffix: " 密钥。",
+      steps: [
+        { title: "启动基础设施", body: "通过 Docker Compose 拉起 PostgreSQL、Redis、ClickHouse。" },
+        { title: "启动网关", body: "两个端口同时启动：3000（网关）与 3001（控制台 API）。" },
+        { title: "启动控制台 UI", body: "Vite 开发服务器跑在 :5173，支持热重载。" },
+        { title: "运行初始化向导", body: "创建超级管理员账号并添加第一个 Provider。" },
+      ],
+    },
+
+    license: {
+      eyebrow: "授权",
+      title: "源码开放。",
+      titleHighlight: "对绝大多数团队免费",
+      sub: "ThinkWatch 采用 Business Source License 1.1。非生产环境永久免费；生产环境在每月慷慨阈值内同样免费 —— 超出才需商业授权。",
+      mostTeams: "适合大多数团队",
+      footnote: ["「计费 Token」和「MCP 工具调用」的定义、阶梯计费模型，以及到 GPL-2.0-or-later 的转换条款，详见 ", "LICENSING.md", "。"],
+      tiers: [
+        {
+          name: "非生产环境",
+          price: "免费",
+          priceNote: "永久",
+          audience: "开发、预发、评估、内部演示。",
+          features: ["Token 不限量", "MCP 工具调用不限量", "全部网关功能", "全部安全功能", "社区支持"],
+          ctaLabel: "立即自托管",
+        },
+        {
+          name: "生产环境 · 免费层",
+          price: "免费",
+          priceNote: "阈值内",
+          audience: "运行生产负载的小团队。",
+          features: ["每月最多 10,000,000 计费 Token", "每月最多 10,000 次 MCP 工具调用", "全部功能包含", "BSL 1.1 授权", "Change Date 后自动转为 GPL-2.0-or-later"],
+          ctaLabel: "阅读授权条款",
+        },
+        {
+          name: "生产环境 · 商业",
+          price: "阶梯",
+          priceNote: "按用量",
+          audience: "超出免费阈值的组织。",
+          features: ["每 UTC 月超过 1000 万 Token 或 1 万次 MCP 调用", "需要商业授权", "按用量阶梯计费", "可选优先支持", "定制部署咨询"],
+          ctaLabel: "联系销售",
+        },
+      ],
+    },
+
+    star: {
+      eyebrow: "社区",
+      title: "见证项目",
+      titleHighlight: "成长",
+      sub: "ThinkWatch 开放开发。Star 仓库以追踪发布动态并共同塑造路线图。",
+      cta: "在 GitHub 上 Star",
+    },
+
+    footer: {
+      tagline: "所有 AI 访问的唯一通行网关。每一次都被认证、授权、限流、记录、计费。",
+      product: "产品",
+      resources: "资源",
+      copyright: "源码可获取，BSL 1.1 授权。",
+      builtWith: "由 Astro 构建 · 部署于 GitHub Pages",
+    },
+  },
+} as const;
+
+export function t(lang: Lang | string | undefined) {
+  const key: Lang = lang === "zh-CN" ? "zh-CN" : "en";
+  return dict[key];
+}
+
+export function getLang(astro: { currentLocale?: string }): Lang {
+  return astro.currentLocale === "zh-CN" ? "zh-CN" : "en";
+}
+
+export function localePath(lang: Lang, path: string): string {
+  const clean = path.startsWith("/") ? path : `/${path}`;
+  if (lang === "en") return clean;
+  return `/zh-CN${clean === "/" ? "" : clean}`;
+}

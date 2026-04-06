@@ -1,0 +1,31 @@
+---
+import { getLang, t } from "~/i18n";
+
+const s = t(getLang(Astro)).compatible;
+
+const items = [
+  "Claude Code",
+  "Cursor",
+  "Continue",
+  "Cline",
+  "OpenAI SDK",
+  "Anthropic SDK",
+  "LangChain",
+  "LlamaIndex",
+];
+---
+
+<section class="py-12 border-t border-white/5" aria-label="Compatible clients and SDKs">
+  <div class="container-page">
+    <p class="text-center text-[10px] uppercase tracking-[0.2em] text-[var(--color-dim)] mb-6">
+      {s.label}
+    </p>
+    <ul class="flex flex-wrap items-center justify-center gap-x-10 gap-y-4 text-[var(--color-muted)]">
+      {items.map((name) => (
+        <li class="text-sm font-medium tracking-tight hover:text-white transition-colors">
+          {name}
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>

@@ -1,16 +1,25 @@
 ---
+import { getLang, t, localePath } from "~/i18n";
+
+const lang = getLang(Astro);
+const s = t(lang);
+
 const links = [
-  { href: "#how", label: "How it works" },
-  { href: "#features", label: "Features" },
-  { href: "#dashboard", label: "Console" },
-  { href: "#quickstart", label: "Quick start" },
-  { href: "/changelog", label: "Changelog" },
+  { href: "#how", label: s.nav.how },
+  { href: "#features", label: s.nav.features },
+  { href: "#dashboard", label: s.nav.console },
+  { href: "#quickstart", label: s.nav.quickstart },
+  { href: localePath(lang, "/changelog"), label: s.nav.changelog },
 ];
+
+const otherLang: "en" | "zh-CN" = lang === "en" ? "zh-CN" : "en";
+const otherLabel = lang === "en" ? "中" : "EN";
+const otherHref = localePath(otherLang, Astro.url.pathname.replace(/^\/zh-CN/, "") || "/");
 ---
 
 <header class="sticky top-0 z-50 backdrop-blur-md bg-[var(--color-bg)]/60 border-b border-white/5">
   <div class="container-page flex items-center justify-between h-16">
-    <a href="/" class="flex items-center gap-2 group">
+    <a href={localePath(lang, "/")} class="flex items-center gap-2 group">
       <span class="relative inline-block w-7 h-7 rounded-md bg-brand-gradient glow" aria-hidden="true"></span>
       <span class="font-semibold tracking-tight text-lg">
         Think<span class="text-gradient">Watch</span>
@@ -25,18 +34,25 @@ const links = [
 
     <div class="flex items-center gap-3">
       <a
+        href={otherHref}
+        class="text-xs font-medium text-[var(--color-muted)] hover:text-white border border-white/10 rounded-md px-2 py-1 transition-colors"
+        aria-label={`Switch to ${otherLabel}`}
+      >
+        {otherLabel}
+      </a>
+      <a
         href="https://github.com/ThinkWatchProject/ThinkWatch"
         target="_blank"
         rel="noopener"
         class="text-sm text-[var(--color-muted)] hover:text-white transition-colors hidden sm:inline"
       >
-        GitHub →
+        {s.nav.githubShort}
       </a>
       <a
         href="#quickstart"
         class="text-sm font-medium px-4 py-2 rounded-lg bg-brand-gradient text-black hover:brightness-110 transition"
       >
-        Get started
+        {s.common.getStarted}
       </a>
     </div>
   </div>

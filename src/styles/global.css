@@ -116,6 +116,19 @@
   }
 }
 
+/* ---------- Shiki host ---------- */
+.shiki-host pre.shiki {
+  background: transparent !important;
+  padding: 1.25rem 1.5rem;
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  line-height: 1.65;
+}
+.shiki-host pre.shiki code {
+  background: transparent;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.001ms !important;

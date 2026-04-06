@@ -1,54 +1,137 @@
 ---
-import CodeTabs from "./CodeTabs.tsx";
+import { codeToHtml } from "shiki";
+import CodeTabs, { type Snippet } from "./CodeTabs.tsx";
+import { getLang, t } from "~/i18n";
 
-const steps = [
+const lang = getLang(Astro);
+const s = t(lang).quickstart;
+
+const rawSnippets: { id: string; label: string; lang: string; code: string }[] = [
   {
-    n: "1",
-    title: "Start infrastructure",
-    body: "Bring up PostgreSQL, Redis, and ClickHouse via Docker Compose.",
-    cmd: "make infra",
+    id: "curl",
+    label: "cURL",
+    lang: "bash",
+    code: `curl https://gateway.your-org.com/v1/chat/completions \\
+  -H "Authorization: Bearer tw-prod-xxxxxxxxxxxxxxxxx" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "model": "gpt-4o",
+    "messages": [{"role": "user", "content": "Hello"}],
+    "stream": true
+  }'`,
   },
   {
-    n: "2",
-    title: "Start the gateway",
-    body: "Both ports come up: 3000 (gateway) and 3001 (console API).",
-    cmd: "cp .env.example .env && make dev-backend",
+    id: "openai",
+    label: "OpenAI SDK",
+    lang: "python",
+    code: `from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://gateway.your-org.com/v1",
+    api_key="tw-prod-xxxxxxxxxxxxxxxxx",
+)
+
+stream = client.chat.completions.create(
+    model="gpt-4o",
+    messages=[{"role": "user", "content": "Hello"}],
+    stream=True,
+)
+for chunk in stream:
+    print(chunk.choices[0].delta.content or "", end="")`,
   },
   {
-    n: "3",
-    title: "Start the console UI",
-    body: "Vite dev server on :5173 with hot reload.",
-    cmd: "cd web && pnpm install && pnpm dev",
+    id: "anthropic",
+    label: "Anthropic SDK",
+    lang: "python",
+    code: `from anthropic import Anthropic
+
+client = Anthropic(
+    base_url="https://gateway.your-org.com",
+    api_key="tw-prod-xxxxxxxxxxxxxxxxx",
+)
+
+with client.messages.stream(
+    model="claude-sonnet-4-5",
+    max_tokens=1024,
+    messages=[{"role": "user", "content": "Hello"}],
+) as stream:
+    for text in stream.text_stream:
+        print(text, end="")`,
   },
   {
-    n: "4",
-    title: "Run the setup wizard",
-    body: "Create the super_admin account and add your first provider.",
-    cmd: "open http://localhost:5173/setup",
+    id: "claude-code",
+    label: "Claude Code",
+    lang: "bash",
+    code: `# ~/.config/claude-code/settings.json
+{
+  "anthropicBaseUrl": "https://gateway.your-org.com",
+  "anthropicApiKey": "tw-prod-xxxxxxxxxxxxxxxxx"
+}
+
+# Or via environment
+export ANTHROPIC_BASE_URL=https://gateway.your-org.com
+export ANTHROPIC_API_KEY=tw-prod-xxxxxxxxxxxxxxxxx`,
+  },
+  {
+    id: "cursor",
+    label: "Cursor",
+    lang: "json",
+    code: `// Cursor → Settings → Models → OpenAI API Key
+{
+  "openai.apiKey": "tw-prod-xxxxxxxxxxxxxxxxx",
+  "openai.baseUrl": "https://gateway.your-org.com/v1"
+}
+
+// Cursor will auto-discover the available models
+// from /v1/models on the gateway.`,
   },
 ];
+
+const snippets: Snippet[] = await Promise.all(
+  rawSnippets.map(async (s) => ({
+    id: s.id,
+    label: s.label,
+    raw: s.code,
+    html: await codeToHtml(s.code, {
+      lang: s.lang,
+      theme: "github-dark-default",
+    }),
+  })),
+);
+
+const stepCmds = [
+  "make infra",
+  "cp .env.example .env && make dev-backend",
+  "cd web && pnpm install && pnpm dev",
+  "open http://localhost:5173/setup",
+];
+const steps = s.steps.map((step, i) => ({
+  n: String(i + 1),
+  title: step.title,
+  body: step.body,
+  cmd: stepCmds[i],
+}));
 ---
 
 <section id="quickstart" class="py-28 border-t border-white/5 relative">
   <div class="container-page relative z-10">
     <div class="max-w-3xl">
       <div class="text-xs uppercase tracking-[0.18em] text-[var(--color-brand-1)] font-medium mb-4">
-        Quick start
+        {s.eyebrow}
       </div>
       <h2 class="text-4xl md:text-5xl font-semibold tracking-tight">
-        Up and running in <span class="text-gradient">under a minute</span>.
+        {s.title}<span class="text-gradient">{s.titleHighlight}</span>.
       </h2>
       <p class="mt-5 text-lg text-[var(--color-muted)] leading-relaxed">
-        Self-host with Docker Compose for a single-node deployment, or use the Helm chart for production Kubernetes. Either way, four commands and you have a working gateway.
+        {s.sub}
       </p>
     </div>
 
     <div class="mt-14 grid lg:grid-cols-[1.1fr_1fr] gap-10 items-start">
-      <!-- Steps -->
       <ol class="space-y-4">
         {steps.map((s) => (
           <li class="rounded-xl border border-white/10 bg-[var(--color-surface)]/60 p-5 flex gap-5">
-            <div class="shrink-0 w-9 h-9 rounded-lg bg-brand-gradient text-black font-mono text-sm font-bold grid place-items-center">
+            <div class="shrink-0 w-9 h-9 rounded-lg bg-brand-gradient text-black font-mono text-sm font-bold grid place-items-center" aria-hidden="true">
               {s.n}
             </div>
             <div class="min-w-0 flex-1">
@@ -62,14 +145,13 @@ const steps = [
         ))}
       </ol>
 
-      <!-- Code tabs -->
       <div class="lg:sticky lg:top-24">
         <div class="text-xs uppercase tracking-[0.18em] text-[var(--color-muted)] mb-3">
-          Then point your client at the gateway
+          {s.pointAt}
         </div>
-        <CodeTabs client:visible />
+        <CodeTabs client:visible snippets={snippets} />
         <p class="mt-4 text-xs text-[var(--color-dim)]">
-          Zero code changes required — just swap the base URL and use a virtual <code class="font-mono text-[var(--color-brand-1)]">tw-</code> key.
+          {s.footer}<code class="font-mono text-[var(--color-brand-1)]">tw-</code>{s.footerSuffix}
         </p>
       </div>
     </div>
