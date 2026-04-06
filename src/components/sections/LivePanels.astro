@@ -29,12 +29,14 @@ const s = t(getLang(Astro)).live;
       <DashboardMock client:visible />
     </div>
 
-    <div class="mt-8 grid gap-6 lg:grid-cols-[1.4fr_1fr]">
-      <div>
+    <div class="mt-8 grid gap-6 lg:grid-cols-[1.4fr_1fr] items-stretch">
+      <div class="flex flex-col">
         <div class="text-xs uppercase tracking-[0.18em] text-[var(--color-muted)] mb-4">
           {s.logs}
         </div>
-        <LogExplorerMock client:visible />
+        <div class="flex-1">
+          <LogExplorerMock client:visible />
+        </div>
       </div>
 
       <div class="flex flex-col gap-6">

@@ -54,7 +54,7 @@ const STATUS_COLOR: Record<Status, string> = {
 export default function LogExplorerMock() {
   const [ref, inView] = useInView<HTMLDivElement>();
   const [rows, setRows] = useState<LogRow[]>(() =>
-    Array.from({ length: 8 }, (_, i) => makeRow(i * 17 + 3)),
+    Array.from({ length: 14 }, (_, i) => makeRow(i * 17 + 3)),
   );
 
   useEffect(() => {
@@ -62,13 +62,13 @@ export default function LogExplorerMock() {
     let seed = Date.now() % 9999;
     const id = setInterval(() => {
       seed += 7;
-      setRows((prev) => [makeRow(seed), ...prev].slice(0, 8));
+      setRows((prev) => [makeRow(seed), ...prev].slice(0, 14));
     }, 1400);
     return () => clearInterval(id);
   }, [inView]);
 
   return (
-    <div ref={ref} className="rounded-2xl border border-white/10 bg-[var(--color-surface)]/80 overflow-hidden backdrop-blur-sm">
+    <div ref={ref} className="rounded-2xl border border-white/10 bg-[var(--color-surface)]/80 overflow-hidden backdrop-blur-sm h-full flex flex-col">
       {/* Top bar */}
       <div className="flex items-center gap-3 px-4 py-3 border-b border-white/10 bg-black/40">
         <div className="flex gap-1.5">
@@ -101,7 +101,7 @@ export default function LogExplorerMock() {
       </div>
 
       {/* Rows */}
-      <ul className="font-mono text-xs" aria-live="polite" aria-label="Live audit log feed">
+      <ul className="font-mono text-xs flex-1" aria-live="polite" aria-label="Live audit log feed">
         {rows.map((r, i) => (
           <li
             key={r.id}
