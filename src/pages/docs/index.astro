@@ -1,0 +1,37 @@
+---
+import DocsLayout from "~/layouts/DocsLayout.astro";
+import { getDocsForLocale } from "~/content/docs/_meta";
+
+const docs = getDocsForLocale("en");
+---
+
+<DocsLayout
+  title="Documentation · ThinkWatch"
+  description="System architecture, deployment, configuration, API reference, and security model for ThinkWatch."
+  current=""
+>
+  <h1>Documentation</h1>
+  <p>
+    Everything you need to deploy, configure, and operate ThinkWatch in production.
+    Pick a topic from the sidebar, or browse the cards below.
+  </p>
+
+  <div class="not-prose mt-10 grid gap-4 sm:grid-cols-2">
+    {docs.map((d) => (
+      <a
+        href={`/docs/${d.slug}`}
+        class="block rounded-xl border border-white/10 bg-[var(--color-surface)]/60 p-5 hover:border-white/25 hover:bg-[var(--color-surface)]/80 transition-colors"
+      >
+        <div class="font-semibold tracking-tight text-white mb-1.5">{d.label.en}</div>
+        <p class="text-sm text-[var(--color-muted)] leading-relaxed">{d.summary?.en}</p>
+      </a>
+    ))}
+  </div>
+
+  <h2>Looking for something else?</h2>
+  <ul>
+    <li><a href="https://github.com/ThinkWatchProject/ThinkWatch">GitHub repository</a> — source, issues, releases</li>
+    <li><a href="/changelog">Changelog</a> — every shipped version</li>
+    <li><a href="https://github.com/ThinkWatchProject/ThinkWatch/blob/main/LICENSING.md">LICENSING.md</a> — production thresholds and commercial tiers</li>
+  </ul>
+</DocsLayout>

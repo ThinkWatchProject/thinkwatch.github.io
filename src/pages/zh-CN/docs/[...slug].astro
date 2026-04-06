@@ -1,0 +1,29 @@
+---
+import { getCollection, render } from "astro:content";
+import DocsLayout from "~/layouts/DocsLayout.astro";
+import { findDoc } from "~/content/docs/_meta";
+
+export async function getStaticPaths() {
+  const all = await getCollection("docs");
+  // Astro lowercases the locale segment in glob ids; match case-insensitively.
+  const entries = all.filter((e) => e.id.toLowerCase().startsWith("zh-cn/"));
+  return entries.map((entry) => {
+    const slug = entry.id.replace(/^zh-CN\//i, "").replace(/\.md$/, "");
+    return {
+      params: { slug },
+      props: { entry, slug },
+    };
+  });
+}
+
+const { entry, slug } = Astro.props;
+const meta = findDoc(slug);
+const { Content } = await render(entry);
+
+const title = meta ? `${meta.label["zh-CN"]} · ThinkWatch 文档` : "ThinkWatch 文档";
+const description = meta?.summary?.["zh-CN"];
+---
+
+<DocsLayout title={title} description={description} current={slug}>
+  <Content />
+</DocsLayout>
