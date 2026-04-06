@@ -4,6 +4,10 @@ import { getLang, t, localePath } from "~/i18n";
 const lang = getLang(Astro);
 const s = t(lang);
 const year = new Date().getFullYear();
+
+const homePath = localePath(lang, "/");
+const isHome = Astro.url.pathname === homePath || Astro.url.pathname === homePath + "index.html";
+const homeAnchor = (hash: string) => (isHome ? hash : `${homePath}${hash}`);
 ---
 
 <footer class="border-t border-white/5 mt-32">
@@ -28,9 +32,9 @@ const year = new Date().getFullYear();
     <div>
       <div class="text-white/80 font-medium mb-3">{s.footer.product}</div>
       <ul class="space-y-2 text-[var(--color-muted)]">
-        <li><a href="#features" class="hover:text-white">{s.nav.features}</a></li>
-        <li><a href="#how" class="hover:text-white">{s.nav.how}</a></li>
-        <li><a href="#quickstart" class="hover:text-white">{s.nav.quickstart}</a></li>
+        <li><a href={homeAnchor("#features")} class="hover:text-white">{s.nav.features}</a></li>
+        <li><a href={homeAnchor("#how")} class="hover:text-white">{s.nav.how}</a></li>
+        <li><a href={homeAnchor("#quickstart")} class="hover:text-white">{s.nav.quickstart}</a></li>
         <li><a href={localePath(lang, "/docs")} class="hover:text-white">{s.nav.docs}</a></li>
         <li><a href={localePath(lang, "/changelog")} class="hover:text-white">{s.nav.changelog}</a></li>
       </ul>
