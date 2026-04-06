@@ -24,6 +24,7 @@ const year = new Date().getFullYear();
         <li><a href="#features" class="hover:text-white">{s.nav.features}</a></li>
         <li><a href="#how" class="hover:text-white">{s.nav.how}</a></li>
         <li><a href="#quickstart" class="hover:text-white">{s.nav.quickstart}</a></li>
+        <li><a href={localePath(lang, "/docs")} class="hover:text-white">{s.nav.docs}</a></li>
         <li><a href={localePath(lang, "/changelog")} class="hover:text-white">{s.nav.changelog}</a></li>
       </ul>
     </div>
@@ -32,7 +33,6 @@ const year = new Date().getFullYear();
       <div class="text-white/80 font-medium mb-3">{s.footer.resources}</div>
       <ul class="space-y-2 text-[var(--color-muted)]">
         <li><a href="https://github.com/ThinkWatchProject/ThinkWatch" class="hover:text-white">GitHub</a></li>
-        <li><a href="https://github.com/ThinkWatchProject/ThinkWatch/tree/main/docs" class="hover:text-white">Documentation</a></li>
         <li><a href="https://github.com/ThinkWatchProject/ThinkWatch/blob/main/LICENSE" class="hover:text-white">LICENSE (BSL 1.1)</a></li>
         <li><a href="https://github.com/ThinkWatchProject/ThinkWatch/blob/main/LICENSING.md" class="hover:text-white">Production thresholds</a></li>
         <li><a href="/changelog.xml" class="hover:text-white">RSS</a></li>

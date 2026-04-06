@@ -12,4 +12,11 @@ const changelog = defineCollection({
   }),
 });
 
-export const collections = { changelog };
+// Docs imported from /Users/faz/Dev/ThinkWatch/docs.
+// They have no frontmatter; the schema allows an empty object.
+const docs = defineCollection({
+  loader: glob({ pattern: "**/*.md", base: "./src/content/docs" }),
+  schema: z.object({}).passthrough(),
+});
+
+export const collections = { changelog, docs };

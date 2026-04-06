@@ -3,6 +3,8 @@ import { defineConfig } from 'astro/config';
 import react from '@astrojs/react';
 import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
+import rehypeSlug from 'rehype-slug';
+import rehypeAutolinkHeadings from 'rehype-autolink-headings';
 
 // https://astro.build/config
 export default defineConfig({
@@ -15,6 +17,29 @@ export default defineConfig({
     },
   },
   integrations: [react(), sitemap({ i18n: { defaultLocale: 'en', locales: { en: 'en', 'zh-CN': 'zh-CN' } } })],
+  markdown: {
+    shikiConfig: {
+      theme: 'github-dark-default',
+      wrap: false,
+    },
+    rehypePlugins: [
+      rehypeSlug,
+      [
+        rehypeAutolinkHeadings,
+        {
+          behavior: 'append',
+          properties: {
+            className: ['heading-anchor'],
+            ariaLabel: 'Link to this section',
+          },
+          content: {
+            type: 'text',
+            value: '#',
+          },
+        },
+      ],
+    ],
+  },
   vite: {
     plugins: [tailwindcss()],
   },

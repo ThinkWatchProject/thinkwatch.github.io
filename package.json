@@ -30,6 +30,8 @@
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "@types/three": "^0.183.1",
+    "rehype-autolink-headings": "^7.1.0",
+    "rehype-slug": "^6.0.0",
     "sharp": "^0.34.5",
     "shiki": "^4.0.2",
     "typescript": "^5.7.0"

@@ -1,6 +1,7 @@
 ---
 import { getLang, t, localePath, type Lang } from "~/i18n";
 import { getStarCount, formatStars } from "~/lib/github";
+import { findDoc } from "~/content/docs/_meta";
 
 const lang = getLang(Astro);
 const s = t(lang);
@@ -11,11 +12,24 @@ const links = [
   { href: "#how", label: s.nav.how },
   { href: "#features", label: s.nav.features },
   { href: "#dashboard", label: s.nav.console },
-  { href: "#quickstart", label: s.nav.quickstart },
+  { href: localePath(lang, "/docs"), label: s.nav.docs },
   { href: localePath(lang, "/changelog"), label: s.nav.changelog },
 ];
 
 const cleanPath = Astro.url.pathname.replace(/^\/zh-CN/, "") || "/";
+
+// Handle docs language switching: if current page is a doc that's missing
+// in the target locale, fall back to the docs index instead of 404.
+const docMatch = cleanPath.match(/^\/docs\/([^\/]+)\/?$/);
+const currentDocSlug = docMatch ? docMatch[1] : null;
+const currentDocMeta = currentDocSlug ? findDoc(currentDocSlug) : undefined;
+
+function targetPath(target: Lang): string {
+  if (currentDocMeta && !currentDocMeta.locales.includes(target)) {
+    return "/docs";
+  }
+  return cleanPath;
+}
 
 const langOptions: { code: Lang; label: string; native: string }[] = [
   { code: "en", label: "English", native: "EN" },
@@ -57,7 +71,7 @@ const currentLangOption = langOptions.find((l) => l.code === lang)!;
         </summary>
         <div class="absolute right-0 mt-2 w-44 rounded-lg border border-white/10 bg-[var(--color-surface)] shadow-2xl shadow-black/40 backdrop-blur-lg overflow-hidden z-50">
           {langOptions.map((opt) => {
-            const href = localePath(opt.code, cleanPath);
+            const href = localePath(opt.code, targetPath(opt.code));
             const isActive = opt.code === lang;
             return (
               <a

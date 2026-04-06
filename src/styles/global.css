@@ -116,6 +116,151 @@
   }
 }
 
+/* ---------- Markdown prose (docs) ---------- */
+.prose-tw {
+  color: var(--color-text);
+  font-size: 0.95rem;
+  line-height: 1.75;
+  max-width: 72ch;
+}
+.prose-tw > * + * { margin-top: 1.1em; }
+
+.prose-tw h1,
+.prose-tw h2,
+.prose-tw h3,
+.prose-tw h4 {
+  color: #fff;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  scroll-margin-top: 5rem;
+  position: relative;
+}
+.prose-tw h1 { font-size: 2.25rem; line-height: 1.15; margin-top: 0; margin-bottom: 0.5em; letter-spacing: -0.025em; }
+.prose-tw h2 { font-size: 1.6rem;  line-height: 1.25; margin-top: 2.4em; margin-bottom: 0.6em; padding-top: 1.4em; border-top: 1px solid rgba(255,255,255,0.06); }
+.prose-tw h3 { font-size: 1.2rem;  line-height: 1.35; margin-top: 1.9em; margin-bottom: 0.5em; }
+.prose-tw h4 { font-size: 1.0rem;  line-height: 1.4;  margin-top: 1.6em; margin-bottom: 0.4em; color: #e5e7eb; }
+
+.prose-tw p,
+.prose-tw ul,
+.prose-tw ol,
+.prose-tw blockquote {
+  color: #cbd5e1;
+}
+.prose-tw a {
+  color: var(--color-brand-1);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in oklab, var(--color-brand-1) 35%, transparent);
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+  transition: color 150ms, text-decoration-color 150ms;
+}
+.prose-tw a:hover {
+  color: #fff;
+  text-decoration-color: #fff;
+}
+
+.prose-tw strong { color: #fff; font-weight: 600; }
+.prose-tw em { color: #e5e7eb; }
+
+.prose-tw ul,
+.prose-tw ol { padding-left: 1.4em; }
+.prose-tw ul { list-style: disc; }
+.prose-tw ol { list-style: decimal; }
+.prose-tw li { margin-top: 0.4em; }
+.prose-tw li::marker { color: var(--color-brand-2); }
+
+.prose-tw blockquote {
+  border-left: 2px solid var(--color-brand-2);
+  padding: 0.25em 0 0.25em 1em;
+  background: color-mix(in oklab, var(--color-brand-2) 5%, transparent);
+  border-radius: 0 8px 8px 0;
+  font-style: italic;
+}
+.prose-tw blockquote p { color: #e5e7eb; }
+
+.prose-tw hr {
+  border: 0;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  margin: 2.5em 0;
+}
+
+/* Inline code */
+.prose-tw :not(pre) > code {
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  color: var(--color-brand-1);
+  background: rgba(34, 211, 238, 0.08);
+  border: 1px solid rgba(34, 211, 238, 0.18);
+  padding: 0.1em 0.4em;
+  border-radius: 4px;
+}
+
+/* Code blocks (Shiki output) */
+.prose-tw pre.shiki,
+.prose-tw pre.astro-code {
+  background: #0d0d14 !important;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  padding: 1.1rem 1.25rem;
+  font-size: 0.81rem;
+  line-height: 1.65;
+  overflow-x: auto;
+  font-family: var(--font-mono);
+}
+.prose-tw pre.shiki code,
+.prose-tw pre.astro-code code {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  color: inherit;
+  font-size: inherit;
+}
+
+/* Tables */
+.prose-tw table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  margin: 1.5em 0;
+}
+.prose-tw thead { background: rgba(255,255,255,0.03); }
+.prose-tw th {
+  text-align: left;
+  font-weight: 600;
+  color: #fff;
+  padding: 0.7em 1em;
+  border-bottom: 1px solid rgba(255,255,255,0.12);
+}
+.prose-tw td {
+  padding: 0.6em 1em;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  color: #cbd5e1;
+}
+.prose-tw tr:hover td { background: rgba(255,255,255,0.02); }
+
+/* Heading anchor link (rehype-autolink-headings) */
+.prose-tw .heading-anchor {
+  margin-left: 0.5em;
+  color: var(--color-dim);
+  text-decoration: none;
+  opacity: 0;
+  transition: opacity 150ms, color 150ms;
+  font-weight: 400;
+}
+.prose-tw h1:hover .heading-anchor,
+.prose-tw h2:hover .heading-anchor,
+.prose-tw h3:hover .heading-anchor,
+.prose-tw h4:hover .heading-anchor { opacity: 1; }
+.prose-tw .heading-anchor:hover { color: var(--color-brand-1); }
+
+/* Images */
+.prose-tw img {
+  max-width: 100%;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.08);
+  margin: 1.5em 0;
+}
+
 /* ---------- Shiki host ---------- */
 .shiki-host pre.shiki {
   background: transparent !important;

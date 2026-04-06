@@ -1,0 +1,36 @@
+---
+import DocsLayout from "~/layouts/DocsLayout.astro";
+import { getDocsForLocale } from "~/content/docs/_meta";
+
+const docs = getDocsForLocale("zh-CN");
+---
+
+<DocsLayout
+  title="文档 · ThinkWatch"
+  description="ThinkWatch 的架构、部署、配置、API 参考与安全模型。"
+  current=""
+>
+  <h1>文档</h1>
+  <p>
+    在生产环境中部署、配置与运维 ThinkWatch 所需的全部资料。从侧边栏挑一个主题，或浏览下方卡片。
+  </p>
+
+  <div class="not-prose mt-10 grid gap-4 sm:grid-cols-2">
+    {docs.map((d) => (
+      <a
+        href={`/zh-CN/docs/${d.slug}`}
+        class="block rounded-xl border border-white/10 bg-[var(--color-surface)]/60 p-5 hover:border-white/25 hover:bg-[var(--color-surface)]/80 transition-colors"
+      >
+        <div class="font-semibold tracking-tight text-white mb-1.5">{d.label["zh-CN"]}</div>
+        <p class="text-sm text-[var(--color-muted)] leading-relaxed">{d.summary?.["zh-CN"]}</p>
+      </a>
+    ))}
+  </div>
+
+  <h2>还需要什么？</h2>
+  <ul>
+    <li><a href="https://github.com/ThinkWatchProject/ThinkWatch">GitHub 仓库</a> —— 源码、Issues、Release</li>
+    <li><a href="/zh-CN/changelog">更新日志</a> —— 每一个发布版本</li>
+    <li><a href="https://github.com/ThinkWatchProject/ThinkWatch/blob/main/LICENSING.md">LICENSING.md</a> —— 生产环境阈值与商业授权</li>
+  </ul>
+</DocsLayout>
