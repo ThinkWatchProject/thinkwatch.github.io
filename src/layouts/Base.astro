@@ -53,6 +53,35 @@ const jsonLd = {
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="generator" content={Astro.generator} />
 
+    <!--
+      Auto-redirect to the user's preferred locale.
+      Runs synchronously before paint so there's no flash.
+      Manual choice (set by the language dropdown) always wins.
+    -->
+    <script is:inline>
+      (function () {
+        try {
+          var path = location.pathname;
+          var isZh = path === "/zh-CN" || path.indexOf("/zh-CN/") === 0;
+          var stored = localStorage.getItem("tw-lang-pref");
+          var want;
+          if (stored === "en" || stored === "zh-CN") {
+            want = stored;
+          } else {
+            var l = (navigator.language || "en").toLowerCase();
+            want = l.indexOf("zh") === 0 ? "zh-CN" : "en";
+          }
+          if (want === "zh-CN" && !isZh) {
+            location.replace("/zh-CN" + (path === "/" ? "" : path) + location.search + location.hash);
+          } else if (want === "en" && isZh) {
+            var stripped = path.replace(/^\/zh-CN/, "") || "/";
+            location.replace(stripped + location.search + location.hash);
+          }
+        } catch (e) {}
+      })();
+    </script>
+
+
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />

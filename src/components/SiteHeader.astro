@@ -63,6 +63,7 @@ const currentLangOption = langOptions.find((l) => l.code === lang)!;
               <a
                 href={href}
                 hreflang={opt.code}
+                data-lang-choice={opt.code}
                 class:list={[
                   "flex items-center justify-between gap-3 px-3.5 py-2.5 text-sm transition-colors",
                   isActive
@@ -116,6 +117,15 @@ const currentLangOption = langOptions.find((l) => l.code === lang)!;
   document.querySelectorAll<HTMLDetailsElement>("details.lang-menu").forEach((d) => {
     document.addEventListener("click", (e) => {
       if (!d.contains(e.target as Node)) d.open = false;
+    });
+  });
+
+  // Persist the manual language choice so the auto-detect respects it.
+  document.querySelectorAll<HTMLAnchorElement>("[data-lang-choice]").forEach((a) => {
+    a.addEventListener("click", () => {
+      try {
+        localStorage.setItem("tw-lang-pref", a.dataset.langChoice || "en");
+      } catch {}
     });
   });
 </script>
