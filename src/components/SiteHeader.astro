@@ -40,10 +40,17 @@ const currentLangOption = langOptions.find((l) => l.code === lang)!;
 
 <header class="sticky top-0 z-50 backdrop-blur-md bg-[var(--color-bg)]/60 border-b border-white/5">
   <div class="container-page flex items-center justify-between h-16">
-    <a href={localePath(lang, "/")} class="flex items-center gap-2 group">
-      <span class="relative inline-block w-7 h-7 rounded-md bg-brand-gradient glow" aria-hidden="true"></span>
-      <span class="font-semibold tracking-tight text-lg">
-        Think<span class="text-gradient">Watch</span>
+    <a href={localePath(lang, "/")} class="flex items-center gap-2.5 group">
+      <svg class="w-8 h-8 shrink-0" viewBox="0 0 200 200" fill="none" aria-hidden="true">
+        <rect width="200" height="200" rx="40" fill="#1E2A4A"/>
+        <rect x="32" y="32" width="136" height="136" rx="28" fill="none" stroke="#3DDBD9" stroke-width="10"/>
+        <line x1="62" y1="68" x2="138" y2="68" stroke="#3DDBD9" stroke-width="12" stroke-linecap="round"/>
+        <line x1="100" y1="68" x2="100" y2="104" stroke="#3DDBD9" stroke-width="12" stroke-linecap="round"/>
+        <polyline points="62,104 80,140 100,104" fill="none" stroke="#3DDBD9" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+        <polyline points="100,104 120,140 138,104" fill="none" stroke="#3DDBD9" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span class="text-lg tracking-tight text-white">
+        <span class="font-medium">Think</span><span class="font-bold">Watch</span>
       </span>
     </a>
 
