@@ -1,0 +1,26 @@
+---
+import Base from "~/layouts/Base.astro";
+import SiteHeader from "~/components/SiteHeader.astro";
+import SiteFooter from "~/components/SiteFooter.astro";
+import Hero from "~/components/sections/Hero.astro";
+import Problem from "~/components/sections/Problem.astro";
+import HowItWorks from "~/components/sections/HowItWorks.astro";
+import FeaturesSection from "~/components/sections/FeaturesSection.astro";
+import LivePanels from "~/components/sections/LivePanels.astro";
+import QuickStart from "~/components/sections/QuickStart.astro";
+import License from "~/components/sections/License.astro";
+---
+
+<Base>
+  <SiteHeader />
+  <main>
+    <Hero />
+    <Problem />
+    <HowItWorks />
+    <FeaturesSection />
+    <LivePanels />
+    <QuickStart />
+    <License />
+  </main>
+  <SiteFooter />
+</Base>

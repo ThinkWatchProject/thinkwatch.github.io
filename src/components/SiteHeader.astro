@@ -1,0 +1,43 @@
+---
+const links = [
+  { href: "#how", label: "How it works" },
+  { href: "#features", label: "Features" },
+  { href: "#dashboard", label: "Console" },
+  { href: "#quickstart", label: "Quick start" },
+  { href: "/changelog", label: "Changelog" },
+];
+---
+
+<header class="sticky top-0 z-50 backdrop-blur-md bg-[var(--color-bg)]/60 border-b border-white/5">
+  <div class="container-page flex items-center justify-between h-16">
+    <a href="/" class="flex items-center gap-2 group">
+      <span class="relative inline-block w-7 h-7 rounded-md bg-brand-gradient glow"></span>
+      <span class="font-semibold tracking-tight text-lg">
+        Think<span class="text-gradient">Watch</span>
+      </span>
+    </a>
+
+    <nav class="hidden md:flex items-center gap-8 text-sm text-[var(--color-muted)]">
+      {links.map((l) => (
+        <a href={l.href} class="hover:text-white transition-colors">{l.label}</a>
+      ))}
+    </nav>
+
+    <div class="flex items-center gap-3">
+      <a
+        href="https://github.com/ThinkWatchProject/ThinkWatch"
+        target="_blank"
+        rel="noopener"
+        class="text-sm text-[var(--color-muted)] hover:text-white transition-colors hidden sm:inline"
+      >
+        GitHub →
+      </a>
+      <a
+        href="#quickstart"
+        class="text-sm font-medium px-4 py-2 rounded-lg bg-brand-gradient text-black hover:brightness-110 transition"
+      >
+        Get started
+      </a>
+    </div>
+  </div>
+</header>

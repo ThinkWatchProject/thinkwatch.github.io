@@ -1,0 +1,69 @@
+---
+import TiltCard from "../ui/TiltCard.tsx";
+
+const pains = [
+  {
+    icon: "🔑",
+    title: "Keys scattered everywhere",
+    body: "Hardcoded in .env files, shared in Slack, rotated never. One leaked key drains your monthly budget overnight.",
+  },
+  {
+    icon: "👁",
+    title: "Zero visibility",
+    body: "Who used which model? How many tokens? Against which project? Nobody knows until the bill arrives.",
+  },
+  {
+    icon: "🛡",
+    title: "No access control",
+    body: "Every developer has direct access to every model and every MCP tool. There is no least-privilege story.",
+  },
+  {
+    icon: "📜",
+    title: "Compliance gaps",
+    body: "No audit trail for AI-assisted code generation or data access. Legal and security cannot answer basic questions.",
+  },
+  {
+    icon: "💸",
+    title: "Cost surprises",
+    body: "Monthly AI bills nobody can explain or attribute. Budget overruns are discovered weeks after the fact.",
+  },
+];
+---
+
+<section id="problem" class="py-28 border-t border-white/5 relative">
+  <div class="container-page relative z-10">
+    <div class="max-w-3xl">
+      <div class="text-xs uppercase tracking-[0.18em] text-[var(--color-accent)] font-medium mb-4">
+        The Problem
+      </div>
+      <h2 class="text-4xl md:text-5xl font-semibold tracking-tight">
+        AI is everywhere. Governance is <span class="text-gradient">nowhere</span>.
+      </h2>
+      <p class="mt-5 text-lg text-[var(--color-muted)] leading-relaxed">
+        As AI agents proliferate across engineering teams, organizations face a growing governance challenge that gets worse every quarter.
+      </p>
+    </div>
+
+    <div class="mt-16 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      {pains.map((p) => (
+        <TiltCard client:visible className="rounded-2xl">
+          <div class="relative rounded-2xl border border-white/10 bg-[var(--color-surface)]/60 p-6 hover:border-white/25 transition-colors overflow-hidden h-full">
+            <div class="text-3xl mb-4 grayscale group-hover:grayscale-0 transition" aria-hidden="true">
+              {p.icon}
+            </div>
+            <h3 class="text-lg font-semibold tracking-tight mb-2">{p.title}</h3>
+            <p class="text-sm text-[var(--color-muted)] leading-relaxed">{p.body}</p>
+
+            <div class="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-pink-400/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+          </div>
+        </TiltCard>
+      ))}
+    </div>
+
+    <div class="mt-12 text-center">
+      <p class="text-[var(--color-muted)]">
+        ThinkWatch solves all of this with a <span class="text-white font-medium">single deployment</span>.
+      </p>
+    </div>
+  </div>
+</section>

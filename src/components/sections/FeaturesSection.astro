@@ -1,0 +1,21 @@
+---
+import Features from "./Features.tsx";
+---
+
+<section id="features" class="py-28 border-t border-white/5 relative">
+  <div class="container-page relative z-10">
+    <div class="max-w-3xl">
+      <div class="text-xs uppercase tracking-[0.18em] text-[var(--color-brand-1)] font-medium mb-4">
+        Features
+      </div>
+      <h2 class="text-4xl md:text-5xl font-semibold tracking-tight">
+        Gateway, MCP proxy, RBAC, analytics — <span class="text-gradient">in one binary</span>.
+      </h2>
+      <p class="mt-5 text-lg text-[var(--color-muted)] leading-relaxed">
+        ThinkWatch is one Rust binary backed by PostgreSQL, Redis, and ClickHouse. No microservice sprawl, no glue code — every concern handled by the same control plane.
+      </p>
+    </div>
+
+    <Features client:visible />
+  </div>
+</section>

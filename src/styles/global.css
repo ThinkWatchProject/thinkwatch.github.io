@@ -1,0 +1,126 @@
+@import "tailwindcss";
+
+/* ---------- Theme tokens ---------- */
+@theme {
+  --color-bg: #0a0a0f;
+  --color-surface: #11111a;
+  --color-surface-2: #161622;
+  --color-border: #232336;
+  --color-border-strong: #2e2e44;
+
+  --color-text: #e5e7eb;
+  --color-muted: #9ca3af;
+  --color-dim: #6b7280;
+
+  --color-brand-1: #22d3ee;   /* cyan-400  */
+  --color-brand-2: #a78bfa;   /* violet-400 */
+  --color-accent:  #f472b6;   /* pink-400  */
+
+  --font-sans: "Geist", "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "Geist Mono", "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+/* ---------- Base ---------- */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    color-scheme: dark;
+  }
+
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    font-feature-settings: "ss01", "cv11";
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background: color-mix(in oklab, var(--color-brand-1) 35%, transparent);
+    color: #fff;
+  }
+
+  /* Subtle grid background */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: -2;
+    background-image:
+      linear-gradient(to right, rgba(255,255,255,0.025) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: 56px 56px;
+    mask-image: radial-gradient(ellipse at center, #000 30%, transparent 80%);
+  }
+
+  /* Aurora glow */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: -1;
+    background:
+      radial-gradient(60rem 40rem at 15% -10%, color-mix(in oklab, var(--color-brand-1) 22%, transparent), transparent 60%),
+      radial-gradient(50rem 35rem at 90% 10%, color-mix(in oklab, var(--color-brand-2) 22%, transparent), transparent 60%),
+      radial-gradient(40rem 30rem at 50% 100%, color-mix(in oklab, var(--color-accent) 12%, transparent), transparent 70%);
+    filter: blur(20px);
+  }
+}
+
+/* ---------- Utilities ---------- */
+@layer utilities {
+  .text-gradient {
+    background: linear-gradient(120deg, #67e8f9 0%, #c4b5fd 50%, #f0abfc 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .bg-brand-gradient {
+    background: linear-gradient(135deg, var(--color-brand-1) 0%, var(--color-brand-2) 100%);
+  }
+
+  .border-gradient {
+    position: relative;
+    isolation: isolate;
+  }
+  .border-gradient::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    padding: 1px;
+    border-radius: inherit;
+    background: linear-gradient(135deg, color-mix(in oklab, var(--color-brand-1) 60%, transparent), color-mix(in oklab, var(--color-brand-2) 60%, transparent));
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+            mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  .glow {
+    box-shadow:
+      0 0 0 1px color-mix(in oklab, var(--color-brand-1) 40%, transparent),
+      0 10px 40px -10px color-mix(in oklab, var(--color-brand-2) 50%, transparent);
+  }
+
+  .container-page {
+    width: 100%;
+    margin-inline: auto;
+    padding-inline: 1.25rem;
+    max-width: 80rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

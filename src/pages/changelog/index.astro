@@ -1,0 +1,80 @@
+---
+import { getCollection, render } from "astro:content";
+import Base from "~/layouts/Base.astro";
+import SiteHeader from "~/components/SiteHeader.astro";
+import SiteFooter from "~/components/SiteFooter.astro";
+
+const entries = (await getCollection("changelog")).sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime(),
+);
+
+const typeStyles: Record<string, string> = {
+  release: "bg-cyan-500/15 text-cyan-300 border-cyan-500/30",
+  feature: "bg-violet-500/15 text-violet-300 border-violet-500/30",
+  fix: "bg-emerald-500/15 text-emerald-300 border-emerald-500/30",
+  security: "bg-pink-500/15 text-pink-300 border-pink-500/30",
+};
+
+const fmt = new Intl.DateTimeFormat("en-US", {
+  year: "numeric",
+  month: "short",
+  day: "numeric",
+});
+---
+
+<Base title="Changelog · ThinkWatch" description="Release notes and updates for ThinkWatch.">
+  <SiteHeader />
+  <main class="container-page py-20">
+    <div class="max-w-3xl">
+      <div class="text-xs uppercase tracking-[0.18em] text-[var(--color-brand-1)] font-medium mb-4">
+        Changelog
+      </div>
+      <h1 class="text-4xl md:text-5xl font-semibold tracking-tight">
+        What's <span class="text-gradient">new</span>
+      </h1>
+      <p class="mt-4 text-[var(--color-muted)] text-lg">
+        Release notes for every shipped version. Subscribe via
+        <a href="/changelog.xml" class="text-white underline underline-offset-4 hover:text-[var(--color-brand-1)]">RSS</a>.
+      </p>
+    </div>
+
+    <ol class="mt-16 space-y-12 max-w-3xl">
+      {entries.map(async (entry) => {
+        const { Content } = await render(entry);
+        return (
+          <li class="relative pl-8 border-l border-white/10">
+            <span class="absolute -left-[5px] top-2 w-2.5 h-2.5 rounded-full bg-brand-gradient ring-4 ring-[var(--color-bg)]"></span>
+
+            <div class="flex flex-wrap items-center gap-3 mb-3">
+              <span class="font-mono text-sm text-white">v{entry.data.version}</span>
+              <span class={`text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full border ${typeStyles[entry.data.type]}`}>
+                {entry.data.type}
+              </span>
+              <time class="text-xs text-[var(--color-dim)]" datetime={entry.data.date.toISOString()}>
+                {fmt.format(entry.data.date)}
+              </time>
+            </div>
+
+            <h2 class="text-2xl font-semibold tracking-tight mb-3">{entry.data.title}</h2>
+
+            {entry.data.highlights && (
+              <ul class="mb-4 space-y-1.5 text-sm text-[var(--color-muted)]">
+                {entry.data.highlights.map((h) => (
+                  <li class="flex gap-2">
+                    <span class="text-[var(--color-brand-1)]">›</span>
+                    <span>{h}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            <div class="prose prose-invert prose-sm max-w-none text-[var(--color-muted)]">
+              <Content />
+            </div>
+          </li>
+        );
+      })}
+    </ol>
+  </main>
+  <SiteFooter />
+</Base>

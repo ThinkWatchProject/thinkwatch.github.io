@@ -1,0 +1,55 @@
+---
+import DashboardMock from "../mocks/DashboardMock.tsx";
+import LogExplorerMock from "../mocks/LogExplorerMock.tsx";
+import ProviderHealthMock from "../mocks/ProviderHealthMock.tsx";
+import RateLimitMock from "../mocks/RateLimitMock.tsx";
+---
+
+<section id="dashboard" class="py-28 border-t border-white/5 relative overflow-hidden">
+  <div class="container-page relative z-10">
+    <div class="max-w-3xl">
+      <div class="text-xs uppercase tracking-[0.18em] text-[var(--color-brand-1)] font-medium mb-4">
+        The Console
+      </div>
+      <h2 class="text-4xl md:text-5xl font-semibold tracking-tight">
+        Every token. Every key. <span class="text-gradient">Every call</span>.
+      </h2>
+      <p class="mt-5 text-lg text-[var(--color-muted)] leading-relaxed">
+        Real-time observability over every AI request flowing through your organization. The panels below are live React components — not screenshots — rendering with mock data so you can see what the console feels like.
+      </p>
+    </div>
+
+    <!-- Dashboard stat row -->
+    <div class="mt-14">
+      <div class="text-xs uppercase tracking-[0.18em] text-[var(--color-muted)] mb-4">
+        Overview · MTD
+      </div>
+      <DashboardMock client:visible />
+    </div>
+
+    <!-- Two-column: Logs + (Health stacked Rate) -->
+    <div class="mt-8 grid gap-6 lg:grid-cols-[1.4fr_1fr]">
+      <div>
+        <div class="text-xs uppercase tracking-[0.18em] text-[var(--color-muted)] mb-4">
+          Unified log explorer
+        </div>
+        <LogExplorerMock client:visible />
+      </div>
+
+      <div class="flex flex-col gap-6">
+        <div>
+          <div class="text-xs uppercase tracking-[0.18em] text-[var(--color-muted)] mb-4">
+            Upstream health
+          </div>
+          <ProviderHealthMock client:visible />
+        </div>
+        <div>
+          <div class="text-xs uppercase tracking-[0.18em] text-[var(--color-muted)] mb-4">
+            Sliding-window rate limit
+          </div>
+          <RateLimitMock client:visible />
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,41 @@
+---
+const year = new Date().getFullYear();
+---
+
+<footer class="border-t border-white/5 mt-32">
+  <div class="container-page py-12 grid gap-10 md:grid-cols-4 text-sm">
+    <div class="md:col-span-2">
+      <div class="flex items-center gap-2 mb-3">
+        <span class="inline-block w-6 h-6 rounded bg-brand-gradient"></span>
+        <span class="font-semibold">ThinkWatch</span>
+      </div>
+      <p class="text-[var(--color-muted)] max-w-sm">
+        The single gateway through which all AI access must flow. Authenticated, authorized, rate-limited, logged, and accounted for.
+      </p>
+    </div>
+
+    <div>
+      <div class="text-white/80 font-medium mb-3">Product</div>
+      <ul class="space-y-2 text-[var(--color-muted)]">
+        <li><a href="#features" class="hover:text-white">Features</a></li>
+        <li><a href="#how" class="hover:text-white">How it works</a></li>
+        <li><a href="#quickstart" class="hover:text-white">Quick start</a></li>
+        <li><a href="/changelog" class="hover:text-white">Changelog</a></li>
+      </ul>
+    </div>
+
+    <div>
+      <div class="text-white/80 font-medium mb-3">Resources</div>
+      <ul class="space-y-2 text-[var(--color-muted)]">
+        <li><a href="https://github.com/ThinkWatchProject/ThinkWatch" class="hover:text-white">GitHub</a></li>
+        <li><a href="https://github.com/ThinkWatchProject/ThinkWatch/tree/main/docs" class="hover:text-white">Documentation</a></li>
+        <li><a href="/changelog.xml" class="hover:text-white">RSS</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="container-page py-6 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-[var(--color-dim)]">
+    <span>© {year} ThinkWatch. Source-available under BSL 1.1.</span>
+    <span>Built with Astro · Deployed on GitHub Pages</span>
+  </div>
+</footer>
