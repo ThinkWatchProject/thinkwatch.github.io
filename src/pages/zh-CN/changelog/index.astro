@@ -23,6 +23,14 @@ const fmt = new Intl.DateTimeFormat("zh-CN", {
   month: "long",
   day: "numeric",
 });
+
+const filterTypes = [
+  { id: "all", label: "全部" },
+  { id: "release", label: "发布" },
+  { id: "feature", label: "新功能" },
+  { id: "fix", label: "修复" },
+  { id: "security", label: "安全" },
+];
 ---
 
 <Base title="更新日志 · ThinkWatch" description="ThinkWatch 的发布说明与更新。">
@@ -42,11 +50,33 @@ const fmt = new Intl.DateTimeFormat("zh-CN", {
       </p>
     </div>
 
-    <ol class="mt-16 space-y-12 max-w-3xl">
+    <div class="mt-12 flex flex-wrap gap-2" role="tablist" aria-label="按类型筛选更新日志">
+      {filterTypes.map((f, i) => (
+        <button
+          type="button"
+          data-filter-btn={f.id}
+          aria-pressed={i === 0 ? "true" : "false"}
+          class:list={[
+            "filter-btn px-3 py-1.5 rounded-full text-xs font-medium border transition-colors",
+            i === 0
+              ? "border-transparent bg-brand-gradient text-black"
+              : "border-white/15 text-[var(--color-muted)] hover:text-white hover:border-white/30",
+          ]}
+        >
+          {f.label}
+        </button>
+      ))}
+    </div>
+
+    <ol class="changelog-list mt-12 space-y-12 max-w-3xl" data-filter="all">
       {entries.map(async (entry) => {
         const { Content } = await render(entry);
         return (
-          <li id={`v${entry.data.version}`} class="relative pl-8 border-l border-white/10 scroll-mt-24">
+          <li
+            id={`v${entry.data.version}`}
+            data-type={entry.data.type}
+            class="changelog-item relative pl-8 border-l border-white/10 scroll-mt-24"
+          >
             <a href={`#v${entry.data.version}`} class="absolute -left-[5px] top-2 w-2.5 h-2.5 rounded-full bg-brand-gradient ring-4 ring-[var(--color-bg)] hover:scale-125 transition-transform" aria-label={`链接到 v${entry.data.version}`}></a>
 
             <div class="flex flex-wrap items-center gap-3 mb-3">
@@ -82,3 +112,34 @@ const fmt = new Intl.DateTimeFormat("zh-CN", {
   </main>
   <SiteFooter />
 </Base>
+
+<style>
+  .changelog-list[data-filter="release"]  .changelog-item:not([data-type="release"]),
+  .changelog-list[data-filter="feature"]  .changelog-item:not([data-type="feature"]),
+  .changelog-list[data-filter="fix"]      .changelog-item:not([data-type="fix"]),
+  .changelog-list[data-filter="security"] .changelog-item:not([data-type="security"]) {
+    display: none;
+  }
+</style>
+
+<script>
+  const list = document.querySelector(".changelog-list");
+  const buttons = document.querySelectorAll<HTMLButtonElement>("[data-filter-btn]");
+  if (list && buttons.length) {
+    buttons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const id = btn.dataset.filterBtn || "all";
+        list.setAttribute("data-filter", id);
+        buttons.forEach((b) => {
+          const active = b === btn;
+          b.setAttribute("aria-pressed", active ? "true" : "false");
+          b.classList.toggle("bg-brand-gradient", active);
+          b.classList.toggle("text-black", active);
+          b.classList.toggle("border-transparent", active);
+          b.classList.toggle("border-white/15", !active);
+          b.classList.toggle("text-[var(--color-muted)]", !active);
+        });
+      });
+    });
+  }
+</script>

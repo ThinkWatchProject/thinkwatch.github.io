@@ -31,13 +31,31 @@ const labels = isZh
       title: ["最新", "发布"],
       sub: "每个发布版本的发布说明。可通过 ",
       subRss: " 订阅。",
+      filterAll: "全部",
+      filterRelease: "发布",
+      filterFeature: "新功能",
+      filterFix: "修复",
+      filterSecurity: "安全",
     }
   : {
       eyebrow: "Changelog",
       title: ["What's", "new"],
       sub: "Release notes for every shipped version. Subscribe via ",
       subRss: ".",
+      filterAll: "All",
+      filterRelease: "Release",
+      filterFeature: "Feature",
+      filterFix: "Fix",
+      filterSecurity: "Security",
     };
+
+const filterTypes = [
+  { id: "all", label: labels.filterAll },
+  { id: "release", label: labels.filterRelease },
+  { id: "feature", label: labels.filterFeature },
+  { id: "fix", label: labels.filterFix },
+  { id: "security", label: labels.filterSecurity },
+];
 ---
 
 <Base
@@ -59,11 +77,33 @@ const labels = isZh
       </p>
     </div>
 
-    <ol class="mt-16 space-y-12 max-w-3xl">
+    <div class="mt-12 flex flex-wrap gap-2" role="tablist" aria-label="Filter changelog by type">
+      {filterTypes.map((f, i) => (
+        <button
+          type="button"
+          data-filter-btn={f.id}
+          aria-pressed={i === 0 ? "true" : "false"}
+          class:list={[
+            "filter-btn px-3 py-1.5 rounded-full text-xs font-medium border transition-colors",
+            i === 0
+              ? "border-transparent bg-brand-gradient text-black"
+              : "border-white/15 text-[var(--color-muted)] hover:text-white hover:border-white/30",
+          ]}
+        >
+          {f.label}
+        </button>
+      ))}
+    </div>
+
+    <ol class="changelog-list mt-12 space-y-12 max-w-3xl" data-filter="all">
       {entries.map(async (entry) => {
         const { Content } = await render(entry);
         return (
-          <li id={`v${entry.data.version}`} class="relative pl-8 border-l border-white/10 scroll-mt-24">
+          <li
+            id={`v${entry.data.version}`}
+            data-type={entry.data.type}
+            class="changelog-item relative pl-8 border-l border-white/10 scroll-mt-24"
+          >
             <a href={`#v${entry.data.version}`} class="absolute -left-[5px] top-2 w-2.5 h-2.5 rounded-full bg-brand-gradient ring-4 ring-[var(--color-bg)] hover:scale-125 transition-transform" aria-label={`Link to v${entry.data.version}`}></a>
 
             <div class="flex flex-wrap items-center gap-3 mb-3">
@@ -99,3 +139,34 @@ const labels = isZh
   </main>
   <SiteFooter />
 </Base>
+
+<style>
+  .changelog-list[data-filter="release"]  .changelog-item:not([data-type="release"]),
+  .changelog-list[data-filter="feature"]  .changelog-item:not([data-type="feature"]),
+  .changelog-list[data-filter="fix"]      .changelog-item:not([data-type="fix"]),
+  .changelog-list[data-filter="security"] .changelog-item:not([data-type="security"]) {
+    display: none;
+  }
+</style>
+
+<script>
+  const list = document.querySelector(".changelog-list");
+  const buttons = document.querySelectorAll<HTMLButtonElement>("[data-filter-btn]");
+  if (list && buttons.length) {
+    buttons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const id = btn.dataset.filterBtn || "all";
+        list.setAttribute("data-filter", id);
+        buttons.forEach((b) => {
+          const active = b === btn;
+          b.setAttribute("aria-pressed", active ? "true" : "false");
+          b.classList.toggle("bg-brand-gradient", active);
+          b.classList.toggle("text-black", active);
+          b.classList.toggle("border-transparent", active);
+          b.classList.toggle("border-white/15", !active);
+          b.classList.toggle("text-[var(--color-muted)]", !active);
+        });
+      });
+    });
+  }
+</script>

@@ -6,10 +6,11 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
-    "prebuild": "node scripts/generate-og.mjs",
+    "prebuild": "node scripts/generate-og.mjs && node scripts/generate-favicons.mjs",
     "build": "astro build",
     "preview": "astro preview",
     "og": "node scripts/generate-og.mjs",
+    "favicons": "node scripts/generate-favicons.mjs",
     "astro": "astro"
   },
   "dependencies": {
