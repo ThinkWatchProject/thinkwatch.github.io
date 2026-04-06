@@ -24,7 +24,7 @@ const fmt = new Intl.DateTimeFormat("en-US", {
 
 <Base title="Changelog · ThinkWatch" description="Release notes and updates for ThinkWatch.">
   <SiteHeader />
-  <main class="container-page py-20">
+  <main id="main" class="container-page py-20">
     <div class="max-w-3xl">
       <div class="text-xs uppercase tracking-[0.18em] text-[var(--color-brand-1)] font-medium mb-4">
         Changelog
@@ -42,8 +42,8 @@ const fmt = new Intl.DateTimeFormat("en-US", {
       {entries.map(async (entry) => {
         const { Content } = await render(entry);
         return (
-          <li class="relative pl-8 border-l border-white/10">
-            <span class="absolute -left-[5px] top-2 w-2.5 h-2.5 rounded-full bg-brand-gradient ring-4 ring-[var(--color-bg)]"></span>
+          <li id={`v${entry.data.version}`} class="relative pl-8 border-l border-white/10 scroll-mt-24">
+            <a href={`#v${entry.data.version}`} class="absolute -left-[5px] top-2 w-2.5 h-2.5 rounded-full bg-brand-gradient ring-4 ring-[var(--color-bg)] hover:scale-125 transition-transform" aria-label={`Link to v${entry.data.version}`}></a>
 
             <div class="flex flex-wrap items-center gap-3 mb-3">
               <span class="font-mono text-sm text-white">v{entry.data.version}</span>

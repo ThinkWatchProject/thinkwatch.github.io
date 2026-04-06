@@ -47,15 +47,19 @@ const pipeline = [
             <div class="flex items-center gap-3 rounded-lg border border-white/10 bg-black/30 px-4 py-3">
               <span class="w-2 h-2 rounded-full" style={`background:${c.color}`}></span>
               <span class="font-mono text-sm">{c.name}</span>
-              <span class="ml-auto text-[10px] text-[var(--color-dim)] font-mono">→</span>
+              <span class="ml-auto text-[10px] text-[var(--color-dim)] font-mono"><span class="hidden lg:inline">→</span><span class="lg:hidden">↓</span></span>
             </div>
           ))}
         </div>
 
         <!-- Gateway box -->
         <div class="relative">
-          <div class="hidden lg:block absolute inset-y-1/2 -left-10 w-10 h-px bg-gradient-to-r from-transparent to-[var(--color-brand-1)]"></div>
-          <div class="hidden lg:block absolute inset-y-1/2 -right-10 w-10 h-px bg-gradient-to-l from-transparent to-[var(--color-brand-2)]"></div>
+          <!-- Desktop horizontal connectors -->
+          <div class="hidden lg:block absolute top-1/2 -left-10 w-10 h-px bg-gradient-to-r from-transparent to-[var(--color-brand-1)]"></div>
+          <div class="hidden lg:block absolute top-1/2 -right-10 w-10 h-px bg-gradient-to-l from-transparent to-[var(--color-brand-2)]"></div>
+          <!-- Mobile vertical connectors -->
+          <div class="lg:hidden absolute left-1/2 -top-6 h-6 w-px bg-gradient-to-b from-transparent to-[var(--color-brand-1)]"></div>
+          <div class="lg:hidden absolute left-1/2 -bottom-6 h-6 w-px bg-gradient-to-t from-transparent to-[var(--color-brand-2)]"></div>
 
           <div class="relative rounded-2xl p-[1.5px] bg-gradient-to-br from-[var(--color-brand-1)] via-[var(--color-brand-2)] to-[var(--color-accent)]">
             <div class="rounded-2xl bg-[var(--color-bg)] p-6 min-w-[220px] text-center">
@@ -78,7 +82,7 @@ const pipeline = [
           <div class="text-[10px] uppercase tracking-[0.18em] text-[var(--color-dim)] mb-3 lg:text-right">Upstreams</div>
           {providers.map((p) => (
             <div class="flex items-center gap-3 rounded-lg border border-white/10 bg-black/30 px-4 py-3">
-              <span class="text-[10px] text-[var(--color-dim)] font-mono">→</span>
+              <span class="text-[10px] text-[var(--color-dim)] font-mono"><span class="hidden lg:inline">→</span><span class="lg:hidden">↓</span></span>
               <span class="font-mono text-sm">{p.name}</span>
               <span class="ml-auto w-2 h-2 rounded-full" style={`background:${p.color}`}></span>
             </div>

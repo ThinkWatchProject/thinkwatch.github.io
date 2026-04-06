@@ -1,15 +1,15 @@
 ---
 import Terminal from "../ui/Terminal.tsx";
 import MagneticButton from "../ui/MagneticButton.tsx";
-import HeroScene from "../hero/HeroScene.tsx";
+import HeroVisual from "../hero/HeroVisual.tsx";
 ---
 
 <section class="relative overflow-hidden pt-24 pb-32 min-h-[88vh]">
-  <HeroScene client:only="react" />
+  <HeroVisual client:load />
   <div class="container-page relative z-10 grid lg:grid-cols-[1.1fr_1fr] gap-12 items-center">
     <div>
       <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/[0.03] text-xs text-[var(--color-muted)] mb-6">
-        <span class="w-1.5 h-1.5 rounded-full bg-[var(--color-brand-1)] animate-pulse"></span>
+        <span class="w-1.5 h-1.5 rounded-full bg-[var(--color-brand-1)] animate-pulse" aria-hidden="true"></span>
         v0.1.0 — now in public preview
       </div>
 

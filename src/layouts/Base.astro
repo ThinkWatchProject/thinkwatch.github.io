@@ -5,15 +5,41 @@ interface Props {
   title?: string;
   description?: string;
   ogImage?: string;
+  /** Suppress the SoftwareApplication JSON-LD on subpages. */
+  noJsonLd?: boolean;
 }
 
 const {
   title = "ThinkWatch — The enterprise-grade secure gateway for AI",
   description = "Secure, audit, and govern every AI API call and MCP tool invocation across your organization — from a single control plane.",
   ogImage = "/og-image.png",
+  noJsonLd = false,
 } = Astro.props;
 
 const canonical = new URL(Astro.url.pathname, Astro.site).toString();
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  name: "ThinkWatch",
+  applicationCategory: "DeveloperApplication",
+  operatingSystem: "Linux, macOS, Windows (via Docker / Kubernetes)",
+  description,
+  url: "https://thinkwat.ch",
+  downloadUrl: "https://github.com/ThinkWatchProject/ThinkWatch",
+  softwareVersion: "0.1.0",
+  license: "https://github.com/ThinkWatchProject/ThinkWatch/blob/main/LICENSE",
+  offers: {
+    "@type": "Offer",
+    price: "0",
+    priceCurrency: "USD",
+  },
+  author: {
+    "@type": "Organization",
+    name: "ThinkWatch Project",
+    url: "https://github.com/ThinkWatchProject",
+  },
+};
 ---
 
 <!doctype html>
@@ -44,8 +70,18 @@ const canonical = new URL(Astro.url.pathname, Astro.site).toString();
     <meta name="twitter:image" content={new URL(ogImage, Astro.site).toString()} />
 
     <meta name="theme-color" content="#0a0a0f" />
+
+    {!noJsonLd && (
+      <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+    )}
   </head>
   <body>
+    <a
+      href="#main"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[100] focus:px-4 focus:py-2 focus:rounded-lg focus:bg-brand-gradient focus:text-black focus:font-medium focus:shadow-xl"
+    >
+      Skip to content
+    </a>
     <slot />
   </body>
 </html>

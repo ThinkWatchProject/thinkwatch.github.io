@@ -87,51 +87,50 @@ export default function LogExplorerMock() {
       </div>
 
       {/* Column headers */}
-      <div className="hidden md:grid grid-cols-[80px_1fr_120px_1fr_80px_60px_70px] gap-3 px-4 py-2 text-[10px] uppercase tracking-wider text-[var(--color-dim)] border-b border-white/5">
-        <div>time</div>
+      <div
+        className="grid gap-3 px-4 py-2 text-[10px] uppercase tracking-wider text-[var(--color-dim)] border-b border-white/5
+          grid-cols-[1fr_auto_56px] sm:grid-cols-[60px_1fr_1fr_56px_60px] lg:grid-cols-[70px_1fr_110px_1fr_70px_50px_56px]"
+      >
+        <div className="hidden sm:block">time</div>
         <div>user</div>
-        <div>key</div>
-        <div>model</div>
-        <div className="text-right">tokens</div>
-        <div className="text-right">ms</div>
+        <div className="hidden lg:block">key</div>
+        <div className="hidden sm:block">model</div>
+        <div className="hidden sm:block text-right">tokens</div>
+        <div className="hidden lg:block text-right">ms</div>
         <div className="text-right">status</div>
       </div>
 
       {/* Rows */}
-      <div className="font-mono text-xs">
+      <ul className="font-mono text-xs" aria-live="polite" aria-label="Live audit log feed">
         {rows.map((r, i) => (
-          <div
+          <li
             key={r.id}
-            className="md:grid hidden grid-cols-[80px_1fr_120px_1fr_80px_60px_70px] gap-3 px-4 py-2.5 border-b border-white/5 hover:bg-white/[0.02] animate-[slideIn_400ms_ease-out]"
-            style={{ opacity: 1 - i * 0.05 }}
+            className="grid gap-3 px-4 py-2.5 border-b border-white/5 hover:bg-white/[0.02] animate-[slideIn_400ms_ease-out]
+              grid-cols-[1fr_auto_56px] sm:grid-cols-[60px_1fr_1fr_56px_60px] lg:grid-cols-[70px_1fr_110px_1fr_70px_50px_56px]"
+            style={{ opacity: 1 - i * 0.04 }}
           >
-            <div className="text-[var(--color-dim)]">{r.ts}</div>
+            <div className="hidden sm:block text-[var(--color-dim)]">{r.ts}</div>
             <div className="text-white truncate">{r.user}</div>
-            <div className="text-[var(--color-brand-1)] truncate">{r.key}</div>
-            <div className="text-[var(--color-brand-2)] truncate">{r.model}</div>
-            <div className="text-right text-[var(--color-text)] tabular-nums">{r.tokens.toLocaleString()}</div>
-            <div className="text-right text-[var(--color-muted)] tabular-nums">{r.ms}</div>
+            <div className="hidden lg:block text-[var(--color-brand-1)] truncate">{r.key}</div>
+            <div className="hidden sm:block text-[var(--color-brand-2)] truncate">{r.model}</div>
+            <div className="hidden sm:block text-right text-[var(--color-text)] tabular-nums">
+              {r.tokens.toLocaleString()}
+            </div>
+            <div className="hidden lg:block text-right text-[var(--color-muted)] tabular-nums">{r.ms}</div>
+
+            {/* Compact: visible only at < sm — collapses model + tokens onto user line */}
+            <div className="sm:hidden text-[10px] text-[var(--color-dim)] truncate">
+              {r.model} · {r.tokens}t
+            </div>
+
             <div className="text-right">
               <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${STATUS_COLOR[r.status]}`}>
                 {r.status}
               </span>
             </div>
-          </div>
+          </li>
         ))}
-
-        {/* Mobile compact view */}
-        {rows.map((r) => (
-          <div key={`m-${r.id}`} className="md:hidden flex items-center justify-between px-4 py-2.5 border-b border-white/5">
-            <div className="min-w-0">
-              <div className="text-white truncate">{r.user}</div>
-              <div className="text-[var(--color-dim)] text-[10px]">{r.model} · {r.tokens}t</div>
-            </div>
-            <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${STATUS_COLOR[r.status]}`}>
-              {r.status}
-            </span>
-          </div>
-        ))}
-      </div>
+      </ul>
 
       <style>{`
         @keyframes slideIn {
