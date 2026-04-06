@@ -77,6 +77,56 @@ const dict = {
       title: "Gateway, MCP proxy, RBAC, analytics — ",
       titleHighlight: "in one binary",
       sub: "ThinkWatch is one Rust binary backed by PostgreSQL, Redis, and ClickHouse. No microservice sprawl, no glue code — every concern handled by the same control plane.",
+      modules: [
+        {
+          id: "ai-gateway",
+          label: "AI API Gateway",
+          tagline: "One port. Every model. Drop-in compatible.",
+          bullets: [
+            { title: "Multi-format proxy", body: "OpenAI Chat Completions, Anthropic Messages, and OpenAI Responses APIs on a single port — drop-in for Cursor, Continue, Cline, Claude Code, and the official SDKs." },
+            { title: "Multi-provider routing", body: "OpenAI, Anthropic, Google Gemini, Azure OpenAI, AWS Bedrock, or any OpenAI-compatible endpoint. Format conversion is automatic." },
+            { title: "Virtual API keys", body: "Issue scoped tw- keys per team, project, or developer. Revoke in one click. Plaintext shown exactly once; SHA-256 hashes at rest." },
+            { title: "Sliding-window rate limits", body: "RPM and TPM enforced via Redis, per key or per user. Circuit breaker (Closed/Open/HalfOpen) and exponential-backoff retries built in." },
+            { title: "Real-time cost tracking", body: "Per-model pricing with budget alerts and team attribution. SSE pass-through with zero-overhead token counting." },
+          ],
+        },
+        {
+          id: "mcp-gateway",
+          label: "MCP Gateway",
+          tagline: "Aggregate every MCP tool behind one endpoint.",
+          bullets: [
+            { title: "Centralized tool proxy", body: "One MCP endpoint that aggregates tools from all upstream servers. No more scattering MCP configs across editors." },
+            { title: "Namespace isolation", body: "github__create_issue, postgres__query — no tool name collisions, ever, even across hundreds of upstream servers." },
+            { title: "Tool-level RBAC", body: "Control exactly which users or roles can invoke which tools. Combine with the 5-tier RBAC model for least-privilege access." },
+            { title: "Connection pooling & health", body: "Automatic reconnection, background health checks, and per-server status surfaced in the console." },
+            { title: "Full audit trail", body: "Every tool invocation logged with caller, parameters, and response — queryable in ClickHouse." },
+          ],
+        },
+        {
+          id: "security",
+          label: "Security & Compliance",
+          tagline: "Defense in depth, by default.",
+          bullets: [
+            { title: "Dual-port architecture", body: "Gateway (:3000, public-facing) and console (:3001, internal-only) on separate ports. Only the gateway should be reachable from the internet." },
+            { title: "5-tier RBAC + SSO/OIDC", body: "Super Admin, Admin, Team Manager, Developer, Viewer. Plug into Zitadel, Okta, Azure AD, or any OIDC provider." },
+            { title: "AES-256-GCM at rest", body: "Provider API keys and secrets encrypted at rest. Virtual API keys stored as SHA-256 hashes; plaintext shown exactly once." },
+            { title: "Hardened HTTP layer", body: "CSP headers, X-Frame-Options, CORS whitelist, request timeouts. Admin sessions bound to client IP — stolen tokens cannot be replayed." },
+            { title: "Distroless containers", body: "2 MB runtime image, no shell, minimal attack surface. JWT entropy enforced at startup; soft-delete with 30-day purge." },
+          ],
+        },
+        {
+          id: "observability",
+          label: "Observability",
+          tagline: "Know exactly what your AI is doing.",
+          bullets: [
+            { title: "Prometheus metrics", body: "GET /metrics on the gateway port: gateway_requests_total, gateway_tokens_total, circuit_breaker_state, and more." },
+            { title: "ClickHouse audit logs", body: "SQL-queryable audit logs across all API calls and tool invocations, stored in ClickHouse for high-performance columnar analytics." },
+            { title: "Multi-channel forwarding", body: "UDP/TCP Syslog (RFC 5424), Kafka, and HTTP webhooks — route audit events to any SIEM, data lake, or alerting pipeline." },
+            { title: "Health & readiness", body: "/health/live, /health/ready (with PG + Redis checks), and /api/health with detailed latency and pool statistics." },
+            { title: "Unified log explorer", body: "Search across audit, gateway, MCP, access, and platform logs from a single page with structured query syntax." },
+          ],
+        },
+      ],
     },
 
     live: {
@@ -231,6 +281,56 @@ const dict = {
       title: "网关、MCP 代理、RBAC、分析 —— ",
       titleHighlight: "全在一个二进制里",
       sub: "ThinkWatch 是一个 Rust 二进制，依赖 PostgreSQL、Redis、ClickHouse。没有微服务大杂烩，没有粘合代码 —— 所有职责都在同一个控制平面里处理。",
+      modules: [
+        {
+          id: "ai-gateway",
+          label: "AI API 网关",
+          tagline: "一个端口，所有模型，零侵入接入。",
+          bullets: [
+            { title: "多格式代理", body: "OpenAI Chat Completions、Anthropic Messages、OpenAI Responses 三种 API 在同一端口提供 —— Cursor、Continue、Cline、Claude Code 以及官方 SDK 都可零修改接入。" },
+            { title: "多 Provider 路由", body: "OpenAI、Anthropic、Google Gemini、Azure OpenAI、AWS Bedrock，或任何 OpenAI 兼容端点，请求格式自动转换。" },
+            { title: "虚拟 API 密钥", body: "按团队、项目或开发者签发限定范围的 tw- 密钥，一键吊销。明文仅展示一次；存储为 SHA-256 哈希。" },
+            { title: "滑动窗口限流", body: "基于 Redis 的 RPM/TPM 限制，可按密钥或按用户。内置三态熔断（Closed/Open/HalfOpen）和指数退避重试。" },
+            { title: "实时成本追踪", body: "按模型计价，含预算告警与团队归因。SSE 零开销转发，token 实时计数。" },
+          ],
+        },
+        {
+          id: "mcp-gateway",
+          label: "MCP 网关",
+          tagline: "把所有 MCP 工具聚合到同一个端点。",
+          bullets: [
+            { title: "集中式工具代理", body: "一个 MCP 端点聚合所有上游服务器的工具，告别在各编辑器之间散落的 MCP 配置。" },
+            { title: "命名空间隔离", body: "github__create_issue、postgres__query —— 跨数百个上游服务器也不会出现工具名冲突。" },
+            { title: "工具级 RBAC", body: "精准控制哪些用户或角色可以调用哪些工具。结合 5 级 RBAC 模型实现最小权限。" },
+            { title: "连接池与健康检查", body: "自动重连、后台健康探活，每个上游服务器的状态在控制台实时可见。" },
+            { title: "全量审计轨迹", body: "每一次工具调用都记录调用方、参数、响应 —— 全部可在 ClickHouse 中 SQL 查询。" },
+          ],
+        },
+        {
+          id: "security",
+          label: "安全与合规",
+          tagline: "默认即纵深防御。",
+          bullets: [
+            { title: "双端口架构", body: "网关（:3000，对外）与控制台（:3001，对内）分离。只有网关应当对公网暴露。" },
+            { title: "5 级 RBAC + SSO/OIDC", body: "Super Admin、Admin、Team Manager、Developer、Viewer 五级角色。可对接 Zitadel、Okta、Azure AD 或任意 OIDC Provider。" },
+            { title: "AES-256-GCM 静态加密", body: "Provider API Key 与机密信息静态加密。虚拟密钥以 SHA-256 哈希存储，明文只展示一次。" },
+            { title: "加固的 HTTP 层", body: "CSP、X-Frame-Options、CORS 白名单、请求超时。管理员会话绑定客户端 IP —— 被盗 token 无法异网重放。" },
+            { title: "Distroless 容器", body: "2 MB 运行时镜像，无 shell，攻击面最小化。启动时强制 JWT 熵校验；软删除 30 天后自动清理。" },
+          ],
+        },
+        {
+          id: "observability",
+          label: "可观测性",
+          tagline: "清楚地知道你的 AI 在做什么。",
+          bullets: [
+            { title: "Prometheus 指标", body: "网关端口的 GET /metrics 暴露 gateway_requests_total、gateway_tokens_total、circuit_breaker_state 等指标。" },
+            { title: "ClickHouse 审计日志", body: "所有 API 调用与工具调用的审计日志可 SQL 查询，存储于 ClickHouse 列式 OLAP 数据库以获得高性能。" },
+            { title: "多通道转发", body: "UDP/TCP Syslog（RFC 5424）、Kafka、HTTP Webhook —— 把审计事件转发到任意 SIEM、数据湖或告警系统。" },
+            { title: "健康与就绪", body: "/health/live、/health/ready（含 PG + Redis 检查）以及 /api/health 提供详细延迟与连接池统计。" },
+            { title: "统一日志检索", body: "在同一页面用结构化查询语法搜索审计、网关、MCP、访问、平台等所有日志。" },
+          ],
+        },
+      ],
     },
 
     live: {

@@ -19,6 +19,6 @@ const s = t(getLang(Astro)).features;
       </p>
     </div>
 
-    <Features client:visible />
+    <Features client:visible modules={s.modules} />
   </div>
 </section>
