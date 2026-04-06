@@ -26,13 +26,15 @@ const chartHref = `https://www.star-history.com/#${repo}&Date`;
       href={chartHref}
       target="_blank"
       rel="noopener"
-      class="mt-12 block rounded-2xl border border-white/10 bg-[var(--color-surface)]/40 p-4 md:p-8 hover:border-white/20 transition-colors"
+      class="mt-12 block max-w-2xl mx-auto rounded-2xl border border-white/10 bg-[var(--color-surface)]/40 p-4 md:p-6 hover:border-white/20 transition-colors"
     >
       <img
         src={chartUrl}
         alt={`Star history chart for ${repo}`}
         loading="lazy"
         decoding="async"
+        width="800"
+        height="533"
         class="w-full h-auto rounded-lg"
       />
     </a>
