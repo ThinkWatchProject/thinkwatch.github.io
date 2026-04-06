@@ -24,7 +24,7 @@ const dict = {
     },
 
     hero: {
-      badge: "v0.1.0 — now in public preview",
+      badge: (v: string) => `v${v} — now in public preview`,
       titleA: "The secure gateway",
       titleB: "for ",
       titleHighlight: "all your AI traffic",
@@ -207,6 +207,15 @@ const dict = {
       copyright: "Source-available under BSL 1.1.",
       builtWith: "Built with Astro · Deployed on GitHub Pages",
     },
+
+    notFound: {
+      title: "404 — Page not found · ThinkWatch",
+      description: "The page you were looking for could not be found.",
+      headline: "This route was not authorized.",
+      sub: "The page you were looking for does not exist — or was rate-limited, audited, and dropped at the gateway.",
+      home: "← Back to home",
+      changelog: "View changelog",
+    },
   },
 
   "zh-CN": {
@@ -229,7 +238,7 @@ const dict = {
     },
 
     hero: {
-      badge: "v0.1.0 — 公开预览",
+      badge: (v: string) => `v${v} — 公开预览`,
       titleA: "面向所有 AI 流量",
       titleB: "的",
       titleHighlight: "安全网关",
@@ -411,6 +420,15 @@ const dict = {
       resources: "资源",
       copyright: "源码可获取，BSL 1.1 授权。",
       builtWith: "由 Astro 构建 · 部署于 GitHub Pages",
+    },
+
+    notFound: {
+      title: "404 — 页面未找到 · ThinkWatch",
+      description: "你访问的页面不存在。",
+      headline: "此路由未被授权。",
+      sub: "你访问的页面不存在 —— 或者它在网关处被限流、审计并丢弃了。",
+      home: "← 返回首页",
+      changelog: "查看更新日志",
     },
   },
 } as const;

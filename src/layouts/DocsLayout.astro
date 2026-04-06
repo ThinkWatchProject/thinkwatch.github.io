@@ -2,31 +2,43 @@
 import Base from "./Base.astro";
 import SiteHeader from "~/components/SiteHeader.astro";
 import SiteFooter from "~/components/SiteFooter.astro";
-import { getDocsForLocale } from "~/content/docs/_meta";
+import { getSidebarForLocale, type DocMeta } from "~/content/docs/_meta";
 import { getLang, localePath } from "~/i18n";
+
+type Heading = { depth: number; slug: string; text: string };
 
 interface Props {
   title: string;
   description?: string;
   /** Slug of the currently displayed doc, e.g. "architecture" */
   current: string;
+  /** Headings extracted from rendered markdown (passed by the route) */
+  headings?: Heading[];
+  /** Previous and next docs in reading order (passed by the route) */
+  prev?: DocMeta;
+  next?: DocMeta;
 }
 
-const { title, description, current } = Astro.props;
+const { title, description, current, headings = [], prev, next } = Astro.props;
 const lang = getLang(Astro);
-const docs = getDocsForLocale(lang);
+const docs = getSidebarForLocale(lang);
 
 const baseHref = localePath(lang, "/docs");
-const headings = isZh => (isZh ? "本节" : "On this page");
 const docsLabel = lang === "zh-CN" ? "文档" : "Documentation";
+const tocLabel = lang === "zh-CN" ? "本页目录" : "On this page";
+const prevLabel = lang === "zh-CN" ? "上一篇" : "Previous";
+const nextLabel = lang === "zh-CN" ? "下一篇" : "Next";
+
+// Only show H2/H3 in the TOC; hide if there's only the (auto-generated) doc title
+const tocHeadings = headings.filter((h) => h.depth === 2 || h.depth === 3);
 ---
 
 <Base title={title} description={description} noJsonLd>
   <SiteHeader />
   <main id="main" class="container-page py-12 lg:py-16">
-    <div class="grid lg:grid-cols-[16rem_1fr] gap-10">
+    <div class="grid lg:grid-cols-[14rem_minmax(0,1fr)_12rem] gap-8 xl:gap-12">
       <!-- Sidebar -->
-      <aside class="lg:sticky lg:top-20 lg:self-start">
+      <aside class="lg:sticky lg:top-20 lg:self-start lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto">
         <div class="text-[10px] uppercase tracking-[0.18em] text-[var(--color-brand-1)] font-medium mb-4">
           {docsLabel}
         </div>
@@ -47,18 +59,24 @@ const docsLabel = lang === "zh-CN" ? "文档" : "Documentation";
             </li>
             {docs.map((d) => {
               const isActive = d.slug === current;
+              const href = d.availableHere ? `${baseHref}/${d.slug}` : `/docs/${d.slug}`;
               return (
                 <li>
                   <a
-                    href={`${baseHref}/${d.slug}`}
+                    href={href}
                     class:list={[
-                      "block px-3 py-2 rounded-md text-sm transition-colors",
+                      "flex items-center justify-between gap-2 px-3 py-2 rounded-md text-sm transition-colors",
                       isActive
                         ? "bg-white/[0.06] text-white border-l-2 border-[var(--color-brand-1)]"
                         : "text-[var(--color-muted)] hover:text-white hover:bg-white/[0.03] border-l-2 border-transparent",
                     ]}
                   >
-                    {d.label[lang]}
+                    <span>{d.label[lang]}</span>
+                    {!d.availableHere && (
+                      <span class="text-[9px] font-mono uppercase tracking-wider px-1.5 py-0.5 rounded bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">
+                        EN
+                      </span>
+                    )}
                   </a>
                 </li>
               );
@@ -82,10 +100,177 @@ const docsLabel = lang === "zh-CN" ? "文档" : "Documentation";
       </aside>
 
       <!-- Article -->
-      <article class="prose-tw min-w-0">
+      <article class="prose-tw min-w-0" data-pagefind-body data-pagefind-meta={`title:${title.split(" · ")[0]}`}>
         <slot />
+
+        {(prev || next) && (
+          <nav class="not-prose mt-16 pt-8 border-t border-white/10 grid sm:grid-cols-2 gap-4" aria-label="Document navigation">
+            {prev ? (
+              <a
+                href={prev.locales.includes(lang) ? `${baseHref}/${prev.slug}` : `/docs/${prev.slug}`}
+                class="group rounded-xl border border-white/10 bg-[var(--color-surface)]/40 p-5 hover:border-white/25 hover:bg-[var(--color-surface)]/70 transition-colors"
+              >
+                <div class="text-[10px] uppercase tracking-[0.18em] text-[var(--color-dim)] mb-1.5">← {prevLabel}</div>
+                <div class="font-semibold tracking-tight text-white group-hover:text-[var(--color-brand-1)] transition-colors">
+                  {prev.label[lang] || prev.label.en}
+                </div>
+              </a>
+            ) : <span />}
+            {next ? (
+              <a
+                href={next.locales.includes(lang) ? `${baseHref}/${next.slug}` : `/docs/${next.slug}`}
+                class="group rounded-xl border border-white/10 bg-[var(--color-surface)]/40 p-5 hover:border-white/25 hover:bg-[var(--color-surface)]/70 transition-colors text-right"
+              >
+                <div class="text-[10px] uppercase tracking-[0.18em] text-[var(--color-dim)] mb-1.5">{nextLabel} →</div>
+                <div class="font-semibold tracking-tight text-white group-hover:text-[var(--color-brand-1)] transition-colors">
+                  {next.label[lang] || next.label.en}
+                </div>
+              </a>
+            ) : <span />}
+          </nav>
+        )}
       </article>
+
+      <!-- TOC (right rail) -->
+      {tocHeadings.length > 0 ? (
+        <aside class="hidden lg:block lg:sticky lg:top-20 lg:self-start lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto">
+          <div class="text-[10px] uppercase tracking-[0.18em] text-[var(--color-brand-1)] font-medium mb-4">
+            {tocLabel}
+          </div>
+          <nav aria-label="Table of contents">
+            <ul class="space-y-1.5 text-sm border-l border-white/10">
+              {tocHeadings.map((h) => (
+                <li>
+                  <a
+                    href={`#${h.slug}`}
+                    data-toc-link={h.slug}
+                    class:list={[
+                      "block py-1 transition-colors -ml-px border-l border-transparent hover:text-white hover:border-white/30",
+                      h.depth === 2 ? "pl-4 text-[var(--color-muted)]" : "pl-7 text-[var(--color-dim)] text-[12.5px]",
+                    ]}
+                  >
+                    {h.text}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        </aside>
+      ) : <span />}
     </div>
   </main>
   <SiteFooter />
 </Base>
+
+<style is:global>
+  .toc-link-active {
+    color: #fff !important;
+    border-color: var(--color-brand-1) !important;
+  }
+
+  /* Code copy button (injected by client script) */
+  .code-block-wrap {
+    position: relative;
+  }
+  .code-copy-btn {
+    position: absolute;
+    top: 0.6rem;
+    right: 0.6rem;
+    padding: 0.35rem 0.55rem;
+    font-size: 0.7rem;
+    font-family: var(--font-mono);
+    color: var(--color-muted);
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 200ms, color 150ms, border-color 150ms, background 150ms;
+  }
+  .code-block-wrap:hover .code-copy-btn,
+  .code-copy-btn:focus {
+    opacity: 1;
+  }
+  .code-copy-btn:hover {
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.08);
+  }
+  .code-copy-btn[data-copied="true"] {
+    color: #6ee7b7;
+    border-color: rgba(110, 231, 183, 0.4);
+    background: rgba(110, 231, 183, 0.1);
+    opacity: 1;
+  }
+</style>
+
+<script>
+  // Wrap every code block with a "Copy" button.
+  const copyLabel = document.documentElement.lang === "zh-CN" ? "复制" : "Copy";
+  const copiedLabel = document.documentElement.lang === "zh-CN" ? "已复制" : "Copied";
+
+  document.querySelectorAll<HTMLPreElement>("article pre.astro-code, article pre.shiki").forEach((pre) => {
+    if (pre.parentElement?.classList.contains("code-block-wrap")) return;
+    const wrap = document.createElement("div");
+    wrap.className = "code-block-wrap";
+    pre.parentElement?.insertBefore(wrap, pre);
+    wrap.appendChild(pre);
+
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "code-copy-btn";
+    btn.textContent = copyLabel;
+    btn.setAttribute("aria-label", copyLabel);
+    btn.addEventListener("click", async () => {
+      const text = pre.innerText;
+      try {
+        await navigator.clipboard.writeText(text);
+        btn.textContent = copiedLabel;
+        btn.dataset.copied = "true";
+        setTimeout(() => {
+          btn.textContent = copyLabel;
+          delete btn.dataset.copied;
+        }, 1500);
+      } catch {
+        btn.textContent = "!";
+      }
+    });
+    wrap.appendChild(btn);
+  });
+</script>
+
+<script>
+  // Highlight the current TOC entry as the user scrolls.
+  const links = document.querySelectorAll<HTMLAnchorElement>("[data-toc-link]");
+  if (links.length && "IntersectionObserver" in window) {
+    const linkBySlug = new Map<string, HTMLAnchorElement>();
+    links.forEach((l) => linkBySlug.set(l.dataset.tocLink || "", l));
+
+    let active: HTMLAnchorElement | null = null;
+    function setActive(slug: string) {
+      const next = linkBySlug.get(slug);
+      if (next === active) return;
+      active?.classList.remove("toc-link-active");
+      active = next ?? null;
+      active?.classList.add("toc-link-active");
+    }
+
+    const headings = Array.from(document.querySelectorAll<HTMLElement>("article h2, article h3")).filter(
+      (h) => h.id && linkBySlug.has(h.id),
+    );
+
+    const obs = new IntersectionObserver(
+      (entries) => {
+        // Pick the topmost intersecting heading
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+        if (visible[0]) {
+          setActive((visible[0].target as HTMLElement).id);
+        }
+      },
+      { rootMargin: "-80px 0px -65% 0px", threshold: 0 },
+    );
+    headings.forEach((h) => obs.observe(h));
+  }
+</script>

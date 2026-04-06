@@ -74,6 +74,11 @@ export function getDocsForLocale(lang: Lang): DocMeta[] {
   return docsOrder.filter((d) => d.locales.includes(lang));
 }
 
+/** Sidebar items: every doc, with a flag indicating whether it's translated. */
+export function getSidebarForLocale(lang: Lang): (DocMeta & { availableHere: boolean })[] {
+  return docsOrder.map((d) => ({ ...d, availableHere: d.locales.includes(lang) }));
+}
+
 export function findDoc(slug: string): DocMeta | undefined {
   return docsOrder.find((d) => d.slug === slug);
 }

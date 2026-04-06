@@ -26,7 +26,13 @@ const models = [
 ];
 
 let counter = 1000;
-function makeRow(seed: number): LogRow {
+function fmtTime(d: Date): string {
+  return [d.getHours(), d.getMinutes(), d.getSeconds()]
+    .map((n) => String(n).padStart(2, "0"))
+    .join(":");
+}
+
+function makeRow(seed: number, when: Date = new Date()): LogRow {
   const r = (n: number) => {
     seed = (seed * 9301 + 49297 + n) % 233280;
     return seed / 233280;
@@ -34,7 +40,7 @@ function makeRow(seed: number): LogRow {
   const status: Status = r(1) > 0.94 ? (r(2) > 0.6 ? 429 : r(3) > 0.5 ? 500 : 401) : 200;
   return {
     id: counter++,
-    ts: new Date().toISOString().slice(11, 19),
+    ts: fmtTime(when),
     user: users[Math.floor(r(4) * users.length)],
     key: keys[Math.floor(r(5) * keys.length)],
     model: models[Math.floor(r(6) * models.length)],
@@ -51,11 +57,30 @@ const STATUS_COLOR: Record<Status, string> = {
   500: "text-red-300 bg-red-500/10",
 };
 
+// Stable seed values used for SSR + first paint so React's hydration doesn't mismatch.
+// Real timestamps are filled in on the client in a useEffect after mount.
+const PLACEHOLDER_TS = "--:--:--";
+
 export default function LogExplorerMock() {
   const [ref, inView] = useInView<HTMLDivElement>();
   const [rows, setRows] = useState<LogRow[]>(() =>
-    Array.from({ length: 14 }, (_, i) => makeRow(i * 17 + 3)),
+    Array.from({ length: 14 }, (_, i) => ({
+      ...makeRow(i * 17 + 3, new Date(0)),
+      ts: PLACEHOLDER_TS,
+    })),
   );
+
+  // After hydration, replace the seeded rows with ones whose timestamps span
+  // the last ~30 seconds so the panel doesn't open on a wall of identical times.
+  useEffect(() => {
+    const now = Date.now();
+    setRows(
+      Array.from({ length: 14 }, (_, i) => {
+        const when = new Date(now - i * 2200);
+        return makeRow(i * 17 + 3, when);
+      }),
+    );
+  }, []);
 
   useEffect(() => {
     if (!inView) return;
