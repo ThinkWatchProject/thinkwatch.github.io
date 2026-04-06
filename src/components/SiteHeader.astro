@@ -9,10 +9,16 @@ const s = t(lang);
 const stars = await getStarCount();
 const starLabel = formatStars(stars);
 
+// On the home page anchor links work as in-page jumps; on /docs/* and
+// /changelog they need to navigate back to the home first.
+const homePath = localePath(lang, "/");
+const isHome = Astro.url.pathname === homePath || Astro.url.pathname === homePath + "index.html";
+const homeAnchor = (hash: string) => (isHome ? hash : `${homePath}${hash}`);
+
 const links = [
-  { href: "#how", label: s.nav.how },
-  { href: "#features", label: s.nav.features },
-  { href: "#dashboard", label: s.nav.console },
+  { href: homeAnchor("#how"), label: s.nav.how },
+  { href: homeAnchor("#features"), label: s.nav.features },
+  { href: homeAnchor("#dashboard"), label: s.nav.console },
   { href: localePath(lang, "/docs"), label: s.nav.docs },
   { href: localePath(lang, "/changelog"), label: s.nav.changelog },
 ];
