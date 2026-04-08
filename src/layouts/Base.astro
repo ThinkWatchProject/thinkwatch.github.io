@@ -1,28 +1,44 @@
 ---
 import "~/styles/global.css";
 import { getLang, t } from "~/i18n";
+import Seo from "~/components/Seo.astro";
 
 const lang = getLang(Astro);
 const i18n = t(lang);
+
+type JsonLdItem = Record<string, unknown>;
 
 interface Props {
   title?: string;
   description?: string;
   ogImage?: string;
-  /** Suppress the SoftwareApplication JSON-LD on subpages. */
+  /** Suppress the default SoftwareApplication JSON-LD (e.g. on subpages where it would be redundant). */
   noJsonLd?: boolean;
+  /** Additional JSON-LD items to inject (BreadcrumbList, TechArticle, etc.) */
+  jsonLd?: JsonLdItem[];
 }
 
+const DEFAULT_TITLE =
+  lang === "zh-CN"
+    ? "ThinkWatch — 面向 AI 的企业级安全网关"
+    : "ThinkWatch — The enterprise-grade secure gateway for AI";
+
+const DEFAULT_DESCRIPTION =
+  lang === "zh-CN"
+    ? "集中认证、审计并治理组织内每一次 AI API 调用与 MCP 工具调用 —— 由同一控制平面完成。"
+    : "Secure, audit, and govern every AI API call and MCP tool invocation across your organization — from a single control plane.";
+
 const {
-  title = "ThinkWatch — The enterprise-grade secure gateway for AI",
-  description = "Secure, audit, and govern every AI API call and MCP tool invocation across your organization — from a single control plane.",
+  title = DEFAULT_TITLE,
+  description = DEFAULT_DESCRIPTION,
   ogImage = "/og-image.png",
   noJsonLd = false,
+  jsonLd: extraJsonLd = [],
 } = Astro.props;
 
 const canonical = new URL(Astro.url.pathname, Astro.site).toString();
 
-const jsonLd = {
+const softwareApplicationLd: JsonLdItem = {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
   name: "ThinkWatch",
@@ -44,6 +60,12 @@ const jsonLd = {
     url: "https://github.com/ThinkWatchProject",
   },
 };
+
+const jsonLd: JsonLdItem[] = noJsonLd
+  ? [...extraJsonLd]
+  : [softwareApplicationLd, ...extraJsonLd];
+
+const GA_ID = "G-R8LX8NCHCJ";
 ---
 
 <!doctype html>
@@ -81,36 +103,33 @@ const jsonLd = {
       })();
     </script>
 
+    <Seo
+      title={title}
+      description={description}
+      ogImage={ogImage}
+      canonical={canonical}
+      lang={lang}
+      jsonLd={jsonLd}
+    />
 
-    <title>{title}</title>
-    <meta name="description" content={description} />
-    <link rel="canonical" href={canonical} />
-
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-    <link rel="shortcut icon" href="/favicon.ico" />
-    <link rel="alternate" type="application/rss+xml" title="ThinkWatch Changelog" href="/changelog.xml" />
-
-    <!-- Open Graph -->
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content={canonical} />
-    <meta property="og:title" content={title} />
-    <meta property="og:description" content={description} />
-    <meta property="og:image" content={new URL(ogImage, Astro.site).toString()} />
-
-    <!-- Twitter -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content={title} />
-    <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content={new URL(ogImage, Astro.site).toString()} />
-
-    <meta name="theme-color" content="#0a0a0f" />
-
-    {!noJsonLd && (
-      <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
-    )}
+    <!--
+      Google Analytics (gtag). Honors Do Not Track and loads async so it
+      never blocks first paint. No personal data is sent until the library
+      has loaded.
+    -->
+    <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}></script>
+    <script is:inline define:vars={{ GA_ID }}>
+      (function () {
+        try {
+          if (navigator.doNotTrack === "1" || window.doNotTrack === "1") return;
+        } catch (e) {}
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { window.dataLayer.push(arguments); }
+        window.gtag = gtag;
+        gtag("js", new Date());
+        gtag("config", GA_ID, { anonymize_ip: true });
+      })();
+    </script>
   </head>
   <body>
     <a

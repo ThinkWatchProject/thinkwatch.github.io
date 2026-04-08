@@ -1,4 +1,11 @@
+# ThinkWatch — https://thinkwat.ch
+# Full crawl permitted for all user agents.
+
 User-agent: *
 Allow: /
+Disallow: /pagefind/
+
+# GPTBot, Claude-Web, etc. — allow by default.
+# Override here if you want to opt out of a specific crawler.
 
 Sitemap: https://thinkwat.ch/sitemap-index.xml
