@@ -1,0 +1,107 @@
+---
+import type { Lang } from "~/i18n";
+
+type JsonLdItem = Record<string, unknown>;
+
+interface Props {
+  title: string;
+  description: string;
+  ogImage: string;
+  canonical: string;
+  lang: Lang;
+  /** Extra JSON-LD items to inject (Organization, WebSite, BreadcrumbList, etc.) */
+  jsonLd?: JsonLdItem[];
+}
+
+const { title, description, ogImage, canonical, lang, jsonLd = [] } = Astro.props;
+
+// Build the cross-locale alternate URLs from the canonical path.
+// Example: canonical = "https://thinkwat.ch/docs/architecture/"
+//          → enHref   = "https://thinkwat.ch/docs/architecture/"
+//          → zhHref   = "https://thinkwat.ch/zh-CN/docs/architecture/"
+const canonicalUrl = new URL(canonical);
+const rawPath = canonicalUrl.pathname.replace(/^\/zh-CN/, "") || "/";
+const enHref = new URL(rawPath, Astro.site).toString();
+const zhHref = new URL(`/zh-CN${rawPath === "/" ? "/" : rawPath}`, Astro.site).toString();
+
+const absoluteOgImage = new URL(ogImage, Astro.site).toString();
+const ogLocale = lang === "zh-CN" ? "zh_CN" : "en_US";
+const ogLocaleAlternate = lang === "zh-CN" ? "en_US" : "zh_CN";
+
+// Global site-wide JSON-LD (injected on every page, in addition to per-page items).
+const siteJsonLd: JsonLdItem[] = [
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "ThinkWatch",
+    url: "https://thinkwat.ch",
+    logo: "https://thinkwat.ch/icon.svg",
+    sameAs: ["https://github.com/ThinkWatchProject/ThinkWatch"],
+    description:
+      "ThinkWatch is the enterprise-grade secure gateway for AI — one control plane for every model request and MCP tool call.",
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "ThinkWatch",
+    url: "https://thinkwat.ch",
+    inLanguage: ["en", "zh-CN"],
+    potentialAction: {
+      "@type": "SearchAction",
+      target: {
+        "@type": "EntryPoint",
+        urlTemplate: "https://thinkwat.ch/docs?q={search_term_string}",
+      },
+      "query-input": "required name=search_term_string",
+    },
+  },
+];
+
+const allJsonLd = [...siteJsonLd, ...jsonLd];
+---
+
+<title>{title}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical} />
+
+<!-- hreflang alternates -->
+<link rel="alternate" hreflang="en" href={enHref} />
+<link rel="alternate" hreflang="zh-CN" href={zhHref} />
+<link rel="alternate" hreflang="x-default" href={enHref} />
+
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+<link rel="shortcut icon" href="/favicon.ico" />
+<link rel="alternate" type="application/rss+xml" title="ThinkWatch Changelog" href="/changelog.xml" />
+
+<!-- Open Graph -->
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="ThinkWatch" />
+<meta property="og:locale" content={ogLocale} />
+<meta property="og:locale:alternate" content={ogLocaleAlternate} />
+<meta property="og:url" content={canonical} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:image" content={absoluteOgImage} />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="ThinkWatch — The enterprise-grade secure gateway for AI" />
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={absoluteOgImage} />
+<meta name="twitter:image:alt" content="ThinkWatch — The enterprise-grade secure gateway for AI" />
+
+<!-- Robots -->
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+<meta name="googlebot" content="index, follow, max-image-preview:large, max-snippet:-1" />
+
+<meta name="theme-color" content="#0a0a0f" />
+
+{allJsonLd.map((item) => (
+  <script type="application/ld+json" set:html={JSON.stringify(item)} />
+))}

@@ -17,9 +17,11 @@ interface Props {
   /** Previous and next docs in reading order (passed by the route) */
   prev?: DocMeta;
   next?: DocMeta;
+  /** Extra JSON-LD items (BreadcrumbList, TechArticle, etc.) */
+  jsonLd?: Record<string, unknown>[];
 }
 
-const { title, description, current, headings = [], prev, next } = Astro.props;
+const { title, description, current, headings = [], prev, next, jsonLd = [] } = Astro.props;
 const lang = getLang(Astro);
 const docs = getSidebarForLocale(lang);
 
@@ -37,7 +39,7 @@ const tocHeadings = headings
   .map((h) => ({ ...h, text: h.text.replace(/#+\s*$/, "").trim() }));
 ---
 
-<Base title={title} description={description} noJsonLd>
+<Base title={title} description={description} noJsonLd jsonLd={jsonLd}>
   <SiteHeader />
   <main id="main" class="container-page py-12 lg:py-16">
     <div class="grid lg:grid-cols-[14rem_minmax(0,1fr)_12rem] gap-8 xl:gap-12">
