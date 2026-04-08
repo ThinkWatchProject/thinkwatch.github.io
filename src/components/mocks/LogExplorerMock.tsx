@@ -95,17 +95,17 @@ export default function LogExplorerMock() {
   return (
     <div ref={ref} className="rounded-2xl border border-white/10 bg-[var(--color-surface)]/80 overflow-hidden backdrop-blur-sm h-full flex flex-col">
       {/* Top bar */}
-      <div className="flex items-center gap-3 px-4 py-3 border-b border-white/10 bg-black/40">
-        <div className="flex gap-1.5">
+      <div className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-3 border-b border-white/10 bg-black/40">
+        <div className="hidden sm:flex gap-1.5 shrink-0">
           <span className="w-2.5 h-2.5 rounded-full bg-red-400/60" />
           <span className="w-2.5 h-2.5 rounded-full bg-amber-400/60" />
           <span className="w-2.5 h-2.5 rounded-full bg-emerald-400/60" />
         </div>
-        <div className="flex-1 flex items-center gap-2 text-xs font-mono text-[var(--color-muted)]">
-          <span className="text-[var(--color-brand-1)]">›</span>
-          <span>status:200 model:claude-* tokens:&gt;500</span>
+        <div className="flex-1 min-w-0 flex items-center gap-2 text-xs font-mono text-[var(--color-muted)]">
+          <span className="text-[var(--color-brand-1)] shrink-0">›</span>
+          <span className="truncate">status:200 model:claude-*</span>
         </div>
-        <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-emerald-300">
+        <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-emerald-300 shrink-0">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
           live
         </div>

@@ -16,25 +16,25 @@ const tiers = s.tiers.map((tier, i) => ({
 }));
 ---
 
-<section id="pricing" class="py-28 border-t border-white/5 relative">
+<section id="pricing" class="py-20 sm:py-28 border-t border-white/5 relative">
   <div class="container-page relative z-10">
     <div class="max-w-3xl">
       <div class="text-xs uppercase tracking-[0.18em] text-[var(--color-brand-1)] font-medium mb-4">
         {s.eyebrow}
       </div>
-      <h2 class="text-4xl md:text-5xl font-semibold tracking-tight">
+      <h2 class="text-3xl sm:text-4xl md:text-5xl font-semibold tracking-tight">
         {s.title}<span class="text-gradient">{s.titleHighlight}</span>.
       </h2>
-      <p class="mt-5 text-lg text-[var(--color-muted)] leading-relaxed">
+      <p class="mt-4 sm:mt-5 text-base sm:text-lg text-[var(--color-muted)] leading-relaxed">
         {s.sub}
       </p>
     </div>
 
-    <div class="mt-14 grid gap-5 md:grid-cols-3">
+    <div class="mt-12 sm:mt-14 grid gap-5 md:grid-cols-3">
       {tiers.map((tier) => (
         <div
           class:list={[
-            "relative rounded-2xl border p-7 flex flex-col",
+            "relative rounded-2xl border p-6 sm:p-7 flex flex-col",
             tier.highlight
               ? "border-transparent bg-[var(--color-surface)]/80 border-gradient"
               : "border-white/10 bg-[var(--color-surface)]/40",

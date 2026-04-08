@@ -13,7 +13,11 @@ export default function Features({ modules }: { modules: readonly FeatureModule[
 
   return (
     <div className="mt-14">
-      <div role="tablist" className="flex flex-wrap gap-2 border-b border-white/10 pb-4">
+      <div
+        role="tablist"
+        className="flex gap-2 border-b border-white/10 pb-4 overflow-x-auto -mx-5 px-5 sm:mx-0 sm:px-0 sm:flex-wrap scrollbar-none snap-x snap-mandatory"
+        style={{ scrollbarWidth: "none" }}
+      >
         {modules.map((m) => {
           const isActive = m.id === active;
           return (
@@ -22,7 +26,7 @@ export default function Features({ modules }: { modules: readonly FeatureModule[
               role="tab"
               aria-selected={isActive}
               onClick={() => setActive(m.id)}
-              className={`relative px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+              className={`relative shrink-0 snap-start px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                 isActive
                   ? "text-white bg-white/[0.06]"
                   : "text-[var(--color-muted)] hover:text-white"
