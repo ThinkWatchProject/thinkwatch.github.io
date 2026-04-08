@@ -25,6 +25,14 @@
   html {
     scroll-behavior: smooth;
     color-scheme: dark;
+    /* Prevent iOS Safari from zooming form inputs with font-size < 16px */
+    -webkit-text-size-adjust: 100%;
+  }
+
+  html, body {
+    /* Avoid horizontal scroll caused by decorative absolute-positioned elements
+       that bleed sideways (aurora orbs, etc). */
+    overflow-x: clip;
   }
 
   body {
@@ -34,6 +42,14 @@
     font-feature-settings: "ss01", "cv11";
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
+  }
+
+  /* iOS Safari — make sure search inputs don't zoom the viewport */
+  input[type="search"],
+  input[type="text"],
+  input[type="email"],
+  textarea {
+    font-size: 16px;
   }
 
   ::selection {

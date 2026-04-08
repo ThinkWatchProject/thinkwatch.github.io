@@ -41,10 +41,95 @@ const tocHeadings = headings
 
 <Base title={title} description={description} noJsonLd jsonLd={jsonLd}>
   <SiteHeader />
-  <main id="main" class="container-page py-12 lg:py-16">
+  <main id="main" class="container-page py-8 lg:py-16">
+    <!-- Mobile docs drawer: a collapsible <details> shown only below lg -->
+    <details class="mobile-docs-nav lg:hidden mb-6 rounded-xl border border-white/10 bg-[var(--color-surface)]/60">
+      <summary class="list-none cursor-pointer select-none flex items-center justify-between gap-3 px-4 py-3 text-sm font-medium text-white">
+        <span class="flex items-center gap-2">
+          <svg class="w-4 h-4 text-[var(--color-brand-1)]" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+            <line x1="3" y1="5" x2="13" y2="5" stroke-linecap="round"/>
+            <line x1="3" y1="8" x2="13" y2="8" stroke-linecap="round"/>
+            <line x1="3" y1="11" x2="13" y2="11" stroke-linecap="round"/>
+          </svg>
+          <span>{docsLabel}</span>
+          <span class="text-[var(--color-dim)]">·</span>
+          <span class="text-[var(--color-muted)] font-normal truncate">{title.split(" · ")[0]}</span>
+        </span>
+        <svg class="w-4 h-4 text-[var(--color-muted)] transition-transform chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="4,6 8,10 12,6"/>
+        </svg>
+      </summary>
+      <div class="border-t border-white/10 p-3">
+        <nav aria-label="Documentation navigation">
+          <ul class="space-y-1">
+            <li>
+              <a
+                href={baseHref}
+                class:list={[
+                  "block px-3 py-2.5 rounded-md text-sm transition-colors",
+                  current === ""
+                    ? "bg-white/[0.06] text-white border-l-2 border-[var(--color-brand-1)]"
+                    : "text-[var(--color-muted)] hover:text-white hover:bg-white/[0.03] border-l-2 border-transparent",
+                ]}
+              >
+                {lang === "zh-CN" ? "概览" : "Overview"}
+              </a>
+            </li>
+            {docs.map((d) => {
+              const isActive = d.slug === current;
+              const href = d.availableHere ? `${baseHref}/${d.slug}` : `/docs/${d.slug}`;
+              return (
+                <li>
+                  <a
+                    href={href}
+                    class:list={[
+                      "flex items-center justify-between gap-2 px-3 py-2.5 rounded-md text-sm transition-colors",
+                      isActive
+                        ? "bg-white/[0.06] text-white border-l-2 border-[var(--color-brand-1)]"
+                        : "text-[var(--color-muted)] hover:text-white hover:bg-white/[0.03] border-l-2 border-transparent",
+                    ]}
+                  >
+                    <span>{d.label[lang]}</span>
+                    {!d.availableHere && (
+                      <span class="text-[9px] font-mono uppercase tracking-wider px-1.5 py-0.5 rounded bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">
+                        EN
+                      </span>
+                    )}
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
+
+        {tocHeadings.length > 0 && (
+          <div class="mt-5 pt-4 border-t border-white/5">
+            <div class="text-[10px] uppercase tracking-[0.18em] text-[var(--color-brand-1)] font-medium mb-2 px-3">
+              {tocLabel}
+            </div>
+            <ul class="space-y-0.5 text-sm">
+              {tocHeadings.map((h) => (
+                <li>
+                  <a
+                    href={`#${h.slug}`}
+                    class:list={[
+                      "block py-1.5 px-3 rounded-md text-[var(--color-muted)] hover:text-white hover:bg-white/[0.03] transition-colors",
+                      h.depth === 3 ? "pl-7 text-[12.5px] text-[var(--color-dim)]" : "",
+                    ]}
+                  >
+                    {h.text}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+    </details>
+
     <div class="grid lg:grid-cols-[14rem_minmax(0,1fr)_12rem] gap-8 xl:gap-12">
-      <!-- Sidebar -->
-      <aside class="lg:sticky lg:top-20 lg:self-start lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto">
+      <!-- Desktop sidebar (hidden on mobile) -->
+      <aside class="hidden lg:block lg:sticky lg:top-20 lg:self-start lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto">
         <div class="text-[10px] uppercase tracking-[0.18em] text-[var(--color-brand-1)] font-medium mb-4">
           {docsLabel}
         </div>
@@ -169,6 +254,9 @@ const tocHeadings = headings
 </Base>
 
 <style is:global>
+  .mobile-docs-nav summary::-webkit-details-marker { display: none; }
+  .mobile-docs-nav[open] summary .chevron { transform: rotate(180deg); }
+
   .toc-link-active {
     color: #fff !important;
     border-color: var(--color-brand-1) !important;
@@ -209,6 +297,17 @@ const tocHeadings = headings
     opacity: 1;
   }
 </style>
+
+<script>
+  // Close the mobile docs drawer when the user taps a TOC link (in-page anchor).
+  document.querySelectorAll<HTMLDetailsElement>(".mobile-docs-nav").forEach((d) => {
+    d.querySelectorAll<HTMLAnchorElement>('a[href^="#"]').forEach((a) => {
+      a.addEventListener("click", () => {
+        d.open = false;
+      });
+    });
+  });
+</script>
 
 <script>
   // Wrap every code block with a "Copy" button.

@@ -113,31 +113,31 @@ const steps = s.steps.map((step, i) => ({
 }));
 ---
 
-<section id="quickstart" class="py-28 border-t border-white/5 relative">
+<section id="quickstart" class="py-20 sm:py-28 border-t border-white/5 relative">
   <div class="container-page relative z-10">
     <div class="max-w-3xl">
       <div class="text-xs uppercase tracking-[0.18em] text-[var(--color-brand-1)] font-medium mb-4">
         {s.eyebrow}
       </div>
-      <h2 class="text-4xl md:text-5xl font-semibold tracking-tight">
+      <h2 class="text-3xl sm:text-4xl md:text-5xl font-semibold tracking-tight">
         {s.title}<span class="text-gradient">{s.titleHighlight}</span>.
       </h2>
-      <p class="mt-5 text-lg text-[var(--color-muted)] leading-relaxed">
+      <p class="mt-4 sm:mt-5 text-base sm:text-lg text-[var(--color-muted)] leading-relaxed">
         {s.sub}
       </p>
     </div>
 
-    <div class="mt-14 grid lg:grid-cols-[1.1fr_1fr] gap-10 items-start">
+    <div class="mt-10 sm:mt-14 grid lg:grid-cols-[1.1fr_1fr] gap-8 lg:gap-10 items-start">
       <ol class="space-y-4">
         {steps.map((s) => (
-          <li class="rounded-xl border border-white/10 bg-[var(--color-surface)]/60 p-5 flex gap-5">
-            <div class="shrink-0 w-9 h-9 rounded-lg bg-brand-gradient text-black font-mono text-sm font-bold grid place-items-center" aria-hidden="true">
+          <li class="rounded-xl border border-white/10 bg-[var(--color-surface)]/60 p-4 sm:p-5 flex gap-4 sm:gap-5">
+            <div class="shrink-0 w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-brand-gradient text-black font-mono text-sm font-bold grid place-items-center" aria-hidden="true">
               {s.n}
             </div>
             <div class="min-w-0 flex-1">
               <div class="font-semibold tracking-tight mb-1">{s.title}</div>
               <p class="text-sm text-[var(--color-muted)] mb-3">{s.body}</p>
-              <code class="block font-mono text-xs text-[var(--color-brand-1)] bg-black/40 border border-white/10 rounded-md px-3 py-2 overflow-x-auto">
+              <code class="block font-mono text-[11px] sm:text-xs text-[var(--color-brand-1)] bg-black/40 border border-white/10 rounded-md px-3 py-2 overflow-x-auto whitespace-nowrap">
                 $ {s.cmd}
               </code>
             </div>

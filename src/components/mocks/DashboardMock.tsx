@@ -122,20 +122,20 @@ export default function DashboardMock() {
 function StatCard({ stat, active }: { stat: Stat; active: boolean }) {
   const v = useCounter(stat.value, active);
   return (
-    <div className="rounded-xl border border-white/10 bg-[var(--color-surface)]/80 p-5 backdrop-blur-sm relative overflow-hidden">
+    <div className="rounded-xl border border-white/10 bg-[var(--color-surface)]/80 p-4 sm:p-5 backdrop-blur-sm relative overflow-hidden">
       <div className="absolute inset-x-0 top-0 h-px" style={{ background: `linear-gradient(90deg, transparent, ${stat.color}, transparent)` }} />
 
-      <div className="flex items-start justify-between gap-3 mb-3">
-        <div className="text-xs text-[var(--color-muted)]">{stat.label}</div>
+      <div className="flex items-start justify-between gap-3 mb-2 sm:mb-3">
+        <div className="text-[11px] sm:text-xs text-[var(--color-muted)] leading-tight">{stat.label}</div>
         <span
-          className="text-[10px] px-1.5 py-0.5 rounded font-mono font-medium"
+          className="text-[10px] px-1.5 py-0.5 rounded font-mono font-medium shrink-0"
           style={{ color: stat.color, background: `${stat.color}15` }}
         >
           {stat.delta}
         </span>
       </div>
 
-      <div className="text-2xl font-semibold tracking-tight tabular-nums font-mono">
+      <div className="text-xl sm:text-2xl font-semibold tracking-tight tabular-nums font-mono">
         {stat.format(v)}
       </div>
 

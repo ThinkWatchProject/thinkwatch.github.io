@@ -25,8 +25,6 @@ const links = [
 
 const cleanPath = Astro.url.pathname.replace(/^\/zh-CN/, "") || "/";
 
-// Handle docs language switching: if current page is a doc that's missing
-// in the target locale, fall back to the docs index instead of 404.
 const docMatch = cleanPath.match(/^\/docs\/([^\/]+)\/?$/);
 const currentDocSlug = docMatch ? docMatch[1] : null;
 const currentDocMeta = currentDocSlug ? findDoc(currentDocSlug) : undefined;
@@ -43,12 +41,15 @@ const langOptions: { code: Lang; label: string; native: string }[] = [
   { code: "zh-CN", label: "简体中文", native: "中文" },
 ];
 const currentLangOption = langOptions.find((l) => l.code === lang)!;
+
+const menuLabel = lang === "zh-CN" ? "菜单" : "Menu";
+const closeLabel = lang === "zh-CN" ? "关闭" : "Close";
 ---
 
 <header class="sticky top-0 z-50 backdrop-blur-md bg-[var(--color-bg)]/60 border-b border-white/5">
-  <div class="container-page flex items-center justify-between h-16">
-    <a href={localePath(lang, "/")} class="flex items-center gap-2.5 group">
-      <svg class="w-8 h-8 shrink-0" viewBox="0 0 200 200" fill="none" aria-hidden="true">
+  <div class="container-page flex items-center justify-between h-16 gap-3">
+    <a href={localePath(lang, "/")} class="flex items-center gap-2 sm:gap-2.5 group shrink-0">
+      <svg class="w-7 h-7 sm:w-8 sm:h-8 shrink-0" viewBox="0 0 200 200" fill="none" aria-hidden="true">
         <rect width="200" height="200" rx="40" fill="#1E2A4A"/>
         <rect x="32" y="32" width="136" height="136" rx="28" fill="none" stroke="#3DDBD9" stroke-width="10"/>
         <line x1="62" y1="68" x2="138" y2="68" stroke="#3DDBD9" stroke-width="12" stroke-linecap="round"/>
@@ -56,32 +57,34 @@ const currentLangOption = langOptions.find((l) => l.code === lang)!;
         <polyline points="62,104 80,140 100,104" fill="none" stroke="#3DDBD9" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
         <polyline points="100,104 120,140 138,104" fill="none" stroke="#3DDBD9" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
-      <span class="text-lg tracking-tight text-white">
+      <span class="text-base sm:text-lg tracking-tight text-white">
         <span class="font-medium">Think</span><span class="font-bold">Watch</span>
       </span>
     </a>
 
+    <!-- Desktop nav -->
     <nav class="hidden md:flex items-center gap-8 text-sm text-[var(--color-muted)]">
       {links.map((l) => (
         <a href={l.href} class="hover:text-white transition-colors">{l.label}</a>
       ))}
     </nav>
 
-    <div class="flex items-center gap-2">
+    <!-- Right cluster: search + lang + GitHub (mobile compact) + CTA + burger -->
+    <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
       <SearchModal />
 
       <!-- Language dropdown — pure HTML <details>, no JS -->
       <details class="lang-menu relative">
         <summary
-          class="list-none cursor-pointer select-none flex items-center gap-1.5 text-xs font-medium text-[var(--color-muted)] hover:text-white border border-white/10 hover:border-white/25 rounded-md px-2.5 py-1.5 transition-colors"
+          class="list-none cursor-pointer select-none flex items-center gap-1 sm:gap-1.5 text-xs font-medium text-[var(--color-muted)] hover:text-white border border-white/10 hover:border-white/25 rounded-md px-2 sm:px-2.5 h-9 transition-colors"
           aria-label="Switch language"
         >
           <svg class="w-3.5 h-3.5" viewBox="0 0 16 16" fill="none" aria-hidden="true">
             <circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.2"/>
             <path d="M1.5 8h13M8 1.5c2 2 2 11 0 13M8 1.5c-2 2-2 11 0 13" stroke="currentColor" stroke-width="1.2"/>
           </svg>
-          <span>{currentLangOption.native}</span>
-          <svg class="w-3 h-3 transition-transform" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+          <span class="hidden xs:inline">{currentLangOption.native}</span>
+          <svg class="w-3 h-3 transition-transform hidden sm:block" viewBox="0 0 12 12" fill="none" aria-hidden="true">
             <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </summary>
@@ -109,30 +112,81 @@ const currentLangOption = langOptions.find((l) => l.code === lang)!;
         </div>
       </details>
 
-      <!-- GitHub icon + star pill -->
+      <!-- GitHub icon + star pill (star count hidden on narrow phones) -->
       <a
         href="https://github.com/ThinkWatchProject/ThinkWatch"
         target="_blank"
         rel="noopener"
         aria-label={`GitHub repository — ${stars ?? 0} stars`}
-        class="group flex items-center gap-1.5 text-xs font-medium text-[var(--color-muted)] hover:text-white border border-white/10 hover:border-white/25 rounded-md pl-2 pr-2.5 py-1.5 transition-colors"
+        class="group flex items-center gap-1.5 text-xs font-medium text-[var(--color-muted)] hover:text-white border border-white/10 hover:border-white/25 rounded-md px-2 sm:pl-2 sm:pr-2.5 h-9 transition-colors"
       >
         <svg class="w-3.5 h-3.5" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
           <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
         </svg>
-        <svg class="w-3 h-3 text-amber-300" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+        <svg class="w-3 h-3 text-amber-300 hidden sm:block" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
           <path d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.75.75 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z"/>
         </svg>
-        <span class="tabular-nums">{starLabel}</span>
+        <span class="tabular-nums hidden sm:inline">{starLabel}</span>
       </a>
 
+      <!-- Desktop CTA -->
       <a
-        href="#quickstart"
-        class="text-sm font-medium px-4 py-2 rounded-lg bg-brand-gradient text-black hover:brightness-110 transition"
+        href={homeAnchor("#quickstart")}
+        class="hidden sm:inline-flex items-center text-sm font-medium px-4 h-9 rounded-md bg-brand-gradient text-black hover:brightness-110 transition"
       >
         {s.common.getStarted}
       </a>
+
+      <!-- Mobile burger -->
+      <button
+        type="button"
+        data-mobile-nav-toggle
+        aria-label={menuLabel}
+        aria-expanded="false"
+        aria-controls="mobile-nav-panel"
+        class="md:hidden flex items-center justify-center w-9 h-9 rounded-md border border-white/10 text-[var(--color-muted)] hover:text-white hover:border-white/25 transition-colors"
+      >
+        <svg class="burger-open w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+          <line x1="4" y1="7" x2="20" y2="7"/>
+          <line x1="4" y1="12" x2="20" y2="12"/>
+          <line x1="4" y1="17" x2="20" y2="17"/>
+        </svg>
+        <svg class="burger-close w-5 h-5 hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+          <line x1="6" y1="6" x2="18" y2="18"/>
+          <line x1="6" y1="18" x2="18" y2="6"/>
+        </svg>
+      </button>
     </div>
+  </div>
+
+  <!-- Mobile nav panel (slides down below the header bar) -->
+  <div
+    id="mobile-nav-panel"
+    hidden
+    class="md:hidden border-t border-white/10 bg-[var(--color-bg)]/95 backdrop-blur-md"
+  >
+    <nav aria-label={menuLabel}>
+      <ul class="container-page py-3 flex flex-col">
+        {links.map((l) => (
+          <li>
+            <a
+              href={l.href}
+              class="block py-3 text-base text-[var(--color-muted)] hover:text-white transition-colors border-b border-white/5"
+            >
+              {l.label}
+            </a>
+          </li>
+        ))}
+        <li>
+          <a
+            href={homeAnchor("#quickstart")}
+            class="mt-4 inline-flex items-center justify-center w-full px-4 py-3 rounded-lg bg-brand-gradient text-black font-medium hover:brightness-110 transition"
+          >
+            {s.common.getStarted}
+          </a>
+        </li>
+      </ul>
+    </nav>
   </div>
 </header>
 
@@ -140,6 +194,11 @@ const currentLangOption = langOptions.find((l) => l.code === lang)!;
   .lang-menu summary::-webkit-details-marker { display: none; }
   .lang-menu[open] summary svg:last-child { transform: rotate(180deg); }
   .lang-menu[open] summary { color: white; border-color: rgba(255, 255, 255, 0.25); }
+
+  /* Extra-small breakpoint: 400px — hide the lang code text on very narrow phones */
+  @media (min-width: 400px) {
+    .xs\:inline { display: inline !important; }
+  }
 </style>
 
 <script>
@@ -158,4 +217,44 @@ const currentLangOption = langOptions.find((l) => l.code === lang)!;
       } catch {}
     });
   });
+
+  // Mobile nav toggle
+  const navToggle = document.querySelector<HTMLButtonElement>("[data-mobile-nav-toggle]");
+  const navPanel = document.getElementById("mobile-nav-panel");
+  if (navToggle && navPanel) {
+    const burgerOpen = navToggle.querySelector<SVGElement>(".burger-open");
+    const burgerClose = navToggle.querySelector<SVGElement>(".burger-close");
+
+    function setOpen(open: boolean) {
+      navToggle!.setAttribute("aria-expanded", open ? "true" : "false");
+      if (open) {
+        navPanel!.removeAttribute("hidden");
+        burgerOpen?.classList.add("hidden");
+        burgerClose?.classList.remove("hidden");
+        document.documentElement.style.overflow = "hidden";
+      } else {
+        navPanel!.setAttribute("hidden", "");
+        burgerOpen?.classList.remove("hidden");
+        burgerClose?.classList.add("hidden");
+        document.documentElement.style.overflow = "";
+      }
+    }
+
+    navToggle.addEventListener("click", () => {
+      const isOpen = navToggle!.getAttribute("aria-expanded") === "true";
+      setOpen(!isOpen);
+    });
+
+    // Close on link click (for in-page anchors on the home page)
+    navPanel.querySelectorAll("a").forEach((a) => {
+      a.addEventListener("click", () => setOpen(false));
+    });
+
+    // Close on resize to desktop
+    window.addEventListener("resize", () => {
+      if (window.innerWidth >= 768 && navToggle!.getAttribute("aria-expanded") === "true") {
+        setOpen(false);
+      }
+    });
+  }
 </script>
