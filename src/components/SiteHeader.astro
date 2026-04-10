@@ -250,6 +250,17 @@ const closeLabel = lang === "zh-CN" ? "关闭" : "Close";
       a.addEventListener("click", () => setOpen(false));
     });
 
+    // Smooth in-page scrolling for mobile nav anchor links
+    navPanel.querySelectorAll<HTMLAnchorElement>("a[href^='#']").forEach((a) => {
+      a.addEventListener("click", (e) => {
+        const target = document.querySelector(a.getAttribute("href")!);
+        if (!target) return;
+        e.preventDefault();
+        target.scrollIntoView({ behavior: "smooth" });
+        history.pushState(null, "", a.getAttribute("href"));
+      });
+    });
+
     // Close on resize to desktop
     window.addEventListener("resize", () => {
       if (window.innerWidth >= 768 && navToggle!.getAttribute("aria-expanded") === "true") {
@@ -257,4 +268,21 @@ const closeLabel = lang === "zh-CN" ? "关闭" : "Close";
       }
     });
   }
+
+  // Intercept all in-page anchor clicks (desktop nav + CTA).
+  // Without this, the browser treats a hash link as a URL navigation,
+  // resets scroll position to 0, then smooth-scrolls from the top.
+  // We preventDefault and call scrollIntoView directly so the scroll
+  // always starts from the current position.
+  document.querySelectorAll<HTMLAnchorElement>("a[href^='#']").forEach((a) => {
+    a.addEventListener("click", (e) => {
+      const hash = a.getAttribute("href");
+      if (!hash) return;
+      const target = document.querySelector(hash);
+      if (!target) return;
+      e.preventDefault();
+      target.scrollIntoView({ behavior: "smooth" });
+      history.pushState(null, "", hash);
+    });
+  });
 </script>
