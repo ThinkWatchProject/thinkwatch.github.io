@@ -1,13 +1,15 @@
 ---
-// Re-uses the locale-aware /changelog page; Astro routes /zh-CN/changelog
-// here. Importing the same module would duplicate the route, so we
-// inline the same content with the locale already set by URL.
 import { getCollection, render } from "astro:content";
 import Base from "~/layouts/Base.astro";
 import SiteHeader from "~/components/SiteHeader.astro";
 import SiteFooter from "~/components/SiteFooter.astro";
 
-const entries = (await getCollection("changelog")).sort(
+// Use zh-CN entries where available, fall back to English for missing ones.
+const zhEntries = await getCollection("changelog_zh");
+const enEntries = await getCollection("changelog");
+const zhVersions = new Set(zhEntries.map((e) => e.data.version));
+const fallback = enEntries.filter((e) => !zhVersions.has(e.data.version));
+const entries = [...zhEntries, ...fallback].sort(
   (a, b) => b.data.date.getTime() - a.data.date.getTime(),
 );
 

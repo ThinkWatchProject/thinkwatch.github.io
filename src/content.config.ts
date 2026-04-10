@@ -1,15 +1,22 @@
 import { defineCollection, z } from "astro:content";
 import { glob } from "astro/loaders";
 
+const changelogSchema = z.object({
+  version: z.string(),
+  date: z.coerce.date(),
+  type: z.enum(["release", "feature", "fix", "security"]).default("release"),
+  title: z.string(),
+  highlights: z.array(z.string()).optional(),
+});
+
 const changelog = defineCollection({
-  loader: glob({ pattern: "**/*.md", base: "./src/content/changelog" }),
-  schema: z.object({
-    version: z.string(),
-    date: z.coerce.date(),
-    type: z.enum(["release", "feature", "fix", "security"]).default("release"),
-    title: z.string(),
-    highlights: z.array(z.string()).optional(),
-  }),
+  loader: glob({ pattern: "en/**/*.md", base: "./src/content/changelog" }),
+  schema: changelogSchema,
+});
+
+const changelog_zh = defineCollection({
+  loader: glob({ pattern: "zh-CN/**/*.md", base: "./src/content/changelog" }),
+  schema: changelogSchema,
 });
 
 // Docs imported from /Users/faz/Dev/ThinkWatch/docs.
@@ -19,4 +26,4 @@ const docs = defineCollection({
   schema: z.object({}).passthrough(),
 });
 
-export const collections = { changelog, docs };
+export const collections = { changelog, changelog_zh, docs };
