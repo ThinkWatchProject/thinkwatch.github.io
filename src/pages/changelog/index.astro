@@ -147,6 +147,25 @@ const filterTypes = [
   .changelog-list[data-filter="security"] .changelog-item:not([data-type="security"]) {
     display: none;
   }
+
+  /* Section headings inside changelog body */
+  .changelog-item :global(h2) {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-brand-1);
+    margin-top: 1.25rem;
+    margin-bottom: 0.375rem;
+  }
+  .changelog-item :global(h2:first-child) {
+    margin-top: 0;
+  }
+
+  /* Hide the # anchor link appended by rehypeAutolinkHeadings */
+  .changelog-item :global(.heading-anchor) {
+    display: none;
+  }
 </style>
 
 <script>
