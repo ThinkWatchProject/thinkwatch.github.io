@@ -130,7 +130,7 @@ const closeLabel = lang === "zh-CN" ? "关闭" : "Close";
         <svg class="w-3 h-3 text-amber-300 hidden sm:block" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
           <path d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.75.75 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z"/>
         </svg>
-        <span class="tabular-nums hidden sm:inline">{starLabel}</span>
+        <span class="tabular-nums hidden sm:inline" data-star-count>{starLabel}</span>
       </a>
 
       <!-- Desktop CTA -->
@@ -277,6 +277,25 @@ const closeLabel = lang === "zh-CN" ? "关闭" : "Close";
         setOpen(false);
       }
     });
+  }
+
+  // Fetch live GitHub star count and update the pill
+  {
+    const el = document.querySelector<HTMLSpanElement>("[data-star-count]");
+    if (el) {
+      fetch("https://api.github.com/repos/ThinkWatchProject/ThinkWatch", {
+        headers: { Accept: "application/vnd.github+json" },
+      })
+        .then((r) => r.ok ? r.json() : null)
+        .then((d: any) => {
+          if (typeof d?.stargazers_count !== "number") return;
+          const n = d.stargazers_count;
+          el.textContent = n < 1000 ? String(n) : n < 10_000 ? (n / 1000).toFixed(1) + "k" : Math.round(n / 1000) + "k";
+          const link = el.closest("a");
+          if (link) link.setAttribute("aria-label", `GitHub repository — ${n} stars`);
+        })
+        .catch(() => {});
+    }
   }
 
   // Intercept in-page anchor clicks so the scroll always starts from the
