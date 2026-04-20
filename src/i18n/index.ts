@@ -32,6 +32,17 @@ const dict = {
       sub: "ThinkWatch is the single control plane through which every model request and every MCP tool call must flow. Authenticated, authorized, rate-limited, logged, and accounted for.",
       ctaPrimary: "Get started in 30s",
       stack: ["Rust + Axum", "2 MB distroless", "OpenAI · Anthropic · Gemini · Bedrock", "BSL 1.1"],
+      stats: [
+        { value: "2 MB", label: "Distroless image" },
+        { value: "3+1", label: "API formats" },
+        { value: "5", label: "Upstream providers" },
+        { value: "Rust", label: "One binary" },
+      ],
+      live: {
+        label: "LIVE",
+        reqPerSec: "req/s",
+        tokensPerMin: "tokens/min",
+      },
     },
 
     compatible: {
@@ -262,6 +273,17 @@ const dict = {
       sub: "ThinkWatch 是企业内所有模型请求与 MCP 工具调用的唯一控制平面。每一次访问都被认证、授权、限流、记录和计费。",
       ctaPrimary: "30 秒上手",
       stack: ["Rust + Axum", "2 MB Distroless", "OpenAI · Anthropic · Gemini · Bedrock", "BSL 1.1"],
+      stats: [
+        { value: "2 MB", label: "Distroless 镜像" },
+        { value: "3+1", label: "API 格式" },
+        { value: "5", label: "上游提供商" },
+        { value: "Rust", label: "单一二进制" },
+      ],
+      live: {
+        label: "实时",
+        reqPerSec: "req/s",
+        tokensPerMin: "tokens/min",
+      },
     },
 
     compatible: {

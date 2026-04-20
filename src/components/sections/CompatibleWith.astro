@@ -13,19 +13,38 @@ const items = [
   "LangChain",
   "LlamaIndex",
 ];
+// Doubled for seamless loop
+const doubled = [...items, ...items];
 ---
 
-<section class="py-12 border-t border-white/5" aria-label="Compatible clients and SDKs">
-  <div class="container-page">
-    <p class="text-center text-[10px] uppercase tracking-[0.2em] text-[var(--color-dim)] mb-6">
+<section class="py-14 border-t border-white/5" aria-label="Compatible clients and SDKs">
+  <div class="container-page flex flex-col md:flex-row md:items-center gap-6 md:gap-10">
+    <p class="shrink-0 text-[10px] uppercase tracking-[0.2em] text-[var(--color-dim)] font-mono">
       {s.label}
     </p>
-    <ul class="flex flex-wrap items-center justify-center gap-x-10 gap-y-4 text-[var(--color-muted)]">
-      {items.map((name) => (
-        <li class="text-sm font-medium tracking-tight hover:text-white transition-colors">
-          {name}
-        </li>
-      ))}
-    </ul>
+    <div class="compat-track-wrap flex-1 overflow-hidden relative">
+      <ul class="compat-track flex gap-10 w-max animate-[marquee_32s_linear_infinite]" aria-hidden="false">
+        {doubled.map((name) => (
+          <li class="font-mono text-[13px] tracking-tight text-[var(--color-muted)] whitespace-nowrap hover:text-white transition-colors">
+            {name}
+          </li>
+        ))}
+      </ul>
+    </div>
   </div>
 </section>
+
+<style>
+  .compat-track-wrap {
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+            mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+  }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .compat-track { animation: none !important; }
+  }
+  .compat-track-wrap:hover .compat-track { animation-play-state: paused; }
+</style>
