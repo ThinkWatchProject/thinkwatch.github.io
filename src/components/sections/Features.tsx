@@ -51,16 +51,17 @@ export default function Features({ modules }: { modules: readonly FeatureModule[
         {current.bullets.map((b, i) => (
           <div
             key={b.title}
-            className="rounded-xl border border-white/10 bg-[var(--color-surface)]/60 p-6 hover:border-white/25 transition-colors animate-[fadeUp_400ms_ease-out_both]"
+            className="group rounded-xl border border-white/10 bg-[var(--color-surface)]/60 p-6 hover:border-white/25 transition-colors animate-[fadeUp_400ms_ease-out_both]"
             style={{ animationDelay: `${i * 60}ms` }}
           >
-            <div className="flex items-start gap-3">
-              <span className="mt-1 inline-block w-1.5 h-1.5 rounded-full bg-[var(--color-brand-1)] shrink-0" />
-              <div>
-                <h4 className="font-semibold tracking-tight mb-1.5">{b.title}</h4>
-                <p className="text-sm text-[var(--color-muted)] leading-relaxed">{b.body}</p>
-              </div>
+            <div className="flex items-center justify-between mb-4">
+              <span className="inline-block w-1.5 h-1.5 rounded-full bg-[var(--color-brand-1)] shadow-[0_0_10px_var(--color-brand-1)] group-hover:scale-110 transition-transform" />
+              <span className="font-mono text-[11px] tracking-[0.12em] text-[var(--color-dim)]">
+                {String(i + 1).padStart(2, "0")}
+              </span>
             </div>
+            <h4 className="font-semibold tracking-tight mb-1.5">{b.title}</h4>
+            <p className="text-sm text-[var(--color-muted)] leading-relaxed">{b.body}</p>
           </div>
         ))}
       </div>
