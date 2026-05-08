@@ -1,0 +1,183 @@
+---
+import { getLang, t } from "~/i18n";
+
+const s = t(getLang(Astro)).mcpAdvantage;
+
+// Map raw cell values to (label, treatment) so the table renders consistently
+// across en / zh-CN. Treatment drives color: positive = green, neutral = amber,
+// negative = dim red.
+type Treatment = "positive" | "neutral" | "negative";
+const cellMap: Record<string, { label: string; treatment: Treatment }> = {
+  yes:           { label: "✓",                 treatment: "positive" },
+  no:            { label: "—",                 treatment: "negative" },
+  shared:        { label: s.legendShared ?? "shared account",  treatment: "negative" },
+  partial:       { label: s.legendPartial ?? "partial",        treatment: "neutral"  },
+  limited:       { label: s.legendLimited ?? "limited",        treatment: "neutral"  },
+  "hosted-only": { label: s.legendHostedOnly ?? "hosted-only", treatment: "neutral"  },
+  "n/a":         { label: "n/a",               treatment: "negative" },
+  saas:          { label: s.legendSaas ?? "SaaS-only",         treatment: "neutral"  },
+  varies:        { label: s.legendVaries ?? "varies",          treatment: "neutral"  },
+  english:       { label: s.legendEnglish ?? "English-only",   treatment: "neutral"  },
+  proprietary:   { label: s.legendProprietary ?? "proprietary",treatment: "neutral"  },
+  oss:           { label: s.legendOss ?? "OSS",                treatment: "neutral"  },
+};
+
+function cell(raw: string) {
+  return cellMap[raw] ?? { label: raw, treatment: "neutral" as Treatment };
+}
+
+const treatmentClass: Record<Treatment, string> = {
+  positive: "text-[var(--color-brand-1)]",
+  neutral:  "text-amber-300/80",
+  negative: "text-[var(--color-dim)]",
+};
+---
+
+<section id="mcp" class="py-20 sm:py-28 border-t border-white/5 relative overflow-hidden">
+  <!-- Subtle radial accent so the section reads as the marquee MCP pitch -->
+  <div
+    class="pointer-events-none absolute inset-0 -z-0"
+    aria-hidden="true"
+    style="background: radial-gradient(60% 50% at 80% 0%, rgba(61, 219, 217, 0.07), transparent 60%), radial-gradient(50% 40% at 10% 100%, rgba(168, 85, 247, 0.06), transparent 60%);"
+  ></div>
+
+  <div class="container-page relative z-10">
+    <div class="max-w-3xl">
+      <div class="text-xs uppercase tracking-[0.18em] text-[var(--color-brand-1)] font-medium mb-4">
+        {s.eyebrow}
+      </div>
+      <h2 class="text-3xl sm:text-4xl md:text-5xl font-semibold tracking-tight">
+        {s.title}<span class="text-gradient">{s.titleHighlight}</span>.
+      </h2>
+      <p class="mt-4 sm:mt-5 text-base sm:text-lg text-[var(--color-muted)] leading-relaxed">
+        {s.sub}
+      </p>
+    </div>
+
+    <!-- Comparison table -->
+    <div class="mt-14">
+      <div class="text-xs uppercase tracking-[0.18em] text-[var(--color-muted)] mb-4">
+        {s.tableTitle}
+      </div>
+
+      <div class="rounded-2xl border border-white/10 bg-[var(--color-surface)]/60 overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm min-w-[720px]">
+            <thead>
+              <tr class="border-b border-white/10 bg-white/[0.02]">
+                {s.columns.map((col, i) => (
+                  <th
+                    scope="col"
+                    class:list={[
+                      "text-left px-5 py-4 text-xs uppercase tracking-[0.14em] font-medium",
+                      i === 0 ? "text-[var(--color-muted)]" : "",
+                      i === 1 ? "text-white" : "",
+                      i > 1 ? "text-[var(--color-dim)]" : "",
+                    ]}
+                  >
+                    {i === 1 ? (
+                      <span class="inline-flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-[var(--color-brand-1)] shadow-[0_0_8px_var(--color-brand-1)]" aria-hidden="true"></span>
+                        {col}
+                      </span>
+                    ) : (
+                      col
+                    )}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {s.rows.map((row, rIdx) => (
+                <tr class:list={["border-b border-white/5 last:border-b-0", rIdx % 2 === 1 ? "bg-white/[0.015]" : ""]}>
+                  <td class="px-5 py-3.5 text-[var(--color-muted)]">{row.label}</td>
+                  {row.values.map((raw, cIdx) => {
+                    const c = cell(raw);
+                    return (
+                      <td
+                        class:list={[
+                          "px-5 py-3.5 font-mono text-[13px] tabular-nums",
+                          treatmentClass[c.treatment],
+                          cIdx === 0 ? "font-semibold" : "",
+                        ]}
+                      >
+                        {c.label}
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <p class="mt-3 text-xs text-[var(--color-dim)]">{s.tableNote}</p>
+    </div>
+
+    <!-- Differentiator cards -->
+    <div class="mt-14 sm:mt-16">
+      <div class="text-xs uppercase tracking-[0.18em] text-[var(--color-muted)] mb-4">
+        {s.cardsTitle}
+      </div>
+      <div class="grid gap-4 sm:gap-5 sm:grid-cols-2">
+        {s.cards.map((card, i) => (
+          <div
+            class="mcp-card group relative rounded-2xl border border-white/10 bg-[var(--color-surface)]/60 p-6 hover:border-white/25 transition-colors overflow-hidden"
+            style={`--mcp-delay:${i * 80}ms`}
+          >
+            <div class="flex items-start justify-between mb-4">
+              <span class="font-mono text-[11px] tracking-[0.18em] text-[var(--color-brand-1)]">
+                0{i + 1}
+              </span>
+              <span class="font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--color-dim)]">
+                ThinkWatch
+              </span>
+            </div>
+            <h3 class="text-lg font-semibold tracking-tight mb-2">{card.title}</h3>
+            <p class="text-sm text-[var(--color-muted)] leading-relaxed">{card.body}</p>
+            <div class="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-cyan-400/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .mcp-card {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  .mcp-card.is-visible {
+    animation: mcpFadeUp 600ms cubic-bezier(.2,.7,.25,1) both;
+    animation-delay: var(--mcp-delay, 0ms);
+  }
+  @keyframes mcpFadeUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .mcp-card { opacity: 1; transform: none; animation: none !important; }
+  }
+</style>
+
+<script>
+  const cards = document.querySelectorAll(".mcp-card");
+  if (cards.length && "IntersectionObserver" in window) {
+    const obs = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-visible");
+            obs.unobserve(entry.target);
+          }
+        }
+      },
+      { threshold: 0.15 }
+    );
+    cards.forEach((c) => obs.observe(c));
+  } else {
+    cards.forEach((c) => c.classList.add("is-visible"));
+  }
+</script>
