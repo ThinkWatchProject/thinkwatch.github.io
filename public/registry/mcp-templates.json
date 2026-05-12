@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updated_at": "2026-04-14T12:00:00Z",
+  "updated_at": "2026-05-12T12:00:00Z",
   "templates": [
     {
       "slug": "github",
@@ -11,6 +11,8 @@
       "endpoint_template": "https://api.githubcopilot.com/mcp/",
 
       "auth_type": "bearer",
+      "auth_shape": "static",
+      "static_token_help_url": "https://github.com/settings/tokens",
       "auth_instructions": { "en": "Go to GitHub → Settings → Developer settings → Personal access tokens → Generate new token", "zh": "前往 GitHub → Settings → Developer settings → Personal access tokens → 生成新 Token" },
       "deploy_type": "hosted",
       "featured": true
@@ -23,6 +25,8 @@
       "tags": ["git", "code", "cicd"],
 
       "auth_type": "bearer",
+      "auth_shape": "static",
+      "static_token_help_url": "https://gitlab.com/-/profile/personal_access_tokens",
       "auth_instructions": { "en": "Go to GitLab → Preferences → Access Tokens → Create personal access token", "zh": "前往 GitLab → Preferences → Access Tokens → 创建个人访问令牌" },
       "deploy_type": "manual",
       "featured": false
@@ -36,6 +40,8 @@
       "endpoint_template": "https://mcp.linear.app/sse",
 
       "auth_type": "bearer",
+      "auth_shape": "static",
+      "static_token_help_url": "https://linear.app/settings/api",
       "auth_instructions": { "en": "Go to Linear → Settings → API → Create personal API key", "zh": "前往 Linear → Settings → API → 创建个人 API Key" },
       "deploy_type": "hosted",
       "featured": false
@@ -48,6 +54,8 @@
       "tags": ["monitoring", "errors"],
 
       "auth_type": "bearer",
+      "auth_shape": "static",
+      "static_token_help_url": "https://sentry.io/settings/account/api/auth-tokens/",
       "auth_instructions": { "en": "Go to Sentry → Settings → Auth Tokens → Create new token", "zh": "前往 Sentry → Settings → Auth Tokens → 创建新令牌" },
       "deploy_type": "manual",
       "featured": false
@@ -60,9 +68,11 @@
       "tags": ["sql", "relational"],
 
       "auth_type": "none",
+      "auth_shape": "anonymous",
       "auth_instructions": { "en": "Deploy the PostgreSQL MCP server with your connection string", "zh": "使用连接字符串部署 PostgreSQL MCP 服务器" },
       "deploy_type": "docker",
-      "deploy_command": "docker run -p 8080:8080 -e DATABASE_URL=postgres://user:pass@host:5432/db ghcr.io/thinkwatch/mcp-postgresql",
+      "deploy_command": "npx -y @modelcontextprotocol/server-postgres postgres://USER:PASS@HOST:5432/DB",
+      "deploy_docs_url": "https://github.com/modelcontextprotocol/servers/tree/main/src/postgres",
       "featured": true
     },
     {
@@ -73,9 +83,11 @@
       "tags": ["sql", "relational"],
 
       "auth_type": "none",
+      "auth_shape": "anonymous",
       "auth_instructions": { "en": "Deploy the MySQL MCP server with your connection string", "zh": "使用连接字符串部署 MySQL MCP 服务器" },
       "deploy_type": "docker",
-      "deploy_command": "docker run -p 8080:8080 -e DATABASE_URL=mysql://user:pass@host:3306/db ghcr.io/thinkwatch/mcp-mysql",
+      "deploy_command": "npx -y @benborla29/mcp-server-mysql",
+      "deploy_docs_url": "https://github.com/benborla/mcp-server-mysql",
       "featured": false
     },
     {
@@ -86,9 +98,11 @@
       "tags": ["cache", "nosql"],
 
       "auth_type": "none",
+      "auth_shape": "anonymous",
       "auth_instructions": { "en": "Deploy the Redis MCP server pointing to your Redis instance", "zh": "部署 Redis MCP 服务器并指向你的 Redis 实例" },
       "deploy_type": "docker",
-      "deploy_command": "docker run -p 8080:8080 -e REDIS_URL=redis://host:6379 ghcr.io/thinkwatch/mcp-redis",
+      "deploy_command": "npx -y @modelcontextprotocol/server-redis redis://HOST:6379",
+      "deploy_docs_url": "https://github.com/modelcontextprotocol/servers/tree/main/src/redis",
       "featured": false
     },
     {
@@ -99,9 +113,11 @@
       "tags": ["nosql", "document"],
 
       "auth_type": "none",
+      "auth_shape": "anonymous",
       "auth_instructions": { "en": "Deploy the MongoDB MCP server with your connection URI", "zh": "使用连接 URI 部署 MongoDB MCP 服务器" },
       "deploy_type": "docker",
-      "deploy_command": "docker run -p 8080:8080 -e MONGO_URI=mongodb://host:27017/db ghcr.io/thinkwatch/mcp-mongodb",
+      "deploy_command": "npx -y mongodb-mcp-server --connectionString \"mongodb://USER:PASS@HOST:27017/DB\"",
+      "deploy_docs_url": "https://github.com/mongodb-js/mongodb-mcp-server",
       "featured": false
     },
     {
@@ -112,8 +128,10 @@
       "tags": ["chat", "messaging"],
 
       "auth_type": "bearer",
-      "auth_instructions": { "en": "Go to Slack → Apps → Create App → OAuth & Permissions → Install to workspace → Copy bot token. Deploy locally: npx -y @anthropic-ai/mcp-server-slack", "zh": "前往 Slack → Apps → 创建应用 → OAuth & Permissions → 安装到工作区 → 复制 Bot Token。本地部署：npx -y @anthropic-ai/mcp-server-slack" },
-      "deploy_type": "docker",
+      "auth_shape": "static",
+      "static_token_help_url": "https://api.slack.com/apps",
+      "auth_instructions": { "en": "Go to Slack → Apps → Create App → OAuth & Permissions → Install to workspace → Copy bot token", "zh": "前往 Slack → Apps → 创建应用 → OAuth & Permissions → 安装到工作区 → 复制 Bot Token" },
+      "deploy_type": "manual",
       "featured": true
     },
     {
@@ -124,6 +142,8 @@
       "tags": ["chat", "gaming"],
 
       "auth_type": "bearer",
+      "auth_shape": "static",
+      "static_token_help_url": "https://discord.com/developers/applications",
       "auth_instructions": { "en": "Go to Discord Developer Portal → Applications → Bot → Copy token", "zh": "前往 Discord 开发者门户 → 应用 → Bot → 复制 Token" },
       "deploy_type": "manual",
       "featured": false
@@ -136,9 +156,10 @@
       "tags": ["infrastructure", "devops"],
 
       "auth_type": "api_key",
-      "auth_instructions": { "en": "Configure with AWS Access Key ID and Secret Access Key", "zh": "使用 AWS Access Key ID 和 Secret Access Key 配置" },
-      "deploy_type": "docker",
-      "deploy_command": "docker run -p 8080:8080 -e AWS_ACCESS_KEY_ID=xxx -e AWS_SECRET_ACCESS_KEY=yyy ghcr.io/thinkwatch/mcp-aws",
+      "auth_shape": "static",
+      "static_token_help_url": "https://console.aws.amazon.com/iam/home#/security_credentials",
+      "auth_instructions": { "en": "Provide an AWS access-key pair (or assume-role token) for the MCP server", "zh": "为 MCP 服务器提供 AWS Access Key 对（或假设角色令牌）" },
+      "deploy_type": "manual",
       "featured": false
     },
     {
@@ -150,6 +171,8 @@
       "endpoint_template": "https://mcp.cloudflare.com",
 
       "auth_type": "bearer",
+      "auth_shape": "static",
+      "static_token_help_url": "https://dash.cloudflare.com/profile/api-tokens",
       "auth_instructions": { "en": "Go to Cloudflare → My Profile → API Tokens → Create Token", "zh": "前往 Cloudflare → 我的个人资料 → API 令牌 → 创建令牌" },
       "deploy_type": "hosted",
       "featured": false
@@ -162,35 +185,26 @@
       "tags": ["files", "local"],
 
       "auth_type": "none",
-      "auth_instructions": { "en": "Deploy locally — grants access to the configured directory", "zh": "本地部署 — 授权访问指定目录" },
+      "auth_shape": "anonymous",
+      "auth_instructions": { "en": "Deploys locally — grants access to the configured directory", "zh": "本地部署 — 授权访问指定目录" },
       "deploy_type": "docker",
-      "deploy_command": "docker run -p 8080:8080 -v /path/to/dir:/data ghcr.io/thinkwatch/mcp-filesystem",
+      "deploy_command": "npx -y @modelcontextprotocol/server-filesystem /path/to/dir",
+      "deploy_docs_url": "https://github.com/modelcontextprotocol/servers/tree/main/src/filesystem",
       "featured": false
-    },
-    {
-      "slug": "web-search",
-      "name": "Web Search",
-      "description": { "en": "Search the web and fetch page content", "zh": "搜索网页并获取页面内容" },
-      "category": "utility",
-      "tags": ["search", "web"],
-
-      "auth_type": "api_key",
-      "auth_instructions": { "en": "Requires a search API key (Google, Bing, or Brave)", "zh": "需要搜索 API Key（Google、Bing 或 Brave）" },
-      "deploy_type": "docker",
-      "deploy_command": "docker run -p 8080:8080 -e SEARCH_API_KEY=xxx ghcr.io/thinkwatch/mcp-web-search",
-      "featured": true
     },
     {
       "slug": "puppeteer",
       "name": "Puppeteer",
-      "description": { "en": "Browser automation — navigate, screenshot, and extract data", "zh": "浏览器自动化 — 导航、截图和数据提取" },
+      "description": { "en": "Browser automation — navigate, screenshot, and extract data (now powered by @playwright/mcp)", "zh": "浏览器自动化 — 导航、截图和数据提取（现由 @playwright/mcp 接棒）" },
       "category": "utility",
       "tags": ["browser", "scraping"],
 
       "auth_type": "none",
-      "auth_instructions": { "en": "Deploy the Puppeteer MCP server with a headless Chrome instance", "zh": "部署带无头 Chrome 的 Puppeteer MCP 服务器" },
+      "auth_shape": "anonymous",
+      "auth_instructions": { "en": "The Puppeteer MCP server was deprecated in favor of @playwright/mcp, which covers the same browser-automation surface", "zh": "Puppeteer MCP 已弃用，由 @playwright/mcp 接棒，覆盖相同的浏览器自动化能力" },
       "deploy_type": "docker",
-      "deploy_command": "docker run -p 8080:8080 ghcr.io/thinkwatch/mcp-puppeteer",
+      "deploy_command": "npx -y @playwright/mcp@latest",
+      "deploy_docs_url": "https://github.com/microsoft/playwright-mcp",
       "featured": false
     },
     {
@@ -202,6 +216,7 @@
       "endpoint_template": "https://learn.microsoft.com/api/mcp",
 
       "auth_type": "none",
+      "auth_shape": "anonymous",
       "deploy_type": "hosted",
       "featured": false
     },
@@ -214,40 +229,8 @@
       "endpoint_template": "https://knowledge-mcp.global.api.aws",
 
       "auth_type": "none",
+      "auth_shape": "anonymous",
       "deploy_type": "hosted",
-      "featured": false
-    },
-    {
-      "slug": "mdn-web-docs",
-      "name": "MDN Web Docs",
-      "description": { "en": "Search MDN for HTML, CSS, JavaScript, and Web API references", "zh": "搜索 MDN 的 HTML、CSS、JavaScript 和 Web API 参考文档" },
-      "category": "knowledge",
-      "tags": ["docs", "web", "frontend"],
-
-      "auth_type": "none",
-      "deploy_type": "docker",
-      "featured": false
-    },
-    {
-      "slug": "wikipedia",
-      "name": "Wikipedia",
-      "description": { "en": "Search and read Wikipedia articles in any language", "zh": "搜索和阅读任意语言的维基百科文章" },
-      "category": "knowledge",
-      "tags": ["docs", "encyclopedia", "reference"],
-
-      "auth_type": "none",
-      "deploy_type": "docker",
-      "featured": false
-    },
-    {
-      "slug": "arxiv",
-      "name": "arXiv",
-      "description": { "en": "Search and read academic papers from arXiv", "zh": "搜索和阅读 arXiv 学术论文" },
-      "category": "knowledge",
-      "tags": ["docs", "research", "papers"],
-
-      "auth_type": "none",
-      "deploy_type": "docker",
       "featured": false
     },
     {
@@ -259,6 +242,8 @@
       "endpoint_template": "https://mcp.notion.com/sse",
 
       "auth_type": "bearer",
+      "auth_shape": "static",
+      "static_token_help_url": "https://www.notion.so/my-integrations",
       "auth_instructions": { "en": "Go to Notion → Settings → My connections → Develop or manage integrations → Create new integration", "zh": "前往 Notion → Settings → My connections → 开发或管理集成 → 创建新集成" },
       "deploy_type": "hosted",
       "featured": false
@@ -271,6 +256,8 @@
       "tags": ["files", "google", "storage"],
 
       "auth_type": "bearer",
+      "auth_shape": "static",
+      "static_token_help_url": "https://console.cloud.google.com/apis/credentials",
       "auth_instructions": { "en": "Create a Google Cloud OAuth2 credential and authorize Drive access", "zh": "创建 Google Cloud OAuth2 凭证并授权 Drive 访问" },
       "deploy_type": "manual",
       "featured": false
@@ -283,8 +270,88 @@
       "tags": ["project", "agile", "atlassian"],
 
       "auth_type": "bearer",
+      "auth_shape": "static",
+      "static_token_help_url": "https://id.atlassian.com/manage-profile/security/api-tokens",
       "auth_instructions": { "en": "Go to Atlassian → Account settings → Security → API tokens → Create API token", "zh": "前往 Atlassian → 账户设置 → 安全 → API 令牌 → 创建 API 令牌" },
       "deploy_type": "manual",
+      "featured": false
+    },
+    {
+      "slug": "stripe",
+      "name": "Stripe",
+      "description": { "en": "Payments — charges, customers, invoices, and subscriptions", "zh": "支付 — 收款、客户、发票和订阅" },
+      "category": "productivity",
+      "tags": ["payments", "billing"],
+      "endpoint_template": "https://mcp.stripe.com",
+
+      "auth_type": "bearer",
+      "auth_shape": "static",
+      "static_token_help_url": "https://dashboard.stripe.com/apikeys",
+      "auth_instructions": { "en": "Create a restricted API key in the Stripe dashboard. Read-only keys are recommended for most agent use cases.", "zh": "在 Stripe 控制台创建受限 API Key。对大多数 Agent 场景推荐使用只读 Key。" },
+      "deploy_type": "hosted",
+      "deploy_docs_url": "https://docs.stripe.com/mcp",
+      "featured": false
+    },
+    {
+      "slug": "memory",
+      "name": "Memory",
+      "description": { "en": "Knowledge-graph memory — persistent facts across agent sessions", "zh": "知识图谱记忆 — 跨会话持久化的事实存储" },
+      "category": "utility",
+      "tags": ["agent", "memory"],
+
+      "auth_type": "none",
+      "auth_shape": "anonymous",
+      "auth_instructions": { "en": "Reference MCP server. State lives in the container's working directory.", "zh": "Anthropic 官方参考实现，状态保存在容器工作目录。" },
+      "deploy_type": "docker",
+      "deploy_command": "npx -y @modelcontextprotocol/server-memory",
+      "deploy_docs_url": "https://github.com/modelcontextprotocol/servers/tree/main/src/memory",
+      "featured": false
+    },
+    {
+      "slug": "sequential-thinking",
+      "name": "Sequential Thinking",
+      "description": { "en": "Step-by-step reasoning helper for complex problems", "zh": "面向复杂问题的分步推理工具" },
+      "category": "utility",
+      "tags": ["agent", "reasoning"],
+
+      "auth_type": "none",
+      "auth_shape": "anonymous",
+      "auth_instructions": { "en": "Reference MCP server that exposes a sequential_thinking tool for the model to externalize multi-step reasoning.", "zh": "Anthropic 官方参考实现，暴露 sequential_thinking 工具让模型把多步推理显式输出。" },
+      "deploy_type": "docker",
+      "deploy_command": "npx -y @modelcontextprotocol/server-sequential-thinking",
+      "deploy_docs_url": "https://github.com/modelcontextprotocol/servers/tree/main/src/sequentialthinking",
+      "featured": false
+    },
+    {
+      "slug": "brave-search",
+      "name": "Brave Search",
+      "description": { "en": "Web + local search via the Brave Search API", "zh": "通过 Brave Search API 提供网页和本地搜索" },
+      "category": "utility",
+      "tags": ["search", "web"],
+
+      "auth_type": "api_key",
+      "auth_shape": "static",
+      "static_token_help_url": "https://brave.com/search/api/",
+      "auth_instructions": { "en": "Create a Brave Search API key (free tier available) and provide it as BRAVE_API_KEY.", "zh": "在 Brave Search API 创建 Key（有免费额度），通过 BRAVE_API_KEY 注入。" },
+      "deploy_type": "docker",
+      "deploy_command": "npx -y @modelcontextprotocol/server-brave-search",
+      "deploy_docs_url": "https://github.com/modelcontextprotocol/servers/tree/main/src/brave-search",
+      "featured": true
+    },
+    {
+      "slug": "tavily",
+      "name": "Tavily",
+      "description": { "en": "LLM-optimized web search and content extraction", "zh": "面向 LLM 的网页搜索和正文提取" },
+      "category": "utility",
+      "tags": ["search", "web", "ai"],
+
+      "auth_type": "api_key",
+      "auth_shape": "static",
+      "static_token_help_url": "https://app.tavily.com/",
+      "auth_instructions": { "en": "Sign up at tavily.com, create an API key, and provide it as TAVILY_API_KEY.", "zh": "在 tavily.com 注册并创建 API Key，通过 TAVILY_API_KEY 注入。" },
+      "deploy_type": "docker",
+      "deploy_command": "npx -y tavily-mcp",
+      "deploy_docs_url": "https://github.com/tavily-ai/tavily-mcp",
       "featured": false
     }
   ]
