@@ -1,80 +1,127 @@
 {
   "version": 2,
-  "updated_at": "2026-05-12T20:30:00Z",
+  "updated_at": "2026-05-13T12:00:00Z",
   "templates": [
     {
       "slug": "github",
       "name": "GitHub",
-      "description": { "en": "Manage repositories, issues, pull requests, and code search", "zh": "管理仓库、Issue、Pull Request 和代码搜索" },
+      "description": {
+        "en": "Manage repositories, issues, pull requests, and code search",
+        "zh": "管理仓库、Issue、Pull Request 和代码搜索"
+      },
       "category": "developer",
-      "tags": ["git", "code", "vcs"],
+      "tags": [
+        "git",
+        "code",
+        "vcs"
+      ],
       "endpoint_template": "https://api.githubcopilot.com/mcp/",
-
       "auth_type": "bearer",
       "auth_shape": "static",
       "static_token_help_url": "https://github.com/settings/tokens",
-      "auth_instructions": { "en": "Go to GitHub → Settings → Developer settings → Personal access tokens → Generate new token", "zh": "前往 GitHub → Settings → Developer settings → Personal access tokens → 生成新 Token" },
+      "auth_instructions": {
+        "en": "Go to GitHub → Settings → Developer settings → Personal access tokens → Generate new token",
+        "zh": "前往 GitHub → Settings → Developer settings → Personal access tokens → 生成新 Token"
+      },
       "deploy_type": "hosted",
       "featured": true
     },
     {
       "slug": "gitlab",
       "name": "GitLab",
-      "description": { "en": "Manage projects, merge requests, and CI/CD pipelines", "zh": "管理项目、合并请求和 CI/CD 流水线" },
+      "description": {
+        "en": "Manage projects, merge requests, and CI/CD pipelines",
+        "zh": "管理项目、合并请求和 CI/CD 流水线"
+      },
       "category": "developer",
-      "tags": ["git", "code", "cicd"],
-
+      "tags": [
+        "git",
+        "code",
+        "cicd"
+      ],
       "auth_type": "bearer",
       "auth_shape": "static",
       "static_token_help_url": "https://gitlab.com/-/profile/personal_access_tokens",
-      "auth_instructions": { "en": "Go to GitLab → Preferences → Access Tokens → Create personal access token", "zh": "前往 GitLab → Preferences → Access Tokens → 创建个人访问令牌" },
+      "auth_instructions": {
+        "en": "Go to GitLab → Preferences → Access Tokens → Create personal access token",
+        "zh": "前往 GitLab → Preferences → Access Tokens → 创建个人访问令牌"
+      },
       "deploy_type": "manual",
       "featured": false
     },
     {
       "slug": "linear",
       "name": "Linear",
-      "description": { "en": "Project management — issues, projects, and cycles", "zh": "项目管理 — Issue、项目和迭代周期" },
+      "description": {
+        "en": "Project management — issues, projects, and cycles",
+        "zh": "项目管理 — Issue、项目和迭代周期"
+      },
       "category": "developer",
-      "tags": ["project", "agile"],
+      "tags": [
+        "project",
+        "agile"
+      ],
       "endpoint_template": "https://mcp.linear.app/sse",
-
       "auth_type": "bearer",
       "auth_shape": "static",
       "static_token_help_url": "https://linear.app/settings/api",
-      "auth_instructions": { "en": "Go to Linear → Settings → API → Create personal API key", "zh": "前往 Linear → Settings → API → 创建个人 API Key" },
+      "auth_instructions": {
+        "en": "Go to Linear → Settings → API → Create personal API key",
+        "zh": "前往 Linear → Settings → API → 创建个人 API Key"
+      },
       "deploy_type": "hosted",
       "featured": false
     },
     {
       "slug": "linear-oauth",
       "name": "Linear (OAuth)",
-      "description": { "en": "Linear via OAuth flow — for org SSO workspaces", "zh": "Linear OAuth 流程 — 适用于企业 SSO 工作区" },
+      "description": {
+        "en": "Linear via OAuth flow — for org SSO workspaces",
+        "zh": "Linear OAuth 流程 — 适用于企业 SSO 工作区"
+      },
       "category": "developer",
-      "tags": ["project", "agile", "oauth"],
+      "tags": [
+        "project",
+        "agile",
+        "oauth"
+      ],
       "endpoint_template": "https://mcp.linear.app/sse",
-
       "auth_type": "oauth",
       "auth_shape": "oauth",
       "oauth_issuer": "https://linear.app",
       "oauth_authorization_endpoint": "https://linear.app/oauth/authorize",
       "oauth_token_endpoint": "https://api.linear.app/oauth/token",
-      "oauth_default_scopes": ["read"],
-      "auth_instructions": { "en": "Register an OAuth application at https://linear.app/settings/api/applications and paste client ID/secret on install", "zh": "在 https://linear.app/settings/api/applications 注册 OAuth 应用，安装时粘贴 client ID 和 secret" },
+      "oauth_default_scopes": [
+        "read"
+      ],
+      "auth_instructions": {
+        "en": "Register an OAuth application at https://linear.app/settings/api/applications and paste client ID/secret on install",
+        "zh": "在 https://linear.app/settings/api/applications 注册 OAuth 应用，安装时粘贴 client ID 和 secret"
+      },
       "deploy_type": "hosted",
       "featured": false
     },
     {
       "slug": "atlassian",
       "name": "Atlassian (Jira + Confluence)",
-      "description": { "en": "Manage Jira issues, sprints, project boards, and Confluence pages — one OAuth MCP for the whole suite", "zh": "管理 Jira Issue、Sprint、项目看板和 Confluence 页面 — 一个 OAuth MCP 覆盖整套" },
+      "description": {
+        "en": "Manage Jira issues, sprints, project boards, and Confluence pages — one OAuth MCP for the whole suite",
+        "zh": "管理 Jira Issue、Sprint、项目看板和 Confluence 页面 — 一个 OAuth MCP 覆盖整套"
+      },
       "category": "developer",
-      "tags": ["project", "agile", "atlassian", "wiki"],
+      "tags": [
+        "project",
+        "agile",
+        "atlassian",
+        "wiki"
+      ],
       "endpoint_template": "https://mcp.atlassian.com/v1/mcp",
-
       "auth_type": "oauth",
       "auth_shape": "oauth",
-      "auth_instructions": { "en": "Click Install → authorize Atlassian via OAuth. Requires admin consent for the workspace.", "zh": "点击安装 → 通过 OAuth 授权 Atlassian。需要工作区管理员同意。" },
+      "auth_instructions": {
+        "en": "Click Install → authorize Atlassian via OAuth. Requires admin consent for the workspace.",
+        "zh": "点击安装 → 通过 OAuth 授权 Atlassian。需要工作区管理员同意。"
+      },
       "deploy_type": "hosted",
       "deploy_docs_url": "https://www.atlassian.com/blog/announcements/remote-mcp-server",
       "featured": true
@@ -82,90 +129,117 @@
     {
       "slug": "sentry",
       "name": "Sentry",
-      "description": { "en": "Error tracking and performance monitoring — issues, events, releases", "zh": "错误追踪和性能监控 — Issue、事件、发布" },
+      "description": {
+        "en": "Error tracking and performance monitoring — issues, events, releases",
+        "zh": "错误追踪和性能监控 — Issue、事件、发布"
+      },
       "category": "developer",
-      "tags": ["monitoring", "errors"],
+      "tags": [
+        "monitoring",
+        "errors"
+      ],
       "endpoint_template": "https://mcp.sentry.dev/mcp",
-
       "auth_type": "oauth",
       "auth_shape": "oauth",
-      "auth_instructions": { "en": "Click Install → authorize Sentry via OAuth.", "zh": "点击安装 → 通过 OAuth 授权 Sentry。" },
+      "auth_instructions": {
+        "en": "Click Install → authorize Sentry via OAuth.",
+        "zh": "点击安装 → 通过 OAuth 授权 Sentry。"
+      },
       "deploy_type": "hosted",
-      "featured": false
-    },
-    {
-      "slug": "vercel",
-      "name": "Vercel",
-      "description": { "en": "Deploy, inspect projects, read build logs, manage environment variables", "zh": "部署、查看项目、读取构建日志、管理环境变量" },
-      "category": "developer",
-      "tags": ["deploy", "frontend", "serverless"],
-      "endpoint_template": "https://mcp.vercel.com",
-
-      "auth_type": "oauth",
-      "auth_shape": "oauth",
-      "auth_instructions": { "en": "Click Install → authorize Vercel via OAuth.", "zh": "点击安装 → 通过 OAuth 授权 Vercel。" },
-      "deploy_type": "hosted",
-      "deploy_docs_url": "https://vercel.com/docs/mcp",
       "featured": false
     },
     {
       "slug": "clerk",
       "name": "Clerk",
-      "description": { "en": "Manage users, sessions, and authentication settings", "zh": "管理用户、会话和认证设置" },
+      "description": {
+        "en": "Manage users, sessions, and authentication settings",
+        "zh": "管理用户、会话和认证设置"
+      },
       "category": "developer",
-      "tags": ["auth", "users", "saas"],
+      "tags": [
+        "auth",
+        "users",
+        "saas"
+      ],
       "endpoint_template": "https://mcp.clerk.com",
-
       "auth_type": "bearer",
       "auth_shape": "static",
       "static_token_help_url": "https://dashboard.clerk.com/last-active?path=api-keys",
-      "auth_instructions": { "en": "Create a Clerk secret key in the dashboard and paste it.", "zh": "在 Clerk 控制台创建 secret key 并粘贴。" },
+      "auth_instructions": {
+        "en": "Create a Clerk secret key in the dashboard and paste it.",
+        "zh": "在 Clerk 控制台创建 secret key 并粘贴。"
+      },
       "deploy_type": "hosted",
       "deploy_docs_url": "https://clerk.com/docs/integrations/mcp",
       "featured": false
     },
-
     {
       "slug": "notion",
       "name": "Notion",
-      "description": { "en": "Read and write Notion pages, databases, and blocks", "zh": "读写 Notion 页面、数据库和区块" },
+      "description": {
+        "en": "Read and write Notion pages, databases, and blocks",
+        "zh": "读写 Notion 页面、数据库和区块"
+      },
       "category": "productivity",
-      "tags": ["notes", "wiki", "docs"],
+      "tags": [
+        "notes",
+        "wiki",
+        "docs"
+      ],
       "endpoint_template": "https://mcp.notion.com/sse",
-
       "auth_type": "bearer",
       "auth_shape": "static",
       "static_token_help_url": "https://www.notion.so/my-integrations",
-      "auth_instructions": { "en": "Go to Notion → Settings → My connections → Develop or manage integrations → Create new integration", "zh": "前往 Notion → Settings → My connections → 开发或管理集成 → 创建新集成" },
+      "auth_instructions": {
+        "en": "Go to Notion → Settings → My connections → Develop or manage integrations → Create new integration",
+        "zh": "前往 Notion → Settings → My connections → 开发或管理集成 → 创建新集成"
+      },
       "deploy_type": "hosted",
       "featured": false
     },
     {
       "slug": "google-drive",
       "name": "Google Drive",
-      "description": { "en": "Search, read, and manage files in Google Drive", "zh": "搜索、读取和管理 Google Drive 文件" },
+      "description": {
+        "en": "Search, read, and manage files in Google Drive",
+        "zh": "搜索、读取和管理 Google Drive 文件"
+      },
       "category": "productivity",
-      "tags": ["files", "google", "storage"],
-
+      "tags": [
+        "files",
+        "google",
+        "storage"
+      ],
       "auth_type": "bearer",
       "auth_shape": "static",
       "static_token_help_url": "https://console.cloud.google.com/apis/credentials",
-      "auth_instructions": { "en": "Create a Google Cloud OAuth2 credential and authorize Drive access", "zh": "创建 Google Cloud OAuth2 凭证并授权 Drive 访问" },
+      "auth_instructions": {
+        "en": "Create a Google Cloud OAuth2 credential and authorize Drive access",
+        "zh": "创建 Google Cloud OAuth2 凭证并授权 Drive 访问"
+      },
       "deploy_type": "manual",
       "featured": false
     },
     {
       "slug": "stripe",
       "name": "Stripe",
-      "description": { "en": "Payments — charges, customers, invoices, and subscriptions", "zh": "支付 — 收款、客户、发票和订阅" },
+      "description": {
+        "en": "Payments — charges, customers, invoices, and subscriptions",
+        "zh": "支付 — 收款、客户、发票和订阅"
+      },
       "category": "productivity",
-      "tags": ["payments", "billing"],
+      "tags": [
+        "payments",
+        "billing"
+      ],
       "endpoint_template": "https://mcp.stripe.com",
-
       "auth_type": "bearer",
       "auth_shape": "static",
       "static_token_help_url": "https://dashboard.stripe.com/apikeys",
-      "auth_instructions": { "en": "Create a restricted API key in the Stripe dashboard. Read-only keys are recommended for most agent use cases.", "zh": "在 Stripe 控制台创建受限 API Key。对大多数 Agent 场景推荐使用只读 Key。" },
+      "auth_instructions": {
+        "en": "Create a restricted API key in the Stripe dashboard. Read-only keys are recommended for most agent use cases.",
+        "zh": "在 Stripe 控制台创建受限 API Key。对大多数 Agent 场景推荐使用只读 Key。"
+      },
       "deploy_type": "hosted",
       "deploy_docs_url": "https://docs.stripe.com/mcp",
       "featured": true
@@ -173,14 +247,22 @@
     {
       "slug": "paypal",
       "name": "PayPal",
-      "description": { "en": "Payments, invoicing, disputes, and B2B operations", "zh": "支付、发票、争议和 B2B 业务" },
+      "description": {
+        "en": "Payments, invoicing, disputes, and B2B operations",
+        "zh": "支付、发票、争议和 B2B 业务"
+      },
       "category": "productivity",
-      "tags": ["payments", "billing"],
+      "tags": [
+        "payments",
+        "billing"
+      ],
       "endpoint_template": "https://mcp.paypal.com/mcp",
-
       "auth_type": "oauth",
       "auth_shape": "oauth",
-      "auth_instructions": { "en": "Click Install → authorize PayPal via OAuth.", "zh": "点击安装 → 通过 OAuth 授权 PayPal。" },
+      "auth_instructions": {
+        "en": "Click Install → authorize PayPal via OAuth.",
+        "zh": "点击安装 → 通过 OAuth 授权 PayPal。"
+      },
       "deploy_type": "hosted",
       "deploy_docs_url": "https://developer.paypal.com/community/blog/paypal-mcp/",
       "featured": false
@@ -188,14 +270,23 @@
     {
       "slug": "square",
       "name": "Square",
-      "description": { "en": "POS payments, orders, catalog, and customers", "zh": "POS 支付、订单、目录和客户" },
+      "description": {
+        "en": "POS payments, orders, catalog, and customers",
+        "zh": "POS 支付、订单、目录和客户"
+      },
       "category": "productivity",
-      "tags": ["payments", "pos", "commerce"],
+      "tags": [
+        "payments",
+        "pos",
+        "commerce"
+      ],
       "endpoint_template": "https://mcp.squareup.com/sse",
-
       "auth_type": "oauth",
       "auth_shape": "oauth",
-      "auth_instructions": { "en": "Click Install → authorize Square via OAuth.", "zh": "点击安装 → 通过 OAuth 授权 Square。" },
+      "auth_instructions": {
+        "en": "Click Install → authorize Square via OAuth.",
+        "zh": "点击安装 → 通过 OAuth 授权 Square。"
+      },
       "deploy_type": "hosted",
       "deploy_docs_url": "https://developer.squareup.com/docs/mcp",
       "featured": false
@@ -203,89 +294,93 @@
     {
       "slug": "plaid",
       "name": "Plaid",
-      "description": { "en": "Banking data — accounts, transactions, balances (per-user audit critical)", "zh": "银行数据 — 账户、交易、余额（强烈建议按用户审计）" },
+      "description": {
+        "en": "Banking data — accounts, transactions, balances (per-user audit critical)",
+        "zh": "银行数据 — 账户、交易、余额（强烈建议按用户审计）"
+      },
       "category": "productivity",
-      "tags": ["banking", "finance", "payments"],
+      "tags": [
+        "banking",
+        "finance",
+        "payments"
+      ],
       "endpoint_template": "https://api.dashboard.plaid.com/mcp/sse",
-
       "auth_type": "oauth",
       "auth_shape": "oauth",
-      "auth_instructions": { "en": "Click Install → authorize via Plaid dashboard OAuth.", "zh": "点击安装 → 通过 Plaid 控制台 OAuth 授权。" },
+      "auth_instructions": {
+        "en": "Click Install → authorize via Plaid dashboard OAuth.",
+        "zh": "点击安装 → 通过 Plaid 控制台 OAuth 授权。"
+      },
       "deploy_type": "hosted",
       "deploy_docs_url": "https://plaid.com/docs/mcp/",
       "featured": false
     },
     {
-      "slug": "hubspot",
-      "name": "HubSpot",
-      "description": { "en": "CRM — contacts, companies, deals, and tickets", "zh": "CRM — 联系人、公司、交易和工单" },
-      "category": "productivity",
-      "tags": ["crm", "sales", "marketing"],
-      "endpoint_template": "https://mcp.hubspot.com",
-
-      "auth_type": "oauth",
-      "auth_shape": "oauth",
-      "auth_instructions": { "en": "Click Install → authorize HubSpot via OAuth.", "zh": "点击安装 → 通过 OAuth 授权 HubSpot。" },
-      "deploy_type": "hosted",
-      "deploy_docs_url": "https://developers.hubspot.com/docs/mcp",
-      "featured": false
-    },
-    {
       "slug": "asana",
       "name": "Asana",
-      "description": { "en": "Tasks, projects, and team workload", "zh": "任务、项目和团队工作量" },
+      "description": {
+        "en": "Tasks, projects, and team workload",
+        "zh": "任务、项目和团队工作量"
+      },
       "category": "productivity",
-      "tags": ["project", "tasks", "collaboration"],
+      "tags": [
+        "project",
+        "tasks",
+        "collaboration"
+      ],
       "endpoint_template": "https://mcp.asana.com/sse",
-
       "auth_type": "oauth",
       "auth_shape": "oauth",
-      "auth_instructions": { "en": "Click Install → authorize Asana via OAuth.", "zh": "点击安装 → 通过 OAuth 授权 Asana。" },
+      "auth_instructions": {
+        "en": "Click Install → authorize Asana via OAuth.",
+        "zh": "点击安装 → 通过 OAuth 授权 Asana。"
+      },
       "deploy_type": "hosted",
       "deploy_docs_url": "https://developers.asana.com/docs/mcp",
       "featured": false
     },
     {
-      "slug": "canva",
-      "name": "Canva",
-      "description": { "en": "Design assets, brand templates, and content automation", "zh": "设计资产、品牌模板和内容自动化" },
-      "category": "productivity",
-      "tags": ["design", "creative", "branding"],
-      "endpoint_template": "https://mcp.canva.com",
-
-      "auth_type": "oauth",
-      "auth_shape": "oauth",
-      "auth_instructions": { "en": "Click Install → authorize Canva via OAuth.", "zh": "点击安装 → 通过 OAuth 授权 Canva。" },
-      "deploy_type": "hosted",
-      "deploy_docs_url": "https://www.canva.dev/docs/apps/mcp/",
-      "featured": false
-    },
-    {
       "slug": "webflow",
       "name": "Webflow",
-      "description": { "en": "CMS items, site publishing, and SEO operations", "zh": "CMS 内容、站点发布和 SEO 操作" },
+      "description": {
+        "en": "CMS items, site publishing, and SEO operations",
+        "zh": "CMS 内容、站点发布和 SEO 操作"
+      },
       "category": "productivity",
-      "tags": ["cms", "web", "design"],
+      "tags": [
+        "cms",
+        "web",
+        "design"
+      ],
       "endpoint_template": "https://mcp.webflow.com/sse",
-
       "auth_type": "oauth",
       "auth_shape": "oauth",
-      "auth_instructions": { "en": "Click Install → authorize Webflow via OAuth.", "zh": "点击安装 → 通过 OAuth 授权 Webflow。" },
+      "auth_instructions": {
+        "en": "Click Install → authorize Webflow via OAuth.",
+        "zh": "点击安装 → 通过 OAuth 授权 Webflow。"
+      },
       "deploy_type": "hosted",
       "deploy_docs_url": "https://developers.webflow.com/data/docs/mcp",
       "featured": false
     },
-
     {
       "slug": "postgresql",
       "name": "PostgreSQL",
-      "description": { "en": "Query databases, browse schemas, and manage tables (self-deploy as HTTP MCP for team audit)", "zh": "查询数据库、浏览 Schema、管理表（自部署为 HTTP MCP 以获得团队审计）" },
+      "description": {
+        "en": "Query databases, browse schemas, and manage tables (self-deploy as HTTP MCP for team audit)",
+        "zh": "查询数据库、浏览 Schema、管理表（自部署为 HTTP MCP 以获得团队审计）"
+      },
       "category": "database",
-      "tags": ["sql", "relational"],
-
+      "tags": [
+        "sql",
+        "relational"
+      ],
       "auth_type": "none",
       "auth_shape": "anonymous",
-      "auth_instructions": { "en": "Deploy the PostgreSQL MCP and wrap with supergateway to expose HTTP — the gateway only proxies streamable_http/sse", "zh": "部署 PostgreSQL MCP，并用 supergateway 包装暴露 HTTP — 网关只代理 streamable_http/sse" },
+      "auth_instructions": {
+        "en": "Deploy the PostgreSQL MCP and wrap with supergateway to expose HTTP — the gateway only proxies streamable_http/sse",
+        "zh": "部署 PostgreSQL MCP，并用 supergateway 包装暴露 HTTP — 网关只代理 streamable_http/sse"
+      },
       "deploy_type": "docker",
       "deploy_command": "npx -y @modelcontextprotocol/server-postgres postgres://USER:PASS@HOST:5432/DB",
       "deploy_docs_url": "https://github.com/modelcontextprotocol/servers/tree/main/src/postgres",
@@ -294,13 +389,21 @@
     {
       "slug": "mysql",
       "name": "MySQL",
-      "description": { "en": "Query databases, browse schemas, and manage tables (self-deploy as HTTP MCP)", "zh": "查询数据库、浏览 Schema、管理表（自部署为 HTTP MCP）" },
+      "description": {
+        "en": "Query databases, browse schemas, and manage tables (self-deploy as HTTP MCP)",
+        "zh": "查询数据库、浏览 Schema、管理表（自部署为 HTTP MCP）"
+      },
       "category": "database",
-      "tags": ["sql", "relational"],
-
+      "tags": [
+        "sql",
+        "relational"
+      ],
       "auth_type": "none",
       "auth_shape": "anonymous",
-      "auth_instructions": { "en": "Deploy the MySQL MCP and wrap with supergateway to expose HTTP", "zh": "部署 MySQL MCP 并用 supergateway 包装暴露 HTTP" },
+      "auth_instructions": {
+        "en": "Deploy the MySQL MCP and wrap with supergateway to expose HTTP",
+        "zh": "部署 MySQL MCP 并用 supergateway 包装暴露 HTTP"
+      },
       "deploy_type": "docker",
       "deploy_command": "npx -y @benborla29/mcp-server-mysql",
       "deploy_docs_url": "https://github.com/benborla/mcp-server-mysql",
@@ -309,13 +412,21 @@
     {
       "slug": "redis",
       "name": "Redis",
-      "description": { "en": "Key-value operations, pub/sub, and data inspection (self-deploy as HTTP MCP)", "zh": "键值操作、发布订阅、数据检查（自部署为 HTTP MCP）" },
+      "description": {
+        "en": "Key-value operations, pub/sub, and data inspection (self-deploy as HTTP MCP)",
+        "zh": "键值操作、发布订阅、数据检查（自部署为 HTTP MCP）"
+      },
       "category": "database",
-      "tags": ["cache", "nosql"],
-
+      "tags": [
+        "cache",
+        "nosql"
+      ],
       "auth_type": "none",
       "auth_shape": "anonymous",
-      "auth_instructions": { "en": "Deploy the Redis MCP and wrap with supergateway to expose HTTP", "zh": "部署 Redis MCP 并用 supergateway 包装暴露 HTTP" },
+      "auth_instructions": {
+        "en": "Deploy the Redis MCP and wrap with supergateway to expose HTTP",
+        "zh": "部署 Redis MCP 并用 supergateway 包装暴露 HTTP"
+      },
       "deploy_type": "docker",
       "deploy_command": "npx -y @modelcontextprotocol/server-redis redis://HOST:6379",
       "deploy_docs_url": "https://github.com/modelcontextprotocol/servers/tree/main/src/redis",
@@ -324,13 +435,21 @@
     {
       "slug": "mongodb",
       "name": "MongoDB (Self-host)",
-      "description": { "en": "Self-hosted MongoDB — document operations, aggregation, collection management. Prefer mongodb-atlas if you're on Atlas", "zh": "自托管 MongoDB — 文档操作、聚合、集合管理。如果用 Atlas 优先选 mongodb-atlas" },
+      "description": {
+        "en": "Self-hosted MongoDB — document operations, aggregation, collection management. Prefer mongodb-atlas if you're on Atlas",
+        "zh": "自托管 MongoDB — 文档操作、聚合、集合管理。如果用 Atlas 优先选 mongodb-atlas"
+      },
       "category": "database",
-      "tags": ["nosql", "document"],
-
+      "tags": [
+        "nosql",
+        "document"
+      ],
       "auth_type": "none",
       "auth_shape": "anonymous",
-      "auth_instructions": { "en": "Deploy the MongoDB MCP and wrap with supergateway to expose HTTP", "zh": "部署 MongoDB MCP 并用 supergateway 包装暴露 HTTP" },
+      "auth_instructions": {
+        "en": "Deploy the MongoDB MCP and wrap with supergateway to expose HTTP",
+        "zh": "部署 MongoDB MCP 并用 supergateway 包装暴露 HTTP"
+      },
       "deploy_type": "docker",
       "deploy_command": "npx -y mongodb-mcp-server --connectionString \"mongodb://USER:PASS@HOST:27017/DB\"",
       "deploy_docs_url": "https://github.com/mongodb-js/mongodb-mcp-server",
@@ -339,15 +458,24 @@
     {
       "slug": "mongodb-atlas",
       "name": "MongoDB Atlas",
-      "description": { "en": "Hosted MongoDB — clusters, collections, indexes, and queries via the official Atlas MCP", "zh": "托管 MongoDB — 通过官方 Atlas MCP 管理集群、集合、索引和查询" },
+      "description": {
+        "en": "Hosted MongoDB — clusters, collections, indexes, and queries via the official Atlas MCP",
+        "zh": "托管 MongoDB — 通过官方 Atlas MCP 管理集群、集合、索引和查询"
+      },
       "category": "database",
-      "tags": ["nosql", "document", "cloud"],
+      "tags": [
+        "nosql",
+        "document",
+        "cloud"
+      ],
       "endpoint_template": "https://mcp.mongodb.com",
-
       "auth_type": "bearer",
       "auth_shape": "static",
       "static_token_help_url": "https://cloud.mongodb.com/v2#/account/access/api",
-      "auth_instructions": { "en": "Create an Atlas API key (Project → Access Manager → Create API Key) and paste it.", "zh": "在 Atlas 创建 API Key（Project → Access Manager → Create API Key）并粘贴。" },
+      "auth_instructions": {
+        "en": "Create an Atlas API key (Project → Access Manager → Create API Key) and paste it.",
+        "zh": "在 Atlas 创建 API Key（Project → Access Manager → Create API Key）并粘贴。"
+      },
       "deploy_type": "hosted",
       "deploy_docs_url": "https://www.mongodb.com/docs/mcp-server/",
       "featured": false
@@ -355,61 +483,95 @@
     {
       "slug": "neon",
       "name": "Neon (Postgres)",
-      "description": { "en": "Serverless Postgres — branches, queries, and project management", "zh": "Serverless Postgres — 分支、查询、项目管理" },
+      "description": {
+        "en": "Serverless Postgres — branches, queries, and project management",
+        "zh": "Serverless Postgres — 分支、查询、项目管理"
+      },
       "category": "database",
-      "tags": ["sql", "postgres", "serverless"],
+      "tags": [
+        "sql",
+        "postgres",
+        "serverless"
+      ],
       "endpoint_template": "https://mcp.neon.tech/mcp",
-
       "auth_type": "bearer",
       "auth_shape": "static",
       "static_token_help_url": "https://console.neon.tech/app/settings/api-keys",
-      "auth_instructions": { "en": "Create a Neon API key in the console and paste it.", "zh": "在 Neon 控制台创建 API Key 并粘贴。" },
+      "auth_instructions": {
+        "en": "Create a Neon API key in the console and paste it.",
+        "zh": "在 Neon 控制台创建 API Key 并粘贴。"
+      },
       "deploy_type": "hosted",
       "deploy_docs_url": "https://neon.com/docs/ai/neon-mcp-server",
       "featured": false
     },
-
     {
       "slug": "aws",
       "name": "AWS",
-      "description": { "en": "Manage S3 buckets, Lambda functions, EC2 instances, and more", "zh": "管理 S3 存储桶、Lambda 函数、EC2 实例等" },
+      "description": {
+        "en": "Manage S3 buckets, Lambda functions, EC2 instances, and more",
+        "zh": "管理 S3 存储桶、Lambda 函数、EC2 实例等"
+      },
       "category": "cloud",
-      "tags": ["infrastructure", "devops"],
-
+      "tags": [
+        "infrastructure",
+        "devops"
+      ],
       "auth_type": "api_key",
       "auth_shape": "static",
       "static_token_help_url": "https://console.aws.amazon.com/iam/home#/security_credentials",
-      "auth_instructions": { "en": "Provide an AWS access-key pair (or assume-role token) for the MCP server", "zh": "为 MCP 服务器提供 AWS Access Key 对（或假设角色令牌）" },
+      "auth_instructions": {
+        "en": "Provide an AWS access-key pair (or assume-role token) for the MCP server",
+        "zh": "为 MCP 服务器提供 AWS Access Key 对（或假设角色令牌）"
+      },
       "deploy_type": "manual",
       "featured": false
     },
     {
       "slug": "cloudflare",
       "name": "Cloudflare",
-      "description": { "en": "Manage DNS records, Workers, and edge configuration", "zh": "管理 DNS 记录、Workers 和边缘配置" },
+      "description": {
+        "en": "Manage DNS records, Workers, and edge configuration",
+        "zh": "管理 DNS 记录、Workers 和边缘配置"
+      },
       "category": "cloud",
-      "tags": ["cdn", "dns", "edge"],
+      "tags": [
+        "cdn",
+        "dns",
+        "edge"
+      ],
       "endpoint_template": "https://mcp.cloudflare.com",
-
       "auth_type": "bearer",
       "auth_shape": "static",
       "static_token_help_url": "https://dash.cloudflare.com/profile/api-tokens",
-      "auth_instructions": { "en": "Go to Cloudflare → My Profile → API Tokens → Create Token", "zh": "前往 Cloudflare → 我的个人资料 → API 令牌 → 创建令牌" },
+      "auth_instructions": {
+        "en": "Go to Cloudflare → My Profile → API Tokens → Create Token",
+        "zh": "前往 Cloudflare → 我的个人资料 → API 令牌 → 创建令牌"
+      },
       "deploy_type": "hosted",
       "featured": false
     },
     {
       "slug": "digitalocean-apps",
       "name": "DigitalOcean App Platform",
-      "description": { "en": "Deploy and manage App Platform apps", "zh": "部署和管理 App Platform 应用" },
+      "description": {
+        "en": "Deploy and manage App Platform apps",
+        "zh": "部署和管理 App Platform 应用"
+      },
       "category": "cloud",
-      "tags": ["deploy", "paas", "cloud"],
+      "tags": [
+        "deploy",
+        "paas",
+        "cloud"
+      ],
       "endpoint_template": "https://apps.mcp.digitalocean.com/mcp",
-
       "auth_type": "bearer",
       "auth_shape": "static",
       "static_token_help_url": "https://cloud.digitalocean.com/account/api/tokens",
-      "auth_instructions": { "en": "Create a personal access token in the DigitalOcean dashboard with the scopes you need.", "zh": "在 DigitalOcean 控制台创建带所需 scope 的 personal access token。" },
+      "auth_instructions": {
+        "en": "Create a personal access token in the DigitalOcean dashboard with the scopes you need.",
+        "zh": "在 DigitalOcean 控制台创建带所需 scope 的 personal access token。"
+      },
       "deploy_type": "hosted",
       "deploy_docs_url": "https://docs.digitalocean.com/reference/mcp/",
       "featured": false
@@ -417,72 +579,109 @@
     {
       "slug": "digitalocean-databases",
       "name": "DigitalOcean Databases",
-      "description": { "en": "Managed Postgres / MySQL / Redis / Kafka clusters", "zh": "托管的 Postgres / MySQL / Redis / Kafka 集群" },
+      "description": {
+        "en": "Managed Postgres / MySQL / Redis / Kafka clusters",
+        "zh": "托管的 Postgres / MySQL / Redis / Kafka 集群"
+      },
       "category": "cloud",
-      "tags": ["databases", "cloud"],
+      "tags": [
+        "databases",
+        "cloud"
+      ],
       "endpoint_template": "https://databases.mcp.digitalocean.com/mcp",
-
       "auth_type": "bearer",
       "auth_shape": "static",
       "static_token_help_url": "https://cloud.digitalocean.com/account/api/tokens",
-      "auth_instructions": { "en": "Same DigitalOcean PAT as the App Platform MCP — reuse if you've already created one.", "zh": "同 App Platform MCP 的 DigitalOcean PAT — 已创建过可复用。" },
+      "auth_instructions": {
+        "en": "Same DigitalOcean PAT as the App Platform MCP — reuse if you've already created one.",
+        "zh": "同 App Platform MCP 的 DigitalOcean PAT — 已创建过可复用。"
+      },
       "deploy_type": "hosted",
       "deploy_docs_url": "https://docs.digitalocean.com/reference/mcp/",
       "featured": false
     },
-
     {
       "slug": "slack",
       "name": "Slack",
-      "description": { "en": "Send messages, manage channels, and search workspace", "zh": "发送消息、管理频道、搜索工作区" },
+      "description": {
+        "en": "Send messages, manage channels, and search workspace",
+        "zh": "发送消息、管理频道、搜索工作区"
+      },
       "category": "communication",
-      "tags": ["chat", "messaging"],
-      "endpoint_template": "https://slack.com/mcp",
-
-      "auth_type": "oauth",
-      "auth_shape": "oauth",
-      "auth_instructions": { "en": "Click Install → authorize Slack via OAuth. Pre-installed apps can be managed at https://api.slack.com/apps", "zh": "点击安装 → 通过 OAuth 授权 Slack。已安装应用可在 https://api.slack.com/apps 管理" },
-      "deploy_type": "hosted",
-      "featured": true
+      "tags": [
+        "chat",
+        "messaging"
+      ],
+      "auth_type": "bearer",
+      "auth_shape": "static",
+      "auth_instructions": {
+        "en": "Slack hosted MCP gates installation behind their app-marketplace allowlist, which a DCR-registered ThinkWatch client cannot satisfy. Run a self-hosted Slack MCP server (or the npm slack-mcp package) and paste the bot token (xoxb-…) here.",
+        "zh": "Slack hosted MCP 走 app marketplace 白名单，DCR 注册的 ThinkWatch 客户端通不过审核。请自部署 Slack MCP 服务器（npm slack-mcp 等），把 Bot Token（xoxb-…）粘到这里。"
+      },
+      "deploy_type": "manual",
+      "featured": true,
+      "static_token_help_url": "https://api.slack.com/apps"
     },
     {
       "slug": "discord",
       "name": "Discord",
-      "description": { "en": "Send messages, manage channels, and moderate servers", "zh": "发送消息、管理频道和服务器管理" },
+      "description": {
+        "en": "Send messages, manage channels, and moderate servers",
+        "zh": "发送消息、管理频道和服务器管理"
+      },
       "category": "communication",
-      "tags": ["chat", "gaming"],
-
+      "tags": [
+        "chat",
+        "gaming"
+      ],
       "auth_type": "bearer",
       "auth_shape": "static",
       "static_token_help_url": "https://discord.com/developers/applications",
-      "auth_instructions": { "en": "Go to Discord Developer Portal → Applications → Bot → Copy token", "zh": "前往 Discord 开发者门户 → 应用 → Bot → 复制 Token" },
+      "auth_instructions": {
+        "en": "Go to Discord Developer Portal → Applications → Bot → Copy token",
+        "zh": "前往 Discord 开发者门户 → 应用 → Bot → 复制 Token"
+      },
       "deploy_type": "manual",
       "featured": false
     },
     {
       "slug": "intercom",
       "name": "Intercom",
-      "description": { "en": "Customer conversations, contacts, and help center articles", "zh": "客户对话、联系人和帮助中心文章" },
+      "description": {
+        "en": "Customer conversations, contacts, and help center articles",
+        "zh": "客户对话、联系人和帮助中心文章"
+      },
       "category": "communication",
-      "tags": ["support", "messaging", "crm"],
+      "tags": [
+        "support",
+        "messaging",
+        "crm"
+      ],
       "endpoint_template": "https://mcp.intercom.com/sse",
-
       "auth_type": "oauth",
       "auth_shape": "oauth",
-      "auth_instructions": { "en": "Click Install → authorize Intercom via OAuth.", "zh": "点击安装 → 通过 OAuth 授权 Intercom。" },
+      "auth_instructions": {
+        "en": "Click Install → authorize Intercom via OAuth.",
+        "zh": "点击安装 → 通过 OAuth 授权 Intercom。"
+      },
       "deploy_type": "hosted",
       "deploy_docs_url": "https://developers.intercom.com/docs/mcp",
       "featured": false
     },
-
     {
       "slug": "microsoft-docs",
       "name": "Microsoft Docs",
-      "description": { "en": "Search and browse Microsoft Learn documentation (Azure, .NET, Office, etc.)", "zh": "搜索和浏览微软文档（Azure、.NET、Office 等）" },
+      "description": {
+        "en": "Search and browse Microsoft Learn documentation (Azure, .NET, Office, etc.)",
+        "zh": "搜索和浏览微软文档（Azure、.NET、Office 等）"
+      },
       "category": "knowledge",
-      "tags": ["docs", "microsoft", "azure"],
+      "tags": [
+        "docs",
+        "microsoft",
+        "azure"
+      ],
       "endpoint_template": "https://learn.microsoft.com/api/mcp",
-
       "auth_type": "none",
       "auth_shape": "anonymous",
       "deploy_type": "hosted",
@@ -491,11 +690,17 @@
     {
       "slug": "aws-docs",
       "name": "AWS Documentation",
-      "description": { "en": "Search and browse AWS service documentation", "zh": "搜索和浏览 AWS 服务文档" },
+      "description": {
+        "en": "Search and browse AWS service documentation",
+        "zh": "搜索和浏览 AWS 服务文档"
+      },
       "category": "knowledge",
-      "tags": ["docs", "aws", "cloud"],
+      "tags": [
+        "docs",
+        "aws",
+        "cloud"
+      ],
       "endpoint_template": "https://knowledge-mcp.global.api.aws",
-
       "auth_type": "none",
       "auth_shape": "anonymous",
       "deploy_type": "hosted",
@@ -504,15 +709,24 @@
     {
       "slug": "huggingface",
       "name": "Hugging Face",
-      "description": { "en": "Search models, datasets, and Spaces", "zh": "搜索模型、数据集和 Spaces" },
+      "description": {
+        "en": "Search models, datasets, and Spaces",
+        "zh": "搜索模型、数据集和 Spaces"
+      },
       "category": "knowledge",
-      "tags": ["ai", "models", "datasets"],
+      "tags": [
+        "ai",
+        "models",
+        "datasets"
+      ],
       "endpoint_template": "https://huggingface.co/mcp",
-
       "auth_type": "bearer",
       "auth_shape": "static",
       "static_token_help_url": "https://huggingface.co/settings/tokens",
-      "auth_instructions": { "en": "Optional — anonymous browsing works; a Hugging Face token unlocks private repos and higher rate limits.", "zh": "可选 — 匿名浏览也可用；Hugging Face token 可访问私有仓库并提高速率限制。" },
+      "auth_instructions": {
+        "en": "Optional — anonymous browsing works; a Hugging Face token unlocks private repos and higher rate limits.",
+        "zh": "可选 — 匿名浏览也可用；Hugging Face token 可访问私有仓库并提高速率限制。"
+      },
       "deploy_type": "hosted",
       "deploy_docs_url": "https://huggingface.co/docs/hub/en/mcp",
       "featured": false
@@ -520,14 +734,23 @@
     {
       "slug": "deepwiki",
       "name": "DeepWiki",
-      "description": { "en": "AI-generated documentation and Q&A over public GitHub repos", "zh": "公开 GitHub 仓库的 AI 生成文档和问答" },
+      "description": {
+        "en": "AI-generated documentation and Q&A over public GitHub repos",
+        "zh": "公开 GitHub 仓库的 AI 生成文档和问答"
+      },
       "category": "knowledge",
-      "tags": ["docs", "github", "code"],
+      "tags": [
+        "docs",
+        "github",
+        "code"
+      ],
       "endpoint_template": "https://mcp.deepwiki.com/mcp",
-
       "auth_type": "none",
       "auth_shape": "anonymous",
-      "auth_instructions": { "en": "Public service — no credentials. Ask questions about any public GitHub repo.", "zh": "公共服务 — 无需凭证。可向任何公开 GitHub 仓库提问。" },
+      "auth_instructions": {
+        "en": "Public service — no credentials. Ask questions about any public GitHub repo.",
+        "zh": "公共服务 — 无需凭证。可向任何公开 GitHub 仓库提问。"
+      },
       "deploy_type": "hosted",
       "deploy_docs_url": "https://docs.devin.ai/work-with-devin/deepwiki-mcp",
       "featured": false
@@ -535,31 +758,48 @@
     {
       "slug": "context7",
       "name": "Context7",
-      "description": { "en": "Up-to-date code library docs for popular npm/pip/go packages", "zh": "热门 npm/pip/go 包的最新代码库文档" },
+      "description": {
+        "en": "Up-to-date code library docs for popular npm/pip/go packages",
+        "zh": "热门 npm/pip/go 包的最新代码库文档"
+      },
       "category": "knowledge",
-      "tags": ["docs", "libraries", "code"],
+      "tags": [
+        "docs",
+        "libraries",
+        "code"
+      ],
       "endpoint_template": "https://mcp.context7.com/mcp",
-
       "auth_type": "none",
       "auth_shape": "anonymous",
-      "auth_instructions": { "en": "Public service — no credentials.", "zh": "公共服务 — 无需凭证。" },
+      "auth_instructions": {
+        "en": "Public service — no credentials.",
+        "zh": "公共服务 — 无需凭证。"
+      },
       "deploy_type": "hosted",
       "deploy_docs_url": "https://context7.com/",
       "featured": false
     },
-
     {
       "slug": "exa",
       "name": "Exa Search",
-      "description": { "en": "LLM-optimized semantic web search and content extraction", "zh": "面向 LLM 的语义网页搜索和正文提取" },
+      "description": {
+        "en": "LLM-optimized semantic web search and content extraction",
+        "zh": "面向 LLM 的语义网页搜索和正文提取"
+      },
       "category": "utility",
-      "tags": ["search", "web", "ai"],
+      "tags": [
+        "search",
+        "web",
+        "ai"
+      ],
       "endpoint_template": "https://mcp.exa.ai",
-
       "auth_type": "bearer",
       "auth_shape": "static",
       "static_token_help_url": "https://dashboard.exa.ai/api-keys",
-      "auth_instructions": { "en": "Create an Exa API key in the dashboard and paste it.", "zh": "在 Exa 控制台创建 API Key 并粘贴。" },
+      "auth_instructions": {
+        "en": "Create an Exa API key in the dashboard and paste it.",
+        "zh": "在 Exa 控制台创建 API Key 并粘贴。"
+      },
       "deploy_type": "hosted",
       "deploy_docs_url": "https://docs.exa.ai/reference/mcp",
       "featured": true
@@ -567,15 +807,24 @@
     {
       "slug": "firecrawl",
       "name": "Firecrawl",
-      "description": { "en": "Crawl and scrape websites into clean Markdown", "zh": "爬取并抓取网页转为干净的 Markdown" },
+      "description": {
+        "en": "Crawl and scrape websites into clean Markdown",
+        "zh": "爬取并抓取网页转为干净的 Markdown"
+      },
       "category": "utility",
-      "tags": ["scraping", "web", "extract"],
+      "tags": [
+        "scraping",
+        "web",
+        "extract"
+      ],
       "endpoint_template": "https://mcp.firecrawl.dev",
-
       "auth_type": "bearer",
       "auth_shape": "static",
       "static_token_help_url": "https://www.firecrawl.dev/app/api-keys",
-      "auth_instructions": { "en": "Create a Firecrawl API key in the dashboard and paste it.", "zh": "在 Firecrawl 控制台创建 API Key 并粘贴。" },
+      "auth_instructions": {
+        "en": "Create a Firecrawl API key in the dashboard and paste it.",
+        "zh": "在 Firecrawl 控制台创建 API Key 并粘贴。"
+      },
       "deploy_type": "hosted",
       "deploy_docs_url": "https://docs.firecrawl.dev/mcp",
       "featured": false
@@ -583,15 +832,24 @@
     {
       "slug": "replicate",
       "name": "Replicate",
-      "description": { "en": "Run hosted ML models — image / video / audio generation", "zh": "运行托管 ML 模型 — 图像 / 视频 / 音频生成" },
+      "description": {
+        "en": "Run hosted ML models — image / video / audio generation",
+        "zh": "运行托管 ML 模型 — 图像 / 视频 / 音频生成"
+      },
       "category": "utility",
-      "tags": ["ai", "models", "inference"],
+      "tags": [
+        "ai",
+        "models",
+        "inference"
+      ],
       "endpoint_template": "https://mcp.replicate.com",
-
       "auth_type": "bearer",
       "auth_shape": "static",
       "static_token_help_url": "https://replicate.com/account/api-tokens",
-      "auth_instructions": { "en": "Create a Replicate API token and paste it.", "zh": "创建 Replicate API token 并粘贴。" },
+      "auth_instructions": {
+        "en": "Create a Replicate API token and paste it.",
+        "zh": "创建 Replicate API token 并粘贴。"
+      },
       "deploy_type": "hosted",
       "deploy_docs_url": "https://replicate.com/docs/topics/mcp",
       "featured": false
@@ -599,31 +857,25 @@
     {
       "slug": "zapier",
       "name": "Zapier",
-      "description": { "en": "Cross-system automation — trigger Zaps and call thousands of integrations from the agent", "zh": "跨系统自动化 — 让 Agent 触发 Zap 并调用数千个集成" },
+      "description": {
+        "en": "Cross-system automation — trigger Zaps and call thousands of integrations from the agent",
+        "zh": "跨系统自动化 — 让 Agent 触发 Zap 并调用数千个集成"
+      },
       "category": "utility",
-      "tags": ["automation", "ipaas", "integration"],
+      "tags": [
+        "automation",
+        "ipaas",
+        "integration"
+      ],
       "endpoint_template": "https://mcp.zapier.com",
-
       "auth_type": "oauth",
       "auth_shape": "oauth",
-      "auth_instructions": { "en": "Click Install → authorize Zapier via OAuth. Select which Zaps the agent is allowed to invoke.", "zh": "点击安装 → 通过 OAuth 授权 Zapier。选择 Agent 可以触发的 Zap。" },
+      "auth_instructions": {
+        "en": "Click Install → authorize Zapier via OAuth. Select which Zaps the agent is allowed to invoke.",
+        "zh": "点击安装 → 通过 OAuth 授权 Zapier。选择 Agent 可以触发的 Zap。"
+      },
       "deploy_type": "hosted",
       "deploy_docs_url": "https://zapier.com/mcp",
-      "featured": false
-    },
-    {
-      "slug": "workato",
-      "name": "Workato",
-      "description": { "en": "Enterprise iPaaS automation — recipes and connectors across business apps", "zh": "企业 iPaaS 自动化 — 跨业务应用的 recipe 和 connector" },
-      "category": "utility",
-      "tags": ["automation", "ipaas", "enterprise"],
-      "endpoint_template": "https://mcp.workato.com",
-
-      "auth_type": "oauth",
-      "auth_shape": "oauth",
-      "auth_instructions": { "en": "Click Install → authorize Workato via OAuth.", "zh": "点击安装 → 通过 OAuth 授权 Workato。" },
-      "deploy_type": "hosted",
-      "deploy_docs_url": "https://docs.workato.com/mcp.html",
       "featured": false
     }
   ]
