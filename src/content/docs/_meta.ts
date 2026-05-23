@@ -62,7 +62,7 @@ export const docsOrder: DocMeta[] = [
   {
     slug: "secret-rotation",
     label: { en: "Secret Rotation", "zh-CN": "密钥轮换" },
-    locales: ["en"],
+    locales: ["en", "zh-CN"],
     summary: {
       en: "Rotating provider keys, JWT secrets, and admin credentials in production.",
       "zh-CN": "在生产环境中轮换 Provider 密钥、JWT secret 和管理员凭据。",
