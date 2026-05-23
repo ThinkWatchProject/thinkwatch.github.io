@@ -98,9 +98,10 @@ const dict = {
           tagline: "One port. Every model. Drop-in compatible.",
           bullets: [
             { title: "Multi-format proxy", body: "OpenAI Chat Completions, Anthropic Messages, and OpenAI Responses APIs on a single port — drop-in for Cursor, Continue, Cline, Claude Code, and the official SDKs." },
-            { title: "Multi-provider routing", body: "OpenAI, Anthropic, Google Gemini, Azure OpenAI, AWS Bedrock, or any OpenAI-compatible endpoint. Format conversion is automatic." },
-            { title: "Virtual API keys", body: "Issue scoped tw- keys per team, project, or developer. Revoke in one click. Plaintext shown exactly once; SHA-256 hashes at rest." },
-            { title: "Rate limits & budget caps", body: "Sliding-window RPM/TPM enforced via Redis per key, user, or team. Hard budget caps fail closed — the gateway blocks requests the moment a limit is exhausted, no silent overruns. Spend alerts fire before the cap is hit." },
+            { title: "Per-model routing — auto or manual", body: "Each registered model gets its own routing config: an Auto mode (latency-cost, balanced, latency-only) and a Manual mode with a drag-to-redistribute traffic bar. Health-aware failover drops unhealthy peers via the circuit breaker; the decision log captures provider chosen, why, and any fallback for every request." },
+            { title: "Multi-provider + model-level kill switch", body: "OpenAI, Anthropic, Google Gemini, Azure OpenAI, AWS Bedrock, or any OpenAI-compatible endpoint — format conversion is automatic. Pause a single model without taking the whole provider down; every gateway_logs row is stamped with the actual upstream_model so post-mortems are unambiguous." },
+            { title: "Virtual API keys", body: "Issue scoped tw- keys per team, project, or developer. Revoke in one click; revoked keys live in a separate archived tab. Re-rotation is blocked during the grace window so a panic-rotation can't strand traffic. Plaintext shown exactly once; SHA-256 hashes at rest." },
+            { title: "Rate limits & budget caps", body: "Sliding-window RPM/TPM enforced via Redis per key, user, or team. Pre-call budget check rejects requests when a cap is already exhausted — no upstream tokens burned before the post-flight debit notices. Hard budget caps fail closed; spend alerts fire at 50 / 80 / 95 / 100%." },
             { title: "Real-time cost tracking", body: "Per-model pricing with budget alerts and team attribution. SSE pass-through with zero-overhead token counting." },
             { title: "Management API & OpenAPI", body: "Provision API keys, users, and providers programmatically. A full OpenAPI spec ships alongside the gateway — integrate key lifecycle into CI pipelines, Terraform, or your own tooling without ever touching the console." },
           ],
@@ -116,6 +117,7 @@ const dict = {
             { title: "Tool-level RBAC + per-user catalogs", body: "Control exactly which roles can invoke which tools. Per-user tool catalogs let different users see different tools based on their upstream permissions — Viewers don't accidentally get write access to your prod database via MCP." },
             { title: "Test before you commit", body: "Per-credential Test Connection on the /connections page verifies your OAuth/PAT actually works against the upstream server. The auth-mode-aware edit form refuses to save the wrong fields. Tool-call and install errors surface actionable, end-user-friendly messages." },
             { title: "Audit + cache, scoped properly", body: "Every tool invocation logged with caller, parameters, and response in ClickHouse. The MCP response cache is scoped to (user, account_label) — OAuth/PAT data never leaks across users or accounts. SSRF protection, rate limits, and structured audit on every gateway hop." },
+            { title: "Downstream SSE streaming", body: "Clients that send Accept: text/event-stream on tools/call receive each upstream event as a discrete SSE event — notifications/progress, partials, the final response. JSON-only clients still get the buffered shape. The audit row captures the full event timeline either way." },
           ],
         },
         {
@@ -129,6 +131,7 @@ const dict = {
             { title: "HttpOnly cookie sessions", body: "Access and refresh tokens live in HttpOnly cookies — zero JavaScript surface. XSS cannot exfiltrate them. The refresh endpoint binds each token to the originating client IP, so a stolen cookie cannot be replayed from a different network." },
             { title: "Content filtering & PII redaction", body: "Block requests matching custom deny-lists or auto-redact PII patterns before they reach upstream providers. Per-rule action (block / redact / log) with live preview in the console." },
             { title: "Distroless containers", body: "2 MB runtime image, no shell, minimal attack surface. JWT entropy enforced at startup; soft-delete with 30-day purge." },
+            { title: "allowed_models on every surface", body: "The per-API-key allowed_models list is enforced uniformly across OpenAI Chat Completions, Anthropic Messages, and OpenAI Responses — no API surface bypasses the model allowlist. Same enforcement is wired into the shared lifecycle pipeline so future surfaces inherit it automatically." },
           ],
         },
         {
@@ -142,6 +145,7 @@ const dict = {
             { title: "Health & readiness", body: "/health/live, /health/ready (with PG + Redis checks), and /api/health with detailed latency and pool statistics." },
             { title: "Unified log explorer", body: "Search across audit, gateway, MCP, access, and platform logs from a single page. Click any cell to filter on it, use -key:value to exclude, and the full query state is persisted in the URL." },
             { title: "Live dashboard", body: "The console overview streams real-time stats over a persistent WebSocket — request rates, error counts, token spend, and upstream health update without a page refresh." },
+            { title: "Full-body audit capture", body: "Every gateway and MCP call persists request + response bodies (and tool_arguments + tool_result on MCP) into ClickHouse alongside the metadata row, with ZSTD compression, per-column TTL, and at-write PII redaction. Oversize payloads transparently offload to S3 / MinIO / the bundled RustFS; auditors query them via the body viewer in the logs detail panel or run cross-row substring search backed by a bloom-filter index. Gated by a separate audit:read_bodies permission." },
           ],
         },
         {
@@ -377,9 +381,10 @@ const dict = {
           tagline: "一个端口，所有模型，零侵入接入。",
           bullets: [
             { title: "多格式代理", body: "OpenAI Chat Completions、Anthropic Messages、OpenAI Responses 三种 API 在同一端口提供 —— Cursor、Continue、Cline、Claude Code 以及官方 SDK 都可零修改接入。" },
-            { title: "多 Provider 路由", body: "OpenAI、Anthropic、Google Gemini、Azure OpenAI、AWS Bedrock，或任何 OpenAI 兼容端点，请求格式自动转换。" },
-            { title: "虚拟 API 密钥", body: "按团队、项目或开发者签发限定范围的 tw- 密钥，一键吊销。明文仅展示一次；存储为 SHA-256 哈希。" },
-            { title: "限流与预算上限", body: "基于 Redis 的滑动窗口 RPM/TPM 限制，可按密钥、用户或团队设置。硬性预算上限采用 fail-closed 机制——一旦额度耗尽，网关立即拦截请求，无任何静默超支。支持在触顶前触发消费预警。" },
+            { title: "按模型路由 —— 自动或手动", body: "每个已注册模型都有独立的路由配置：Auto 模式（latency-cost / balanced / latency-only）或 Manual 模式（拖拽式流量分配条）。健康感知的故障转移通过熔断器自动剔除不健康节点；决策日志为每个请求记录所选 Provider、原因以及任何回退方案。" },
+            { title: "多 Provider + 模型级开关", body: "OpenAI、Anthropic、Google Gemini、Azure OpenAI、AWS Bedrock，或任意 OpenAI 兼容端点 —— 请求格式自动转换。可在不影响整个 Provider 的前提下暂停单个模型；每行 gateway_logs 都标记真实 upstream_model，事故复盘不留歧义。" },
+            { title: "虚拟 API 密钥", body: "按团队、项目或开发者签发限定范围的 tw- 密钥，一键吊销，吊销的密钥归入独立的归档分页。轮换宽限期内拒绝再次轮换，避免应急轮换把流量逼入死胡同。明文仅展示一次；存储为 SHA-256 哈希。" },
+            { title: "限流与预算上限", body: "基于 Redis 的滑动窗口 RPM/TPM 限制，可按密钥、用户或团队设置。Pre-call 预算检查在请求送达上游之前直接拒绝已超额的调用 —— 不再让 token 先被烧掉再被事后扣账发现。硬性预算上限 fail-closed；50 / 80 / 95 / 100% 触发消费预警。" },
             { title: "实时成本追踪", body: "按模型计价，含预算告警与团队归因。SSE 零开销转发，token 实时计数。" },
             { title: "管理 API 与 OpenAPI 文档", body: "通过程序化接口管理 API 密钥、用户和 Provider。网关附带完整 OpenAPI 规范，可将密钥生命周期集成到 CI 流水线、Terraform 或自有工具链，无需打开控制台。" },
           ],
@@ -395,6 +400,7 @@ const dict = {
             { title: "工具级 RBAC + 用户工具目录", body: "精准控制哪些角色可以调用哪些工具。按用户的工具目录让不同用户根据其上游权限看到不同工具集 —— Viewer 角色不会因为 MCP 工具而意外获得生产数据库写入权。" },
             { title: "提交前先测试", body: "/connections 页面提供逐凭证 Test Connection，验证你的 OAuth/PAT 真正能连上上游服务器。鉴权模式感知的编辑表单拒绝保存错误字段。工具调用与安装失败的错误信息对终端用户可读、可执行。" },
             { title: "审计与缓存，正确隔离", body: "每一次工具调用都记录调用方、参数、响应到 ClickHouse。MCP 响应缓存按 (user, account_label) 维度隔离 —— OAuth/PAT 数据绝不跨用户或账号串扰。SSRF 防护、限流、结构化审计在每一跳都启用。" },
+            { title: "下游 SSE 流式响应", body: "客户端在 tools/call 上声明 Accept: text/event-stream 即可逐事件接收上游响应 —— notifications/progress、中间块、最终结果都作为独立 SSE 事件下发。仅 JSON 的客户端仍返回缓冲格式。无论哪种姿态，审计行都完整记录整条事件时间线。" },
           ],
         },
         {
@@ -408,6 +414,7 @@ const dict = {
             { title: "HttpOnly Cookie 会话", body: "访问令牌和刷新令牌均存储在 HttpOnly Cookie 中——JavaScript 完全无法读取。XSS 攻击无法窃取会话。刷新端点将每个令牌绑定到来源客户端 IP，被盗 Cookie 无法跨网络重放。" },
             { title: "内容过滤与 PII 脱敏", body: "在请求到达上游 Provider 之前，拦截匹配自定义禁止列表的内容，或自动脱敏 PII 字段。每条规则可独立配置动作（拦截 / 脱敏 / 仅记录），控制台提供实时预览。" },
             { title: "Distroless 容器", body: "2 MB 运行时镜像，无 shell，攻击面最小化。启动时强制 JWT 熵校验；软删除 30 天后自动清理。" },
+            { title: "allowed_models 全表面强制", body: "每个 API 密钥的 allowed_models 白名单在 OpenAI Chat Completions、Anthropic Messages、OpenAI Responses 三个表面均一致生效 —— 没有任何 API 表面可以绕过模型白名单。同一套强制被接入共享生命周期管线，未来新增表面自动继承。" },
           ],
         },
         {
@@ -421,6 +428,7 @@ const dict = {
             { title: "健康与就绪", body: "/health/live、/health/ready（含 PG + Redis 检查）以及 /api/health 提供详细延迟与连接池统计。" },
             { title: "统一日志检索", body: "在同一页面搜索审计、网关、MCP、访问、平台等所有日志。点击任意单元格即可筛选，用 -key:value 排除指定条件，查询状态完整持久化到 URL。" },
             { title: "实时看板", body: "控制台总览通过持久 WebSocket 实时推送统计数据——请求速率、错误数、Token 消耗和上游健康状态，无需刷新页面。" },
+            { title: "全量请求 / 响应体审计", body: "每一次 Gateway 和 MCP 调用都将 request_body / response_body（以及 MCP 的 tool_arguments / tool_result）和元数据一同写入 ClickHouse，启用 ZSTD 压缩、按列 TTL，并支持落盘前 PII 脱敏。超大载荷透明卸载到 S3 / MinIO / 内置 RustFS；审计员通过日志详情面板的「Body Viewer」查看，或用基于布隆过滤器索引的子串搜索跨行检索。访问由独立的 audit:read_bodies 权限控制。" },
           ],
         },
         {
