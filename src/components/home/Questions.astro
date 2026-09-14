@@ -2,43 +2,63 @@
 import { getLang } from "~/i18n";
 import { homeCopy } from "~/i18n/pages/home";
 
-const c = homeCopy[getLang(Astro)].questions;
+const lang = getLang(Astro);
+const c = homeCopy[lang].questions;
+const t = homeCopy[lang].trace;
 ---
 
-<section class="container-page pb-20 lg:pb-28">
-  <div class="font-mono text-[13px] uppercase tracking-[0.08em] text-[var(--color-muted)]">{c.eyebrow}</div>
-  <div class="mt-8 grid gap-5 [perspective:900px] md:grid-cols-3 md:gap-6">
-    {c.items.map((item) => (
-      <div data-tilt class="tilt flex flex-col gap-3 rounded-2xl border border-[var(--color-border-strong)] bg-[#0f1729] p-7 sm:p-8">
-        <div class="font-mono text-[13px] text-[var(--color-brand-1)]">{item.tag}</div>
-        <h3 class="text-[22px] font-semibold text-white sm:text-[26px]">{item.title}</h3>
-        <p class="text-base leading-relaxed text-[var(--color-muted)] sm:text-[17px]">{item.body}</p>
+<section class="container-page py-20 lg:py-28">
+  <div class="grid items-center gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:gap-16">
+    <div class="flex flex-col gap-6">
+      <div class="font-mono text-[13px] uppercase tracking-[0.08em] text-[var(--color-muted)]">{c.eyebrow}</div>
+      <div class="flex flex-col gap-4">
+        {c.items.map((item) => (
+          <div class="flex flex-col gap-2 rounded-2xl border border-[var(--color-border-strong)] bg-[#0f1729] p-6">
+            <div class="font-mono text-[13px] text-[var(--color-brand-1)]">{item.tag}</div>
+            <h3 class="text-xl font-semibold text-white sm:text-[22px]">{item.title}</h3>
+            <p class="text-base leading-relaxed text-[var(--color-muted)]">{item.body}</p>
+          </div>
+        ))}
       </div>
-    ))}
+    </div>
+
+    <div class="min-w-0 overflow-hidden rounded-[14px] border border-[var(--color-border-strong)] bg-[rgba(17,26,46,0.92)] font-mono text-[13px] shadow-[0_40px_120px_-40px_rgba(61,219,217,0.35)] sm:text-sm">
+      <div class="flex items-center justify-between gap-3 border-b border-[#22304f] px-4 py-3.5 text-[var(--color-muted)] sm:px-5">
+        <span class="flex items-center gap-2.5">
+          <span class="flex gap-1.5" aria-hidden="true"><span class="h-2.5 w-2.5 rounded-full bg-[var(--color-border-strong)]"></span><span class="h-2.5 w-2.5 rounded-full bg-[var(--color-border-strong)]"></span><span class="h-2.5 w-2.5 rounded-full bg-[var(--color-border-strong)]"></span></span>
+          <span><span class="text-[var(--color-brand-1)]">POST</span> /v1/messages</span>
+        </span>
+        <span class="uppercase text-[var(--color-accent)]">{t.tag}</span>
+      </div>
+      <div class="flex flex-col gap-1 px-2.5 py-4 sm:px-3.5">
+        <div class="trace-row grid grid-cols-[88px_minmax(0,1fr)] gap-3 rounded-md p-1.5 sm:grid-cols-[110px_minmax(0,1fr)] sm:gap-4" style="animation-delay: 0.2s;"><span class="text-[var(--color-muted)]">{t.client[0]}</span><span class="text-[#e6ebf2]">{t.client[1]}</span></div>
+        <div class="trace-row grid grid-cols-[88px_minmax(0,1fr)] gap-3 rounded-md p-1.5 sm:grid-cols-[110px_minmax(0,1fr)] sm:gap-4" style="animation-delay: 0.7s;"><span class="text-[var(--color-muted)]">{t.rule[0]}</span><span class="text-[#e6ebf2]">{t.rule[1]}</span></div>
+        <div class="trace-row grid grid-cols-[88px_minmax(0,1fr)] gap-3 rounded-md p-1.5 sm:grid-cols-[110px_minmax(0,1fr)] sm:gap-4" style="animation-delay: 1.3s;"><span class="text-[var(--color-muted)]">{t.hop1[0]}</span><span class="text-[#e6ebf2]">{t.hop1[1]} · <span class="text-[var(--color-accent)]">{t.hop1[2]}</span> · {t.hop1[3]}</span></div>
+        <div class="trace-row grid grid-cols-[88px_minmax(0,1fr)] gap-3 rounded-md p-1.5 sm:grid-cols-[110px_minmax(0,1fr)] sm:gap-4" style="animation-delay: 2s;"><span class="text-[var(--color-muted)]">{t.hop2[0]}</span><span class="text-[#e6ebf2]">{t.hop2[1]} · <span class="text-[var(--color-brand-1)]">{t.hop2[2]}</span> · {t.hop2[3]}</span></div>
+        <div class="trace-row grid grid-cols-[88px_minmax(0,1fr)] gap-3 rounded-md p-1.5 sm:grid-cols-[110px_minmax(0,1fr)] sm:gap-4" style="animation-delay: 2.7s;"><span class="text-[var(--color-muted)]">{t.cost[0]}</span><span class="text-[#e6ebf2]">{t.cost[1]}</span></div>
+        <div class="trace-row grid grid-cols-[88px_minmax(0,1fr)] gap-3 rounded-md p-1.5 sm:grid-cols-[110px_minmax(0,1fr)] sm:gap-4" style="animation-delay: 3.4s;"><span class="text-[var(--color-muted)]">{t.redaction[0]}</span><span class="text-[#e6ebf2]">{t.redaction[1]}</span></div>
+        <div class="trace-row trace-flag grid grid-cols-[88px_minmax(0,1fr)] gap-3 rounded-md p-1.5 sm:grid-cols-[110px_minmax(0,1fr)] sm:gap-4" style="animation-delay: 4.1s;"><span class="text-[var(--color-muted)]">{t.tool[0]}</span><span class="text-[var(--color-accent)]">{t.tool[1]}<span class="blink ml-1 inline-block h-4 w-2 bg-[var(--color-brand-1)] align-[-2px]" aria-hidden="true"></span></span></div>
+      </div>
+      <div class="border-t border-[#22304f] px-4 py-3 text-xs text-[var(--color-muted)] sm:px-5">{t.note}</div>
+    </div>
   </div>
 </section>
 
 <style>
-  .tilt { transition: transform 180ms ease-out, border-color 250ms ease; transform-style: preserve-3d; }
-  .tilt:hover { border-color: var(--color-brand-1); }
-</style>
-
-<script>
-  // Tilt cards toward the pointer. Only on devices with a precise pointer and
-  // when the visitor hasn't asked for reduced motion.
-  const fine = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
-  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  if (fine && !reduced) {
-    document.querySelectorAll<HTMLElement>("[data-tilt]").forEach((el) => {
-      el.addEventListener("mousemove", (e) => {
-        const b = el.getBoundingClientRect();
-        const x = (e.clientX - b.left) / b.width - 0.5;
-        const y = (e.clientY - b.top) / b.height - 0.5;
-        el.style.transform = `rotateX(${(-y * 8).toFixed(2)}deg) rotateY(${(x * 10).toFixed(2)}deg)`;
-      });
-      el.addEventListener("mouseleave", () => {
-        el.style.transform = "";
-      });
-    });
+  .trace-row { opacity: 0; animation: trace-row 10s ease-out infinite; }
+  .trace-flag { animation: trace-row 10s ease-out infinite, trace-flash 10s ease-out infinite; }
+  @keyframes trace-row {
+    0% { opacity: 0; transform: translateY(6px); }
+    5% { opacity: 1; transform: none; }
+    88% { opacity: 1; }
+    96%, 100% { opacity: 0; }
   }
-</script>
+  @keyframes trace-flash {
+    0%, 62% { background: transparent; }
+    64% { background: rgba(229, 192, 123, 0.28); }
+    72%, 100% { background: rgba(229, 192, 123, 0.08); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .trace-row, .trace-flag { opacity: 1; animation: none; }
+  }
+</style>

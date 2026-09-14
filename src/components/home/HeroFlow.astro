@@ -1,67 +1,44 @@
 ---
+// The hero visual: requests flow from AI clients into the ThinkWatch mark and
+// out to model providers. Amber particles are requests held at the gateway.
+// Desktop only; phones get a stacked diagram in HomeHero.
 import { getLang } from "~/i18n";
 import { homeCopy } from "~/i18n/pages/home";
 
-const lang = getLang(Astro);
-const c = homeCopy[lang].how;
+const c = homeCopy[getLang(Astro)].how;
 const clients = ["Claude Code", "Codex", "Cursor", c.agents];
 const models = ["OpenAI", "Anthropic", "Gemini", "Azure OpenAI", "AWS Bedrock", c.mcp];
 ---
 
-<section id="how" class="container-page scroll-mt-20 py-20 lg:py-28">
-  <div class="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-    <div class="flex flex-col gap-4">
-      <div class="font-mono text-[13px] uppercase tracking-[0.08em] text-[var(--color-muted)]">{c.eyebrow}</div>
-      <h2
-        class:list={[
-          "font-display text-white [text-wrap:balance]",
-          lang === "zh-CN" ? "text-[28px] leading-[1.35] sm:text-[34px] lg:text-[40px]" : "text-[32px] leading-[1.15] sm:text-[40px] lg:text-[46px]",
-        ]}
-      >{c.title}</h2>
-    </div>
-    <div class="hidden shrink-0 gap-7 whitespace-nowrap text-sm text-[var(--color-muted)] md:flex">
-      <span class="flex items-center gap-2"><span class="h-0.5 w-[18px] rounded bg-[var(--color-brand-1)]"></span>{c.allowed}</span>
-      <span class="flex items-center gap-2"><span class="h-0.5 w-[18px] rounded bg-[var(--color-accent)]"></span>{c.held}</span>
-    </div>
-  </div>
-
-  <div data-flow-stage class="flow-stage relative mt-12 hidden h-[420px] overflow-hidden rounded-[20px] border border-[var(--color-border)] md:block">
+<div class="flex flex-col gap-4">
+  <div data-flow-stage class="hero-flow relative h-[460px] xl:h-[500px]">
     <canvas data-flow-canvas class="absolute inset-0 h-full w-full" aria-hidden="true"></canvas>
-    <div class="absolute bottom-0 left-7 top-0 flex flex-col justify-around py-10 text-[15px] text-[#cbd5e1]">
+    <div class="absolute bottom-0 left-0 top-0 flex flex-col justify-around py-12 text-[13px] text-[#cbd5e1] xl:text-sm">
       {clients.map((name) => <span data-lane-in>{name}</span>)}
     </div>
-    <div class="absolute bottom-0 right-7 top-0 flex flex-col items-end justify-around py-5 text-[15px] text-[#cbd5e1]">
+    <div class="absolute bottom-0 right-0 top-0 flex flex-col items-end justify-around py-6 text-[13px] text-[#cbd5e1] xl:text-sm">
       {models.map((name) => <span data-lane-out>{name}</span>)}
     </div>
-    <div class="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-3.5">
-      <div class="flow-core flex h-[104px] w-[104px] items-center justify-center rounded-[26px] bg-[var(--color-navy)]">
-        <svg width="72" height="72" viewBox="32 32 136 136" fill="none" aria-hidden="true"><rect x="32" y="32" width="136" height="136" rx="28" stroke="#3DDBD9" stroke-width="10"></rect><line x1="62" y1="68" x2="138" y2="68" stroke="#3DDBD9" stroke-width="12" stroke-linecap="round"></line><line x1="100" y1="68" x2="100" y2="104" stroke="#3DDBD9" stroke-width="12" stroke-linecap="round"></line><polyline points="62,104 80,140 100,104" stroke="#3DDBD9" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"></polyline><polyline points="100,104 120,140 138,104" stroke="#3DDBD9" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"></polyline></svg>
+    <div class="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-3">
+      <div class="flow-core flex h-[88px] w-[88px] items-center justify-center rounded-[22px] bg-[var(--color-navy)]">
+        <svg width="60" height="60" viewBox="32 32 136 136" fill="none" aria-hidden="true"><rect x="32" y="32" width="136" height="136" rx="28" stroke="#3DDBD9" stroke-width="10"></rect><line x1="62" y1="68" x2="138" y2="68" stroke="#3DDBD9" stroke-width="12" stroke-linecap="round"></line><line x1="100" y1="68" x2="100" y2="104" stroke="#3DDBD9" stroke-width="12" stroke-linecap="round"></line><polyline points="62,104 80,140 100,104" stroke="#3DDBD9" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"></polyline><polyline points="100,104 120,140 138,104" stroke="#3DDBD9" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"></polyline></svg>
       </div>
-      <span class="rounded-full border border-[var(--color-border-strong)] bg-[rgba(11,18,32,0.85)] px-3 py-1.5 font-mono text-[13px] text-[#cbd5e1]">{c.core}</span>
+      <span class="rounded-full border border-[var(--color-border-strong)] bg-[rgba(11,18,32,0.85)] px-3 py-1 font-mono text-xs text-[#cbd5e1]">{c.core}</span>
     </div>
   </div>
-
-  <div class="mt-10 flex flex-col md:hidden">
-    <div class="flex flex-col gap-1.5 rounded-xl border border-[var(--color-border-strong)] p-[18px]">
-      <div class="font-mono text-[11px] uppercase tracking-[0.08em] text-[var(--color-muted)]">{c.clients}</div>
-      <div class="text-[15px] text-[#cbd5e1]">{clients.join(" · ")}</div>
-    </div>
-    <div class="ml-7 h-7 w-px bg-[var(--color-brand-1)]"></div>
-    <div class="flex flex-col gap-2 rounded-xl border border-[var(--color-brand-1)] bg-[var(--color-surface)] p-5">
-      <div class="font-mono text-[11px] uppercase tracking-[0.08em] text-[var(--color-brand-1)]">ThinkWatch</div>
-      <div class="font-display text-2xl leading-snug text-white">{c.stackedCore}</div>
-    </div>
-    <div class="ml-7 h-7 w-px bg-[var(--color-brand-1)]"></div>
-    <div class="flex flex-col gap-1.5 rounded-xl border border-[var(--color-border-strong)] p-[18px]">
-      <div class="font-mono text-[11px] uppercase tracking-[0.08em] text-[var(--color-muted)]">{c.models}</div>
-      <div class="text-[15px] leading-normal text-[#cbd5e1]">{models.join(" · ")}</div>
-    </div>
+  <div class="flex justify-center gap-7 text-[13px] text-[var(--color-muted)]">
+    <span class="flex items-center gap-2 whitespace-nowrap"><span class="h-0.5 w-[18px] rounded bg-[var(--color-brand-1)]"></span>{c.allowed}</span>
+    <span class="flex items-center gap-2 whitespace-nowrap"><span class="h-0.5 w-[18px] rounded bg-[var(--color-accent)]"></span>{c.held}</span>
   </div>
-</section>
+</div>
 
 <style>
-  .flow-stage {
-    background: radial-gradient(ellipse at 50% 50%, rgba(61, 219, 217, 0.07), transparent 60%), #0d1526;
+  .hero-flow {
+    background: radial-gradient(ellipse at 50% 50%, rgba(61, 219, 217, 0.09), transparent 62%);
+  }
+  .hero-flow canvas {
+    -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 14%, #000 86%, transparent 100%);
+    mask-image: linear-gradient(90deg, transparent 0%, #000 14%, #000 86%, transparent 100%);
   }
   .flow-core {
     box-shadow: 0 0 0 1px rgba(61, 219, 217, 0.5), 0 0 50px 4px rgba(61, 219, 217, 0.2);
@@ -77,10 +54,6 @@ const models = ["OpenAI", "Anthropic", "Gemini", "Azure OpenAI", "AWS Bedrock", 
 </style>
 
 <script>
-  // Particles flow from each client label into the gateway mark and fan out to
-  // each model label. Amber particles stand for requests held at the gateway:
-  // they stop at the centre and leave a ripple. Lanes are read from the label
-  // positions, so the drawing follows the layout at any width.
   type Particle = { x: number; lin: number; lout: number; sp: number; jy: number; amber: boolean };
 
   function initFlow(stage: HTMLElement) {
@@ -115,16 +88,17 @@ const models = ["OpenAI", "Anthropic", "Gemini", "Azure OpenAI", "AWS Bedrock", 
     const spawn = (p: Particle, anywhere: boolean) => {
       p.lin = Math.floor(Math.random() * Math.max(1, inL.length));
       p.lout = Math.floor(Math.random() * Math.max(1, outL.length));
-      p.sp = 1.2 + Math.random() * 1.8;
-      p.jy = (Math.random() - 0.5) * 16;
+      p.sp = 1 + Math.random() * 1.5;
+      p.jy = (Math.random() - 0.5) * 14;
       p.amber = Math.random() < 0.07;
       p.x = anywhere ? x0 + Math.random() * (x1 - x0) : x0 - Math.random() * 40;
-      if (p.amber && p.x > cx - 50) p.x = x0 + Math.random() * Math.max(1, cx - x0 - 60);
+      if (p.amber && p.x > cx - 44) p.x = x0 + Math.random() * Math.max(1, cx - x0 - 50);
       return p;
     };
 
     const layout = () => {
       const box = stage.getBoundingClientRect();
+      if (box.width === 0) return;
       const dpr = Math.min(2, window.devicePixelRatio || 1);
       W = box.width;
       H = box.height;
@@ -141,10 +115,10 @@ const models = ["OpenAI", "Anthropic", "Gemini", "Azure OpenAI", "AWS Bedrock", 
       const outs = Array.from(stage.querySelectorAll("[data-lane-out]"));
       inL = ins.map(mid);
       outL = outs.map(mid);
-      x0 = Math.max(...ins.map((el) => el.getBoundingClientRect().right - box.left)) + 18;
-      x1 = Math.min(...outs.map((el) => el.getBoundingClientRect().left - box.left)) - 18;
+      x0 = Math.max(...ins.map((el) => el.getBoundingClientRect().right - box.left)) + 14;
+      x1 = Math.min(...outs.map((el) => el.getBoundingClientRect().left - box.left)) - 14;
       if (particles.length === 0) {
-        const count = Math.round(Math.min(420, Math.max(160, W * 0.3)));
+        const count = Math.round(Math.min(320, Math.max(140, W * 0.4)));
         for (let i = 0; i < count; i++) particles.push(spawn({} as Particle, true));
       }
     };
@@ -152,18 +126,18 @@ const models = ["OpenAI", "Anthropic", "Gemini", "Azure OpenAI", "AWS Bedrock", 
     const frame = () => {
       t += 1;
       ctx.clearRect(0, 0, W, H);
-      const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, 150);
+      const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, 130);
       g.addColorStop(0, `rgba(61,219,217,${0.16 + Math.sin(t / 40) * 0.05})`);
       g.addColorStop(1, "rgba(61,219,217,0)");
       ctx.fillStyle = g;
-      ctx.fillRect(cx - 150, cy - 150, 300, 300);
+      ctx.fillRect(cx - 130, cy - 130, 260, 260);
 
       ctx.globalCompositeOperation = "lighter";
       ctx.lineCap = "round";
       for (const p of particles) {
         p.x += p.sp;
-        if (p.amber && p.x >= cx - 58) {
-          rings.push({ r: 56, a: 0.9 });
+        if (p.amber && p.x >= cx - 50) {
+          rings.push({ r: 48, a: 0.9 });
           spawn(p, false);
           continue;
         }
@@ -173,9 +147,9 @@ const models = ["OpenAI", "Anthropic", "Gemini", "Azure OpenAI", "AWS Bedrock", 
         }
         if (p.x < x0) continue;
         const px = p.x - p.sp * 7;
-        const edge = Math.min(1, (p.x - x0) / 60, (x1 - p.x) / 60);
-        ctx.strokeStyle = p.amber ? `rgba(229,192,123,${0.95 * edge})` : `rgba(61,219,217,${0.75 * edge})`;
-        ctx.lineWidth = p.amber ? 2.2 : 1.5;
+        const edge = Math.min(1, (p.x - x0) / 50, (x1 - p.x) / 50);
+        ctx.strokeStyle = p.amber ? `rgba(229,192,123,${0.95 * edge})` : `rgba(61,219,217,${0.72 * edge})`;
+        ctx.lineWidth = p.amber ? 2 : 1.4;
         ctx.beginPath();
         ctx.moveTo(px, yAt(p, px));
         ctx.lineTo(p.x, yAt(p, p.x));
@@ -184,14 +158,14 @@ const models = ["OpenAI", "Anthropic", "Gemini", "Azure OpenAI", "AWS Bedrock", 
       ctx.globalCompositeOperation = "source-over";
       for (let i = rings.length - 1; i >= 0; i--) {
         const r = rings[i];
-        r.r += 1.1;
-        r.a -= 0.018;
+        r.r += 1;
+        r.a -= 0.02;
         if (r.a <= 0) {
           rings.splice(i, 1);
           continue;
         }
         ctx.strokeStyle = `rgba(229,192,123,${r.a})`;
-        ctx.lineWidth = 1.5;
+        ctx.lineWidth = 1.4;
         ctx.beginPath();
         ctx.arc(cx, cy, r.r, 0, Math.PI * 2);
         ctx.stroke();
@@ -203,7 +177,7 @@ const models = ["OpenAI", "Anthropic", "Gemini", "Azure OpenAI", "AWS Bedrock", 
       raf = requestAnimationFrame(loop);
     };
     const start = () => {
-      if (reduced || raf || !visible) return;
+      if (reduced || raf || !visible || W === 0) return;
       raf = requestAnimationFrame(loop);
     };
     const stop = () => {
@@ -215,12 +189,12 @@ const models = ["OpenAI", "Anthropic", "Gemini", "Azure OpenAI", "AWS Bedrock", 
     };
 
     layout();
-    if (reduced) drawStill();
+    if (reduced && W > 0) drawStill();
 
     new ResizeObserver(() => {
-      if (stage.offsetParent === null) return;
       layout();
-      if (reduced) drawStill();
+      if (reduced && W > 0) drawStill();
+      else start();
     }).observe(stage);
 
     new IntersectionObserver((entries) => {
