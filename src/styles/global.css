@@ -32,8 +32,6 @@
 
   --font-sans: "Geist", "Noto Sans SC", "PingFang SC", "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-mono: "Geist Mono", "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
-  --font-serif: "Instrument Serif", Georgia, "Times New Roman", serif;
-  --font-serif-zh: "Noto Serif SC", "Songti SC", "STSong", serif;
 }
 
 /* ---------- Base ---------- */
@@ -115,15 +113,13 @@
     background: linear-gradient(135deg, var(--color-brand-1) 0%, var(--color-brand-2) 100%);
   }
 
-  /* Display serif. Chinese pages switch to a CJK serif with more weight. */
+  /* Display headings use the product sans at a heavier weight. */
   .font-display {
-    font-family: var(--font-serif);
-    font-weight: 400;
-    letter-spacing: -0.02em;
+    font-family: var(--font-sans);
+    font-weight: 600;
+    letter-spacing: -0.025em;
   }
   :lang(zh-CN) .font-display {
-    font-family: var(--font-serif-zh);
-    font-weight: 600;
     letter-spacing: 0;
   }
 
