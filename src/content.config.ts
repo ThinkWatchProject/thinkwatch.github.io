@@ -26,4 +26,17 @@ const docs = defineCollection({
   schema: z.object({}).passthrough(),
 });
 
-export const collections = { changelog, changelog_zh, docs };
+// Product docs for ThinkWatch Lite and ThinkWatch Core, written for this site.
+// Layout mirrors `docs`: en/<slug>.md and zh-CN/<slug>.md, no frontmatter.
+// en/overview.md is rendered as the product's docs home (/docs/lite, /docs/core).
+const docs_lite = defineCollection({
+  loader: glob({ pattern: "**/*.md", base: "./src/content/docs-lite" }),
+  schema: z.object({}).passthrough(),
+});
+
+const docs_core = defineCollection({
+  loader: glob({ pattern: "**/*.md", base: "./src/content/docs-core" }),
+  schema: z.object({}).passthrough(),
+});
+
+export const collections = { changelog, changelog_zh, docs, docs_lite, docs_core };

@@ -2,34 +2,51 @@
 import Base from "./Base.astro";
 import SiteHeader from "~/components/SiteHeader.astro";
 import SiteFooter from "~/components/SiteFooter.astro";
-import { getSidebarForLocale, type DocMeta } from "~/content/docs/_meta";
-import { getLang, localePath } from "~/i18n";
+import {
+  docHref,
+  getProduct,
+  getSidebar,
+  groupLabels,
+  products,
+  productHomeHref,
+  type DocMeta,
+  type ProductId,
+} from "~/content/docs/_meta";
+import { getLang } from "~/i18n";
 
 type Heading = { depth: number; slug: string; text: string };
 
 interface Props {
   title: string;
   description?: string;
-  /** Slug of the currently displayed doc, e.g. "architecture" */
+  /** Product whose docs are shown in the sidebar and switcher */
+  product: ProductId;
+  /** Slug of the currently displayed doc, e.g. "architecture"; "" for the product's docs home */
   current: string;
   /** Headings extracted from rendered markdown (passed by the route) */
   headings?: Heading[];
-  /** Previous and next docs in reading order (passed by the route) */
+  /** Previous and next docs in reading order within the product (passed by the route) */
   prev?: DocMeta;
   next?: DocMeta;
   /** Extra JSON-LD items (BreadcrumbList, TechArticle, etc.) */
   jsonLd?: Record<string, unknown>[];
 }
 
-const { title, description, current, headings = [], prev, next, jsonLd = [] } = Astro.props;
+const { title, description, product, current, headings = [], prev, next, jsonLd = [] } = Astro.props;
 const lang = getLang(Astro);
-const docs = getSidebarForLocale(lang);
+const zh = lang === "zh-CN";
+const p = getProduct(product);
+const sidebar = getSidebar(product, lang);
+const currentDoc = p.docs.find((d) => d.slug === current);
 
-const baseHref = localePath(lang, "/docs");
-const docsLabel = lang === "zh-CN" ? "文档" : "Documentation";
-const tocLabel = lang === "zh-CN" ? "本页目录" : "On this page";
-const prevLabel = lang === "zh-CN" ? "上一篇" : "Previous";
-const nextLabel = lang === "zh-CN" ? "下一篇" : "Next";
+const tocLabel = zh ? "本页目录" : "On this page";
+const prevLabel = zh ? "上一篇" : "Previous";
+const nextLabel = zh ? "下一篇" : "Next";
+const productLabel = zh ? "产品" : "Product";
+const searchLabel = zh ? `搜索 ${p.name} 文档` : `Search ${p.name} docs`;
+const pageLabel = currentDoc?.label[lang] ?? title.split(" · ")[0];
+// Title stored in the search index: on a product home "Overview" alone would be ambiguous.
+const searchTitle = current === "" ? (product === "thinkwatch" ? title.split(" · ")[0] : p.name) : pageLabel;
 
 // Only show H2/H3 in the TOC; hide if there's only the (auto-generated) doc title.
 // rehype-autolink-headings appends a literal "#" text node to each heading,
@@ -37,83 +54,121 @@ const nextLabel = lang === "zh-CN" ? "下一篇" : "Next";
 const tocHeadings = headings
   .filter((h) => h.depth === 2 || h.depth === 3)
   .map((h) => ({ ...h, text: h.text.replace(/#+\s*$/, "").trim() }));
+
+const itemBase = "flex items-center justify-between gap-2 rounded-lg px-3 text-[15px] transition-colors";
+const itemActive = "text-[var(--color-brand-1)] font-medium";
+const itemIdle = "text-[var(--color-text)]/80 hover:text-[var(--color-text)]";
 ---
 
 <Base title={title} description={description} noJsonLd jsonLd={jsonLd}>
   <SiteHeader />
-  <main id="main" class="container-page py-8 lg:py-16">
-    <!-- Mobile docs drawer: a collapsible <details> shown only below lg -->
-    <details class="mobile-docs-nav lg:hidden mb-6 rounded-xl border border-white/10 bg-[var(--color-surface)]/60">
-      <summary class="list-none cursor-pointer select-none flex items-center justify-between gap-3 px-4 py-3 text-sm font-medium text-white">
-        <span class="flex items-center gap-2">
-          <svg class="w-4 h-4 text-[var(--color-brand-1)]" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
-            <line x1="3" y1="5" x2="13" y2="5" stroke-linecap="round"/>
-            <line x1="3" y1="8" x2="13" y2="8" stroke-linecap="round"/>
-            <line x1="3" y1="11" x2="13" y2="11" stroke-linecap="round"/>
-          </svg>
-          <span>{docsLabel}</span>
-          <span class="text-[var(--color-dim)]">·</span>
-          <span class="text-[var(--color-muted)] font-normal truncate">{title.split(" · ")[0]}</span>
+
+  <!-- Product switcher bar. data-docs-product scopes the search modal to this product. -->
+  <div
+    class="docs-product-bar border-b border-[var(--color-border)] bg-[var(--color-surface)]"
+    data-docs-product={p.id}
+    data-docs-product-name={p.name}
+  >
+    <div class="container-page flex items-center justify-between gap-6 py-2.5 md:py-3.5">
+      <div class="flex min-w-0 items-center gap-5">
+        <span class="hidden font-mono text-xs uppercase tracking-[0.08em] text-[var(--color-muted)] sm:inline">
+          {productLabel}
         </span>
-        <svg class="w-4 h-4 text-[var(--color-muted)] transition-transform chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <polyline points="4,6 8,10 12,6"/>
-        </svg>
-      </summary>
-      <div class="border-t border-white/10 p-3">
-        <nav aria-label="Documentation navigation">
-          <ul class="space-y-1">
-            <li>
-              <a
-                href={baseHref}
-                class:list={[
-                  "block px-3 py-2.5 rounded-md text-sm transition-colors",
-                  current === ""
-                    ? "bg-white/[0.06] text-white border-l-2 border-[var(--color-brand-1)]"
-                    : "text-[var(--color-muted)] hover:text-white hover:bg-white/[0.03] border-l-2 border-transparent",
-                ]}
-              >
-                {lang === "zh-CN" ? "概览" : "Overview"}
-              </a>
-            </li>
-            {docs.map((d) => {
-              const isActive = d.slug === current;
-              const href = d.availableHere ? `${baseHref}/${d.slug}` : `/docs/${d.slug}`;
+        <nav aria-label={productLabel} class="product-switch min-w-0 max-w-full overflow-x-auto" data-product-switch>
+          <ul class="inline-flex rounded-[10px] border border-[var(--color-border-strong)] bg-[var(--color-bg)] p-1 text-[15px]">
+            {products.map((pr) => {
+              const active = pr.id === product;
               return (
                 <li>
                   <a
-                    href={href}
+                    href={productHomeHref(lang, pr.id)}
+                    aria-current={active ? "page" : undefined}
                     class:list={[
-                      "flex items-center justify-between gap-2 px-3 py-2.5 rounded-md text-sm transition-colors",
-                      isActive
-                        ? "bg-white/[0.06] text-white border-l-2 border-[var(--color-brand-1)]"
-                        : "text-[var(--color-muted)] hover:text-white hover:bg-white/[0.03] border-l-2 border-transparent",
+                      "flex h-11 items-center whitespace-nowrap rounded-[7px] px-4 transition-colors sm:h-9",
+                      active
+                        ? "bg-[var(--color-border)] font-medium text-[var(--color-text)]"
+                        : "text-[var(--color-text)]/80 hover:text-[var(--color-text)]",
                     ]}
                   >
-                    <span>{d.label[lang]}</span>
-                    {!d.availableHere && (
-                      <span class="text-[9px] font-mono uppercase tracking-wider px-1.5 py-0.5 rounded bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">
-                        EN
-                      </span>
-                    )}
+                    {pr.name}
                   </a>
                 </li>
               );
             })}
           </ul>
         </nav>
+      </div>
+
+      <button
+        type="button"
+        data-search-trigger
+        class="hidden h-10 w-[22.5rem] max-w-[40vw] shrink-0 items-center justify-between rounded-[10px] border border-[var(--color-border-strong)] bg-[var(--color-bg)] px-3.5 text-sm text-[var(--color-muted)] transition-colors hover:border-[var(--color-brand-1)]/50 hover:text-[var(--color-text)] md:flex"
+      >
+        <span class="flex min-w-0 items-center gap-2.5">
+          <svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="7" />
+            <line x1="16.5" y1="16.5" x2="21" y2="21" />
+          </svg>
+          <span class="truncate">{searchLabel}</span>
+        </span>
+        <kbd class="rounded-[5px] border border-[var(--color-border-strong)] px-1.5 py-0.5 font-mono text-xs">⌘K</kbd>
+      </button>
+    </div>
+  </div>
+
+  <main id="main" class="container-page py-8 lg:py-10">
+    <!-- Mobile docs drawer: a collapsible <details> shown only below lg -->
+    <details class="mobile-docs-nav mb-6 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)]/60 lg:hidden">
+      <summary class="flex min-h-11 cursor-pointer select-none list-none items-center justify-between gap-3 px-4 py-3 text-sm font-medium text-[var(--color-text)]">
+        <span class="flex min-w-0 items-center gap-2">
+          <svg class="h-4 w-4 shrink-0 text-[var(--color-brand-1)]" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+            <line x1="3" y1="5" x2="13" y2="5" stroke-linecap="round"/>
+            <line x1="3" y1="8" x2="13" y2="8" stroke-linecap="round"/>
+            <line x1="3" y1="11" x2="13" y2="11" stroke-linecap="round"/>
+          </svg>
+          <span class="shrink-0">{p.name}</span>
+          <span class="text-[var(--color-dim)]">·</span>
+          <span class="truncate font-normal text-[var(--color-muted)]">{pageLabel}</span>
+        </span>
+        <svg class="chevron h-4 w-4 shrink-0 text-[var(--color-muted)] transition-transform" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="4,6 8,10 12,6"/>
+        </svg>
+      </summary>
+      <div class="border-t border-[var(--color-border)] p-3">
+        <nav aria-label={zh ? `${p.name} 文档导航` : `${p.name} documentation`} class="space-y-5">
+          {sidebar.map((g) => (
+            <div>
+              <div class="px-3 pb-1.5 font-mono text-xs uppercase tracking-[0.08em] text-[var(--color-muted)]">{g.label}</div>
+              <ul class="space-y-0.5">
+                {g.items.map((d) => (
+                  <li>
+                    <a
+                      href={d.href}
+                      aria-current={d.slug === current ? "page" : undefined}
+                      class:list={[itemBase, "min-h-11 py-2", d.slug === current ? `bg-[var(--color-surface-2)] ${itemActive}` : itemIdle]}
+                    >
+                      <span>{d.label[lang]}</span>
+                      {!d.availableHere && (
+                        <span class="rounded border border-cyan-500/30 bg-cyan-500/15 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider text-cyan-300">EN</span>
+                      )}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </nav>
 
         {tocHeadings.length > 0 && (
-          <div class="mt-5 pt-4 border-t border-white/5">
-            <div class="text-[10px] uppercase tracking-[0.18em] text-[var(--color-brand-1)] font-medium mb-2 px-3">
-              {tocLabel}
-            </div>
+          <div class="mt-5 border-t border-[var(--color-border)] pt-4">
+            <div class="mb-2 px-3 font-mono text-xs uppercase tracking-[0.08em] text-[var(--color-muted)]">{tocLabel}</div>
             <ul class="space-y-0.5 text-sm">
               {tocHeadings.map((h) => (
                 <li>
                   <a
                     href={`#${h.slug}`}
                     class:list={[
-                      "block py-1.5 px-3 rounded-md text-[var(--color-muted)] hover:text-white hover:bg-white/[0.03] transition-colors",
+                      "block rounded-md px-3 py-2 text-[var(--color-muted)] transition-colors hover:bg-white/[0.03] hover:text-white",
                       h.depth === 3 ? "pl-7 text-[12.5px] text-[var(--color-dim)]" : "",
                     ]}
                   >
@@ -124,98 +179,103 @@ const tocHeadings = headings
             </ul>
           </div>
         )}
+
+        <a
+          href={p.editUrl}
+          target="_blank"
+          rel="noopener"
+          class="mt-4 flex min-h-11 items-center gap-1.5 border-t border-[var(--color-border)] px-3 pt-3 text-xs text-[var(--color-muted)] hover:text-white"
+        >
+          {zh ? "在 GitHub 上编辑" : "Edit on GitHub"}
+        </a>
       </div>
     </details>
 
-    <div class="grid lg:grid-cols-[14rem_minmax(0,1fr)_12rem] gap-8 xl:gap-12">
+    <div class="grid gap-8 lg:grid-cols-[15rem_minmax(0,1fr)_12rem] xl:grid-cols-[17.5rem_minmax(0,1fr)_15rem] xl:gap-14">
       <!-- Desktop sidebar (hidden on mobile) -->
-      <aside class="hidden lg:block lg:sticky lg:top-20 lg:self-start lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto">
-        <div class="text-[10px] uppercase tracking-[0.18em] text-[var(--color-brand-1)] font-medium mb-4">
-          {docsLabel}
-        </div>
-        <nav aria-label="Documentation navigation">
-          <ul class="space-y-1">
-            <li>
-              <a
-                href={baseHref}
-                class:list={[
-                  "block px-3 py-2 rounded-md text-sm transition-colors",
-                  current === ""
-                    ? "bg-white/[0.06] text-white border-l-2 border-[var(--color-brand-1)]"
-                    : "text-[var(--color-muted)] hover:text-white hover:bg-white/[0.03]",
-                ]}
-              >
-                {lang === "zh-CN" ? "概览" : "Overview"}
-              </a>
-            </li>
-            {docs.map((d) => {
-              const isActive = d.slug === current;
-              const href = d.availableHere ? `${baseHref}/${d.slug}` : `/docs/${d.slug}`;
-              return (
-                <li>
-                  <a
-                    href={href}
-                    class:list={[
-                      "flex items-center justify-between gap-2 px-3 py-2 rounded-md text-sm transition-colors",
-                      isActive
-                        ? "bg-white/[0.06] text-white border-l-2 border-[var(--color-brand-1)]"
-                        : "text-[var(--color-muted)] hover:text-white hover:bg-white/[0.03] border-l-2 border-transparent",
-                    ]}
-                  >
-                    <span>{d.label[lang]}</span>
-                    {!d.availableHere && (
-                      <span class="text-[9px] font-mono uppercase tracking-wider px-1.5 py-0.5 rounded bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">
-                        EN
-                      </span>
-                    )}
-                  </a>
-                </li>
-              );
-            })}
-          </ul>
+      <aside class="hidden lg:sticky lg:top-20 lg:block lg:max-h-[calc(100vh-6rem)] lg:self-start lg:overflow-y-auto">
+        <nav aria-label={zh ? `${p.name} 文档导航` : `${p.name} documentation`} class="flex flex-col gap-7">
+          {sidebar.map((g) => (
+            <div class="flex flex-col gap-1">
+              <div class="px-3 pb-2 font-mono text-xs uppercase tracking-[0.08em] text-[var(--color-muted)]">{g.label}</div>
+              <ul class="flex flex-col gap-1">
+                {g.items.map((d) => (
+                  <li>
+                    <a
+                      href={d.href}
+                      aria-current={d.slug === current ? "page" : undefined}
+                      class:list={[itemBase, "py-2", d.slug === current ? `bg-[var(--color-surface)] ${itemActive}` : itemIdle]}
+                    >
+                      <span>{d.label[lang]}</span>
+                      {!d.availableHere && (
+                        <span class="rounded border border-cyan-500/30 bg-cyan-500/15 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider text-cyan-300">EN</span>
+                      )}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </nav>
 
-        <div class="mt-8 pt-6 border-t border-white/5 text-xs text-[var(--color-dim)]">
+        <div class="mt-8 border-t border-[var(--color-border)] pt-6 text-xs text-[var(--color-muted)]">
           <a
-            href="https://github.com/ThinkWatchProject/ThinkWatch/tree/main/docs"
+            href={p.editUrl}
             target="_blank"
             rel="noopener"
-            class="inline-flex items-center gap-1.5 hover:text-white transition-colors"
+            class="inline-flex items-center gap-1.5 transition-colors hover:text-white"
           >
-            <svg class="w-3 h-3" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+            <svg class="h-3 w-3" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
               <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
             </svg>
-            {lang === "zh-CN" ? "在 GitHub 上编辑" : "Edit on GitHub"}
+            {zh ? "在 GitHub 上编辑" : "Edit on GitHub"}
           </a>
         </div>
       </aside>
 
-      <!-- Article -->
-      <article class="prose-tw min-w-0" data-pagefind-body data-pagefind-meta={`title:${title.split(" · ")[0]}`}>
-        <slot />
+      <!-- Article. Only the markdown gets .prose-tw: those rules are unlayered and
+           would override the utilities on the breadcrumb, cards and prev/next links. -->
+      <article
+        class="min-w-0 max-w-[72ch] text-[0.95rem]"
+        data-pagefind-body
+        data-pagefind-meta={`title:${searchTitle}`}
+        data-pagefind-filter={`product:${p.id}`}
+      >
+        {current !== "" && currentDoc && (
+          <nav aria-label={zh ? "面包屑" : "Breadcrumb"} class="mb-5 flex flex-wrap items-center gap-2 text-sm text-[var(--color-muted)]" data-pagefind-ignore>
+            <a href={productHomeHref(lang, product)} class="transition-colors hover:text-[var(--color-text)]">{p.name}</a>
+            <span aria-hidden="true">/</span>
+            <span>{groupLabels[currentDoc.group][lang]}</span>
+            <span aria-hidden="true">/</span>
+            <span aria-current="page" class="text-[var(--color-text)]/80">{currentDoc.label[lang]}</span>
+          </nav>
+        )}
+
+        <div class="prose-tw"><slot /></div>
+        <slot name="after" />
 
         {(prev || next) && (
-          <nav class="not-prose mt-16 pt-8 border-t border-white/10 grid sm:grid-cols-2 gap-4" aria-label="Document navigation">
+          <nav class="mt-16 grid gap-4 border-t border-[var(--color-border)] pt-8 sm:grid-cols-2" aria-label={zh ? "文档翻页" : "Document navigation"} data-pagefind-ignore>
             {prev ? (
               <a
-                href={prev.locales.includes(lang) ? `${baseHref}/${prev.slug}` : `/docs/${prev.slug}`}
-                class="group rounded-xl border border-white/10 bg-[var(--color-surface)]/40 p-5 hover:border-white/25 hover:bg-[var(--color-surface)]/70 transition-colors"
+                href={docHref(lang, product, prev)}
+                class="group flex flex-col gap-1 rounded-xl border border-[var(--color-border-strong)] px-5 py-4 transition-colors hover:border-[var(--color-brand-1)]/50 hover:bg-[var(--color-surface)]/60"
               >
-                <div class="text-[10px] uppercase tracking-[0.18em] text-[var(--color-dim)] mb-1.5">← {prevLabel}</div>
-                <div class="font-semibold tracking-tight text-white group-hover:text-[var(--color-brand-1)] transition-colors">
+                <span class="text-[13px] text-[var(--color-muted)]">← {prevLabel}</span>
+                <span class="text-base text-[var(--color-text)] transition-colors group-hover:text-[var(--color-brand-1)]">
                   {prev.label[lang] || prev.label.en}
-                </div>
+                </span>
               </a>
-            ) : <span />}
+            ) : <span class="hidden sm:block" />}
             {next ? (
               <a
-                href={next.locales.includes(lang) ? `${baseHref}/${next.slug}` : `/docs/${next.slug}`}
-                class="group rounded-xl border border-white/10 bg-[var(--color-surface)]/40 p-5 hover:border-white/25 hover:bg-[var(--color-surface)]/70 transition-colors text-right"
+                href={docHref(lang, product, next)}
+                class="group flex flex-col items-end gap-1 rounded-xl border border-[var(--color-border-strong)] px-5 py-4 text-right transition-colors hover:border-[var(--color-brand-1)]/50 hover:bg-[var(--color-surface)]/60"
               >
-                <div class="text-[10px] uppercase tracking-[0.18em] text-[var(--color-dim)] mb-1.5">{nextLabel} →</div>
-                <div class="font-semibold tracking-tight text-white group-hover:text-[var(--color-brand-1)] transition-colors">
+                <span class="text-[13px] text-[var(--color-muted)]">{nextLabel} →</span>
+                <span class="text-base text-[var(--color-text)] transition-colors group-hover:text-[var(--color-brand-1)]">
                   {next.label[lang] || next.label.en}
-                </div>
+                </span>
               </a>
             ) : <span />}
           </nav>
@@ -224,20 +284,20 @@ const tocHeadings = headings
 
       <!-- TOC (right rail) -->
       {tocHeadings.length > 0 ? (
-        <aside class="hidden lg:block lg:sticky lg:top-20 lg:self-start lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto">
-          <div class="text-[10px] uppercase tracking-[0.18em] text-[var(--color-brand-1)] font-medium mb-4">
+        <aside class="hidden lg:sticky lg:top-20 lg:block lg:max-h-[calc(100vh-6rem)] lg:self-start lg:overflow-y-auto">
+          <div class="mb-4 font-mono text-xs uppercase tracking-[0.08em] text-[var(--color-muted)]">
             {tocLabel}
           </div>
-          <nav aria-label="Table of contents">
-            <ul class="space-y-1.5 text-sm border-l border-white/10">
+          <nav aria-label={zh ? "本页目录" : "Table of contents"}>
+            <ul class="space-y-1.5 border-l border-[var(--color-border)] text-sm">
               {tocHeadings.map((h) => (
                 <li>
                   <a
                     href={`#${h.slug}`}
                     data-toc-link={h.slug}
                     class:list={[
-                      "block py-1 transition-colors -ml-px border-l border-transparent hover:text-white hover:border-white/30",
-                      h.depth === 2 ? "pl-4 text-[var(--color-muted)]" : "pl-7 text-[var(--color-dim)] text-[12.5px]",
+                      "-ml-px block border-l-2 border-transparent py-1 transition-colors hover:border-white/30 hover:text-white",
+                      h.depth === 2 ? "pl-3 text-[var(--color-muted)]" : "pl-6 text-[12.5px] text-[var(--color-dim)]",
                     ]}
                   >
                     {h.text}
@@ -257,8 +317,15 @@ const tocHeadings = headings
   .mobile-docs-nav summary::-webkit-details-marker { display: none; }
   .mobile-docs-nav[open] summary .chevron { transform: rotate(180deg); }
 
+  /* Product switcher scrolls sideways on narrow screens without a visible bar. */
+  .product-switch {
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .product-switch::-webkit-scrollbar { display: none; }
+
   .toc-link-active {
-    color: #fff !important;
+    color: var(--color-text) !important;
     border-color: var(--color-brand-1) !important;
   }
 
@@ -285,15 +352,19 @@ const tocHeadings = headings
   .code-copy-btn:focus {
     opacity: 1;
   }
+  /* Touch screens have no hover: keep the button visible. */
+  @media (hover: none) {
+    .code-copy-btn { opacity: 1; }
+  }
   .code-copy-btn:hover {
     color: #fff;
     border-color: rgba(255, 255, 255, 0.25);
     background: rgba(255, 255, 255, 0.08);
   }
   .code-copy-btn[data-copied="true"] {
-    color: #6ee7b7;
-    border-color: rgba(110, 231, 183, 0.4);
-    background: rgba(110, 231, 183, 0.1);
+    color: var(--color-brand-1);
+    border-color: color-mix(in oklab, var(--color-brand-1) 40%, transparent);
+    background: color-mix(in oklab, var(--color-brand-1) 10%, transparent);
     opacity: 1;
   }
 </style>
@@ -306,6 +377,15 @@ const tocHeadings = headings
         d.open = false;
       });
     });
+  });
+
+  // On narrow screens, keep the active product pill in view inside the
+  // horizontally scrolling switcher (without scrolling the page itself).
+  document.querySelectorAll<HTMLElement>("[data-product-switch]").forEach((scroller) => {
+    const active = scroller.querySelector<HTMLElement>('[aria-current="page"]');
+    if (!active || scroller.scrollWidth <= scroller.clientWidth) return;
+    const offset = active.offsetLeft - (scroller.clientWidth - active.offsetWidth) / 2;
+    scroller.scrollLeft = Math.max(0, offset);
   });
 </script>
 

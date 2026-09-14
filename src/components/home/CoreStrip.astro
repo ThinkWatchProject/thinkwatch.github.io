@@ -1,0 +1,16 @@
+---
+import { getLang, localePath } from "~/i18n";
+import { homeCopy } from "~/i18n/pages/home";
+
+const lang = getLang(Astro);
+const c = homeCopy[lang].core;
+---
+
+<div class="border-y border-[var(--color-border)]">
+  <div class="container-page flex flex-col gap-5 py-10 md:flex-row md:items-center md:justify-between md:gap-12 md:py-12">
+    <p class="max-w-3xl text-base leading-relaxed text-[#cbd5e1] sm:text-xl">
+      {c.a}<a href={localePath(lang, "/core")} class="font-semibold text-white underline decoration-[var(--color-brand-1)]/50 underline-offset-4 hover:text-[var(--color-brand-1)]">{c.name}</a>{c.b}
+    </p>
+    <code class="shrink-0 self-start rounded-[10px] border border-[var(--color-border-strong)] bg-[var(--color-surface)] px-5 py-4 font-mono text-sm text-[var(--color-brand-1)] md:self-auto sm:text-[15px]">cargo run -p twcore -- serve</code>
+  </div>
+</div>

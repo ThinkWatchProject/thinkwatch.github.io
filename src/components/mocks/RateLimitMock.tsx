@@ -66,8 +66,8 @@ export default function RateLimitMock() {
                 style={{
                   height: `${pct}%`,
                   background: over
-                    ? "linear-gradient(180deg, #F472B6, #A78BFA)"
-                    : "linear-gradient(180deg, #22D3EE, #A78BFA)",
+                    ? "linear-gradient(180deg, #E5C07B, #F2A3B3)"
+                    : "linear-gradient(180deg, #3DDBD9, #2A3A63)",
                   opacity: 0.4 + (i / buckets.length) * 0.6,
                 }}
               />

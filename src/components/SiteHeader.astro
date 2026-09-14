@@ -18,25 +18,29 @@ const isHome =
   Astro.url.pathname === homePath + "index.html";
 const homeAnchor = (hash: string) => (isHome ? hash : `${homePath}${hash}`);
 
+const currentPath = Astro.url.pathname.replace(/^\/zh-CN/, "").replace(/\/$/, "") || "/";
 const links = [
-  { href: homeAnchor("#how"), label: s.nav.how },
-  { href: homeAnchor("#features"), label: s.nav.features },
-  { href: homeAnchor("#mcp"), label: s.nav.mcp },
-  { href: homeAnchor("#dashboard"), label: s.nav.console },
-  { href: homeAnchor("#pricing"), label: s.nav.pricing },
-  { href: localePath(lang, "/docs"), label: s.nav.docs },
-  { href: localePath(lang, "/changelog"), label: s.nav.changelog },
-];
+  { href: localePath(lang, "/thinkwatch"), label: s.nav.thinkwatch, match: "/thinkwatch" },
+  { href: localePath(lang, "/lite"), label: s.nav.lite, match: "/lite" },
+  { href: localePath(lang, "/core"), label: s.nav.core, match: "/core" },
+  { href: localePath(lang, "/docs"), label: s.nav.docs, match: "/docs" },
+  { href: localePath(lang, "/changelog"), label: s.nav.changelog, match: "/changelog" },
+  { href: localePath(lang, "/license"), label: s.nav.license, match: "/license" },
+].map((l) => ({ ...l, active: currentPath === l.match || currentPath.startsWith(l.match + "/") }));
 
 const cleanPath = Astro.url.pathname.replace(/^\/zh-CN/, "") || "/";
 
-const docMatch = cleanPath.match(/^\/docs\/([^\/]+)\/?$/);
-const currentDocSlug = docMatch ? docMatch[1] : null;
-const currentDocMeta = currentDocSlug ? findDoc(currentDocSlug) : undefined;
+// /docs/<slug> is a ThinkWatch guide; /docs/lite/<slug> and /docs/core/<slug> are product docs.
+const docMatch = cleanPath.match(/^\/docs\/(?:(lite|core)\/)?([^\/]+)\/?$/);
+const currentDocSlug = docMatch ? docMatch[2] : null;
+const currentDocMeta = currentDocSlug
+  ? findDoc(currentDocSlug, (docMatch?.[1] as "lite" | "core" | undefined) ?? "thinkwatch")
+  : undefined;
 
 function targetPath(target: Lang): string {
   if (currentDocMeta && !currentDocMeta.locales.includes(target)) {
-    return "/docs";
+    // Untranslated doc: fall back to that product's docs home.
+    return docMatch?.[1] ? `/docs/${docMatch[1]}` : "/docs";
   }
   return cleanPath;
 }
@@ -70,7 +74,13 @@ const closeLabel = lang === "zh-CN" ? "关闭" : "Close";
     <!-- Desktop nav -->
     <nav class="hidden md:flex items-center gap-8 text-sm text-[var(--color-muted)]">
       {links.map((l) => (
-        <a href={l.href} class="hover:text-white transition-colors">{l.label}</a>
+        <a
+          href={l.href}
+          aria-current={l.active ? "page" : undefined}
+          class:list={["transition-colors", l.active ? "text-[var(--color-brand-1)]" : "hover:text-white"]}
+        >
+          {l.label}
+        </a>
       ))}
     </nav>
 
@@ -136,7 +146,7 @@ const closeLabel = lang === "zh-CN" ? "关闭" : "Close";
 
       <!-- Desktop CTA -->
       <a
-        href={homeAnchor("#quickstart")}
+        href={localePath(lang, "/thinkwatch#quickstart")}
         class="hidden sm:inline-flex items-center text-sm font-medium px-4 h-9 rounded-md bg-brand-gradient text-black hover:brightness-110 transition"
       >
         {s.common.getStarted}
@@ -176,7 +186,11 @@ const closeLabel = lang === "zh-CN" ? "关闭" : "Close";
           <li>
             <a
               href={l.href}
-              class="block py-3 text-base text-[var(--color-muted)] hover:text-white transition-colors border-b border-white/5"
+              aria-current={l.active ? "page" : undefined}
+              class:list={[
+                "block py-3 text-base transition-colors border-b border-white/5",
+                l.active ? "text-[var(--color-brand-1)]" : "text-[var(--color-muted)] hover:text-white",
+              ]}
             >
               {l.label}
             </a>
@@ -184,7 +198,7 @@ const closeLabel = lang === "zh-CN" ? "关闭" : "Close";
         ))}
         <li>
           <a
-            href={homeAnchor("#quickstart")}
+            href={localePath(lang, "/thinkwatch#quickstart")}
             class="mt-4 inline-flex items-center justify-center w-full px-4 py-3 rounded-lg bg-brand-gradient text-black font-medium hover:brightness-110 transition"
           >
             {s.common.getStarted}

@@ -1,0 +1,91 @@
+---
+import DashboardMock from "~/components/mocks/DashboardMock.tsx";
+import LogExplorerMock from "~/components/mocks/LogExplorerMock.tsx";
+import ProviderHealthMock from "~/components/mocks/ProviderHealthMock.tsx";
+import RateLimitMock from "~/components/mocks/RateLimitMock.tsx";
+import { getLang, localePath } from "~/i18n";
+import { homeCopy } from "~/i18n/pages/home";
+
+const lang = getLang(Astro);
+const c = homeCopy[lang].tw;
+---
+
+<section class="border-y border-[var(--color-border)] bg-[var(--color-surface)]">
+  <div class="container-page py-20 lg:py-28">
+    <div class="grid gap-12 lg:grid-cols-2 lg:items-end lg:gap-[72px]">
+      <div class="flex flex-col gap-5">
+        <div class="font-mono text-[13px] uppercase tracking-[0.08em] text-[var(--color-brand-1)]">{c.eyebrow}</div>
+        <h2
+          class:list={[
+            "font-display text-white [text-wrap:balance]",
+            lang === "zh-CN" ? "text-[32px] leading-[1.3] sm:text-[44px] lg:text-[52px]" : "text-[40px] leading-[1.05] sm:text-[56px] lg:text-[64px]",
+          ]}
+        >{c.title}</h2>
+        <p class="text-[17px] leading-relaxed text-[#cbd5e1] sm:text-lg">{c.sub}</p>
+        <a href={localePath(lang, "/thinkwatch")} class="inline-flex min-h-11 items-center self-start text-[17px] font-medium text-[var(--color-brand-1)] hover:text-[var(--color-brand-2)]">{c.cta}</a>
+      </div>
+      <div class="grid gap-7 sm:grid-cols-2">
+        {c.features.map((f) => (
+          <div class="flex flex-col gap-1.5">
+            <div class="text-[17px] font-semibold text-white">{f.t}</div>
+            <div class="text-[15px] leading-normal text-[var(--color-muted)]">{f.b}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <div class="mt-16 font-mono text-[13px] uppercase tracking-[0.08em] text-[var(--color-muted)]">{c.stepsLabel}</div>
+    <ol class="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+      {c.steps.map((s, i) => (
+        <li class="step flex flex-col gap-2 rounded-xl border border-[var(--color-border-strong)] p-[18px]" style={`animation-delay: ${i * 2}s;`}>
+          <span class="font-mono text-xs text-[var(--color-brand-1)]">{String(i + 1).padStart(2, "0")}</span>
+          <span class="text-base font-semibold text-white">{s.t}</span>
+          <span class="text-[13px] leading-snug text-[var(--color-muted)]">{s.b}</span>
+        </li>
+      ))}
+    </ol>
+
+    <div class="mt-16 flex items-center justify-between gap-4">
+      <div class="font-mono text-[13px] uppercase tracking-[0.08em] text-[var(--color-muted)]">{c.consoleLabel}</div>
+      <span class="rounded-full border border-[var(--color-accent)] px-2.5 py-1 font-mono text-xs uppercase text-[var(--color-accent)]">{c.sample}</span>
+    </div>
+    <div class="mt-5">
+      <DashboardMock client:visible />
+    </div>
+    <div class="mt-4 grid items-stretch gap-4 lg:grid-cols-[1.35fr_1fr]">
+      <div class="min-w-0">
+        <LogExplorerMock client:visible />
+      </div>
+      <div class="flex min-w-0 flex-col gap-4">
+        <ProviderHealthMock client:visible />
+        <RateLimitMock client:visible />
+      </div>
+    </div>
+
+    <div class="mt-20 grid gap-6 border-t border-[var(--color-border-strong)] pt-14 lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-16">
+      <div class="font-mono text-[13px] uppercase tracking-[0.08em] text-[var(--color-muted)] lg:pt-3.5">{c.quoteLabel}</div>
+      <div class="flex flex-col gap-5">
+        <p
+          class:list={[
+            "font-display text-white [text-wrap:balance]",
+            lang === "zh-CN" ? "text-[26px] leading-[1.45] sm:text-[34px] lg:text-[42px]" : "text-[34px] leading-[1.1] sm:text-[44px] lg:text-[56px] lg:leading-[1.04]",
+          ]}
+        >
+          {c.quoteA}<span class:list={["text-shimmer", lang === "en" && "italic"]}>{c.quoteEm}</span>{c.quoteB}
+        </p>
+        <p class="max-w-3xl text-[17px] leading-relaxed text-[#cbd5e1] sm:text-lg">{c.quoteBody}</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .step { animation: step-cycle 12s ease-in-out infinite; }
+  @keyframes step-cycle {
+    0%, 15% { border-color: #3ddbd9; background: #15223d; box-shadow: 0 10px 36px -16px rgba(61, 219, 217, 0.6); }
+    18%, 100% { border-color: #2a3a63; background: transparent; box-shadow: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .step { animation: none; }
+  }
+</style>

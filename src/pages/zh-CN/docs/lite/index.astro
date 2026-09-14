@@ -1,0 +1,8 @@
+---
+import DocArticle from "~/pages/docs/_DocArticle.astro";
+import { getHomeEntry } from "~/pages/docs/_lib";
+
+const entry = await getHomeEntry("lite", "zh-CN");
+---
+
+<DocArticle lang="zh-CN" product="lite" slug="" entry={entry} />

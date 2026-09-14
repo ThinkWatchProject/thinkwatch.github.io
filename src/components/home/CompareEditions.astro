@@ -1,0 +1,50 @@
+---
+import { getLang, localePath } from "~/i18n";
+import { homeCopy } from "~/i18n/pages/home";
+
+const lang = getLang(Astro);
+const c = homeCopy[lang].compare;
+const editions = [
+  { name: "ThinkWatch", href: localePath(lang, "/thinkwatch"), v: c.thinkwatch },
+  { name: "ThinkWatch Lite", href: localePath(lang, "/lite"), v: c.lite },
+  { name: "ThinkWatch Core", href: localePath(lang, "/core"), v: c.core },
+];
+const rows = ["runsAs", "builtFor", "status", "license"] as const;
+---
+
+<section class="container-page py-20 lg:py-24">
+  <div class="font-mono text-[13px] uppercase tracking-[0.08em] text-[var(--color-muted)]">{c.eyebrow}</div>
+
+  <div class="mt-7 hidden grid-cols-[200px_repeat(3,minmax(0,1fr))] gap-x-8 text-base md:grid">
+    <div class="border-b border-[var(--color-border-strong)] py-3.5"></div>
+    {editions.map((e) => (
+      <a href={e.href} class="border-b border-[var(--color-border-strong)] py-3.5 text-xl font-semibold text-white hover:text-[var(--color-brand-1)]">{e.name}</a>
+    ))}
+    {rows.map((row) => (
+      <>
+        <div class="border-b border-[var(--color-border)] py-[18px] font-mono text-sm text-[var(--color-muted)]">{c.rows[row]}</div>
+        {editions.map((e) => (
+          <div class="border-b border-[var(--color-border)] py-[18px] leading-relaxed text-[#cbd5e1]">{e.v[row]}</div>
+        ))}
+      </>
+    ))}
+  </div>
+
+  <div class="mt-7 flex flex-col gap-4 md:hidden">
+    {editions.map((e) => (
+      <a href={e.href} class="flex flex-col gap-3 rounded-xl border border-[var(--color-border-strong)] p-5">
+        <span class="text-lg font-semibold text-white">{e.name}</span>
+        <dl class="grid grid-cols-[88px_minmax(0,1fr)] gap-x-3 gap-y-2 text-[15px]">
+          {rows.map((row) => (
+            <>
+              <dt class="font-mono text-xs leading-6 text-[var(--color-muted)]">{c.rows[row]}</dt>
+              <dd class="leading-relaxed text-[#cbd5e1]">{e.v[row]}</dd>
+            </>
+          ))}
+        </dl>
+      </a>
+    ))}
+  </div>
+
+  <a href={localePath(lang, "/license")} class="mt-7 inline-flex min-h-11 items-center text-[17px] font-medium text-[var(--color-brand-1)] hover:text-[var(--color-brand-2)]">{c.link}</a>
+</section>

@@ -1,0 +1,44 @@
+---
+import { getLang } from "~/i18n";
+import { homeCopy } from "~/i18n/pages/home";
+
+const c = homeCopy[getLang(Astro)].questions;
+---
+
+<section class="container-page pb-20 lg:pb-28">
+  <div class="font-mono text-[13px] uppercase tracking-[0.08em] text-[var(--color-muted)]">{c.eyebrow}</div>
+  <div class="mt-8 grid gap-5 [perspective:900px] md:grid-cols-3 md:gap-6">
+    {c.items.map((item) => (
+      <div data-tilt class="tilt flex flex-col gap-3 rounded-2xl border border-[var(--color-border-strong)] bg-[#0f1729] p-7 sm:p-8">
+        <div class="font-mono text-[13px] text-[var(--color-brand-1)]">{item.tag}</div>
+        <h3 class="text-[22px] font-semibold text-white sm:text-[26px]">{item.title}</h3>
+        <p class="text-base leading-relaxed text-[var(--color-muted)] sm:text-[17px]">{item.body}</p>
+      </div>
+    ))}
+  </div>
+</section>
+
+<style>
+  .tilt { transition: transform 180ms ease-out, border-color 250ms ease; transform-style: preserve-3d; }
+  .tilt:hover { border-color: var(--color-brand-1); }
+</style>
+
+<script>
+  // Tilt cards toward the pointer. Only on devices with a precise pointer and
+  // when the visitor hasn't asked for reduced motion.
+  const fine = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (fine && !reduced) {
+    document.querySelectorAll<HTMLElement>("[data-tilt]").forEach((el) => {
+      el.addEventListener("mousemove", (e) => {
+        const b = el.getBoundingClientRect();
+        const x = (e.clientX - b.left) / b.width - 0.5;
+        const y = (e.clientY - b.top) / b.height - 0.5;
+        el.style.transform = `rotateX(${(-y * 8).toFixed(2)}deg) rotateY(${(x * 10).toFixed(2)}deg)`;
+      });
+      el.addEventListener("mouseleave", () => {
+        el.style.transform = "";
+      });
+    });
+  }
+</script>

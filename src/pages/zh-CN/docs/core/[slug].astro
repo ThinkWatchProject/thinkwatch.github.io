@@ -1,0 +1,12 @@
+---
+import DocArticle from "~/pages/docs/_DocArticle.astro";
+import { getArticlePaths } from "~/pages/docs/_lib";
+
+export async function getStaticPaths() {
+  return getArticlePaths("core", "zh-CN");
+}
+
+const { entry, slug } = Astro.props;
+---
+
+<DocArticle lang="zh-CN" product="core" slug={slug} entry={entry} />

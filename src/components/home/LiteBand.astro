@@ -1,0 +1,34 @@
+---
+import LiteMenubar from "./LiteMenubar.astro";
+import { getLang, localePath } from "~/i18n";
+import { homeCopy } from "~/i18n/pages/home";
+
+const lang = getLang(Astro);
+const c = homeCopy[lang].lite;
+---
+
+<section class="container-page grid items-center gap-12 py-20 lg:grid-cols-2 lg:gap-[72px] lg:py-28">
+  <div class="order-2 min-w-0 lg:order-1">
+    <LiteMenubar />
+  </div>
+  <div class="order-1 flex flex-col gap-5 lg:order-2">
+    <div class="font-mono text-[13px] uppercase tracking-[0.08em] text-[var(--color-brand-1)]">{c.eyebrow}</div>
+    <h2
+      class:list={[
+        "font-display text-white [text-wrap:balance]",
+        lang === "zh-CN" ? "text-[32px] leading-[1.3] sm:text-[44px] lg:text-[52px]" : "text-[40px] leading-[1.05] sm:text-[56px] lg:text-[64px]",
+      ]}
+    >{c.title}</h2>
+    <div class="mt-2 flex flex-col gap-4">
+      {c.points.map((p) => (
+        <p class="text-base leading-relaxed text-[#cbd5e1] sm:text-[17px]"><span class="font-semibold text-white">{p.t}</span> {p.b}</p>
+      ))}
+    </div>
+    <div class="flex flex-wrap items-center gap-3">
+      {c.pills.map((pill) => (
+        <span class="rounded-full border border-[var(--color-border-strong)] px-3 py-1.5 text-[13px] text-[#cbd5e1]">{pill}</span>
+      ))}
+    </div>
+    <a href={localePath(lang, "/lite")} class="inline-flex min-h-11 items-center self-start text-[17px] font-medium text-[var(--color-brand-1)] hover:text-[var(--color-brand-2)]">{c.cta}</a>
+  </div>
+</section>

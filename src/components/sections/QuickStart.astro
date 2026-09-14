@@ -1,18 +1,20 @@
 ---
 import { codeToHtml } from "shiki";
 import CodeTabs, { type Snippet } from "./CodeTabs.tsx";
-import { getLang, t } from "~/i18n";
+import { getLang, localePath, t } from "~/i18n";
 
 const lang = getLang(Astro);
 const s = t(lang).quickstart;
 
+// Client snippets. Env var names and the Cursor settings path follow the
+// configuration guide built into the ThinkWatch console (/gateway/guide).
 const rawSnippets: { id: string; label: string; lang: string; code: string }[] = [
   {
     id: "curl",
     label: "cURL",
     lang: "bash",
     code: `curl https://gateway.your-org.com/v1/chat/completions \\
-  -H "Authorization: Bearer tw-prod-xxxxxxxxxxxxxxxxx" \\
+  -H "Authorization: Bearer tw-your-api-key-here" \\
   -H "Content-Type: application/json" \\
   -d '{
     "model": "gpt-4o",
@@ -28,7 +30,7 @@ const rawSnippets: { id: string; label: string; lang: string; code: string }[] =
 
 client = OpenAI(
     base_url="https://gateway.your-org.com/v1",
-    api_key="tw-prod-xxxxxxxxxxxxxxxxx",
+    api_key="tw-your-api-key-here",
 )
 
 stream = client.chat.completions.create(
@@ -47,7 +49,7 @@ for chunk in stream:
 
 client = Anthropic(
     base_url="https://gateway.your-org.com",
-    api_key="tw-prod-xxxxxxxxxxxxxxxxx",
+    api_key="tw-your-api-key-here",
 )
 
 with client.messages.stream(
@@ -62,28 +64,20 @@ with client.messages.stream(
     id: "claude-code",
     label: "Claude Code",
     lang: "bash",
-    code: `# ~/.config/claude-code/settings.json
-{
-  "anthropicBaseUrl": "https://gateway.your-org.com",
-  "anthropicApiKey": "tw-prod-xxxxxxxxxxxxxxxxx"
-}
-
-# Or via environment
+    code: `# Set ThinkWatch as the Anthropic API proxy
 export ANTHROPIC_BASE_URL=https://gateway.your-org.com
-export ANTHROPIC_API_KEY=tw-prod-xxxxxxxxxxxxxxxxx`,
+export ANTHROPIC_API_KEY=tw-your-api-key-here
+
+# Then use claude normally
+claude`,
   },
   {
     id: "cursor",
     label: "Cursor",
-    lang: "json",
-    code: `// Cursor → Settings → Models → OpenAI API Key
-{
-  "openai.apiKey": "tw-prod-xxxxxxxxxxxxxxxxx",
-  "openai.baseUrl": "https://gateway.your-org.com/v1"
-}
-
-// Cursor will auto-discover the available models
-// from /v1/models on the gateway.`,
+    lang: "text",
+    code: `// In Cursor Settings > Models > OpenAI API Key
+// Base URL: https://gateway.your-org.com/v1
+// API Key:  tw-your-api-key-here`,
   },
 ];
 
@@ -99,47 +93,66 @@ const snippets: Snippet[] = await Promise.all(
   })),
 );
 
-const stepCmds = [
-  "make infra",
-  "cp .env.example .env && make dev-backend",
-  "cd web && pnpm install && pnpm dev",
-  "open http://localhost:5173/setup",
+// Commands match the Quick Start in the ThinkWatch README exactly.
+const stepCmds: { cmds: string[]; url?: string }[] = [
+  { cmds: ["make infra"] },
+  { cmds: ["make dev-secrets", "make dev-backend"] },
+  { cmds: ["cd web && pnpm install && pnpm dev"] },
+  { cmds: [], url: "http://localhost:5173/setup" },
 ];
 const steps = s.steps.map((step, i) => ({
   n: String(i + 1),
   title: step.title,
   body: step.body,
-  cmd: stepCmds[i],
+  ...stepCmds[i],
 }));
 ---
 
-<section id="quickstart" class="py-20 sm:py-28 border-t border-white/5 relative">
+<section id="quickstart" class="py-20 sm:py-28 border-t border-white/5 relative scroll-mt-20">
   <div class="container-page relative z-10">
     <div class="max-w-3xl">
       <div class="text-xs uppercase tracking-[0.18em] text-[var(--color-brand-1)] font-medium mb-4">
         {s.eyebrow}
       </div>
       <h2 class="text-3xl sm:text-4xl md:text-5xl font-semibold tracking-tight">
-        {s.title}<span class="text-gradient">{s.titleHighlight}</span>.
+        {s.title}<span class="text-gradient">{s.titleHighlight}</span>{s.titleEnd}
       </h2>
       <p class="mt-4 sm:mt-5 text-base sm:text-lg text-[var(--color-muted)] leading-relaxed">
         {s.sub}
       </p>
+      <a
+        href={localePath(lang, "/docs/deployment-guide")}
+        class="mt-3 inline-flex min-h-11 items-center text-base font-medium text-[var(--color-brand-1)] hover:text-[var(--color-brand-2)] transition-colors"
+      >
+        {s.deployLink}
+        <svg class="ml-1.5 h-4 w-4" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+        </svg>
+      </a>
     </div>
 
     <div class="mt-10 sm:mt-14 grid lg:grid-cols-[1.1fr_1fr] gap-8 lg:gap-10 items-start">
       <ol class="space-y-4">
-        {steps.map((s) => (
+        {steps.map((step) => (
           <li class="rounded-xl border border-white/10 bg-[var(--color-surface)]/60 p-4 sm:p-5 flex gap-4 sm:gap-5">
             <div class="shrink-0 w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-brand-gradient text-black font-mono text-sm font-bold grid place-items-center" aria-hidden="true">
-              {s.n}
+              {step.n}
             </div>
             <div class="min-w-0 flex-1">
-              <div class="font-semibold tracking-tight mb-1">{s.title}</div>
-              <p class="text-sm text-[var(--color-muted)] mb-3">{s.body}</p>
-              <code class="block font-mono text-[11px] sm:text-xs text-[var(--color-brand-1)] bg-black/40 border border-white/10 rounded-md px-3 py-2 overflow-x-auto whitespace-nowrap">
-                $ {s.cmd}
-              </code>
+              <div class="font-semibold tracking-tight mb-1">{step.title}</div>
+              <p class="text-sm text-[var(--color-muted)] mb-3">{step.body}</p>
+              {step.cmds.length > 0 && (
+                <code class="block font-mono text-[11px] sm:text-xs text-[var(--color-brand-1)] bg-black/40 border border-white/10 rounded-md px-3 py-2 overflow-x-auto whitespace-nowrap">
+                  {step.cmds.map((cmd) => (
+                    <span class="block"><span class="select-none text-[var(--color-dim)]">$ </span>{cmd}</span>
+                  ))}
+                </code>
+              )}
+              {step.url && (
+                <code class="block font-mono text-[11px] sm:text-xs text-[var(--color-brand-1)] bg-black/40 border border-white/10 rounded-md px-3 py-2 overflow-x-auto whitespace-nowrap">
+                  {step.url}
+                </code>
+              )}
             </div>
           </li>
         ))}

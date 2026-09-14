@@ -3,6 +3,7 @@ import { getLang, t } from "~/i18n";
 
 const s = t(getLang(Astro)).compatible;
 
+// Only clients the ThinkWatch README names as drop-in compatible.
 const items = [
   "Claude Code",
   "Cursor",
@@ -10,8 +11,6 @@ const items = [
   "Cline",
   "OpenAI SDK",
   "Anthropic SDK",
-  "LangChain",
-  "LlamaIndex",
 ];
 // Doubled for seamless loop
 const doubled = [...items, ...items];
