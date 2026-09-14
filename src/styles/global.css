@@ -2,22 +2,38 @@
 
 /* ---------- Theme tokens ---------- */
 @theme {
-  --color-bg: #0a0a0f;
-  --color-surface: #11111a;
-  --color-surface-2: #161622;
-  --color-border: #232336;
-  --color-border-strong: #2e2e44;
+  /* Brand: the logo's navy and teal, with amber for warnings. */
+  --color-bg: #0b1220;
+  --color-surface: #111a2e;
+  --color-surface-2: #16213a;
+  --color-border: #1e2a4a;
+  --color-border-strong: #2a3a63;
+  --color-navy: #1e2a4a;
 
-  --color-text: #e5e7eb;
-  --color-muted: #9ca3af;
-  --color-dim: #6b7280;
+  --color-text: #e6ebf2;
+  --color-muted: #94a3b8;
+  --color-dim: #8a96ab;
 
-  --color-brand-1: #22d3ee;   /* cyan-400  */
-  --color-brand-2: #a78bfa;   /* violet-400 */
-  --color-accent:  #f472b6;   /* pink-400  */
+  --color-brand-1: #3ddbd9;   /* logo teal */
+  --color-brand-2: #8eebea;   /* light teal */
+  --color-accent:  #e5c07b;   /* amber: flagged, held, warnings */
 
-  --font-sans: "Geist", "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  /* Legacy palette classes (cyan, violet, pink, purple, fuchsia) used across
+     older components are remapped onto the brand ramps, so every component
+     follows the logo without per-file edits. */
+  --color-cyan-50: #ecfdfc;  --color-cyan-100: #d2f9f8; --color-cyan-200: #a8f2f0; --color-cyan-300: #6fe6e4; --color-cyan-400: #3ddbd9;
+  --color-cyan-500: #22bfbd; --color-cyan-600: #189a99; --color-cyan-700: #167a7a; --color-cyan-800: #155f60; --color-cyan-900: #134e4f; --color-cyan-950: #062d2e;
+  --color-violet-50: #f0fefd; --color-violet-100: #ddfaf9; --color-violet-200: #c3f6f5; --color-violet-300: #a8f2f0; --color-violet-400: #8eebea;
+  --color-violet-500: #6fe6e4; --color-violet-600: #3ddbd9; --color-violet-700: #22bfbd; --color-violet-800: #189a99; --color-violet-900: #167a7a; --color-violet-950: #0b3f40;
+  --color-purple-300: #a8f2f0; --color-purple-400: #8eebea; --color-purple-500: #6fe6e4;
+  --color-pink-50: #fbf6ec;  --color-pink-100: #f6eacf; --color-pink-200: #efd9a8; --color-pink-300: #e9cb8e; --color-pink-400: #e5c07b;
+  --color-pink-500: #d6a95a; --color-pink-600: #b98a3f; --color-pink-700: #946b31; --color-pink-800: #74542b; --color-pink-900: #5f4526; --color-pink-950: #352413;
+  --color-fuchsia-300: #e9cb8e; --color-fuchsia-400: #e5c07b; --color-fuchsia-500: #d6a95a;
+
+  --font-sans: "Geist", "Noto Sans SC", "PingFang SC", "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-mono: "Geist Mono", "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-serif: "Instrument Serif", Georgia, "Times New Roman", serif;
+  --font-serif-zh: "Noto Serif SC", "Songti SC", "STSong", serif;
 }
 
 /* ---------- Base ---------- */
@@ -65,8 +81,8 @@
     pointer-events: none;
     z-index: -2;
     background-image:
-      linear-gradient(to right, rgba(255,255,255,0.025) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(255,255,255,0.025) 1px, transparent 1px);
+      linear-gradient(to right, rgba(148,163,184,0.045) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(148,163,184,0.045) 1px, transparent 1px);
     background-size: 56px 56px;
     mask-image: radial-gradient(ellipse at center, #000 30%, transparent 80%);
   }
@@ -79,9 +95,9 @@
     pointer-events: none;
     z-index: -1;
     background:
-      radial-gradient(60rem 40rem at 15% -10%, color-mix(in oklab, var(--color-brand-1) 22%, transparent), transparent 60%),
-      radial-gradient(50rem 35rem at 90% 10%, color-mix(in oklab, var(--color-brand-2) 22%, transparent), transparent 60%),
-      radial-gradient(40rem 30rem at 50% 100%, color-mix(in oklab, var(--color-accent) 12%, transparent), transparent 70%);
+      radial-gradient(60rem 40rem at 15% -10%, color-mix(in oklab, var(--color-brand-1) 16%, transparent), transparent 60%),
+      radial-gradient(50rem 35rem at 90% 10%, color-mix(in oklab, var(--color-border-strong) 70%, transparent), transparent 60%),
+      radial-gradient(40rem 30rem at 50% 100%, color-mix(in oklab, var(--color-brand-1) 6%, transparent), transparent 70%);
     filter: blur(20px);
   }
 }
@@ -89,7 +105,7 @@
 /* ---------- Utilities ---------- */
 @layer utilities {
   .text-gradient {
-    background: linear-gradient(120deg, #67e8f9 0%, #c4b5fd 50%, #f0abfc 100%);
+    background: linear-gradient(120deg, #3ddbd9 0%, #8eebea 55%, #d8fbfa 100%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -98,6 +114,37 @@
   .bg-brand-gradient {
     background: linear-gradient(135deg, var(--color-brand-1) 0%, var(--color-brand-2) 100%);
   }
+
+  /* Display serif. Chinese pages switch to a CJK serif with more weight. */
+  .font-display {
+    font-family: var(--font-serif);
+    font-weight: 400;
+    letter-spacing: -0.02em;
+  }
+  :lang(zh-CN) .font-display {
+    font-family: var(--font-serif-zh);
+    font-weight: 600;
+    letter-spacing: 0;
+  }
+
+  /* Teal text with a light sweep passing through it. */
+  .text-shimmer {
+    background: linear-gradient(100deg, #3ddbd9 0%, #3ddbd9 35%, #d8fbfa 50%, #3ddbd9 65%, #3ddbd9 100%);
+    background-size: 250% 100%;
+    background-position: 100% 0;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: tw-shine 5s ease-in-out 1.2s infinite;
+  }
+
+  .reveal {
+    opacity: 0;
+    animation: tw-rise 900ms cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
+  }
+
+  .blink { animation: tw-blink 1s steps(1) infinite; }
+  .pulse-dot { animation: tw-blink 1.4s ease-in-out infinite; }
 
   .border-gradient {
     position: relative;
@@ -131,6 +178,12 @@
     max-width: 80rem;
   }
 }
+
+@keyframes tw-shine { 0% { background-position: 100% 0; } 45%, 100% { background-position: -50% 0; } }
+@keyframes tw-rise { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+@keyframes tw-blink { 50% { opacity: 0; } }
+@keyframes tw-marquee { to { transform: translateX(-50%); } }
+@keyframes tw-fade-in { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
 
 /* ---------- Markdown prose (docs) ---------- */
 .prose-tw {
@@ -205,8 +258,8 @@
   font-family: var(--font-mono);
   font-size: 0.85em;
   color: var(--color-brand-1);
-  background: rgba(34, 211, 238, 0.08);
-  border: 1px solid rgba(34, 211, 238, 0.18);
+  background: rgba(61, 219, 217, 0.08);
+  border: 1px solid rgba(61, 219, 217, 0.2);
   padding: 0.1em 0.4em;
   border-radius: 4px;
 }
@@ -214,7 +267,7 @@
 /* Code blocks (Shiki output) */
 .prose-tw pre.shiki,
 .prose-tw pre.astro-code {
-  background: #0d0d14 !important;
+  background: #0d1526 !important;
   border: 1px solid rgba(255,255,255,0.08);
   border-radius: 12px;
   padding: 1.1rem 1.25rem;

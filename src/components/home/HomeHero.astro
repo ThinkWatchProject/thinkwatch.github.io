@@ -1,0 +1,103 @@
+---
+import { getLang, localePath } from "~/i18n";
+import { homeCopy } from "~/i18n/pages/home";
+
+const lang = getLang(Astro);
+const c = homeCopy[lang];
+const t = c.trace;
+---
+
+<section class="home-hero relative overflow-hidden">
+  <div class="hero-glow" aria-hidden="true"></div>
+  <div class="container-page relative grid items-center gap-12 pb-16 pt-12 sm:pt-20 lg:grid-cols-[minmax(0,1.12fr)_minmax(0,1fr)] lg:gap-16 lg:pb-28 lg:pt-24">
+    <div class="flex min-w-0 flex-col gap-6">
+      <div class="reveal font-mono text-[11px] uppercase tracking-[0.08em] text-[var(--color-brand-1)] sm:text-[13px]">{c.eyebrow}</div>
+      <h1
+        class:list={[
+          "reveal font-display text-white [text-wrap:balance]",
+          lang === "zh-CN"
+            ? "text-[34px] leading-[1.3] sm:text-[46px] lg:text-[54px] xl:text-[58px] lg:leading-[1.25]"
+            : "text-[44px] leading-[1.02] sm:text-[64px] lg:text-[76px] xl:text-[84px] lg:leading-[0.97]",
+        ]}
+        style="animation-delay: 120ms;"
+      >
+        {c.h1a} <span class:list={["text-shimmer", lang === "en" && "italic"]}>{c.h1b}</span>
+      </h1>
+      <p class="reveal text-pretty text-[17px] leading-relaxed text-[#cbd5e1] sm:text-xl" style="animation-delay: 260ms;">{c.sub}</p>
+
+      <div class="reveal mt-2 grid gap-4 sm:grid-cols-2" style="animation-delay: 400ms;">
+        <a href={localePath(lang, "/thinkwatch")} class="door group flex flex-col gap-2.5 rounded-[14px] border border-[var(--color-border-strong)] bg-[rgba(17,26,46,0.85)] p-6">
+          <span class="font-mono text-xs uppercase tracking-[0.08em] text-[var(--color-muted)]">{c.doors.teams.label}</span>
+          <span class="text-2xl font-semibold tracking-tight text-white">{c.doors.teams.name}</span>
+          <span class="text-[15px] leading-normal text-[#cbd5e1]">{c.doors.teams.text}</span>
+          <span class="cta mt-2 inline-flex min-h-11 items-center self-start rounded-[10px] bg-[var(--color-brand-1)] px-[18px] text-[15px] font-semibold text-[var(--color-bg)]">{c.doors.teams.cta}</span>
+        </a>
+        <a href={localePath(lang, "/lite")} class="door group flex flex-col gap-2.5 rounded-[14px] border border-[var(--color-border-strong)] bg-[rgba(17,26,46,0.85)] p-6">
+          <span class="font-mono text-xs uppercase tracking-[0.08em] text-[var(--color-muted)]">{c.doors.machine.label}</span>
+          <span class="text-2xl font-semibold tracking-tight text-white">{c.doors.machine.name}</span>
+          <span class="text-[15px] leading-normal text-[#cbd5e1]">{c.doors.machine.text}</span>
+          <span class="cta mt-2 inline-flex min-h-11 items-center self-start rounded-[10px] border border-[var(--color-brand-1)] px-[17px] text-[15px] font-semibold text-[var(--color-brand-1)]">{c.doors.machine.cta}</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="reveal min-w-0 overflow-hidden rounded-[14px] border border-[var(--color-border-strong)] bg-[rgba(17,26,46,0.92)] font-mono text-[13px] shadow-[0_40px_120px_-40px_rgba(61,219,217,0.35)] sm:text-sm" style="animation-delay: 520ms;">
+      <div class="flex items-center justify-between gap-3 border-b border-[#22304f] px-4 py-3.5 text-[var(--color-muted)] sm:px-5">
+        <span class="flex items-center gap-2.5">
+          <span class="flex gap-1.5" aria-hidden="true"><span class="h-2.5 w-2.5 rounded-full bg-[var(--color-border-strong)]"></span><span class="h-2.5 w-2.5 rounded-full bg-[var(--color-border-strong)]"></span><span class="h-2.5 w-2.5 rounded-full bg-[var(--color-border-strong)]"></span></span>
+          <span><span class="text-[var(--color-brand-1)]">POST</span> /v1/messages</span>
+        </span>
+        <span class="uppercase text-[var(--color-accent)]">{t.tag}</span>
+      </div>
+      <div class="flex flex-col gap-1 px-2.5 py-4 sm:px-3.5">
+        <div class="trace-row grid grid-cols-[88px_minmax(0,1fr)] gap-3 rounded-md p-1.5 sm:grid-cols-[110px_minmax(0,1fr)] sm:gap-4" style="animation-delay: 0.2s;"><span class="text-[var(--color-muted)]">{t.client[0]}</span><span class="text-[#e6ebf2]">{t.client[1]}</span></div>
+        <div class="trace-row grid grid-cols-[88px_minmax(0,1fr)] gap-3 rounded-md p-1.5 sm:grid-cols-[110px_minmax(0,1fr)] sm:gap-4" style="animation-delay: 0.7s;"><span class="text-[var(--color-muted)]">{t.rule[0]}</span><span class="text-[#e6ebf2]">{t.rule[1]}</span></div>
+        <div class="trace-row grid grid-cols-[88px_minmax(0,1fr)] gap-3 rounded-md p-1.5 sm:grid-cols-[110px_minmax(0,1fr)] sm:gap-4" style="animation-delay: 1.3s;"><span class="text-[var(--color-muted)]">{t.hop1[0]}</span><span class="text-[#e6ebf2]">{t.hop1[1]} · <span class="text-[var(--color-accent)]">{t.hop1[2]}</span> · {t.hop1[3]}</span></div>
+        <div class="trace-row grid grid-cols-[88px_minmax(0,1fr)] gap-3 rounded-md p-1.5 sm:grid-cols-[110px_minmax(0,1fr)] sm:gap-4" style="animation-delay: 2s;"><span class="text-[var(--color-muted)]">{t.hop2[0]}</span><span class="text-[#e6ebf2]">{t.hop2[1]} · <span class="text-[var(--color-brand-1)]">{t.hop2[2]}</span> · {t.hop2[3]}</span></div>
+        <div class="trace-row grid grid-cols-[88px_minmax(0,1fr)] gap-3 rounded-md p-1.5 sm:grid-cols-[110px_minmax(0,1fr)] sm:gap-4" style="animation-delay: 2.7s;"><span class="text-[var(--color-muted)]">{t.cost[0]}</span><span class="text-[#e6ebf2]">{t.cost[1]}</span></div>
+        <div class="trace-row grid grid-cols-[88px_minmax(0,1fr)] gap-3 rounded-md p-1.5 sm:grid-cols-[110px_minmax(0,1fr)] sm:gap-4" style="animation-delay: 3.4s;"><span class="text-[var(--color-muted)]">{t.redaction[0]}</span><span class="text-[#e6ebf2]">{t.redaction[1]}</span></div>
+        <div class="trace-row trace-flag grid grid-cols-[88px_minmax(0,1fr)] gap-3 rounded-md p-1.5 sm:grid-cols-[110px_minmax(0,1fr)] sm:gap-4" style="animation-delay: 4.1s;"><span class="text-[var(--color-muted)]">{t.tool[0]}</span><span class="text-[var(--color-accent)]">{t.tool[1]}<span class="blink ml-1 inline-block h-4 w-2 bg-[var(--color-brand-1)] align-[-2px]" aria-hidden="true"></span></span></div>
+      </div>
+      <div class="border-t border-[#22304f] px-4 py-3 text-xs text-[var(--color-muted)] sm:px-5">{t.note}</div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero-glow {
+    position: absolute;
+    inset: -20%;
+    pointer-events: none;
+    background:
+      radial-gradient(42rem 30rem at 18% 8%, rgba(61, 219, 217, 0.16), transparent 60%),
+      radial-gradient(38rem 28rem at 88% 22%, rgba(42, 58, 99, 0.7), transparent 62%);
+    filter: blur(24px);
+    animation: hero-drift 18s ease-in-out infinite alternate;
+  }
+  @keyframes hero-drift {
+    from { transform: translate3d(-2%, -1%, 0) scale(1); }
+    to { transform: translate3d(2%, 2%, 0) scale(1.06); }
+  }
+  .door { transition: border-color 250ms ease, box-shadow 250ms ease, transform 250ms ease; }
+  .door:hover { border-color: var(--color-brand-1); box-shadow: 0 0 0 1px rgba(61, 219, 217, 0.35), 0 18px 48px -18px rgba(61, 219, 217, 0.45); transform: translateY(-2px); }
+  .door:hover .cta { box-shadow: 0 8px 32px -6px rgba(61, 219, 217, 0.55); }
+  .door:focus-visible { outline: 2px solid var(--color-brand-1); outline-offset: 3px; }
+
+  .trace-row { opacity: 0; animation: trace-row 10s ease-out infinite; }
+  .trace-flag { animation: trace-row 10s ease-out infinite, trace-flash 10s ease-out infinite; }
+  @keyframes trace-row {
+    0% { opacity: 0; transform: translateY(6px); }
+    5% { opacity: 1; transform: none; }
+    88% { opacity: 1; }
+    96%, 100% { opacity: 0; }
+  }
+  @keyframes trace-flash {
+    0%, 62% { background: transparent; }
+    64% { background: rgba(229, 192, 123, 0.28); }
+    72%, 100% { background: rgba(229, 192, 123, 0.08); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-glow { animation: none; }
+    .trace-row, .trace-flag { opacity: 1; animation: none; }
+  }
+</style>

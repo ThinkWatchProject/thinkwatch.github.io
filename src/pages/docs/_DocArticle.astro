@@ -1,0 +1,94 @@
+---
+// Renders one markdown doc (or a product's docs home) inside DocsLayout,
+// with localized title, BreadcrumbList and TechArticle JSON-LD.
+import { render } from "astro:content";
+import DocsLayout from "~/layouts/DocsLayout.astro";
+import { docHref, getNeighbours, getProduct, productHomeHref, type ProductId } from "~/content/docs/_meta";
+import { localePath, type Lang } from "~/i18n";
+import type { DocsEntry } from "./_lib";
+
+interface Props {
+  lang: Lang;
+  product: ProductId;
+  /** Doc slug, or "" for the product's docs home */
+  slug: string;
+  entry: DocsEntry;
+}
+
+const { lang, product, slug, entry } = Astro.props;
+const zh = lang === "zh-CN";
+const p = getProduct(product);
+const meta = p.docs.find((d) => d.slug === slug);
+const { Content, headings } = await render(entry);
+const { prev, next } = getNeighbours(product, slug, lang);
+
+const docLabel = meta?.label[lang] ?? slug;
+const title = `${docLabel} · ${p.name} ${zh ? "文档" : "Docs"}`;
+const description = meta?.summary?.[lang] ?? p.tagline[lang];
+
+const site = Astro.site ?? new URL("https://thinkwat.ch");
+const abs = (path: string) => new URL(path.endsWith("/") ? path : `${path}/`, site).toString();
+const pageUrl = new URL(Astro.url.pathname, site).toString();
+
+const crumbs = [
+  { name: zh ? "首页" : "Home", item: abs(localePath(lang, "/")) },
+  { name: zh ? "文档" : "Documentation", item: abs(localePath(lang, "/docs")) },
+  { name: p.name, item: slug ? abs(productHomeHref(lang, product)) : pageUrl },
+  ...(slug ? [{ name: docLabel, item: pageUrl }] : []),
+];
+
+const jsonLd: Record<string, unknown>[] = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: crumbs.map((c, i) => ({ "@type": "ListItem", position: i + 1, name: c.name, item: c.item })),
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    headline: slug ? docLabel : `${p.name} ${zh ? "文档" : "documentation"}`,
+    description,
+    inLanguage: lang,
+    url: pageUrl,
+    about: { "@type": "SoftwareApplication", name: p.name },
+    author: { "@type": "Organization", name: "ThinkWatch Project", url: "https://github.com/ThinkWatchProject" },
+    publisher: {
+      "@type": "Organization",
+      name: "ThinkWatch",
+      logo: { "@type": "ImageObject", url: "https://thinkwat.ch/icon.svg" },
+    },
+  },
+];
+
+// On a product's docs home, list the rest of its docs below the overview.
+const homeCards = slug ? [] : p.docs.filter((d) => d.slug);
+---
+
+<DocsLayout
+  title={title}
+  description={description}
+  product={product}
+  current={slug}
+  headings={headings}
+  prev={prev}
+  next={next}
+  jsonLd={jsonLd}
+>
+  <Content />
+
+  <div slot="after">
+    {homeCards.length > 0 && (
+      <div class="mt-12 grid gap-4 sm:grid-cols-2" data-pagefind-ignore>
+      {homeCards.map((d) => (
+        <a
+          href={docHref(lang, product, d)}
+          class="block rounded-xl border border-[var(--color-border-strong)] bg-[var(--color-surface)]/60 p-5 transition-colors hover:border-[var(--color-brand-1)]/50 hover:bg-[var(--color-surface)]"
+        >
+          <div class="mb-1.5 font-semibold tracking-tight text-[var(--color-text)]">{d.label[lang]}</div>
+          <p class="text-sm leading-relaxed text-[var(--color-muted)]">{d.summary?.[lang]}</p>
+        </a>
+      ))}
+    </div>
+    )}
+  </div>
+</DocsLayout>

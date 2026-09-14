@@ -78,7 +78,7 @@ const stats: Stat[] = [
     value: 8_420_137,
     format: (v) => fmtCompact.format(v),
     delta: "+12.4%",
-    color: "#22D3EE",
+    color: "#3DDBD9",
     spark: sparkPoints(7),
   },
   {
@@ -86,7 +86,7 @@ const stats: Stat[] = [
     value: 1287.42,
     format: (v) => fmtUsd.format(v),
     delta: "+8.1%",
-    color: "#A78BFA",
+    color: "#8FDDB0",
     spark: sparkPoints(13),
   },
   {
@@ -94,7 +94,7 @@ const stats: Stat[] = [
     value: 47,
     format: (v) => fmtInt.format(Math.round(v)),
     delta: "+3",
-    color: "#F472B6",
+    color: "#A9B8FF",
     spark: sparkPoints(21),
   },
   {
@@ -102,7 +102,7 @@ const stats: Stat[] = [
     value: 1342,
     format: (v) => fmtInt.format(Math.round(v)),
     delta: "live",
-    color: "#67E8F9",
+    color: "#E5C07B",
     spark: sparkPoints(33),
   },
 ];

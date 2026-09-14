@@ -6,6 +6,11 @@ const placeholder = lang === "zh-CN" ? "搜索文档…" : "Search docs…";
 const buttonLabel = lang === "zh-CN" ? "搜索" : "Search";
 const emptyHint = lang === "zh-CN" ? "开始输入以搜索文档。" : "Start typing to search the docs.";
 const noResults = lang === "zh-CN" ? "未找到结果" : "No results";
+// Used when the page is a product's docs page (DocsLayout sets data-docs-product).
+const scopedPlaceholder = lang === "zh-CN" ? "搜索 {product} 文档…" : "Search {product} docs…";
+const scopeLabel = lang === "zh-CN" ? "范围" : "Scope";
+const scopeAll = lang === "zh-CN" ? "全部文档" : "All docs";
+const scopeProduct = lang === "zh-CN" ? "{product} 文档" : "{product} docs";
 ---
 
 <!--
@@ -13,6 +18,9 @@ const noResults = lang === "zh-CN" ? "未找到结果" : "No results";
   - Trigger button lives in the header (rendered via the data attribute below).
   - The modal markup is a <dialog> hidden until first open.
   - Pagefind's runtime is loaded lazily the first time the user opens the modal.
+  - On a product's docs page, results are filtered to that product by default
+    (Pagefind filter "product", set on each docs article) and can be widened to all docs.
+    Any element with data-search-trigger opens the modal (header button, docs bar).
 -->
 
 <button
@@ -33,6 +41,9 @@ const noResults = lang === "zh-CN" ? "未找到结果" : "No results";
   id="search-modal"
   data-empty-hint={emptyHint}
   data-no-results={noResults}
+  data-placeholder={placeholder}
+  data-scoped-placeholder={scopedPlaceholder}
+  data-scope-product={scopeProduct}
   class="search-modal fixed top-4 sm:top-[15vh] left-1/2 -translate-x-1/2 m-0 w-[calc(100vw-1rem)] sm:w-full max-w-2xl rounded-2xl border border-white/10 bg-[var(--color-surface)]/95 backdrop-blur-xl shadow-2xl shadow-black/60 text-[var(--color-text)] p-0 outline-none"
 >
   <form method="dialog">
@@ -52,6 +63,12 @@ const noResults = lang === "zh-CN" ? "未找到结果" : "No results";
       <button type="submit" aria-label="Close" class="text-[10px] font-mono px-1.5 py-0.5 rounded border border-white/15 text-[var(--color-muted)] hover:text-white hover:border-white/30">
         ESC
       </button>
+    </div>
+
+    <div id="search-scope" hidden class="flex items-center gap-2 overflow-x-auto px-5 py-2.5 border-b border-white/10 text-xs">
+      <span class="text-[var(--color-dim)] mr-1 shrink-0">{scopeLabel}</span>
+      <button type="button" data-scope="product" aria-pressed="true" class="search-scope-btn"></button>
+      <button type="button" data-scope="all" aria-pressed="false" class="search-scope-btn">{scopeAll}</button>
     </div>
 
     <div id="search-results" class="max-h-[70vh] sm:max-h-[50vh] overflow-y-auto px-2 py-2 text-sm">
@@ -98,6 +115,34 @@ const noResults = lang === "zh-CN" ? "未找到结果" : "No results";
     line-height: 1.55;
     color: var(--color-muted);
   }
+  .search-scope-btn {
+    flex-shrink: 0;
+    min-height: 2rem;
+    padding: 0 0.75rem;
+    border-radius: 999px;
+    border: 1px solid var(--color-border-strong);
+    color: var(--color-muted);
+    white-space: nowrap;
+    transition: background 150ms, color 150ms, border-color 150ms;
+  }
+  .search-scope-btn:hover { color: var(--color-text); }
+  .search-scope-btn[aria-pressed="true"] {
+    background: var(--color-border);
+    border-color: var(--color-border-strong);
+    color: var(--color-text);
+  }
+  .search-result-product {
+    display: inline-block;
+    margin-left: 0.5rem;
+    padding: 0 0.4rem;
+    border: 1px solid var(--color-border-strong);
+    border-radius: 4px;
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    font-weight: 400;
+    color: var(--color-muted);
+    vertical-align: 0.1em;
+  }
   .search-result-excerpt mark {
     background: rgba(34, 211, 238, 0.2);
     color: #fff;
@@ -107,17 +152,56 @@ const noResults = lang === "zh-CN" ? "未找到结果" : "No results";
 </style>
 
 <script>
-  const trigger = document.querySelector<HTMLButtonElement>("[data-search-trigger]");
+  const triggers = Array.from(document.querySelectorAll<HTMLButtonElement>("[data-search-trigger]"));
   const modal = document.getElementById("search-modal") as HTMLDialogElement | null;
   const input = document.getElementById("search-input") as HTMLInputElement | null;
   const results = document.getElementById("search-results");
 
-  if (!trigger || !modal || !input || !results) {
+  const scopeRow = document.getElementById("search-scope");
+
+  if (!triggers.length || !modal || !input || !results) {
     // Page has no search modal (shouldn't happen with shared header) — bail.
     console.debug("[search] modal markup missing");
   } else {
     const emptyHint = modal.dataset.emptyHint || "";
     const noResultsLabel = modal.dataset.noResults || "No results";
+    const defaultPlaceholder = modal.dataset.placeholder || input.placeholder;
+
+    // Product names shown next to results when searching across all docs.
+    const productNames: Record<string, string> = {
+      thinkwatch: "ThinkWatch",
+      lite: "ThinkWatch Lite",
+      core: "ThinkWatch Core",
+    };
+
+    // Current product (null outside product docs pages) and chosen scope.
+    let pageProduct: string | null = null;
+    let scope: "product" | "all" = "all";
+
+    function readPageProduct() {
+      const el = document.querySelector<HTMLElement>("[data-docs-product]");
+      pageProduct = el?.dataset.docsProduct || null;
+      const name = el?.dataset.docsProductName || (pageProduct ? productNames[pageProduct] : "") || "";
+      if (pageProduct && scopeRow) {
+        const productBtn = scopeRow.querySelector<HTMLButtonElement>('[data-scope="product"]');
+        if (productBtn) productBtn.textContent = (modal!.dataset.scopeProduct || "{product}").replace("{product}", name);
+        scopeRow.hidden = false;
+      } else if (scopeRow) {
+        scopeRow.hidden = true;
+      }
+      return name;
+    }
+
+    function setScope(next: "product" | "all", name: string) {
+      scope = pageProduct ? next : "all";
+      scopeRow?.querySelectorAll<HTMLButtonElement>("[data-scope]").forEach((b) => {
+        b.setAttribute("aria-pressed", String(b.dataset.scope === scope));
+      });
+      input!.placeholder =
+        scope === "product" && modal!.dataset.scopedPlaceholder
+          ? modal!.dataset.scopedPlaceholder.replace("{product}", name)
+          : defaultPlaceholder;
+    }
 
     let pagefind: any = null;
     async function ensurePagefind() {
@@ -136,7 +220,12 @@ const noResults = lang === "zh-CN" ? "未找到结果" : "No results";
     }
 
     function open() {
-      if (!modal!.open) modal!.showModal();
+      if (!modal!.open) {
+        // Scope to the current product by default every time the modal opens.
+        const name = readPageProduct();
+        setScope("product", name);
+        modal!.showModal();
+      }
       setTimeout(() => input!.focus(), 30);
       ensurePagefind();
     }
@@ -144,7 +233,16 @@ const noResults = lang === "zh-CN" ? "未找到结果" : "No results";
       if (modal!.open) modal!.close();
     }
 
-    trigger.addEventListener("click", open);
+    triggers.forEach((t) => t.addEventListener("click", open));
+
+    scopeRow?.querySelectorAll<HTMLButtonElement>("[data-scope]").forEach((b) => {
+      b.addEventListener("click", () => {
+        const name = readPageProduct();
+        setScope(b.dataset.scope === "product" ? "product" : "all", name);
+        input!.focus();
+        runSearch();
+      });
+    });
 
     // Cmd+K / Ctrl+K
     document.addEventListener("keydown", (e) => {
@@ -172,7 +270,7 @@ const noResults = lang === "zh-CN" ? "未找到结果" : "No results";
     let active = -1;
     let currentLinks: HTMLAnchorElement[] = [];
 
-    function renderResults(items: { url: string; title: string; excerpt: string }[]) {
+    function renderResults(items: { url: string; title: string; excerpt: string; product?: string }[]) {
       if (!items.length) {
         results!.innerHTML = `<div class="px-3 py-6 text-center text-[var(--color-dim)]">${noResultsLabel}</div>`;
         currentLinks = [];
@@ -183,7 +281,11 @@ const noResults = lang === "zh-CN" ? "未找到结果" : "No results";
         .map(
           (r, i) => `
             <a href="${r.url}" class="search-result" data-idx="${i}">
-              <div class="search-result-title">${r.title || "Untitled"}</div>
+              <div class="search-result-title">${r.title || "Untitled"}${
+                scope === "all" && r.product && productNames[r.product]
+                  ? `<span class="search-result-product">${productNames[r.product]}</span>`
+                  : ""
+              }</div>
               <div class="search-result-excerpt">${r.excerpt}</div>
             </a>`,
         )
@@ -215,22 +317,29 @@ const noResults = lang === "zh-CN" ? "未找到结果" : "No results";
     });
 
     let searchTimer: number | undefined;
-    input.addEventListener("input", () => {
+    // Incremented per query so a slow, stale response never overwrites a newer one.
+    let searchSeq = 0;
+
+    function runSearch() {
       clearTimeout(searchTimer);
       const q = input!.value.trim();
       if (!q) {
+        searchSeq++;
         results!.innerHTML = `<div class="px-3 py-6 text-center text-[var(--color-dim)]">${emptyHint}</div>`;
         currentLinks = [];
         active = -1;
         return;
       }
+      const seq = ++searchSeq;
       searchTimer = window.setTimeout(async () => {
         const pf = await ensurePagefind();
+        if (seq !== searchSeq) return;
         if (!pf) {
           results!.innerHTML = `<div class="px-3 py-6 text-center text-[var(--color-dim)]">${noResultsLabel}</div>`;
           return;
         }
-        const search = await pf.search(q);
+        const options = scope === "product" && pageProduct ? { filters: { product: pageProduct } } : undefined;
+        const search = await pf.search(q, options);
         const items = await Promise.all(
           search.results.slice(0, 10).map(async (r: any) => {
             const data = await r.data();
@@ -238,15 +347,21 @@ const noResults = lang === "zh-CN" ? "未找到结果" : "No results";
               url: data.url,
               title: data.meta?.title || data.url,
               excerpt: data.excerpt,
+              product: data.filters?.product?.[0],
             };
           }),
         );
+        if (seq !== searchSeq) return;
         renderResults(items);
       }, 120);
-    });
+    }
+
+    input.addEventListener("input", runSearch);
 
     // Reset state on close
     modal.addEventListener("close", () => {
+      clearTimeout(searchTimer);
+      searchSeq++;
       input!.value = "";
       results!.innerHTML = `<div class="px-3 py-6 text-center text-[var(--color-dim)]">${emptyHint}</div>`;
       currentLinks = [];

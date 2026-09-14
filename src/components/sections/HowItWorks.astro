@@ -4,17 +4,17 @@ import { getLang, t } from "~/i18n";
 const s = t(getLang(Astro)).how;
 
 const clients = [
-  { name: "Claude Code", color: "#22D3EE" },
-  { name: "Cursor", color: "#67E8F9" },
-  { name: "Custom Agent", color: "#A78BFA" },
-  { name: "CI/CD Pipeline", color: "#C4B5FD" },
+  { name: "Claude Code", color: "#3DDBD9" },
+  { name: "Cursor", color: "#8EEBEA" },
+  { name: "Custom Agent", color: "#8EEBEA" },
+  { name: "CI/CD Pipeline", color: "#D8FBFA" },
 ];
 
 const providers = [
   { name: "OpenAI", color: "#10A37F" },
   { name: "Anthropic", color: "#D97706" },
   { name: "Google Gemini", color: "#4285F4" },
-  { name: "Azure / Bedrock", color: "#A78BFA" },
+  { name: "Azure / Bedrock", color: "#8EEBEA" },
 ];
 ---
 
@@ -55,8 +55,8 @@ const providers = [
             <line x1="0" y1="1" x2="48" y2="1" stroke="url(#flow-l)" stroke-width="1.5" stroke-dasharray="3 4" class="arch-flow" />
             <defs>
               <linearGradient id="flow-l" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0%" stop-color="#22D3EE" stop-opacity="0"/>
-                <stop offset="100%" stop-color="#22D3EE"/>
+                <stop offset="0%" stop-color="#3DDBD9" stop-opacity="0"/>
+                <stop offset="100%" stop-color="#3DDBD9"/>
               </linearGradient>
             </defs>
           </svg>
@@ -67,8 +67,8 @@ const providers = [
             <line x1="0" y1="1" x2="48" y2="1" stroke="url(#flow-r)" stroke-width="1.5" stroke-dasharray="3 4" class="arch-flow arch-flow-reverse" />
             <defs>
               <linearGradient id="flow-r" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0%" stop-color="#A78BFA"/>
-                <stop offset="100%" stop-color="#A78BFA" stop-opacity="0"/>
+                <stop offset="0%" stop-color="#8EEBEA"/>
+                <stop offset="100%" stop-color="#8EEBEA" stop-opacity="0"/>
               </linearGradient>
             </defs>
           </svg>

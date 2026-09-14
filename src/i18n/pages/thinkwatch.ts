@@ -1,0 +1,58 @@
+// Copy for the /thinkwatch product page (the self-hosted enterprise edition).
+// Facts come from the ThinkWatch README; the sections below the hero still
+// read their copy from src/i18n/index.ts.
+
+export const thinkwatchCopy = {
+  en: {
+    meta: {
+      title: "ThinkWatch — The AI bastion host for your organization",
+      description:
+        "Secure, audit, and govern every AI API call and MCP tool invocation across your organization, from a single self-hosted control plane.",
+    },
+    hero: {
+      eyebrow: "ThinkWatch · For teams and enterprises",
+      titleA: "The AI bastion host ",
+      titleHighlight: "for your organization.",
+      sub: "Secure, audit, and govern every AI API call and MCP tool invocation across your organization, from a single control plane.",
+      ctaPrimary: "Deploy ThinkWatch",
+      ctaSecondary: "Read the docs",
+      pills: ["Self-hosted", "Docker Compose or Kubernetes"],
+      license: "BSL 1.1",
+      versionLabel: "Latest release",
+      mockTitle: "Log explorer",
+      mockSample: "Sample data",
+      mockNote: "Users, keys, and models in this panel are illustrative.",
+    },
+    licenseTeaser: {
+      title: "Free for most teams",
+      body: "BSL 1.1. Free for non-production use, and free in production up to 10,000,000 billable tokens and 10,000 MCP tool calls per month.",
+      link: "See licensing and tiers",
+    },
+  },
+  "zh-CN": {
+    meta: {
+      title: "ThinkWatch — 组织的 AI 堡垒机",
+      description:
+        "在一个自托管的统一控制面上，对组织内每一次 AI API 调用和 MCP 工具调用进行安全管控、审计和治理。",
+    },
+    hero: {
+      eyebrow: "ThinkWatch · 面向团队与企业",
+      titleA: "组织的",
+      titleHighlight: "AI 堡垒机。",
+      sub: "在一个统一控制面上，对组织内每一次 AI API 调用和 MCP 工具调用进行安全管控、审计追踪和治理。",
+      ctaPrimary: "部署 ThinkWatch",
+      ctaSecondary: "阅读文档",
+      pills: ["自托管", "Docker Compose 或 Kubernetes"],
+      license: "BSL 1.1",
+      versionLabel: "最新版本",
+      mockTitle: "日志查询",
+      mockSample: "示例数据",
+      mockNote: "面板中的用户、密钥和模型仅作示意。",
+    },
+    licenseTeaser: {
+      title: "对大多数团队免费",
+      body: "BSL 1.1 许可证。非生产环境免费；生产环境每月不超过 10,000,000 计费 token 且不超过 10,000 次 MCP 工具调用时同样免费。",
+      link: "查看许可证与分级",
+    },
+  },
+} as const;

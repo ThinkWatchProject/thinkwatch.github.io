@@ -93,8 +93,8 @@ export default function ProviderHealthMock() {
                       width: `${latencyBar}%`,
                       background:
                         p.status === "degraded"
-                          ? "linear-gradient(90deg, #FBBF24, #F472B6)"
-                          : "linear-gradient(90deg, #22D3EE, #A78BFA)",
+                          ? "linear-gradient(90deg, #E5C07B, #F2A3B3)"
+                          : "linear-gradient(90deg, #3DDBD9, #8EEBEA)",
                     }}
                   />
                 </div>
