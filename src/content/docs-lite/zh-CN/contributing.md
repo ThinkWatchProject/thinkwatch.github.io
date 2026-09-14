@@ -1,29 +1,29 @@
 # 贡献指南
 
-## PR 请提到 `dev` 分支
+## PR 目标分支
 
 ```bash
 gh pr create --base dev --head your-branch
 ```
 
-`main` 是发布线，`dev` 是日常工作合入的地方。GitHub 新建 PR 时默认的 base 是默认分支 `main`，所以**默认值不是你想要的那个**。如果已经提到了 `main`，点 PR 标题旁边的 *Edit* 把 base 改掉即可，提交和讨论都会保留。
+`main` 为发布分支，`dev` 用于合入日常工作。GitHub 新建 PR 时以默认分支 `main` 作为 base，**该默认值并非正确的目标分支**。如已向 `main` 提交 PR，点击 PR 标题旁的 *Edit* 修改 base 即可，提交与讨论记录均会保留。
 
-## 已经定下的范围
+## 已确定的范围
 
-有两件事已经定了，不接受为此提的 PR：
+以下两项决定已经确定，不接受相关 PR：
 
-- **先做 macOS。** Windows 和 Linux 等 macOS 版做完再适配，所以现在添加它们的 PR 暂时不会合并。
-- **不分发构建产物。** 没有签名的 `.app`，没有安装包，没有发布流程，没有自动更新。从源码运行。
+- **优先支持 macOS。** Windows 与 Linux 将在 macOS 版本完成后适配，在此之前添加这些平台的 PR 不会合并。
+- **不分发构建产物。** 不提供签名的 `.app`、安装包、发布流程或自动更新，需从源码运行。
 
-网关本体（路由、转发、计费、脱敏）在 [ThinkWatch Core](https://github.com/ThinkWatchProject/ThinkWatch-Core) 里。如果你想改的行为在数据通路上，应该去那个仓库。
+网关本体（路由、转发、成本核算、脱敏）由 [ThinkWatch Core](https://github.com/ThinkWatchProject/ThinkWatch-Core) 实现。涉及数据通路的行为变更，应提交至该仓库。
 
 ## 提交信息
 
-使用 Conventional Commits（`fix(scope): subject`），并用**英文**书写：这是一个公开仓库，提交历史就是文档。
+使用 Conventional Commits（`fix(scope): subject`），并以**英文**书写：本仓库为公开仓库，提交历史即为文档。
 
-在正文里写清楚*为什么*，而不只是*改了什么*；改了什么 diff 已经说明了。
+正文应说明*原因*，而不仅是*改动内容*；改动内容已由 diff 体现。
 
-## 提 PR 之前
+## 提交 PR 前的检查
 
 ```bash
 pnpm typecheck
@@ -31,6 +31,6 @@ cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings
 cargo test --manifest-path src-tauri/Cargo.toml
 ```
 
-警告即错误。工具链是 `stable`，比你本地更新的 stable 可能报出你本地看不到的 lint；怪 CI 之前先跑一下 `rustup update stable`。
+警告视为错误。工具链为 `stable`，若其版本新于本地工具链，可能报告本地未出现的 lint；排查 CI 问题前，请先执行 `rustup update stable`。
 
-另外请读一读[界面绝不能做的事](/zh-CN/docs/lite/architecture)。
+另请参阅[界面约束](/zh-CN/docs/lite/architecture)。

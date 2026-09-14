@@ -21,13 +21,13 @@ interface Props {
 
 const DEFAULT_TITLE =
   lang === "zh-CN"
-    ? "ThinkWatch — 面向团队，也面向个人电脑的 AI 网关"
-    : "ThinkWatch — AI gateways for teams, and for your own machine";
+    ? "ThinkWatch — 面向组织与个人开发者的 AI 网关"
+    : "ThinkWatch — AI Gateways for Organizations and Individual Developers";
 
 const DEFAULT_DESCRIPTION =
   lang === "zh-CN"
-    ? "在 AI 客户端和模型之间设一道网关。ThinkWatch 面向团队与企业，ThinkWatch Lite 面向个人开发者，两者都构建在 MIT 许可证的 ThinkWatch Core 之上。"
-    : "One gateway between your AI clients and the models they call. ThinkWatch for teams and enterprises, ThinkWatch Lite for individual developers, both built on the MIT-licensed ThinkWatch Core.";
+    ? "ThinkWatch 提供对模型请求与 MCP 工具调用进行路由、检查和计量的 AI 网关，包括面向组织的自托管服务端 ThinkWatch 和面向个人开发者的桌面应用 ThinkWatch Lite，二者均基于 MIT 许可证的 ThinkWatch Core。"
+    : "ThinkWatch provides AI gateways that route, inspect, and meter model requests and MCP tool calls: ThinkWatch, a self-hosted server for organizations, and ThinkWatch Lite, a desktop application for individual developers. Both are built on the MIT-licensed ThinkWatch Core.";
 
 const {
   title = DEFAULT_TITLE,
@@ -82,8 +82,8 @@ const GA_ID = "G-R8LX8NCHCJ";
     <link
       rel="stylesheet"
       href={lang === "zh-CN"
-        ? "https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Noto+Sans+SC:wght@400;500;600&family=Noto+Serif+SC:wght@600&display=swap"
-        : "https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap"}
+        ? "https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;600;700&display=swap"
+        : "https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap"}
     />
 
     <!--

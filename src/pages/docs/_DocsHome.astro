@@ -16,22 +16,22 @@ const copy = zh
   ? {
       title: "文档 · ThinkWatch",
       description:
-        "ThinkWatch、ThinkWatch Lite 与 ThinkWatch Core 的文档：架构、部署、配置、API 参考、安全模型，桌面端与共用核心层。",
+        "ThinkWatch、ThinkWatch Lite 与 ThinkWatch Core 的文档，涵盖架构、部署、配置、API 参考、安全模型、桌面应用与共享核心。",
       h1: "文档",
       intro:
-        "三个产品各有一套文档：面向团队与企业的 ThinkWatch，本地运行的桌面端 ThinkWatch Lite，以及两者共用的 ThinkWatch Core。用上方的切换器选一个，或从下面的卡片进入。",
+        "三个产品分别提供文档：面向团队与企业的 ThinkWatch、在本地运行的桌面应用 ThinkWatch Lite，以及二者共用的 ThinkWatch Core。可通过上方的切换器选择产品，或从下方卡片进入。",
       open: (name: string) => `进入 ${name} 文档`,
-      more: "还需要什么？",
+      more: "其他资源",
     }
   : {
       title: "Documentation · ThinkWatch",
       description:
-        "Documentation for ThinkWatch, ThinkWatch Lite and ThinkWatch Core: architecture, deployment, configuration, API reference, security model, the desktop app, and the shared core.",
+        "Documentation for ThinkWatch, ThinkWatch Lite, and ThinkWatch Core, covering architecture, deployment, configuration, API reference, the security model, the desktop application, and the shared core.",
       h1: "Documentation",
       intro:
-        "Each product has its own docs: ThinkWatch for teams and enterprises, ThinkWatch Lite for your own machine, and ThinkWatch Core, the crates both build on. Pick one with the switcher above, or start from a card below.",
+        "Documentation is provided for three products: ThinkWatch, for teams and enterprises; ThinkWatch Lite, a desktop application that runs locally; and ThinkWatch Core, the crates both are built on. Select a product with the switcher above or from the cards below.",
       open: (name: string) => `Open ${name} docs`,
-      more: "Looking for something else?",
+      more: "Additional resources",
     };
 ---
 
@@ -85,13 +85,13 @@ const copy = zh
   {zh ? (
     <ul>
       <li><a href="https://github.com/ThinkWatchProject/ThinkWatch">GitHub 仓库</a> —— 源码、Issues、Release</li>
-      <li><a href={localePath(lang, "/changelog")}>更新日志</a> —— 每一个发布版本</li>
+      <li><a href={localePath(lang, "/changelog")}>更新日志</a> —— 各发布版本的变更记录</li>
       <li><a href="https://github.com/ThinkWatchProject/ThinkWatch/blob/main/LICENSING.md">LICENSING.md</a> —— 生产环境阈值与商业授权</li>
     </ul>
   ) : (
     <ul>
       <li><a href="https://github.com/ThinkWatchProject/ThinkWatch">GitHub repository</a> — source, issues, releases</li>
-      <li><a href={localePath(lang, "/changelog")}>Changelog</a> — every shipped version</li>
+      <li><a href={localePath(lang, "/changelog")}>Changelog</a> — release notes for each version</li>
       <li><a href="https://github.com/ThinkWatchProject/ThinkWatch/blob/main/LICENSING.md">LICENSING.md</a> — production thresholds and commercial tiers</li>
     </ul>
   )}
