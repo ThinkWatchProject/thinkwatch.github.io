@@ -2,6 +2,7 @@
 import "~/styles/global.css";
 import { getLang, t } from "~/i18n";
 import Seo from "~/components/Seo.astro";
+import { getLatestRelease } from "~/lib/github";
 
 const lang = getLang(Astro);
 const i18n = t(lang);
@@ -20,13 +21,13 @@ interface Props {
 
 const DEFAULT_TITLE =
   lang === "zh-CN"
-    ? "ThinkWatch — 面向 AI 的企业级安全网关"
-    : "ThinkWatch — The enterprise-grade secure gateway for AI";
+    ? "ThinkWatch — 面向团队，也面向个人电脑的 AI 网关"
+    : "ThinkWatch — AI gateways for teams, and for your own machine";
 
 const DEFAULT_DESCRIPTION =
   lang === "zh-CN"
-    ? "集中认证、审计并治理组织内每一次 AI API 调用与 MCP 工具调用 —— 由同一控制平面完成。"
-    : "Secure, audit, and govern every AI API call and MCP tool invocation across your organization — from a single control plane.";
+    ? "在 AI 客户端和模型之间设一道网关。ThinkWatch 面向团队与企业，ThinkWatch Lite 面向个人开发者，两者都构建在 MIT 许可证的 ThinkWatch Core 之上。"
+    : "One gateway between your AI clients and the models they call. ThinkWatch for teams and enterprises, ThinkWatch Lite for individual developers, both built on the MIT-licensed ThinkWatch Core.";
 
 const {
   title = DEFAULT_TITLE,
@@ -37,6 +38,7 @@ const {
 } = Astro.props;
 
 const canonical = new URL(Astro.url.pathname, Astro.site).toString();
+const latestRelease = await getLatestRelease();
 
 const softwareApplicationLd: JsonLdItem = {
   "@context": "https://schema.org",
@@ -47,7 +49,7 @@ const softwareApplicationLd: JsonLdItem = {
   description,
   url: "https://thinkwat.ch",
   downloadUrl: "https://github.com/ThinkWatchProject/ThinkWatch",
-  softwareVersion: "0.1.0",
+  ...(latestRelease ? { softwareVersion: latestRelease.replace(/^v/, "") } : {}),
   license: "https://github.com/ThinkWatchProject/ThinkWatch/blob/main/LICENSE",
   offers: {
     "@type": "Offer",
@@ -74,6 +76,15 @@ const GA_ID = "G-R8LX8NCHCJ";
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="generator" content={Astro.generator} />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href={lang === "zh-CN"
+        ? "https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Noto+Sans+SC:wght@400;500;600&family=Noto+Serif+SC:wght@600&display=swap"
+        : "https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap"}
+    />
 
     <!--
       Auto-redirect to the user's preferred locale.

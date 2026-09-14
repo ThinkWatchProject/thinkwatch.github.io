@@ -3,6 +3,15 @@ import TiltCard from "../ui/TiltCard.tsx";
 import { getLang, t } from "~/i18n";
 
 const s = t(getLang(Astro)).problem;
+
+// Line icons keyed by the `icon` id in the copy; 24px grid, 1.6 stroke.
+const icons: Record<string, string> = {
+  key: '<circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M17 6l3 3M14 9l2 2"/>',
+  eye: '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+  shield: '<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6l8-3z"/><path d="M9 12l2 2 4-4"/>',
+  audit: '<path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h7M9 17h5"/>',
+  cost: '<circle cx="12" cy="12" r="9"/><path d="M15 9.5c-.5-1-1.6-1.5-3-1.5-1.7 0-3 .9-3 2.2 0 3 6 1.6 6 4.6 0 1.3-1.3 2.2-3 2.2-1.4 0-2.6-.6-3-1.6M12 6v2M12 16v2"/>',
+};
 ---
 
 <section id="problem" class="py-20 sm:py-28 border-t border-white/5 relative">
@@ -25,16 +34,14 @@ const s = t(getLang(Astro)).problem;
           <TiltCard client:visible className="rounded-2xl">
             <div class="relative rounded-2xl border border-white/10 bg-[var(--color-surface)]/60 p-5 sm:p-6 hover:border-white/25 transition-colors overflow-hidden h-full">
               <div class="flex items-start justify-between mb-4">
-                <div class="text-3xl grayscale group-hover:grayscale-0 transition" aria-hidden="true">
-                  {p.icon}
-                </div>
+                <svg class="w-7 h-7 text-[var(--color-brand-1)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={icons[p.icon] ?? ""}></svg>
                 <span class="font-mono text-[11px] tracking-[0.12em] text-[var(--color-dim)]">
                   {String(i + 1).padStart(2, "0")}
                 </span>
               </div>
               <h3 class="text-lg font-semibold tracking-tight mb-2">{p.title}</h3>
               <p class="text-sm text-[var(--color-muted)] leading-relaxed">{p.body}</p>
-              <div class="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-pink-400/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              <div class="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-cyan-400/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
             </div>
           </TiltCard>
         </div>

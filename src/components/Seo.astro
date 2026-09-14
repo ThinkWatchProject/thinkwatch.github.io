@@ -36,9 +36,14 @@ const siteJsonLd: JsonLdItem[] = [
     name: "ThinkWatch",
     url: "https://thinkwat.ch",
     logo: "https://thinkwat.ch/icon.svg",
-    sameAs: ["https://github.com/ThinkWatchProject/ThinkWatch"],
+    sameAs: [
+      "https://github.com/ThinkWatchProject",
+      "https://github.com/ThinkWatchProject/ThinkWatch",
+      "https://github.com/ThinkWatchProject/ThinkWatch-Lite",
+      "https://github.com/ThinkWatchProject/ThinkWatch-Core",
+    ],
     description:
-      "ThinkWatch is the enterprise-grade secure gateway for AI — one control plane for every model request and MCP tool call.",
+      "ThinkWatch builds AI gateways: ThinkWatch for teams and enterprises, ThinkWatch Lite for individual developers, and the shared MIT-licensed ThinkWatch Core.",
   },
   {
     "@context": "https://schema.org",
@@ -87,20 +92,20 @@ const allJsonLd = [...siteJsonLd, ...jsonLd];
 <meta property="og:image" content={absoluteOgImage} />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
-<meta property="og:image:alt" content="ThinkWatch — The enterprise-grade secure gateway for AI" />
+<meta property="og:image:alt" content="ThinkWatch — AI gateways for teams, and for your own machine" />
 
 <!-- Twitter -->
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content={title} />
 <meta name="twitter:description" content={description} />
 <meta name="twitter:image" content={absoluteOgImage} />
-<meta name="twitter:image:alt" content="ThinkWatch — The enterprise-grade secure gateway for AI" />
+<meta name="twitter:image:alt" content="ThinkWatch — AI gateways for teams, and for your own machine" />
 
 <!-- Robots -->
 <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
 <meta name="googlebot" content="index, follow, max-image-preview:large, max-snippet:-1" />
 
-<meta name="theme-color" content="#0a0a0f" />
+<meta name="theme-color" content="#0b1220" />
 
 {allJsonLd.map((item) => (
   <script type="application/ld+json" set:html={JSON.stringify(item)} />

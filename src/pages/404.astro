@@ -4,52 +4,71 @@ import SiteHeader from "~/components/SiteHeader.astro";
 import SiteFooter from "~/components/SiteFooter.astro";
 import { t } from "~/i18n";
 
+// GitHub Pages serves one static 404 for every language, so both copies are
+// rendered and the inline script below shows the one the visitor prefers.
 const en = t("en").notFound;
 const zh = t("zh-CN").notFound;
+
+// `path` is the English path; the script prefixes /zh-CN for Chinese visitors.
+const links = [
+  { path: "/", en: en.home, zh: zh.home, primary: true },
+  { path: "/thinkwatch", en: en.thinkwatch, zh: zh.thinkwatch, primary: false },
+  { path: "/lite", en: en.lite, zh: zh.lite, primary: false },
+  { path: "/core", en: en.core, zh: zh.core, primary: false },
+  { path: "/docs", en: en.docs, zh: zh.docs, primary: false },
+];
 ---
 
 <Base title={en.title} description={en.description}>
   <SiteHeader />
-  <main id="main" class="container-page py-32 text-center relative">
-    <div class="absolute left-1/2 top-1/3 -translate-x-1/2 -translate-y-1/2 w-[34rem] h-[34rem] rounded-full bg-brand-gradient opacity-15 blur-[120px] pointer-events-none"></div>
+  <main id="main" class="container-page relative overflow-hidden py-20 text-center md:py-28">
+    <div
+      class="pointer-events-none absolute left-1/2 top-1/3 h-[24rem] w-[24rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand-gradient opacity-10 blur-[120px] md:h-[34rem] md:w-[34rem]"
+      aria-hidden="true"
+    ></div>
 
     <div class="relative">
-      <div class="text-[10rem] md:text-[14rem] font-semibold tracking-tighter leading-none">
-        <span class="text-gradient">404</span>
+      <div class="font-display text-gradient text-[8rem] leading-none sm:text-[10rem] md:text-[13rem] reveal" aria-hidden="true">
+        404
       </div>
-      <h1 class="mt-4 text-2xl md:text-3xl font-semibold tracking-tight">
+      <h1 class="font-display mt-4 text-3xl md:text-5xl reveal" style="animation-delay: 80ms">
         <span data-i18n="en">{en.headline}</span>
         <span data-i18n="zh-CN" hidden>{zh.headline}</span>
       </h1>
-      <p class="mt-4 text-[var(--color-muted)] max-w-md mx-auto">
+      <p class="mx-auto mt-4 max-w-md text-[var(--color-muted)] reveal" style="animation-delay: 160ms">
         <span data-i18n="en">{en.sub}</span>
         <span data-i18n="zh-CN" hidden>{zh.sub}</span>
       </p>
 
-      <div class="mt-10 flex flex-wrap items-center justify-center gap-4">
-        <a
-          href="/"
-          data-home-link
-          class="px-5 py-3 rounded-lg bg-brand-gradient text-black font-medium hover:brightness-110 transition shadow-lg shadow-cyan-500/20"
-        >
-          <span data-i18n="en">{en.home}</span>
-          <span data-i18n="zh-CN" hidden>{zh.home}</span>
-        </a>
-        <a
-          href="/changelog"
-          data-changelog-link
-          class="px-5 py-3 rounded-lg border border-white/15 hover:border-white/30 hover:bg-white/5 transition font-medium"
-        >
-          <span data-i18n="en">{en.changelog}</span>
-          <span data-i18n="zh-CN" hidden>{zh.changelog}</span>
-        </a>
-      </div>
+      <nav class="mt-10 reveal" style="animation-delay: 240ms">
+        <h2 class="sr-only">
+          <span data-i18n="en">{en.linksLabel}</span>
+          <span data-i18n="zh-CN" hidden>{zh.linksLabel}</span>
+        </h2>
+        <ul class="mx-auto flex max-w-2xl flex-col items-stretch gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-center">
+          {links.map((l) => (
+            <li>
+              <a
+                href={l.path}
+                data-localize={l.path}
+                class:list={[
+                  "inline-flex min-h-11 w-full items-center justify-center rounded-lg px-5 font-medium transition sm:w-auto",
+                  l.primary
+                    ? "bg-brand-gradient text-black hover:brightness-110"
+                    : "border border-[var(--color-border-strong)] text-[var(--color-text)] hover:border-[var(--color-brand-1)] hover:text-[var(--color-brand-1)]",
+                ]}
+              >
+                <span data-i18n="en">{l.en}</span>
+                <span data-i18n="zh-CN" hidden>{l.zh}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
 
-      <pre class="mt-12 inline-block text-left font-mono text-xs text-[var(--color-dim)] bg-black/40 border border-white/10 rounded-lg px-4 py-3">
-<span class="text-[var(--color-brand-1)]">$</span> curl -i https://thinkwat.ch{Astro.url.pathname}
-HTTP/2 404
-content-type: text/html
-x-thinkwatch-audit: 01HQZ-NOT-FOUND</pre>
+      <!-- A real request for the missing path; the script fills in the path the visitor asked for. -->
+      <pre class="mt-12 inline-block max-w-full overflow-x-auto rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3 text-left font-mono text-xs text-[var(--color-dim)]"><span class="text-[var(--color-brand-1)]">$</span> curl -I https://thinkwat.ch<span data-request-path>{Astro.url.pathname}</span>
+HTTP/2 404</pre>
     </div>
   </main>
   <SiteFooter />
@@ -58,6 +77,10 @@ x-thinkwatch-audit: 01HQZ-NOT-FOUND</pre>
 <script is:inline define:vars={{ enTitle: en.title, zhTitle: zh.title }}>
   (function () {
     try {
+      // Show the path that was actually requested, not the build-time /404.
+      var pathEl = document.querySelector("[data-request-path]");
+      if (pathEl) pathEl.textContent = location.pathname;
+
       var stored = localStorage.getItem("tw-lang-pref");
       var pref = (stored === "en" || stored === "zh-CN")
         ? stored
@@ -72,12 +95,12 @@ x-thinkwatch-audit: 01HQZ-NOT-FOUND</pre>
       document.documentElement.lang = pref;
       document.title = pref === "zh-CN" ? zhTitle : enTitle;
 
-      // Localize CTAs
+      // Point every link at the Chinese site for Chinese visitors
       if (pref === "zh-CN") {
-        var home = document.querySelector("[data-home-link]");
-        var cl = document.querySelector("[data-changelog-link]");
-        if (home) home.setAttribute("href", "/zh-CN/");
-        if (cl) cl.setAttribute("href", "/zh-CN/changelog");
+        document.querySelectorAll("[data-localize]").forEach(function (a) {
+          var path = a.getAttribute("data-localize") || "/";
+          a.setAttribute("href", path === "/" ? "/zh-CN/" : "/zh-CN" + path);
+        });
       }
     } catch (e) {}
   })();

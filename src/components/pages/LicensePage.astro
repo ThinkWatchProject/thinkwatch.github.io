@@ -1,0 +1,219 @@
+---
+// Shared /license page. Copy lives in src/i18n/pages/license.ts.
+import Base from "~/layouts/Base.astro";
+import SiteHeader from "~/components/SiteHeader.astro";
+import SiteFooter from "~/components/SiteFooter.astro";
+import { getLang, localePath } from "~/i18n";
+import { licenseCopy } from "~/i18n/pages/license";
+
+const lang = getLang(Astro);
+const c = licenseCopy[lang];
+
+const pageUrl = new URL(localePath(lang, "/license"), Astro.site).toString();
+const homeUrl = new URL(localePath(lang, "/"), Astro.site).toString();
+
+const jsonLd = [
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    name: c.meta.title,
+    description: c.meta.description,
+    url: pageUrl,
+    inLanguage: lang,
+    isPartOf: { "@type": "WebSite", name: "ThinkWatch", url: "https://thinkwat.ch" },
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: c.meta.breadcrumbHome, item: homeUrl },
+      { "@type": "ListItem", position: 2, name: c.meta.breadcrumbPage, item: pageUrl },
+    ],
+  },
+];
+
+const eyebrow = "font-mono text-xs sm:text-[13px] uppercase tracking-[0.08em]";
+---
+
+<Base title={c.meta.title} description={c.meta.description} noJsonLd jsonLd={jsonLd}>
+  <SiteHeader />
+  <main id="main">
+    <!-- Hero -->
+    <section class="container-page pt-16 pb-12 md:pt-24 md:pb-16">
+      <div class={`${eyebrow} text-[var(--color-brand-1)] reveal`}>{c.hero.eyebrow}</div>
+      <h1
+        class="font-display mt-5 text-[2.75rem] leading-[1.05] sm:text-6xl md:text-7xl lg:text-[80px] lg:leading-none reveal"
+        style="animation-delay: 80ms"
+      >
+        {c.hero.title}
+      </h1>
+      <p
+        class="mt-5 max-w-[820px] text-lg md:text-xl leading-relaxed text-slate-300 reveal"
+        style="animation-delay: 160ms"
+      >
+        {c.hero.sub}
+      </p>
+    </section>
+
+    <!-- The three products and their licenses -->
+    <section class="container-page pb-16 md:pb-24">
+      <div class="grid gap-4 md:grid-cols-3 md:gap-5">
+        {c.products.map((p, i) => (
+          <div
+            class:list={[
+              "flex flex-col gap-3 rounded-2xl border border-[var(--color-border-strong)] p-6 md:p-8 reveal",
+              p.tone === "amber" && "bg-[var(--color-surface)]",
+            ]}
+            style={`animation-delay: ${220 + i * 70}ms`}
+          >
+            <h2 class="text-xl md:text-[22px] font-semibold text-[var(--color-text)]">{p.name}</h2>
+            <span
+              class:list={[
+                "self-start rounded-full border px-2.5 py-1 font-mono text-[13px] leading-none",
+                p.tone === "amber"
+                  ? "border-[var(--color-accent)] text-[var(--color-accent)]"
+                  : "border-[var(--color-brand-1)] text-[var(--color-brand-1)]",
+              ]}
+            >
+              {p.badge}
+            </span>
+            <p class="text-base leading-relaxed text-[var(--color-muted)]">{p.body}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- ThinkWatch BSL rules and commercial tiers -->
+    <section class="bg-[var(--color-surface)] py-16 md:py-24">
+      <div class="container-page">
+        <div class={`${eyebrow} text-[var(--color-muted)]`}>{c.rules.eyebrow}</div>
+        <h2 class="font-display mt-4 text-4xl md:text-[52px] md:leading-tight">{c.rules.title}</h2>
+
+        <dl class="mt-8 md:mt-9 border-b border-[var(--color-border-strong)] text-base md:text-[17px]">
+          {c.rules.rows.map((r) => (
+            <div class="grid gap-1.5 border-t border-[var(--color-border-strong)] py-5 md:grid-cols-[300px_minmax(0,1fr)] md:gap-0">
+              <dt class="font-semibold text-[var(--color-text)]">{r.term}</dt>
+              <dd class="leading-relaxed text-slate-300">{r.rule}</dd>
+            </div>
+          ))}
+        </dl>
+
+        <h3 class="mt-14 md:mt-[72px] text-2xl md:text-[26px] font-semibold text-[var(--color-text)]">{c.tiers.title}</h3>
+        <p class="mt-2.5 text-base md:text-[17px] text-[var(--color-muted)]">{c.tiers.sub}</p>
+        <p class="mt-2 text-sm text-[var(--color-dim)] md:hidden">{c.tiers.scrollHint}</p>
+
+        <!-- The table keeps its column widths and scrolls inside this box on narrow screens. -->
+        <div
+          class="tier-scroll mt-6 -mx-5 overflow-x-auto px-5 md:mx-0 md:px-0"
+          role="region"
+          aria-label={c.tiers.tableLabel}
+          tabindex="0"
+        >
+          <table class="w-full min-w-[760px] border-collapse text-left text-base">
+            <thead>
+              <tr>
+                {c.tiers.headers.map((h) => (
+                  <th scope="col" class="whitespace-nowrap border-b border-[var(--color-border-strong)] py-3.5 pr-6 font-normal text-[var(--color-muted)]">
+                    {h}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {c.tiers.rows.map((row) => (
+                <tr>
+                  <th scope="row" class="whitespace-nowrap border-b border-[var(--color-border)] py-4 pr-6 font-semibold text-[var(--color-text)]">
+                    {row.name}
+                  </th>
+                  <td class="whitespace-nowrap border-b border-[var(--color-border)] py-4 pr-6 font-mono text-[15px] tabular-nums text-slate-300">
+                    {row.tokens}
+                  </td>
+                  <td class="whitespace-nowrap border-b border-[var(--color-border)] py-4 pr-6 font-mono text-[15px] tabular-nums text-slate-300">
+                    {row.calls}
+                  </td>
+                  <td
+                    class:list={[
+                      "border-b border-[var(--color-border)] py-4",
+                      row.free ? "text-[var(--color-brand-1)]" : "text-slate-300",
+                    ]}
+                  >
+                    {row.price}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <div class="mt-5 max-w-[980px] space-y-2 text-base leading-relaxed text-[var(--color-muted)]">
+          {c.tiers.notes.map((n) => <p>{n}</p>)}
+        </div>
+      </div>
+    </section>
+
+    <!-- What counts toward the thresholds -->
+    <section class="container-page py-16 md:py-24">
+      <h2 class={`${eyebrow} text-[var(--color-muted)]`}>{c.counts.eyebrow}</h2>
+      <p class="mt-4 max-w-[820px] text-base md:text-[17px] leading-relaxed text-slate-300">{c.counts.volume}</p>
+      <div class="mt-7 grid gap-4 md:grid-cols-2 md:gap-6">
+        {c.counts.cards.map((card) => (
+          <div class="flex flex-col gap-[18px] rounded-2xl border border-[var(--color-border-strong)] p-6 md:p-8">
+            <h3 class="text-[22px] md:text-2xl font-semibold text-[var(--color-text)]">{card.title}</h3>
+            <div class="flex flex-col gap-1.5">
+              <span class={`${eyebrow} !text-xs text-[var(--color-brand-1)]`}>{c.counts.counted}</span>
+              <p class="text-base leading-relaxed text-slate-300">{card.counted}</p>
+            </div>
+            <div class="flex flex-col gap-1.5">
+              <span class={`${eyebrow} !text-xs text-[var(--color-muted)]`}>{c.counts.notCounted}</span>
+              <p class="text-base leading-relaxed text-slate-300">{card.notCounted}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- Full text and sales contact -->
+    <section class="container-page pb-16 md:pb-24">
+      <div class="grid gap-4 md:grid-cols-2 md:gap-6">
+        <div class="flex flex-col gap-2.5 rounded-2xl border border-[var(--color-border-strong)] p-6 md:p-8">
+          <h2 class="text-xl font-semibold text-[var(--color-text)]">{c.fullText.title}</h2>
+          <p class="text-base leading-relaxed text-[var(--color-muted)]">{c.fullText.body}</p>
+          <ul class="mt-1 flex flex-col gap-x-6 sm:flex-row sm:flex-wrap">
+            {c.fullText.links.map((l) => (
+              <li>
+                <a
+                  href={l.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="inline-flex min-h-11 items-center text-base text-[var(--color-brand-1)] underline-offset-4 transition-colors hover:text-[var(--color-brand-2)] hover:underline focus-visible:underline"
+                >
+                  {l.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div class="flex flex-col gap-2.5 rounded-2xl border border-[var(--color-border-strong)] bg-[var(--color-surface)] p-6 md:p-8">
+          <h2 class="text-xl font-semibold text-[var(--color-text)]">{c.contact.title}</h2>
+          <p class="text-base leading-relaxed text-[var(--color-muted)]">{c.contact.body}</p>
+          <a
+            href={c.contact.href}
+            class="mt-1 inline-flex min-h-11 items-center self-start text-base text-[var(--color-brand-1)] underline-offset-4 transition-colors hover:text-[var(--color-brand-2)] hover:underline focus-visible:underline"
+          >
+            {c.contact.label}
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+  <SiteFooter />
+</Base>
+
+<style>
+  /* Keyboard users can focus the scroll box; show where focus is. */
+  .tier-scroll:focus-visible {
+    outline: 2px solid var(--color-brand-1);
+    outline-offset: 4px;
+    border-radius: 4px;
+  }
+</style>

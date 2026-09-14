@@ -5,9 +5,6 @@ const lang = getLang(Astro);
 const s = t(lang);
 const year = new Date().getFullYear();
 
-const homePath = localePath(lang, "/");
-const isHome = Astro.url.pathname === homePath || Astro.url.pathname === homePath + "index.html";
-const homeAnchor = (hash: string) => (isHome ? hash : `${homePath}${hash}`);
 ---
 
 <footer class="border-t border-white/5 mt-20 sm:mt-32">
@@ -32,27 +29,26 @@ const homeAnchor = (hash: string) => (isHome ? hash : `${homePath}${hash}`);
     <div>
       <div class="text-white/80 font-medium mb-3">{s.footer.product}</div>
       <ul class="space-y-1 sm:space-y-2 text-[var(--color-muted)]">
-        <li><a href={homeAnchor("#features")} class="inline-block py-1.5 hover:text-white">{s.nav.features}</a></li>
-        <li><a href={homeAnchor("#how")} class="inline-block py-1.5 hover:text-white">{s.nav.how}</a></li>
-        <li><a href={homeAnchor("#quickstart")} class="inline-block py-1.5 hover:text-white">{s.nav.quickstart}</a></li>
-        <li><a href={localePath(lang, "/docs")} class="inline-block py-1.5 hover:text-white">{s.nav.docs}</a></li>
-        <li><a href={localePath(lang, "/changelog")} class="inline-block py-1.5 hover:text-white">{s.nav.changelog}</a></li>
+        <li><a href={localePath(lang, "/thinkwatch")} class="inline-block py-1.5 hover:text-white">ThinkWatch</a></li>
+        <li><a href={localePath(lang, "/lite")} class="inline-block py-1.5 hover:text-white">ThinkWatch Lite</a></li>
+        <li><a href={localePath(lang, "/core")} class="inline-block py-1.5 hover:text-white">ThinkWatch Core</a></li>
       </ul>
     </div>
 
     <div>
       <div class="text-white/80 font-medium mb-3">{s.footer.resources}</div>
       <ul class="space-y-1 sm:space-y-2 text-[var(--color-muted)]">
-        <li><a href="https://github.com/ThinkWatchProject/ThinkWatch" class="inline-block py-1.5 hover:text-white">GitHub</a></li>
-        <li><a href="https://github.com/ThinkWatchProject/ThinkWatch/blob/main/LICENSE" class="inline-block py-1.5 hover:text-white">LICENSE (BSL 1.1)</a></li>
-        <li><a href="https://github.com/ThinkWatchProject/ThinkWatch/blob/main/LICENSING.md" class="inline-block py-1.5 hover:text-white">Production thresholds</a></li>
+        <li><a href={localePath(lang, "/docs")} class="inline-block py-1.5 hover:text-white">{s.nav.docs}</a></li>
+        <li><a href={localePath(lang, "/changelog")} class="inline-block py-1.5 hover:text-white">{s.nav.changelog}</a></li>
+        <li><a href={localePath(lang, "/license")} class="inline-block py-1.5 hover:text-white">{s.nav.license}</a></li>
+        <li><a href="https://github.com/ThinkWatchProject" class="inline-block py-1.5 hover:text-white">GitHub</a></li>
         <li><a href="/changelog.xml" class="inline-block py-1.5 hover:text-white">RSS</a></li>
       </ul>
     </div>
   </div>
 
   <div class="container-page py-6 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-[var(--color-dim)]">
-    <span>© {year} ThinkWatch. {s.footer.copyright}</span>
+    <span>© {year} ThinkWatch. {s.footer.licensing}</span>
     <span>{s.footer.builtWith}</span>
   </div>
 </footer>
