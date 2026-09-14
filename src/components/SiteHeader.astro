@@ -20,8 +20,8 @@ const homeAnchor = (hash: string) => (isHome ? hash : `${homePath}${hash}`);
 
 const currentPath = Astro.url.pathname.replace(/^\/zh-CN/, "").replace(/\/$/, "") || "/";
 const links = [
-  { href: localePath(lang, "/thinkwatch"), label: s.nav.thinkwatch, match: "/thinkwatch" },
   { href: localePath(lang, "/lite"), label: s.nav.lite, match: "/lite" },
+  { href: localePath(lang, "/thinkwatch"), label: s.nav.thinkwatch, match: "/thinkwatch" },
   { href: localePath(lang, "/core"), label: s.nav.core, match: "/core" },
   { href: localePath(lang, "/docs"), label: s.nav.docs, match: "/docs" },
   { href: localePath(lang, "/changelog"), label: s.nav.changelog, match: "/changelog" },

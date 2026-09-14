@@ -14,7 +14,7 @@ const dict = {
     },
 
     nav: {
-      thinkwatch: "ThinkWatch",
+      thinkwatch: "Enterprise",
       lite: "Lite",
       core: "Core",
       license: "License",
@@ -308,7 +308,7 @@ const dict = {
     },
 
     nav: {
-      thinkwatch: "ThinkWatch",
+      thinkwatch: "企业版",
       lite: "Lite",
       core: "Core",
       license: "许可证",
