@@ -169,7 +169,7 @@ const scopeProduct = lang === "zh-CN" ? "{product} 文档" : "{product} docs";
 
     // Product names shown next to results when searching across all docs.
     const productNames: Record<string, string> = {
-      thinkwatch: "ThinkWatch",
+      thinkwatch: document.documentElement.lang === "zh-CN" ? "ThinkWatch 企业版" : "ThinkWatch Enterprise",
       lite: "ThinkWatch Lite",
       core: "ThinkWatch Core",
     };

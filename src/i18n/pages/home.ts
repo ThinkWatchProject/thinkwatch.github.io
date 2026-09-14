@@ -8,7 +8,7 @@ export const homeCopy = {
     h1b: "organizations and individual developers",
     sub: "ThinkWatch routes, inspects, and meters model requests and MCP tool calls. It is available as a self-hosted server for organizations and as a desktop application for individual developers.",
     doors: {
-      teams: { label: "For organizations", name: "ThinkWatch", text: "Self-hosted AI API and MCP gateway.", cta: "Deploy ThinkWatch" },
+      teams: { label: "For organizations", name: "ThinkWatch Enterprise", text: "Self-hosted AI API and MCP gateway.", cta: "Deploy ThinkWatch" },
       machine: { label: "For individual developers", name: "ThinkWatch Lite", text: "Menu-bar application backed by a local gateway. In development, macOS first.", cta: "Run from source" },
     },
     trace: {
@@ -44,7 +44,7 @@ export const homeCopy = {
       ],
     },
     tw: {
-      eyebrow: "ThinkWatch · For teams and enterprises",
+      eyebrow: "ThinkWatch Enterprise · For organizations",
       title: "An AI bastion host for organizations",
       sub: "Authentication, authorization, rate limiting, audit logging, and cost accounting for every model request, tool call, and token.",
       cta: "Explore ThinkWatch",
@@ -122,7 +122,7 @@ export const homeCopy = {
     h1b: "AI 网关",
     sub: "ThinkWatch 对模型请求与 MCP 工具调用进行路由、检查与计量，提供面向组织的自托管服务端，以及面向个人开发者的桌面应用。",
     doors: {
-      teams: { label: "面向组织", name: "ThinkWatch", text: "自托管的 AI API 与 MCP 网关。", cta: "部署 ThinkWatch" },
+      teams: { label: "面向组织", name: "ThinkWatch 企业版", text: "自托管的 AI API 与 MCP 网关。", cta: "部署 ThinkWatch" },
       machine: { label: "面向个人开发者", name: "ThinkWatch Lite", text: "基于本地网关的菜单栏应用。目前处于开发阶段，优先支持 macOS。", cta: "从源码运行" },
     },
     trace: {
@@ -158,7 +158,7 @@ export const homeCopy = {
       ],
     },
     tw: {
-      eyebrow: "ThinkWatch · 面向团队与企业",
+      eyebrow: "ThinkWatch 企业版 · 面向组织",
       title: "面向组织的 AI 堡垒机",
       sub: "对每一次模型请求、工具调用及每一个 token 进行认证、授权、限流、日志记录与成本核算。",
       cta: "了解 ThinkWatch",

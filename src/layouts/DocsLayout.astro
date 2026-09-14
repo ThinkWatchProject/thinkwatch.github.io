@@ -1,4 +1,5 @@
 ---
+import { productName } from "~/content/docs/_meta";
 import Base from "./Base.astro";
 import SiteHeader from "~/components/SiteHeader.astro";
 import SiteFooter from "~/components/SiteFooter.astro";
@@ -43,10 +44,10 @@ const tocLabel = zh ? "本页目录" : "On this page";
 const prevLabel = zh ? "上一篇" : "Previous";
 const nextLabel = zh ? "下一篇" : "Next";
 const productLabel = zh ? "产品" : "Product";
-const searchLabel = zh ? `搜索 ${p.name} 文档` : `Search ${p.name} docs`;
+const searchLabel = zh ? `搜索 ${productName(p, lang)} 文档` : `Search ${productName(p, lang)} docs`;
 const pageLabel = currentDoc?.label[lang] ?? title.split(" · ")[0];
 // Title stored in the search index: on a product home "Overview" alone would be ambiguous.
-const searchTitle = current === "" ? (product === "thinkwatch" ? title.split(" · ")[0] : p.name) : pageLabel;
+const searchTitle = current === "" ? (product === "thinkwatch" ? title.split(" · ")[0] : productName(p, lang)) : pageLabel;
 
 // Only show H2/H3 in the TOC; hide if there's only the (auto-generated) doc title.
 // rehype-autolink-headings appends a literal "#" text node to each heading,
@@ -67,7 +68,7 @@ const itemIdle = "text-[var(--color-text)]/80 hover:text-[var(--color-text)]";
   <div
     class="docs-product-bar border-b border-[var(--color-border)] bg-[var(--color-surface)]"
     data-docs-product={p.id}
-    data-docs-product-name={p.name}
+    data-docs-product-name={productName(p, lang)}
   >
     <div class="container-page flex items-center justify-between gap-6 py-2.5 md:py-3.5">
       <div class="flex min-w-0 items-center gap-5">
@@ -90,7 +91,7 @@ const itemIdle = "text-[var(--color-text)]/80 hover:text-[var(--color-text)]";
                         : "text-[var(--color-text)]/80 hover:text-[var(--color-text)]",
                     ]}
                   >
-                    {pr.name}
+                    {productName(pr, lang)}
                   </a>
                 </li>
               );
@@ -126,7 +127,7 @@ const itemIdle = "text-[var(--color-text)]/80 hover:text-[var(--color-text)]";
             <line x1="3" y1="8" x2="13" y2="8" stroke-linecap="round"/>
             <line x1="3" y1="11" x2="13" y2="11" stroke-linecap="round"/>
           </svg>
-          <span class="shrink-0">{p.name}</span>
+          <span class="shrink-0">{productName(p, lang)}</span>
           <span class="text-[var(--color-dim)]">·</span>
           <span class="truncate font-normal text-[var(--color-muted)]">{pageLabel}</span>
         </span>
@@ -135,7 +136,7 @@ const itemIdle = "text-[var(--color-text)]/80 hover:text-[var(--color-text)]";
         </svg>
       </summary>
       <div class="border-t border-[var(--color-border)] p-3">
-        <nav aria-label={zh ? `${p.name} 文档导航` : `${p.name} documentation`} class="space-y-5">
+        <nav aria-label={zh ? `${productName(p, lang)} 文档导航` : `${productName(p, lang)} documentation`} class="space-y-5">
           {sidebar.map((g) => (
             <div>
               <div class="px-3 pb-1.5 font-mono text-xs uppercase tracking-[0.08em] text-[var(--color-muted)]">{g.label}</div>
@@ -194,7 +195,7 @@ const itemIdle = "text-[var(--color-text)]/80 hover:text-[var(--color-text)]";
     <div class="grid gap-8 lg:grid-cols-[15rem_minmax(0,1fr)_12rem] xl:grid-cols-[17.5rem_minmax(0,1fr)_15rem] xl:gap-14">
       <!-- Desktop sidebar (hidden on mobile) -->
       <aside class="hidden lg:sticky lg:top-20 lg:block lg:max-h-[calc(100vh-6rem)] lg:self-start lg:overflow-y-auto">
-        <nav aria-label={zh ? `${p.name} 文档导航` : `${p.name} documentation`} class="flex flex-col gap-7">
+        <nav aria-label={zh ? `${productName(p, lang)} 文档导航` : `${productName(p, lang)} documentation`} class="flex flex-col gap-7">
           {sidebar.map((g) => (
             <div class="flex flex-col gap-1">
               <div class="px-3 pb-2 font-mono text-xs uppercase tracking-[0.08em] text-[var(--color-muted)]">{g.label}</div>
@@ -243,7 +244,7 @@ const itemIdle = "text-[var(--color-text)]/80 hover:text-[var(--color-text)]";
       >
         {current !== "" && currentDoc && (
           <nav aria-label={zh ? "面包屑" : "Breadcrumb"} class="mb-5 flex flex-wrap items-center gap-2 text-sm text-[var(--color-muted)]" data-pagefind-ignore>
-            <a href={productHomeHref(lang, product)} class="transition-colors hover:text-[var(--color-text)]">{p.name}</a>
+            <a href={productHomeHref(lang, product)} class="transition-colors hover:text-[var(--color-text)]">{productName(p, lang)}</a>
             <span aria-hidden="true">/</span>
             <span>{groupLabels[currentDoc.group][lang]}</span>
             <span aria-hidden="true">/</span>

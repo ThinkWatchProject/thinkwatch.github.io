@@ -1,4 +1,5 @@
 ---
+import { productName } from "~/content/docs/_meta";
 // Renders one markdown doc (or a product's docs home) inside DocsLayout,
 // with localized title, BreadcrumbList and TechArticle JSON-LD.
 import { render } from "astro:content";
@@ -23,7 +24,7 @@ const { Content, headings } = await render(entry);
 const { prev, next } = getNeighbours(product, slug, lang);
 
 const docLabel = meta?.label[lang] ?? slug;
-const title = `${docLabel} · ${p.name} ${zh ? "文档" : "Docs"}`;
+const title = `${docLabel} · ${productName(p, lang)} ${zh ? "文档" : "Docs"}`;
 const description = meta?.summary?.[lang] ?? p.tagline[lang];
 
 const site = Astro.site ?? new URL("https://thinkwat.ch");
@@ -33,7 +34,7 @@ const pageUrl = new URL(Astro.url.pathname, site).toString();
 const crumbs = [
   { name: zh ? "首页" : "Home", item: abs(localePath(lang, "/")) },
   { name: zh ? "文档" : "Documentation", item: abs(localePath(lang, "/docs")) },
-  { name: p.name, item: slug ? abs(productHomeHref(lang, product)) : pageUrl },
+  { name: productName(p, lang), item: slug ? abs(productHomeHref(lang, product)) : pageUrl },
   ...(slug ? [{ name: docLabel, item: pageUrl }] : []),
 ];
 
@@ -46,11 +47,11 @@ const jsonLd: Record<string, unknown>[] = [
   {
     "@context": "https://schema.org",
     "@type": "TechArticle",
-    headline: slug ? docLabel : `${p.name} ${zh ? "文档" : "documentation"}`,
+    headline: slug ? docLabel : `${productName(p, lang)} ${zh ? "文档" : "documentation"}`,
     description,
     inLanguage: lang,
     url: pageUrl,
-    about: { "@type": "SoftwareApplication", name: p.name },
+    about: { "@type": "SoftwareApplication", name: productName(p, lang) },
     author: { "@type": "Organization", name: "ThinkWatch Project", url: "https://github.com/ThinkWatchProject" },
     publisher: {
       "@type": "Organization",

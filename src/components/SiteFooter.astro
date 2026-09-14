@@ -29,7 +29,7 @@ const year = new Date().getFullYear();
     <div>
       <div class="text-white/80 font-medium mb-3">{s.footer.product}</div>
       <ul class="space-y-1 sm:space-y-2 text-[var(--color-muted)]">
-        <li><a href={localePath(lang, "/thinkwatch")} class="inline-block py-1.5 hover:text-white">ThinkWatch</a></li>
+        <li><a href={localePath(lang, "/thinkwatch")} class="inline-block py-1.5 hover:text-white">{lang === "zh-CN" ? "ThinkWatch 企业版" : "ThinkWatch Enterprise"}</a></li>
         <li><a href={localePath(lang, "/lite")} class="inline-block py-1.5 hover:text-white">ThinkWatch Lite</a></li>
         <li><a href={localePath(lang, "/core")} class="inline-block py-1.5 hover:text-white">ThinkWatch Core</a></li>
       </ul>
