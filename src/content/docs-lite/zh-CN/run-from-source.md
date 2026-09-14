@@ -1,27 +1,27 @@
-# 从源码运行
+# 从源码构建
 
-ThinkWatch Lite 仍在开发中。它先做 macOS，没有可下载的构建产物：没有签名的 `.app`，没有安装包，没有 release 页面。你需要从源码运行它。
+ThinkWatch Lite 正在开发中，优先支持 macOS，不提供可下载的构建产物：没有签名的 `.app`、安装包或 release 页面，需从源码运行。
 
-## 运行
+## 构建与运行
 
-在 [ThinkWatch Lite 仓库](https://github.com/ThinkWatchProject/ThinkWatch-Lite)的检出目录里执行：
+在 [ThinkWatch Lite 仓库](https://github.com/ThinkWatchProject/ThinkWatch-Lite)的检出目录中执行以下命令：
 
 ```bash
 pnpm install
 pnpm tauri dev
 ```
 
-## 平台
+## 平台支持
 
-Lite 先做 macOS。Windows 和 Linux 等 macOS 版做完再适配，所以现在添加它们的 PR 暂时不会合并。
+优先支持 macOS。Windows 与 Linux 将在 macOS 版本完成后适配，在此之前添加这些平台的 PR 不会合并。
 
-对 macOS 的专注贯穿整个应用：菜单栏渲染成 macOS 位图，检测客户端用的是 macOS 路径，托管器和 launchd 打交道。
+应用的实现以 macOS 为准：菜单栏以 macOS 位图渲染，客户端检测使用 macOS 路径，托管器与 launchd 集成。
 
-## 为什么没有安装包
+## 不提供安装包
 
-不分发构建产物是一个明确的范围决定，不是一个待填的坑。没有签名的 `.app`，没有安装包，没有发布流程，也没有自动更新。
+不分发构建产物是有意做出的范围决定。项目不提供签名的 `.app`、安装包、发布流程或自动更新。
 
-## 接下来
+## 后续阅读
 
-- [架构](/zh-CN/docs/lite/architecture)：应用是怎么组成的，以及它如何与 Core 通信。
-- [贡献指南](/zh-CN/docs/lite/contributing)：提 PR 之前要跑的检查。
+- [架构](/zh-CN/docs/lite/architecture)：应用的组成，以及与 Core 的通信方式。
+- [贡献指南](/zh-CN/docs/lite/contributing)：提交 PR 前须通过的检查。

@@ -1,35 +1,35 @@
 # ThinkWatch Lite
 
-ThinkWatch Lite 是本地 AI API 网关的桌面端。它是一个菜单栏应用，托管 [ThinkWatch Core](/zh-CN/docs/core)，把它的配置、流量和花费摆到你眼前。
+ThinkWatch Lite 是本地 AI API 网关的桌面应用。它是一个菜单栏应用，负责托管 [ThinkWatch Core](/zh-CN/docs/core)，并展示其配置、流量与成本。
 
-> ThinkWatch Lite 先做 macOS，不分发构建产物。没有签名的 `.app`，没有安装包，没有 release 页面：请[从源码运行](/zh-CN/docs/lite/run-from-source)。
+> ThinkWatch Lite 正在开发中，优先支持 macOS，其他平台将在 macOS 版本完成后适配。项目不分发构建产物：不提供签名的 `.app`、安装包或 release 页面，需[从源码构建](/zh-CN/docs/lite/run-from-source)。
 
-把 Claude Code、Codex，或者任何说 Anthropic / OpenAI API 的东西指向一个本地端口，Lite 就是看接下来发生了什么的那个窗口。
+将 Claude Code、Codex 或任何使用 Anthropic / OpenAI API 的客户端指向本地端口后，即可通过 Lite 查看每个请求的处理过程。
 
-## 一次会话花了多少，以及那个数字有多可信
+## 会话成本及其可信度
 
-实测、估算、算不出价钱是三个分开的数字，绝不相加。价目表的快照日期就标在合计旁边：一个两个月前的价目表算出来的数，和昨天的不是一回事。
+实测、估算与无法计价的成本分别列为三个数字，不会相加。合计旁标注价目表的快照日期，因为基于不同日期价目表计算的数字不可直接比较。
 
-## 每个请求去了哪儿、为什么
+## 请求路由
 
-每个请求都能看到命中的规则（按名字说）、经过的策略组，以及完整的故障转移链，每一跳带着原因和耗时。
+每个请求均显示命中的规则名称、策略组以及完整的故障转移链，每一跳附有原因与耗时。
 
-## 跟着它出去的还有什么
+## 出站内容
 
-Lite 会显示被抓到正发往不受信任上游的密钥、做过的脱敏，以及看起来危险的工具调用。请求体和响应体在上屏之前就已经打过码。
+Lite 会标记发往不受信任上游的密钥、已执行的脱敏以及潜在危险的工具调用。请求体与响应体在显示前即已遮蔽。
 
-## 配置有两种改法
+## 配置编辑
 
-改一个值用表单，结构性的改动用 CodeMirror 编辑器。两条路走同一个 span 补丁层，所以改一个字段就只有那一行变，你的注释一字不动。
+修改单个值使用表单，结构性修改使用 CodeMirror 编辑器。两者均通过同一 span 补丁层写入，因此修改一个字段仅变更对应的一行，并保留原有注释。
 
-## 菜单栏那 50 像素
+## 菜单栏
 
-菜单栏显示今日花费，或者订阅账号的剩余额度。它渲染成图片，因为菜单栏放不下两行文字。
+Lite 在菜单栏中占用 50 像素，显示当日花费，或订阅账号的剩余额度。由于菜单栏无法容纳两行文字，该区域以位图形式渲染。
 
-## 网关在哪里
+## 与 ThinkWatch Core 的关系
 
-网关本体在 ThinkWatch Core 里。Lite 不含任何路由、转发或计费逻辑，它通过一个 unix socket 和 Core 通信。详见[架构](/zh-CN/docs/lite/architecture)。
+网关由 ThinkWatch Core 实现。Lite 不包含路由、转发或计量逻辑，通过 unix socket 与 Core 通信。详见[架构](/zh-CN/docs/lite/architecture)。
 
-## 许可
+## 许可证
 
-ThinkWatch Lite 采用 MIT 许可。
+ThinkWatch Lite 采用 MIT 许可证。

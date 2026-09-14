@@ -1,29 +1,29 @@
 # Contributing
 
-## Open pull requests against `dev`
+## Pull request target branch
 
 ```bash
 gh pr create --base dev --head your-branch
 ```
 
-`main` is the release line; `dev` is where routine work lands. GitHub pre-fills a new pull request's base with the default branch, `main`, so the default is not the one you want. If you already opened against `main`, click *Edit* next to the pull request title and change the base; the commits and the discussion carry over.
+`main` is the release branch; `dev` receives routine work. GitHub sets the base of a new pull request to the default branch, `main`, which is not the intended target. If a pull request was opened against `main`, select *Edit* next to its title and change the base; the commits and the discussion are preserved.
 
 ## Settled scope
 
-Two decisions are settled and not up for a pull request:
+The following two decisions are settled and are not open to change through a pull request:
 
-- **macOS first.** Windows and Linux come after the macOS version is done, so pull requests adding them won't be merged yet.
-- **Not distributed as a build.** No signed `.app`, no installer, no release workflow, no auto-update. Run it from source.
+- **macOS first.** Windows and Linux will follow once the macOS version is complete; pull requests adding them will not be merged until then.
+- **Not distributed as a build.** There is no signed `.app`, no installer, no release workflow, and no auto-update. Lite is run from source.
 
-The gateway itself (routing, forwarding, cost accounting, redaction) lives in [ThinkWatch Core](https://github.com/ThinkWatchProject/ThinkWatch-Core). If the behaviour you want to change is on the data path, that is the repository for it.
+The gateway itself (routing, forwarding, cost accounting, redaction) is implemented in [ThinkWatch Core](https://github.com/ThinkWatchProject/ThinkWatch-Core). Changes to behaviour on the data path belong in that repository.
 
 ## Commit messages
 
-Use Conventional Commits (`fix(scope): subject`), in English: this is a public repository and the history is documentation.
+Use Conventional Commits (`fix(scope): subject`), written in English. This is a public repository, and the commit history serves as documentation.
 
-Say *why* in the body, not just *what*; the diff already shows what changed.
+Explain *why* in the body, not only *what*; the diff already shows what changed.
 
-## Before you open the pull request
+## Checks before opening a pull request
 
 ```bash
 pnpm typecheck
@@ -31,6 +31,6 @@ cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings
 cargo test --manifest-path src-tauri/Cargo.toml
 ```
 
-Warnings are errors. The toolchain is `stable`, so a newer stable than your local one can surface lints you cannot see; run `rustup update stable` before blaming CI.
+Warnings are treated as errors. The toolchain tracks `stable`, so a stable release newer than your local one may report lints that do not appear locally. Run `rustup update stable` before investigating a CI failure.
 
-Also read [what the UI must not do](/docs/lite/architecture#what-the-ui-must-not-do).
+See also [What the UI must not do](/docs/lite/architecture#what-the-ui-must-not-do).

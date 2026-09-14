@@ -135,19 +135,19 @@ export const products: Product[] = [
     base: "/docs/lite",
     editUrl: "https://github.com/ThinkWatchProject/thinkwatch.github.io/tree/main/src/content/docs-lite",
     tagline: {
-      en: "The desktop app for a local AI API gateway. A menu-bar app that supervises ThinkWatch Core.",
-      "zh-CN": "本地 AI API 网关的桌面端。一个托管 ThinkWatch Core 的菜单栏应用。",
+      en: "The desktop application for a local AI API gateway: a menu-bar app that supervises ThinkWatch Core.",
+      "zh-CN": "本地 AI API 网关的桌面应用：托管 ThinkWatch Core 的菜单栏应用。",
     },
     docs: [
       overview(),
       {
         slug: "run-from-source",
-        label: { en: "Run from source", "zh-CN": "从源码运行" },
+        label: { en: "Build from source", "zh-CN": "从源码构建" },
         locales: both,
         group: "getStarted",
         summary: {
-          en: "macOS first, no installer: pnpm install, then pnpm tauri dev.",
-          "zh-CN": "先做 macOS，没有安装包：pnpm install，然后 pnpm tauri dev。",
+          en: "In development, macOS first, no installer. Run pnpm install, then pnpm tauri dev.",
+          "zh-CN": "开发中，优先支持 macOS，不提供安装包。依次执行 pnpm install 与 pnpm tauri dev。",
         },
       },
       {
@@ -156,8 +156,8 @@ export const products: Product[] = [
         locales: both,
         group: "concepts",
         summary: {
-          en: "A Tauri 2 shell and a React 19 frontend that supervise Core and talk to it over a unix socket.",
-          "zh-CN": "Tauri 2 外壳加 React 19 前端，托管 Core，并通过 unix socket 与它通信。",
+          en: "A Tauri 2 shell and a React 19 frontend that supervise Core and communicate with it over a unix socket.",
+          "zh-CN": "Tauri 2 外壳与 React 19 前端，负责托管 Core，并通过 unix socket 与其通信。",
         },
       },
       {
@@ -166,8 +166,8 @@ export const products: Product[] = [
         locales: both,
         group: "contributing",
         summary: {
-          en: "Branches, settled scope, checks to run before a pull request.",
-          "zh-CN": "分支、已定的范围、提 PR 之前要跑的检查。",
+          en: "Branches, settled scope, and the checks required before opening a pull request.",
+          "zh-CN": "分支约定、已确定的范围，以及提交 PR 前须通过的检查。",
         },
       },
     ],
@@ -178,19 +178,19 @@ export const products: Product[] = [
     base: "/docs/core",
     editUrl: "https://github.com/ThinkWatchProject/thinkwatch.github.io/tree/main/src/content/docs-core",
     tagline: {
-      en: "The shared core of a local AI API gateway. A set of MIT-licensed Rust crates, plus the twcore binary.",
-      "zh-CN": "本地 AI API 网关的共用核心层。一组 MIT 许可的 Rust crate，外加 twcore 二进制。",
+      en: "Shared core of the ThinkWatch gateways: MIT-licensed Rust crates and the twcore binary.",
+      "zh-CN": "ThinkWatch 网关的共享核心：采用 MIT 许可证的 Rust crate 与 twcore 二进制。",
     },
     docs: [
       overview(),
       {
         slug: "quick-start",
-        label: { en: "Quick start with twcore", "zh-CN": "用 twcore 快速上手" },
+        label: { en: "Quick start with twcore", "zh-CN": "twcore 快速入门" },
         locales: both,
         group: "getStarted",
         summary: {
           en: "Write, check, and serve a config with the twcore binary.",
-          "zh-CN": "用 twcore 二进制生成、校验并启动一份配置。",
+          "zh-CN": "使用 twcore 二进制生成、校验并启动配置。",
         },
       },
       {
@@ -199,8 +199,8 @@ export const products: Product[] = [
         locales: both,
         group: "concepts",
         summary: {
-          en: "The four layers, and why the lower two are not shared with the server edition.",
-          "zh-CN": "四层结构，以及下面两层为什么不与服务端版本共用。",
+          en: "The four layers, and why the bottom two are not shared with the server edition.",
+          "zh-CN": "四层结构，以及下面两层不与服务端版本共享的原因。",
         },
       },
       {
@@ -209,8 +209,8 @@ export const products: Product[] = [
         locales: both,
         group: "contributing",
         summary: {
-          en: "cargo test, scripts/smoke.sh, pull request checks, and the rules that are load-bearing.",
-          "zh-CN": "cargo test、scripts/smoke.sh、PR 前的检查，以及不能破坏的规则。",
+          en: "cargo test, scripts/smoke.sh, pull request checks, and mandatory rules.",
+          "zh-CN": "cargo test、scripts/smoke.sh、PR 前的检查，以及必须遵守的规则。",
         },
       },
     ],

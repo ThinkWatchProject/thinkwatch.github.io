@@ -1,23 +1,23 @@
-# 用 twcore 快速上手
+# twcore 快速入门
 
-ThinkWatch Core 是一组 crate，不是一个装上就能用的应用。想要跑得起来的东西，`bin/twcore` 是一个完整的、可独立运行的网关二进制，想看实际行为时就跑它。
+ThinkWatch Core 是一组 crate，而非可安装的应用。`bin/twcore` 是一个完整且可独立运行的网关二进制，可用于观察 Core 的实际行为。
 
-## 生成、校验、启动一份配置
+## 生成、校验并启动配置
 
-在 [ThinkWatch Core 仓库](https://github.com/ThinkWatchProject/ThinkWatch-Core)的检出目录里执行：
+在 [ThinkWatch Core 仓库](https://github.com/ThinkWatchProject/ThinkWatch-Core)的检出目录中执行以下命令：
 
 ```bash
-cargo run -p twcore -- init     # 生成一份带注释的 config.yaml
-cargo run -p twcore -- check    # 只校验，不启动
-cargo run -p twcore -- serve    # 起网关和控制面
+cargo run -p twcore -- init     # 生成带注释的 config.yaml
+cargo run -p twcore -- check    # 仅校验，不启动
+cargo run -p twcore -- serve    # 启动网关与控制面
 ```
 
-- **`init`** 生成一份带注释的 `config.yaml`。
-- **`check`** 只校验配置，不启动任何东西。
-- **`serve`** 启动网关和控制面。
+- **`init`** 生成带注释的 `config.yaml`。
+- **`check`** 仅校验配置，不启动任何服务。
+- **`serve`** 启动网关与控制面。
 
-## 把客户端指向它
+## 接入客户端
 
-把 Claude Code、Codex 之类的客户端指向本地的端口。之后 Core 会按你的规则路由每个请求、在上游之间故障转移、按价目表快照计价、在出站时脱敏密钥，并在返回时审查工具调用。各项说明见[概览](/zh-CN/docs/core)。
+将 Claude Code、Codex 等客户端指向本地端口。此后 Core 将按配置的规则路由每个请求、在上游之间执行故障转移、按价目表快照计价、对出站请求中的密钥进行脱敏，并审查返回的工具调用。各项功能说明见[概览](/zh-CN/docs/core)。
 
-各个客户端的逐步配置说明暂时还没有写。
+各客户端的分步配置说明尚未编写。
