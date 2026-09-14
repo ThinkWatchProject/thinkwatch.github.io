@@ -58,7 +58,7 @@ const overview = (group: GroupId = "getStarted"): DocMeta => ({
 export const products: Product[] = [
   {
     id: "thinkwatch",
-    name: "ThinkWatch",
+    name: "ThinkWatch Enterprise",
     base: "/docs",
     editUrl: "https://github.com/ThinkWatchProject/ThinkWatch/tree/main/docs",
     tagline: {
@@ -276,3 +276,11 @@ export function getDocsForLocale(lang: Lang, id: ProductId = "thinkwatch"): DocM
 
 /** ThinkWatch guides in reading order (docs home excluded). Kept for existing imports. */
 export const docsOrder: DocMeta[] = getProduct("thinkwatch").docs.filter((d) => d.slug);
+
+/** Display name of a product in the given language. The server edition is
+ *  called "ThinkWatch Enterprise" / "ThinkWatch 企业版" wherever it is listed
+ *  next to Lite and Core. */
+export function productName(p: Pick<Product, "id" | "name">, lang: Lang): string {
+  if (p.id === "thinkwatch") return lang === "zh-CN" ? "ThinkWatch 企业版" : "ThinkWatch Enterprise";
+  return p.name;
+}

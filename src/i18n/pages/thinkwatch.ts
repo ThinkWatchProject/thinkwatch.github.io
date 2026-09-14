@@ -5,12 +5,12 @@
 export const thinkwatchCopy = {
   en: {
     meta: {
-      title: "ThinkWatch — An AI bastion host for organizations",
+      title: "ThinkWatch Enterprise — An AI bastion host for organizations",
       description:
         "Security, auditing, and governance for every AI API call and MCP tool invocation across an organization, from a single self-hosted control plane.",
     },
     hero: {
-      eyebrow: "ThinkWatch · For teams and enterprises",
+      eyebrow: "ThinkWatch Enterprise · For organizations",
       titleA: "An AI bastion host ",
       titleHighlight: "for organizations",
       sub: "ThinkWatch secures, audits, and governs every AI API call and MCP tool invocation across an organization from a single control plane.",
@@ -31,12 +31,12 @@ export const thinkwatchCopy = {
   },
   "zh-CN": {
     meta: {
-      title: "ThinkWatch — 面向组织的 AI 堡垒机",
+      title: "ThinkWatch 企业版 — 面向组织的 AI 堡垒机",
       description:
         "在一个自托管的统一控制面上，对组织内每一次 AI API 调用和 MCP 工具调用进行安全管控、审计和治理。",
     },
     hero: {
-      eyebrow: "ThinkWatch · 面向团队与企业",
+      eyebrow: "ThinkWatch 企业版 · 面向组织",
       titleA: "面向组织的 ",
       titleHighlight: "AI 堡垒机",
       sub: "在统一控制面上，对组织内的每一次 AI API 调用与 MCP 工具调用进行安全管控、审计与治理。",

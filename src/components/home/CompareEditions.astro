@@ -5,7 +5,7 @@ import { homeCopy } from "~/i18n/pages/home";
 const lang = getLang(Astro);
 const c = homeCopy[lang].compare;
 const editions = [
-  { name: "ThinkWatch", href: localePath(lang, "/thinkwatch"), v: c.thinkwatch },
+  { name: lang === "zh-CN" ? "ThinkWatch 企业版" : "ThinkWatch Enterprise", href: localePath(lang, "/thinkwatch"), v: c.thinkwatch },
   { name: "ThinkWatch Lite", href: localePath(lang, "/lite"), v: c.lite },
   { name: "ThinkWatch Core", href: localePath(lang, "/core"), v: c.core },
 ];
