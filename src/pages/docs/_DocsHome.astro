@@ -1,4 +1,5 @@
 ---
+import { productName } from "~/content/docs/_meta";
 // Documentation home (/docs, /zh-CN/docs): intro, one card per product listing
 // its docs. It is also ThinkWatch's docs home, so the sidebar shows ThinkWatch.
 import DocsLayout from "~/layouts/DocsLayout.astro";
@@ -47,7 +48,7 @@ const copy = zh
       return (
         <section class="rounded-xl border border-[var(--color-border-strong)] bg-[var(--color-surface)]/60 p-5 sm:p-6">
           <h2 class="text-lg font-semibold tracking-tight text-[var(--color-text)]">
-            <a href={productHomeHref(lang, p.id)} class="hover:text-[var(--color-brand-1)] transition-colors">{p.name}</a>
+            <a href={productHomeHref(lang, p.id)} class="hover:text-[var(--color-brand-1)] transition-colors">{productName(p, lang)}</a>
           </h2>
           <p class="mt-1.5 text-sm leading-relaxed text-[var(--color-muted)]">{p.tagline[lang]}</p>
           <ul class="mt-4 grid gap-x-4 sm:grid-cols-2">
@@ -69,7 +70,7 @@ const copy = zh
             href={productHomeHref(lang, p.id)}
             class="mt-4 inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-[var(--color-brand-1)] transition-colors hover:text-[var(--color-brand-2)]"
           >
-            {copy.open(p.name)}
+            {copy.open(productName(p, lang))}
             <svg class="h-3.5 w-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <line x1="3" y1="8" x2="13" y2="8" />
               <polyline points="9,4 13,8 9,12" />

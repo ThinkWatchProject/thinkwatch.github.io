@@ -47,14 +47,14 @@ export const licenseCopy = {
         body: "Use, modify, and redistribute it, commercially or not. Keep the copyright and license notice.",
       },
       {
-        name: "ThinkWatch",
+        name: "ThinkWatch Enterprise",
         badge: "BSL 1.1",
         tone: "amber",
         body: "Free for non-production use. Free in production up to both monthly thresholds below. A commercial license is required above either threshold.",
       },
     ],
     rules: {
-      eyebrow: "ThinkWatch · Business Source License 1.1",
+      eyebrow: "ThinkWatch Enterprise · Business Source License 1.1",
       title: "Terms summary",
       rows: [
         { term: "Non-production use", rule: "Permitted at no charge." },
@@ -164,14 +164,14 @@ export const licenseCopy = {
         body: "可自由使用、修改和再分发，商业或非商业用途均可。需保留版权声明与许可声明。",
       },
       {
-        name: "ThinkWatch",
+        name: "ThinkWatch 企业版",
         badge: "BSL 1.1",
         tone: "amber",
         body: "非生产环境免费。生产环境在下方两项月度阈值内免费。超出任一阈值须获取商业授权。",
       },
     ],
     rules: {
-      eyebrow: "ThinkWatch · Business Source License 1.1",
+      eyebrow: "ThinkWatch 企业版 · Business Source License 1.1",
       title: "条款概要",
       rows: [
         { term: "非生产环境", rule: "免费使用。" },
