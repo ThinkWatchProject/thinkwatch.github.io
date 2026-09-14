@@ -1,5 +1,5 @@
-import { Canvas, useFrame } from "@react-three/fiber";
-import { Suspense, useMemo, useRef } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { Suspense, useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 
 // Brand palette: logo teal flowing in, light teal flowing out, a faint amber halo.
@@ -41,7 +41,7 @@ function InboundFlow({
     const arr = pos.array as Float32Array;
 
     for (let i = 0; i < count; i++) {
-      arr[i * 3] += speeds[i] * (delta * 60);
+      arr[i * 3] += speeds[i] * (Math.min(delta, 0.1) * 60);
 
       // Funnel: squeeze y/z as x → 0
       const distToCenter = Math.abs(arr[i * 3]);
@@ -123,7 +123,7 @@ function OutboundFlow({
     if (!pts) return;
     const pos = pts.geometry.attributes.position as THREE.BufferAttribute;
     const arr = pos.array as Float32Array;
-    const dt = delta * 60;
+    const dt = Math.min(delta, 0.1) * 60;
 
     for (let i = 0; i < count; i++) {
       arr[i * 3] += speeds[i] * dt;
@@ -195,7 +195,7 @@ function GatewayCore() {
       {/* Inner glowing sphere */}
       <mesh ref={inner}>
         <sphereGeometry args={[0.55, 32, 32]} />
-        <meshBasicMaterial color={COLOR_CYAN} transparent opacity={0.55} />
+        <meshBasicMaterial color={COLOR_CYAN} transparent opacity={0.22} />
       </mesh>
 
       {/* Outer wireframe icosahedron */}
@@ -213,20 +213,48 @@ function GatewayCore() {
       {/* Soft halo */}
       <mesh>
         <sphereGeometry args={[1.7, 32, 32]} />
-        <meshBasicMaterial color={COLOR_PINK} transparent opacity={0.04} />
+        <meshBasicMaterial color={COLOR_PINK} transparent opacity={0.025} />
       </mesh>
     </group>
   );
+}
+
+/**
+ * Renders on demand at a fixed rate instead of every display refresh, and not
+ * at all while the hero is off-screen or the tab is hidden. Particle motion is
+ * scaled by frame delta, so the scene moves at the same speed at 30 fps.
+ */
+function FrameLimiter({ fps = 30 }: { fps?: number }) {
+  const invalidate = useThree((state) => state.invalidate);
+  const gl = useThree((state) => state.gl);
+
+  useEffect(() => {
+    let onScreen = true;
+    const tick = () => {
+      if (onScreen && document.visibilityState === "visible") invalidate();
+    };
+    const timer = window.setInterval(tick, 1000 / fps);
+    const observer = new IntersectionObserver(([entry]) => {
+      onScreen = entry.isIntersecting;
+    });
+    observer.observe(gl.domElement);
+    return () => {
+      window.clearInterval(timer);
+      observer.disconnect();
+    };
+  }, [invalidate, gl, fps]);
+
+  return null;
 }
 
 function Scene() {
   return (
     <>
       <ambientLight intensity={0.4} />
-      <pointLight position={[0, 0, 5]} intensity={1.2} color={COLOR_CYAN} />
+      <pointLight position={[0, 0, 5]} intensity={0.6} color={COLOR_CYAN} />
 
-      <InboundFlow color={COLOR_CYAN} count={700} />
-      <OutboundFlow color={COLOR_VIOLET} count={700} />
+      <InboundFlow color={COLOR_CYAN} count={400} />
+      <OutboundFlow color={COLOR_VIOLET} count={400} />
       <GatewayCore />
     </>
   );
@@ -237,9 +265,11 @@ export default function HeroScene() {
     <div className="absolute inset-0 pointer-events-none">
       <Canvas
         camera={{ position: [0, 0.6, 6.5], fov: 55 }}
-        dpr={[1, 2]}
-        gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
+        dpr={[1, 1.25]}
+        frameloop="demand"
+        gl={{ antialias: false, alpha: true, powerPreference: "low-power" }}
       >
+        <FrameLimiter fps={30} />
         <Suspense fallback={null}>
           <Scene />
         </Suspense>

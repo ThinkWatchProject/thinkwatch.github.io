@@ -15,16 +15,16 @@ export default function HeroFallback() {
       >
         <defs>
           <radialGradient id="hf-core" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="#3DDBD9" stopOpacity="0.9" />
-            <stop offset="60%" stopColor="#8EEBEA" stopOpacity="0.4" />
+            <stop offset="0%" stopColor="#3DDBD9" stopOpacity="0.35" />
+            <stop offset="60%" stopColor="#8EEBEA" stopOpacity="0.14" />
             <stop offset="100%" stopColor="#8EEBEA" stopOpacity="0" />
           </radialGradient>
           <radialGradient id="hf-orb-l" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="#3DDBD9" stopOpacity="0.5" />
+            <stop offset="0%" stopColor="#3DDBD9" stopOpacity="0.2" />
             <stop offset="100%" stopColor="#3DDBD9" stopOpacity="0" />
           </radialGradient>
           <radialGradient id="hf-orb-r" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="#8EEBEA" stopOpacity="0.5" />
+            <stop offset="0%" stopColor="#8EEBEA" stopOpacity="0.18" />
             <stop offset="100%" stopColor="#8EEBEA" stopOpacity="0" />
           </radialGradient>
           <linearGradient id="hf-line" x1="0" y1="0" x2="1" y2="0">
