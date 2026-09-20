@@ -80,7 +80,8 @@ export const homeCopy = {
         { t: "Outbound inspection", b: "Secret redaction, tool-call inspection, and a scan of the client configuration files." },
       ],
       pills: ["Available", "macOS · Apple Silicon", "MIT"],
-      menubarCaption: "The menu-bar item: today's cost and output rate, or the quota left on a subscription account.",
+      shotAlt:
+        "The usage overview: tokens, cost and requests, a 24-hour trend stacked by model, the leaderboard by model and the cache hit rate",
       cta: "Explore ThinkWatch Lite",
     },
     core: {
@@ -195,7 +196,8 @@ export const homeCopy = {
         { t: "出站检查", b: "出站脱敏、工具调用审查，以及客户端配置文件的扫描。" },
       ],
       pills: ["已发布", "macOS · Apple Silicon", "MIT"],
-      menubarCaption: "菜单栏常驻显示今日费用与输出速率；订阅账号则显示剩余额度。",
+      shotAlt:
+        "ThinkWatch Lite 的用量概览：token、费用与请求数，按模型分层的 24 小时趋势，模型排行与缓存命中率",
       cta: "了解 ThinkWatch Lite",
     },
     core: {

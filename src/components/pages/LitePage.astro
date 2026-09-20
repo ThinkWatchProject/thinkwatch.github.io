@@ -2,9 +2,8 @@
 // The /lite product page: ThinkWatch Lite, the menu-bar app for individual
 // developers. Status copy must stay in line with the Lite README.
 //
-// The interface screenshots are shown on the Chinese page only: the interface
-// is Simplified Chinese, and a screenshot of it says little to an English
-// reader. The menu-bar images carry numbers, so they appear on both.
+// Each page shows the interface in its own language: the app ships in both,
+// and a screenshot of the other one says little to the reader.
 import Base from "~/layouts/Base.astro";
 import SiteHeader from "~/components/SiteHeader.astro";
 import SiteFooter from "~/components/SiteFooter.astro";
@@ -14,8 +13,8 @@ import { liteCopy } from "~/i18n/pages/lite";
 const lang = getLang(Astro);
 const c = liteCopy[lang];
 const zh = lang === "zh-CN";
-/** 界面截图只在中文页出现，见文件头 */
-const shots = zh;
+/** 英文界面的那一套图带 `-en`，见文件头 */
+const shot = (id: string) => `/lite/${id}${zh ? "" : "-en"}.webp`;
 
 const repo = "https://github.com/ThinkWatchProject/ThinkWatch-Lite";
 const releases = `${repo}/releases`;
@@ -105,26 +104,14 @@ const shotClass = "w-full rounded-[10px]";
           </div>
         </div>
         <div class="reveal min-w-0" style={delay(3)}>
-          {
-            shots ? (
-              <img
-                src="/lite/overview.webp"
-                width="2360"
-                height="1540"
-                class={shotClass}
-                fetchpriority="high"
-                alt="ThinkWatch Lite 的用量概览：token、费用与请求数，按模型分层的 24 小时趋势，模型排行与缓存命中率"
-              />
-            ) : (
-              <div class="flex flex-col gap-4">
-                <div class="flex flex-wrap items-center gap-4">
-                  <img src="/lite/menubar-cost.png" width="420" height="64" class="h-auto w-[420px] max-w-full" alt="Menu bar item: today's cost $24.72, output at 47 tokens per second" />
-                  <img src="/lite/menubar-quota.png" width="420" height="64" class="h-auto w-[420px] max-w-full" alt="Menu bar item: 34% of the subscription quota used, resets in 2 hours" />
-                </div>
-                <p class="m-0 max-w-[30rem] text-[15px] leading-relaxed text-[var(--color-muted)]">{c.hero.menubarCaption}</p>
-              </div>
-            )
-          }
+          <img
+            src={shot("overview")}
+            width="2360"
+            height="1540"
+            class={shotClass}
+            fetchpriority="high"
+            alt={c.hero.shotAlt}
+          />
         </div>
       </div>
     </section>
@@ -144,58 +131,41 @@ const shotClass = "w-full rounded-[10px]";
     <section class="py-16 sm:py-20 lg:py-24" aria-labelledby="lite-shows">
       <div class="container-page">
         <h2 id="lite-shows" class:list={[eyebrow, "m-0 font-normal"]}>{c.features.eyebrow}</h2>
-        {
-          shots ? (
-            <div class="mt-8 flex flex-col gap-14 sm:gap-20">
-              {c.features.items.map((item, i) => (
-                <div class="grid items-center gap-6 lg:grid-cols-2 lg:gap-14">
-                  <div class:list={["flex min-w-0 flex-col gap-3", i % 2 === 1 && "lg:order-2"]}>
-                    <h3 class="m-0 text-xl font-semibold leading-snug tracking-tight sm:text-2xl">{item.title}</h3>
-                    <p class="m-0 text-base leading-relaxed text-[var(--color-muted)] sm:text-[17px]">{item.body}</p>
-                  </div>
-                  <img
-                    src={`/lite/${item.id}.webp`}
-                    width="2360"
-                    height="1540"
-                    loading="lazy"
-                    decoding="async"
-                    class={shotClass}
-                    alt={item.title}
-                  />
-                </div>
-              ))}
+        <div class="mt-8 flex flex-col gap-14 sm:gap-20">
+          {c.features.items.map((item, i) => (
+            <div class="grid items-center gap-6 lg:grid-cols-2 lg:gap-14">
+              <div class:list={["flex min-w-0 flex-col gap-3", i % 2 === 1 && "lg:order-2"]}>
+                <h3 class="m-0 text-xl font-semibold leading-snug tracking-tight sm:text-2xl">{item.title}</h3>
+                <p class="m-0 text-base leading-relaxed text-[var(--color-muted)] sm:text-[17px]">{item.body}</p>
+              </div>
+              <img
+                src={shot(item.id)}
+                width="2360"
+                height="1540"
+                loading="lazy"
+                decoding="async"
+                class={shotClass}
+                alt={item.title}
+              />
             </div>
-          ) : (
-            <div class="mt-8 grid gap-4 sm:gap-6 md:grid-cols-2">
-              {c.features.items.map((item) => (
-                <div class="flex flex-col gap-3 rounded-2xl border border-[var(--color-border-strong)] p-6 transition-colors hover:border-[var(--color-brand-1)]/50 sm:p-8">
-                  <h3 class="m-0 text-xl font-semibold leading-snug tracking-tight sm:text-2xl">{item.title}</h3>
-                  <p class="m-0 text-base leading-relaxed text-[var(--color-muted)] sm:text-[17px]">{item.body}</p>
-                </div>
-              ))}
-            </div>
-          )
-        }
+          ))}
+        </div>
       </div>
     </section>
 
-    {
-      shots && (
-        <section class="pb-16 sm:pb-20 lg:pb-24" aria-labelledby="lite-menubar">
-          <div class="container-page grid items-center gap-8 rounded-2xl border border-[var(--color-border-strong)] p-6 sm:p-10 lg:grid-cols-[minmax(0,1fr)_auto] lg:gap-14">
-            <div class="flex flex-col gap-3">
-              <p class:list={[eyebrow, "m-0"]}>{c.menubar.eyebrow}</p>
-              <h2 id="lite-menubar" class={h2}>{c.menubar.title}</h2>
-              <p class="m-0 text-base leading-relaxed text-[var(--color-muted)] sm:text-[17px]">{c.menubar.body}</p>
-            </div>
-            <div class="flex flex-wrap items-center gap-4">
-              <img src="/lite/menubar-cost.png" width="420" height="64" loading="lazy" class="h-auto w-[420px] max-w-full" alt="菜单栏：今日费用 $24.72，输出速率 47 token/秒" />
-              <img src="/lite/menubar-quota.png" width="420" height="64" loading="lazy" class="h-auto w-[420px] max-w-full" alt="菜单栏：订阅额度已用 34%，2 小时后重置" />
-            </div>
-          </div>
-        </section>
-      )
-    }
+    <section class="pb-16 sm:pb-20 lg:pb-24" aria-labelledby="lite-menubar">
+      <div class="container-page grid items-center gap-8 rounded-2xl border border-[var(--color-border-strong)] p-6 sm:p-10 lg:grid-cols-[minmax(0,1fr)_auto] lg:gap-14">
+        <div class="flex flex-col gap-3">
+          <p class:list={[eyebrow, "m-0"]}>{c.menubar.eyebrow}</p>
+          <h2 id="lite-menubar" class={h2}>{c.menubar.title}</h2>
+          <p class="m-0 text-base leading-relaxed text-[var(--color-muted)] sm:text-[17px]">{c.menubar.body}</p>
+        </div>
+        <div class="flex flex-wrap items-center gap-4">
+          <img src="/lite/menubar-cost.png" width="420" height="64" loading="lazy" class="h-auto w-[420px] max-w-full" alt={c.menubar.costAlt} />
+          <img src="/lite/menubar-quota.png" width="420" height="64" loading="lazy" class="h-auto w-[420px] max-w-full" alt={c.menubar.quotaAlt} />
+        </div>
+      </div>
+    </section>
 
     <section class="bg-[var(--color-surface)] py-16 sm:py-20 lg:py-[88px]" aria-labelledby="lite-built">
       <div class="container-page">
