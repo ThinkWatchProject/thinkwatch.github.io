@@ -1,34 +1,56 @@
 # ThinkWatch Lite
 
-ThinkWatch Lite is the desktop application for a local AI API gateway. It is a menu-bar app that supervises [ThinkWatch Core](/docs/core) and displays its configuration, traffic, and cost.
+ThinkWatch Lite is a macOS menu-bar app that runs a local AI API gateway. It supervises [ThinkWatch Core](/docs/core) and displays its configuration, traffic and cost.
 
-> ThinkWatch Lite is in development. macOS is supported first, and other platforms will follow once the macOS version is complete. Lite is not distributed as a build: there is no signed `.app`, no installer, and no release page. It is [built from source](/docs/lite/run-from-source).
+Claude Code, Codex CLI and other clients of the Anthropic, OpenAI and Gemini APIs send their requests to the gateway, and Lite shows what each request cost, which upstream served it and why, and what was sent along with it.
 
-Point Claude Code, Codex, or any other client of the Anthropic or OpenAI API at a local port, and Lite displays how each request is handled.
+> It runs on macOS 12 or later on Apple Silicon, is [installed](/docs/lite/install) with Homebrew or a disk image, and updates itself. Other platforms follow once the macOS version is complete.
 
-## Session cost and its reliability
+## Usage and cost
 
-Measured, estimated, and unpriced costs are reported as three separate figures and are never summed. The snapshot date of the price list is shown next to the total, because figures computed from price lists of different dates are not directly comparable.
+Tokens, cost and requests over any period, broken down by model, with the cache hit rate, the net savings from caching and latency percentiles per model.
 
-## Request routing
+Measured costs, estimated costs and unpriced requests are reported separately and never added together; usage served by a subscription upstream is counted apart from billed usage. Every request records the price sheet and the date of the prices it was costed with — figures computed from price lists of different dates are not directly comparable.
 
-For every request, Lite shows the matched rule by name, the policy group, and the full failover chain, with the reason and duration of every hop.
+## Routing and failover
 
-## Outbound content
+Routing rules send requests to an upstream or a group of upstreams by model, key, token count, tools, images and other properties. Every request records the rule it matched, the group it went through and each attempt with its status and duration.
 
-Lite flags secrets bound for an untrusted upstream, the redactions that were applied, and tool calls that appear dangerous. Request and response bodies are masked before they are displayed.
+A dry run evaluates the rules for a given request and shows where it would go, which rules did not match and for what reason. It sends nothing and costs nothing.
 
-## Configuration editing
+## Upstreams
 
-A form is provided for changing individual values, and a CodeMirror editor for structural changes. Both write through the same span-patching layer, so editing a field modifies exactly one line and preserves existing comments.
+API keys, a ChatGPT account signed in from the app (with its usage limits and reset times), relays such as OpenRouter, and local models.
 
-## Menu bar
+When a client and an upstream speak different API formats, requests are converted between Anthropic Messages, OpenAI Chat Completions, OpenAI Responses and Gemini, and the fields that cannot be carried over are listed. Upstreams can be reached through an outbound proxy and priced with a custom price sheet.
 
-Lite occupies 50 pixels of the menu bar, where it shows today's spend, or the remaining subscription quota for accounts that have one. The item is rendered as a bitmap because the menu bar cannot display two lines of text.
+## Security
+
+- **Outbound redaction** replaces keys, private keys and connection strings before a request leaves for an untrusted upstream, and restores them in the response.
+- **Tool-call inspection** cuts off the response stream when an upstream returns a tool call carrying a command that would grant code execution.
+- **Config scan** checks client configuration files (skills, hooks, MCP servers) for hidden characters, injected instructions and dangerous commands.
+
+Each runs in Off, Observe or Enforce mode, and all three start in Observe. The Findings page collects the scan results and compares each upstream's last 24 hours with the 30 days before.
+
+Request and response bodies are masked before they are displayed; a secret is never shown in the interface.
+
+## Client setup
+
+Claude Code, Codex CLI, opencode, Zed and Aider can be pointed at the gateway from the app. The change is shown as a diff before anything is written, the original file is backed up, only the endpoint and key fields change, and the change can be restored at any time. Cursor, Continue and Gemini CLI come with step-by-step instructions.
+
+## Menu bar and notifications
+
+The menu bar shows today's cost and the output rate; for a subscription account it shows the quota used and the time until it resets instead. The item is rendered as a bitmap because the menu bar cannot display two lines of text.
+
+System notifications report when the gateway stops forwarding, an upstream becomes unreachable, a subscription quota runs out or a credential stops working; each kind can be set to a system notification, in-app only, or off.
+
+## Interface language
+
+The interface is currently in Simplified Chinese; an English interface is in development.
 
 ## Relationship to ThinkWatch Core
 
-The gateway is implemented in ThinkWatch Core. Lite contains no routing, forwarding, or accounting logic and communicates with Core over a unix socket. See [Architecture](/docs/lite/architecture).
+The gateway is implemented in ThinkWatch Core. Lite contains no routing, forwarding or accounting logic and communicates with Core over a unix socket. See [Architecture](/docs/lite/architecture).
 
 ## License
 

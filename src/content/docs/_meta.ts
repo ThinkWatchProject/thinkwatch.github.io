@@ -135,19 +135,29 @@ export const products: Product[] = [
     base: "/docs/lite",
     editUrl: "https://github.com/ThinkWatchProject/thinkwatch.github.io/tree/main/src/content/docs-lite",
     tagline: {
-      en: "The desktop application for a local AI API gateway: a menu-bar app that supervises ThinkWatch Core.",
-      "zh-CN": "本地 AI API 网关的桌面应用：托管 ThinkWatch Core 的菜单栏应用。",
+      en: "The macOS menu-bar app for a local AI API gateway: what it shows, how to install it, and how it is built.",
+      "zh-CN": "本地 AI API 网关的 macOS 菜单栏应用：它展示什么、怎么安装、怎么构建。",
     },
     docs: [
       overview(),
+      {
+        slug: "install",
+        label: { en: "Install and update", "zh-CN": "安装与更新" },
+        locales: both,
+        group: "getStarted",
+        summary: {
+          en: "Homebrew or a disk image, the quarantine attribute, and how updates reach each kind of install.",
+          "zh-CN": "通过 Homebrew 或磁盘映像安装、隔离属性的处理，以及两种安装方式各自如何更新。",
+        },
+      },
       {
         slug: "run-from-source",
         label: { en: "Build from source", "zh-CN": "从源码构建" },
         locales: both,
         group: "getStarted",
         summary: {
-          en: "In development, macOS first, no installer. Run pnpm install, then pnpm tauri dev.",
-          "zh-CN": "开发中，优先支持 macOS，不提供安装包。依次执行 pnpm install 与 pnpm tauri dev。",
+          en: "Run a development build with pnpm tauri dev, or build an Apple Silicon bundle.",
+          "zh-CN": "用 pnpm tauri dev 运行开发版本，或打包面向 Apple Silicon 的产物。",
         },
       },
       {

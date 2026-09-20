@@ -1,27 +1,31 @@
 # 从源码构建
 
-ThinkWatch Lite 正在开发中，优先支持 macOS，不提供可下载的构建产物：没有签名的 `.app`、安装包或 release 页面，需从源码运行。
+开发版本在 [ThinkWatch Lite 仓库](https://github.com/ThinkWatchProject/ThinkWatch-Lite)的检出目录中运行。安装已发布的应用请参见[安装与更新](/zh-CN/docs/lite/install)。
 
-## 构建与运行
-
-在 [ThinkWatch Lite 仓库](https://github.com/ThinkWatchProject/ThinkWatch-Lite)的检出目录中执行以下命令：
+## 运行
 
 ```bash
 pnpm install
 pnpm tauri dev
 ```
 
-## 平台支持
+`pnpm tauri dev` 不联网、不下载任何内容：它会在同级的 `thinkwatch-core` 检出目录中寻找 `twcore` 二进制。开发版本不执行自动更新。
 
-优先支持 macOS。Windows 与 Linux 将在 macOS 版本完成后适配，在此之前添加这些平台的 PR 不会合并。
+## 打包
 
-应用的实现以 macOS 为准：菜单栏以 macOS 位图渲染，客户端检测使用 macOS 路径，托管器与 launchd 集成。
+```bash
+pnpm tauri build
+```
 
-## 不提供安装包
+这会产出一个自包含的 `.app`。包内的 `twcore` 从 ThinkWatch Core 的 release 下载并校验哈希，而不是从同级检出目录复制，因此分发出去的是哪一个构建由该 release 决定，与本地工作副本的状态无关。用哪个 release 由 `Cargo.lock` 中 `tw-api` 解析到的 tag 决定，因此编译进应用的协议镜像与随包分发的二进制始终来自同一个 Core 提交。
 
-不分发构建产物是有意做出的范围决定。项目不提供签名的 `.app`、安装包、发布流程或自动更新。
+产物未经 Apple 注册开发者签名，也未公证，且只面向 Apple Silicon 构建。
 
-## 后续阅读
+## 平台
 
-- [架构](/zh-CN/docs/lite/architecture)：应用的组成，以及与 Core 的通信方式。
-- [贡献指南](/zh-CN/docs/lite/contributing)：提交 PR 前须通过的检查。
+优先支持 macOS。Windows 与 Linux 将在 macOS 版本完成后适配：菜单栏是按 macOS 渲染的位图，客户端检测使用 macOS 路径，守护进程接的是 launchd。
+
+## 下一步
+
+- [架构](/zh-CN/docs/lite/architecture)：应用的结构，以及它与 Core 的通信方式。
+- [贡献指南](/zh-CN/docs/lite/contributing)：提交 PR 前需要通过的检查。

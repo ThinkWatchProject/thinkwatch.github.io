@@ -12,8 +12,8 @@ gh pr create --base dev --head your-branch
 
 The following two decisions are settled and are not open to change through a pull request:
 
-- **macOS first.** Windows and Linux will follow once the macOS version is complete; pull requests adding them will not be merged until then.
-- **Not distributed as a build.** There is no signed `.app`, no installer, no release workflow, and no auto-update. Lite is run from source.
+- **macOS first.** Windows and Linux will follow once the macOS version is complete; pull requests adding them will not be merged until then. The menu bar is rendered as a macOS bitmap, client detection uses macOS paths, and the supervisor integrates with launchd.
+- **Apple Silicon only, and not signed by Apple.** Each release is one artifact: an arm64 `.app` in a disk image, with the gateway inside it, signed with the project's own self-signed certificate. That certificate does not satisfy Gatekeeper; it exists so that every release has the same signer, which is what lets Homebrew upgrade the app without warning that the signer changed. A universal binary for Intel and a Developer ID signature are both ongoing costs nobody has taken on, so a pull request that adds the notarization step without the account behind it cannot be merged, and neither can one that makes the build fall back to whatever architecture the machine happens to be — that ships a file some users can download and cannot open.
 
 The gateway itself (routing, forwarding, cost accounting, redaction) is implemented in [ThinkWatch Core](https://github.com/ThinkWatchProject/ThinkWatch-Core). Changes to behaviour on the data path belong in that repository.
 
@@ -27,6 +27,8 @@ Explain *why* in the body, not only *what*; the diff already shows what changed.
 
 ```bash
 pnpm typecheck
+pnpm test
+cargo fmt --manifest-path src-tauri/Cargo.toml --all --check
 cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings
 cargo test --manifest-path src-tauri/Cargo.toml
 ```

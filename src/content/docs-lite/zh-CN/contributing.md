@@ -13,7 +13,7 @@ gh pr create --base dev --head your-branch
 以下两项决定已经确定，不接受相关 PR：
 
 - **优先支持 macOS。** Windows 与 Linux 将在 macOS 版本完成后适配，在此之前添加这些平台的 PR 不会合并。
-- **不分发构建产物。** 不提供签名的 `.app`、安装包、发布流程或自动更新，需从源码运行。
+- **只面向 Apple Silicon，且未经 Apple 签名。** 每个版本只产出一件东西：磁盘映像中的 arm64 `.app`，网关在包内，使用项目自己的自签名证书签名。该证书不满足 Gatekeeper 的要求，它的作用是让每个版本的签名者保持一致，Homebrew 升级时才不会提示签名者变更。Intel 的通用二进制和 Developer ID 签名都是持续成本，目前没有人承担，因此只加公证步骤、没有对应账号的 PR 无法合并；让构建回退到本机架构的 PR 同样无法合并——那会发出一个部分用户下载后打不开的文件。
 
 网关本体（路由、转发、成本核算、脱敏）由 [ThinkWatch Core](https://github.com/ThinkWatchProject/ThinkWatch-Core) 实现。涉及数据通路的行为变更，应提交至该仓库。
 
@@ -27,6 +27,8 @@ gh pr create --base dev --head your-branch
 
 ```bash
 pnpm typecheck
+pnpm test
+cargo fmt --manifest-path src-tauri/Cargo.toml --all --check
 cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings
 cargo test --manifest-path src-tauri/Cargo.toml
 ```
