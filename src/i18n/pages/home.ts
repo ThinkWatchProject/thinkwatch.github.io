@@ -9,7 +9,7 @@ export const homeCopy = {
     sub: "ThinkWatch routes, inspects, and meters model requests and MCP tool calls. It is available as a self-hosted server for organizations and as a desktop application for individual developers.",
     doors: {
       teams: { label: "For organizations", name: "ThinkWatch Enterprise", text: "Self-hosted AI API and MCP gateway.", cta: "Deploy ThinkWatch" },
-      machine: { label: "For individual developers", name: "ThinkWatch Lite", text: "Menu-bar application backed by a local gateway. In development, macOS first.", cta: "Run from source" },
+      machine: { label: "For individual developers", name: "ThinkWatch Lite", text: "Menu-bar application backed by a local gateway, for macOS on Apple Silicon.", cta: "Install Lite" },
     },
     trace: {
       tag: "Sample trace",
@@ -75,11 +75,12 @@ export const homeCopy = {
       eyebrow: "ThinkWatch Lite · For individual developers",
       title: "A local AI gateway in the macOS menu bar",
       points: [
-        { t: "Cost reporting", b: "Measured, estimated, and unpriced usage are reported separately and never combined." },
-        { t: "Request routing", b: "The matched rule, the policy group, and the complete failover chain for each request." },
-        { t: "Outbound inspection", b: "Secret detection, redaction, and flagging of high-risk tool calls." },
+        { t: "Cost reporting", b: "Measured, estimated, and unpriced usage are reported separately and never combined; subscription usage is counted apart." },
+        { t: "Request routing", b: "The matched rule, the group, and every upstream attempt, with a dry run for rules before any traffic." },
+        { t: "Outbound inspection", b: "Secret redaction, tool-call inspection, and a scan of the client configuration files." },
       ],
-      pills: ["In development", "macOS first", "MIT"],
+      pills: ["Available", "macOS · Apple Silicon", "MIT"],
+      menubarCaption: "The menu-bar item: today's cost and output rate, or the quota left on a subscription account.",
       cta: "Explore ThinkWatch Lite",
     },
     core: {
@@ -104,7 +105,7 @@ export const homeCopy = {
       lite: {
         runsAs: "Menu-bar desktop app",
         builtFor: "Individual developers",
-        status: "In development · macOS first · run from source",
+        status: "Available · macOS on Apple Silicon · Homebrew or disk image",
         license: "MIT",
       },
       core: {
@@ -123,7 +124,7 @@ export const homeCopy = {
     sub: "ThinkWatch 对模型请求与 MCP 工具调用进行路由、检查与计量，提供面向组织的自托管服务端，以及面向个人开发者的桌面应用。",
     doors: {
       teams: { label: "面向组织", name: "ThinkWatch 企业版", text: "自托管的 AI API 与 MCP 网关。", cta: "部署 ThinkWatch" },
-      machine: { label: "面向个人开发者", name: "ThinkWatch Lite", text: "基于本地网关的菜单栏应用。目前处于开发阶段，优先支持 macOS。", cta: "从源码运行" },
+      machine: { label: "面向个人开发者", name: "ThinkWatch Lite", text: "基于本地网关的菜单栏应用，支持 Apple Silicon 机型的 macOS。", cta: "安装 Lite" },
     },
     trace: {
       tag: "示例追踪",
@@ -189,11 +190,12 @@ export const homeCopy = {
       eyebrow: "ThinkWatch Lite · 面向个人开发者",
       title: "macOS 菜单栏中的本地 AI 网关",
       points: [
-        { t: "成本报告", b: "实测、估算与无法计价的用量分别显示，不合并计算。" },
-        { t: "请求路由", b: "展示每个请求匹配的规则、策略组及完整的故障转移链。" },
-        { t: "出站检查", b: "密钥检测、脱敏，以及高风险工具调用的标记。" },
+        { t: "费用报告", b: "实测、估算与无法计价的用量分别显示，不合并计算；订阅制用量单独统计。" },
+        { t: "请求路由", b: "展示每个请求命中的规则、策略组与每一次尝试，改规则前可以先试算。" },
+        { t: "出站检查", b: "出站脱敏、工具调用审查，以及客户端配置文件的扫描。" },
       ],
-      pills: ["开发中", "优先支持 macOS", "MIT"],
+      pills: ["已发布", "macOS · Apple Silicon", "MIT"],
+      menubarCaption: "菜单栏常驻显示今日费用与输出速率；订阅账号则显示剩余额度。",
       cta: "了解 ThinkWatch Lite",
     },
     core: {
@@ -218,7 +220,7 @@ export const homeCopy = {
       lite: {
         runsAs: "菜单栏桌面应用",
         builtFor: "个人开发者",
-        status: "开发中 · 优先支持 macOS · 从源码运行",
+        status: "已发布 · macOS（Apple Silicon）· Homebrew 或磁盘映像",
         license: "MIT",
       },
       core: {
