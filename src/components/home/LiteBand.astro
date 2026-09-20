@@ -1,7 +1,6 @@
 ---
-// The Lite band on the home page. The screenshot is shown on the Chinese page
-// only — the interface is Simplified Chinese; see LitePage.astro. The English
-// page shows the menu-bar item instead, which carries numbers.
+// The Lite band on the home page. Each page shows the interface in its own
+// language; see LitePage.astro.
 import { getLang, localePath } from "~/i18n";
 import { homeCopy } from "~/i18n/pages/home";
 
@@ -12,27 +11,15 @@ const zh = lang === "zh-CN";
 
 <section class="container-page grid items-center gap-12 py-20 lg:grid-cols-2 lg:gap-[72px] lg:py-28">
   <div class="order-2 min-w-0 lg:order-1">
-    {
-      zh ? (
-        <img
-          src="/lite/overview.webp"
-          width="2360"
-          height="1540"
-          loading="lazy"
-          decoding="async"
-          class="w-full rounded-[10px]"
-          alt="ThinkWatch Lite 的用量概览：token、费用与请求数，按模型分层的 24 小时趋势，模型排行与缓存命中率"
-        />
-      ) : (
-        <div class="flex flex-col gap-4">
-          <div class="flex flex-wrap items-center gap-4">
-            <img src="/lite/menubar-cost.png" width="420" height="64" loading="lazy" class="h-auto w-[420px] max-w-full" alt="Menu bar item: today's cost $24.72, output at 47 tokens per second" />
-            <img src="/lite/menubar-quota.png" width="420" height="64" loading="lazy" class="h-auto w-[420px] max-w-full" alt="Menu bar item: 34% of the subscription quota used, resets in 2 hours" />
-          </div>
-          <p class="m-0 max-w-[30rem] text-[15px] leading-relaxed text-[var(--color-muted)]">{c.menubarCaption}</p>
-        </div>
-      )
-    }
+    <img
+      src={zh ? "/lite/overview.webp" : "/lite/overview-en.webp"}
+      width="2360"
+      height="1540"
+      loading="lazy"
+      decoding="async"
+      class="w-full rounded-[10px]"
+      alt={c.shotAlt}
+    />
   </div>
   <div class="order-1 flex flex-col gap-5 lg:order-2">
     <div class="font-mono text-[13px] uppercase tracking-[0.08em] text-[var(--color-brand-1)]">{c.eyebrow}</div>

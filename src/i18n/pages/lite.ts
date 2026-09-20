@@ -20,11 +20,12 @@ export const liteCopy = {
       sub: "Claude Code, Codex CLI and other clients of the Anthropic, OpenAI and Gemini APIs send their requests to a gateway on your own machine, and Lite shows what each request cost, which upstream served it and why, and what was sent along with it.",
       ctaPrimary: "Install",
       ctaSecondary: "Lite documentation",
-      menubarCaption: "The menu-bar item: today's cost and output rate, or the quota left on a subscription account.",
+      shotAlt:
+        "The usage overview: tokens, cost and requests, a 24-hour trend stacked by model, the leaderboard by model and the cache hit rate",
     },
     status: {
       badge: "Available",
-      body: "macOS 12 or later on Apple Silicon, installed with Homebrew or a disk image, and updated by the app itself. Other platforms follow once the macOS version is complete. The interface is currently in Simplified Chinese; an English interface is in development.",
+      body: "macOS 12 or later on Apple Silicon, installed with Homebrew or a disk image, and updated by the app itself. Other platforms follow once the macOS version is complete.",
     },
     features: {
       eyebrow: "What it shows",
@@ -65,6 +66,8 @@ export const liteCopy = {
       eyebrow: "Always visible",
       title: "Fifty pixels in the menu bar",
       body: "Today's cost and the output rate stay in the menu bar; for a subscription account, the quota used and the time until it resets take their place. System notifications report a gateway that stopped forwarding, an upstream that became unreachable, a quota that ran out or a credential that stopped working.",
+      costAlt: "Menu bar item: today's cost $24.72, output at 47 tokens per second",
+      quotaAlt: "Menu bar item: 34% of the subscription quota used, resets in 2 hours",
     },
     built: {
       eyebrow: "Architecture",
@@ -112,7 +115,8 @@ export const liteCopy = {
       sub: "Claude Code、Codex CLI 等使用 Anthropic、OpenAI、Gemini API 的客户端把请求发给本机上的网关，Lite 展示每个请求的费用、由哪个上游处理及其原因，以及随请求发出的内容。",
       ctaPrimary: "安装",
       ctaSecondary: "Lite 文档",
-      menubarCaption: "菜单栏常驻显示今日费用与输出速率；订阅账号则显示剩余额度。",
+      shotAlt:
+        "ThinkWatch Lite 的用量概览：token、费用与请求数，按模型分层的 24 小时趋势，模型排行与缓存命中率",
     },
     status: {
       badge: "已发布",
@@ -157,6 +161,8 @@ export const liteCopy = {
       eyebrow: "常驻可见",
       title: "菜单栏上的五十像素",
       body: "菜单栏常驻显示今日费用与输出速率；使用订阅账号时，改为显示额度用量与重置倒计时。网关停止转发、上游无法连接、订阅额度用完、凭据失效等情况会发送系统通知。",
+      costAlt: "菜单栏：今日费用 $24.72，输出速率 47 token/秒",
+      quotaAlt: "菜单栏：订阅额度已用 34%，2 小时后重置",
     },
     built: {
       eyebrow: "架构",
