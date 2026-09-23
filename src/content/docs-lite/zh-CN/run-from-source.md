@@ -17,13 +17,13 @@ pnpm tauri dev
 pnpm tauri build
 ```
 
-这会产出一个自包含的 `.app`。包内的 `twcore` 从 ThinkWatch Core 的 release 下载并校验哈希，而不是从同级检出目录复制，因此分发出去的是哪一个构建由该 release 决定，与本地工作副本的状态无关。用哪个 release 由 `Cargo.lock` 中 `tw-api` 解析到的 tag 决定，因此编译进应用的协议镜像与随包分发的二进制始终来自同一个 Core 提交。
+在 macOS 上这会产出一个自包含的 `.app`，在 Windows 上产出 NSIS 安装程序。包内的 `twcore` 从 ThinkWatch Core 的 release 下载并校验哈希，而不是从同级检出目录复制，因此分发出去的是哪一个构建由该 release 决定，与本地工作副本的状态无关。用哪个 release 由 `Cargo.lock` 中 `tw-api` 解析到的 tag 决定，因此编译进应用的协议镜像与随包分发的二进制始终来自同一个 Core 提交。
 
-产物未经 Apple 注册开发者签名，也未公证，且只面向 Apple Silicon 构建。
+macOS 产物未经 Apple 注册开发者签名，也未公证，且只面向 Apple Silicon 构建。Windows 安装程序未经代码签名。
 
 ## 平台
 
-优先支持 macOS。Windows 与 Linux 将在 macOS 版本完成后适配：菜单栏是按 macOS 渲染的位图，客户端检测使用 macOS 路径，守护进程接的是 launchd。
+发布版本面向 Apple Silicon 的 macOS，以及 x64 与 ARM64 的 Windows。没有 Linux 版本。
 
 ## 下一步
 

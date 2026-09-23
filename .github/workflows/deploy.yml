@@ -4,6 +4,11 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+  # Lite 页面上的下载按钮指向构建时查到的那一版安装包。Lite 发了新版之后，
+  # 不重新构建的话按钮会一直指着旧版本 —— 旧版照样能装、装上会自己更新，
+  # 但没理由让它停在那里。定时重建一次，最多晚三个小时跟上。
+  schedule:
+    - cron: "41 */3 * * *"
 
 permissions:
   contents: read

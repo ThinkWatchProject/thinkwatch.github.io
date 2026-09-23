@@ -17,13 +17,13 @@ pnpm tauri dev
 pnpm tauri build
 ```
 
-This produces a self-contained `.app`. The `twcore` inside it is downloaded from a ThinkWatch Core release and checksum-verified rather than copied out of a sibling checkout, so which build was distributed is determined by that release and not by the state of a local working copy. Which release is decided by the tag that `Cargo.lock` resolved for `tw-api`, so the protocol mirror compiled into the app and the binary shipped beside it always come from one Core commit.
+On macOS this produces a self-contained `.app`; on Windows, an NSIS installer. The `twcore` inside it is downloaded from a ThinkWatch Core release and checksum-verified rather than copied out of a sibling checkout, so which build was distributed is determined by that release and not by the state of a local working copy. Which release is decided by the tag that `Cargo.lock` resolved for `tw-api`, so the protocol mirror compiled into the app and the binary shipped beside it always come from one Core commit.
 
-The bundle is neither signed by a registered Apple developer nor notarized, and it is built for Apple Silicon only.
+The macOS bundle is neither signed by a registered Apple developer nor notarized, and it is built for Apple Silicon only. The Windows installer is not code-signed.
 
 ## Platforms
 
-macOS comes first. Windows and Linux follow once the macOS version is complete: the menu bar is rendered as a macOS bitmap, client detection uses macOS paths, and the supervisor integrates with launchd.
+Releases are built for macOS on Apple Silicon and for Windows on x64 and ARM64. There is no Linux build.
 
 ## Next steps
 
