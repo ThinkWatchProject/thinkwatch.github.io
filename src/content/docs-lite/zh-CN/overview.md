@@ -1,10 +1,10 @@
 # ThinkWatch Lite
 
-ThinkWatch Lite 是运行本地 AI API 网关的 macOS 菜单栏应用。它托管 [ThinkWatch Core](/zh-CN/docs/core)，并展示其配置、流量与费用。
+ThinkWatch Lite 是运行本地 AI API 网关的桌面应用，常驻 macOS 菜单栏或 Windows 通知区域。它托管 [ThinkWatch Core](/zh-CN/docs/core)，并展示其配置、流量与费用。
 
 Claude Code、Codex CLI 等使用 Anthropic、OpenAI、Gemini API 的客户端把请求发给这个网关，Lite 展示每个请求的费用、由哪个上游处理及其原因，以及随请求发出的内容。
 
-> 支持 macOS 12 及以上版本的 Apple Silicon 机型，可通过 Homebrew 或磁盘映像[安装](/zh-CN/docs/lite/install)，并由应用自动更新。其他系统将在 macOS 版本完成后适配。
+> 支持 macOS 12 及以上版本的 Apple Silicon 机型，以及 Windows 10 及以上版本的 x64 与 ARM64 机型，可通过 Homebrew、磁盘映像或 Windows 安装程序[安装](/zh-CN/docs/lite/install)，并由应用自动更新。
 
 ## 用量与费用
 
@@ -42,6 +42,8 @@ Claude Code、Codex CLI、opencode、Zed 与 Aider 可以在应用内一键指�
 
 菜单栏常驻显示今日费用与输出速率；使用订阅账号时改为显示额度用量与重置倒计时。由于菜单栏放不下两行文字，这一块以位图形式渲染。
 
+Windows 上图标位于通知区域：悬停显示网关状态与今日 token、费用；左键打开主界面，右键打开同一份菜单，其中的额度条改为文字。系统通知为 Windows 原生通知。
+
 网关停止转发、上游无法连接、订阅额度用完、凭据失效等情况会发送系统通知，每一类都可以设为系统通知、仅在应用内显示或关闭。
 
 ## 界面语言
@@ -50,7 +52,7 @@ Claude Code、Codex CLI、opencode、Zed 与 Aider 可以在应用内一键指�
 
 ## 与 ThinkWatch Core 的关系
 
-网关本体在 ThinkWatch Core 中实现。Lite 不包含路由、转发或计费逻辑，通过 unix socket 与 Core 通信。参见[架构](/zh-CN/docs/lite/architecture)。
+网关本体在 ThinkWatch Core 中实现。Lite 不包含路由、转发或计费逻辑，在 macOS 上通过 unix socket、在 Windows 上通过回环端口与 Core 通信，两者都带一个每次启动生成的凭据。参见[架构](/zh-CN/docs/lite/architecture)。
 
 ## 许可证
 

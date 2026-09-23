@@ -1,6 +1,7 @@
 ---
-// The /lite product page: ThinkWatch Lite, the menu-bar app for individual
-// developers. Status copy must stay in line with the Lite README.
+// The /lite product page: ThinkWatch Lite, the desktop app for individual
+// developers on macOS and Windows. Status copy must stay in line with the Lite
+// README.
 //
 // Each page shows the interface in its own language: the app ships in both,
 // and a screenshot of the other one says little to the reader.
@@ -9,6 +10,7 @@ import SiteHeader from "~/components/SiteHeader.astro";
 import SiteFooter from "~/components/SiteFooter.astro";
 import { getLang, localePath } from "~/i18n";
 import { liteCopy } from "~/i18n/pages/lite";
+import { getLatestLiteRelease } from "~/lib/github";
 
 const lang = getLang(Astro);
 const c = liteCopy[lang];
@@ -18,6 +20,24 @@ const shot = (id: string) => `/lite/${id}${zh ? "" : "-en"}.webp`;
 
 const repo = "https://github.com/ThinkWatchProject/ThinkWatch-Lite";
 const releases = `${repo}/releases`;
+const latestPage = `${releases}/latest`;
+
+// Windows installers of the latest release. The file names carry the version,
+// so they come from the release's asset list, looked up at build time; without
+// it, the buttons lead to the latest release page instead.
+const liteRelease = await getLatestLiteRelease();
+const assetUrl = (suffix: string) => {
+  const name = Object.keys(liteRelease?.assets ?? {}).find((n) => n.endsWith(suffix));
+  return name ? liteRelease!.assets[name] : null;
+};
+const winArchs = ["x64", "arm64"] as const;
+const win = Object.fromEntries(
+  winArchs.map((arch) => [
+    arch,
+    { url: assetUrl(`-${arch}-setup.exe`) ?? latestPage, sha: assetUrl(`-${arch}-setup.exe.sha256`) },
+  ]),
+) as Record<(typeof winArchs)[number], { url: string; sha: string | null }>;
+const liteVersion = liteRelease?.tag.replace(/^v/, "") ?? null;
 const docsHref = localePath(lang, "/docs/lite");
 const installDocsHref = localePath(lang, "/docs/lite/install");
 const sourceDocsHref = localePath(lang, "/docs/lite/run-from-source");
@@ -30,7 +50,7 @@ const jsonLd = [
     name: "ThinkWatch Lite",
     description: c.meta.description,
     applicationCategory: "DeveloperApplication",
-    operatingSystem: "macOS 12 or later, Apple Silicon",
+    operatingSystem: "macOS 12 or later (Apple Silicon); Windows 10 or later (x64, ARM64)",
     url: pageUrl,
     downloadUrl: releases,
     license: "https://opensource.org/licenses/MIT",
@@ -63,6 +83,8 @@ const textLink =
 const nodes = [c.built.lite, c.built.core, c.built.upstreams];
 /** 截图外的一圈：和窗口自带的阴影配合，不再加边框 */
 const shotClass = "w-full rounded-[10px]";
+const platformLabel = "m-0 font-mono text-[13px] text-[var(--color-muted)]";
+const archLabel = { x64: "x64", arm64: "ARM64" } as const;
 ---
 
 <Base title={c.meta.title} description={c.meta.description} noJsonLd jsonLd={jsonLd}>
@@ -209,7 +231,7 @@ const shotClass = "w-full rounded-[10px]";
       </div>
     </section>
 
-    <section id="install" class="scroll-mt-20 py-16 sm:py-20 lg:py-[88px]">
+    <section id="install" data-os="other" class="scroll-mt-20 py-16 sm:py-20 lg:py-[88px]">
       <div class="container-page grid items-start gap-8 lg:grid-cols-2 lg:gap-16">
         <div class="flex min-w-0 flex-col gap-4">
           <p class:list={[eyebrow, "m-0"]}>{c.install.eyebrow}</p>
@@ -220,21 +242,63 @@ const shotClass = "w-full rounded-[10px]";
             <a href={sourceDocsHref} class={textLink}>{c.install.source}</a>
           </div>
         </div>
-        <div class="flex min-w-0 flex-col gap-5">
-          <div class="overflow-x-auto rounded-[14px] border border-[var(--color-border-strong)] bg-[var(--color-surface)] p-5 font-mono text-[15px] leading-relaxed sm:p-7 sm:text-base">
-            <code class="flex flex-col gap-2.5 whitespace-nowrap text-[#e6ebf2]">
-              <span><span class="select-none text-[var(--color-dim)]">$ </span>brew install --cask thinkwatchproject/tap/thinkwatch-lite</span>
-            </code>
+        <div class="flex min-w-0 flex-col gap-8" data-install-list>
+          <div class="flex min-w-0 flex-col gap-4" data-install-os="mac">
+            <p class={platformLabel}>{c.install.macLabel}</p>
+            <div class="overflow-x-auto rounded-[14px] border border-[var(--color-border-strong)] bg-[var(--color-surface)] p-5 font-mono text-[15px] leading-relaxed sm:p-7 sm:text-base">
+              <code class="flex flex-col gap-2.5 whitespace-nowrap text-[#e6ebf2]">
+                <span><span class="select-none text-[var(--color-dim)]">$ </span>brew install --cask thinkwatchproject/tap/thinkwatch-lite</span>
+              </code>
+            </div>
+            <div class="flex flex-col gap-2 rounded-[14px] border border-[var(--color-border-strong)] p-5 sm:p-7">
+              <h3 class="m-0 text-lg font-semibold sm:text-xl">{c.install.dmgTitle}</h3>
+              <p class="m-0 text-[15px] leading-relaxed text-[var(--color-muted)] sm:text-base">{c.install.dmgBody}</p>
+              <a href={releases} target="_blank" rel="noopener" class:list={[textLink, "self-start"]}>
+                {c.install.releases}
+                <svg class="ml-1.5 h-4 w-4" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                  <path d="M5 11L11 5M6 5h5v5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+                </svg>
+              </a>
+            </div>
           </div>
-          <div class="flex flex-col gap-2 rounded-[14px] border border-[var(--color-border-strong)] p-5 sm:p-7">
-            <h3 class="m-0 text-lg font-semibold sm:text-xl">{c.install.dmgTitle}</h3>
-            <p class="m-0 text-[15px] leading-relaxed text-[var(--color-muted)] sm:text-base">{c.install.dmgBody}</p>
-            <a href={releases} target="_blank" rel="noopener" class:list={[textLink, "self-start"]}>
-              {c.install.releases}
-              <svg class="ml-1.5 h-4 w-4" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                <path d="M5 11L11 5M6 5h5v5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
-              </svg>
-            </a>
+          <div class="flex min-w-0 flex-col gap-4" data-install-os="windows">
+            <p class={platformLabel}>{c.install.winLabel}</p>
+            <div class="flex flex-col gap-4 rounded-[14px] border border-[var(--color-border-strong)] p-5 sm:p-7">
+              <h3 class="m-0 text-lg font-semibold sm:text-xl">{c.install.winTitle}</h3>
+              <p class="m-0 text-[15px] leading-relaxed text-[var(--color-muted)] sm:text-base">{c.install.winBody}</p>
+              <div class="flex flex-col items-start gap-2">
+                {winArchs.map((arch) => (
+                  <a href={win[arch].url} class="win-download" data-win-arch={arch} hidden={arch !== "x64"}>
+                    {c.install.winDownload[arch]}
+                  </a>
+                ))}
+                {winArchs.map((arch) => (
+                  <p class="m-0 text-[15px] text-[var(--color-muted)]" data-win-other={arch} hidden={arch === "x64"}>
+                    {c.install.winOther}<a href={win[arch].url} class="font-medium text-[var(--color-brand-1)] transition-colors hover:text-[var(--color-brand-2)]">
+                      {c.install.winOtherLink[arch]}
+                    </a>
+                  </p>
+                ))}
+              </div>
+              {liteVersion && (
+                <p class="m-0 font-mono text-[13px] text-[var(--color-muted)]">
+                  {c.install.version} {liteVersion}
+                  {winArchs.map((arch) =>
+                    win[arch].sha && (
+                      <Fragment>
+                        {" · "}
+                        <a href={win[arch].sha} class="text-[var(--color-brand-1)] transition-colors hover:text-[var(--color-brand-2)]">
+                          sha256 ({archLabel[arch]})
+                        </a>
+                      </Fragment>
+                    ),
+                  )}
+                </p>
+              )}
+              <p class="m-0 border-t border-[var(--color-border-strong)] pt-4 text-[15px] leading-relaxed text-[var(--color-muted)] sm:text-base">
+                {c.install.winUnsigned}
+              </p>
+            </div>
           </div>
         </div>
       </div>
@@ -260,7 +324,69 @@ const shotClass = "w-full rounded-[10px]";
   <SiteFooter />
 </Base>
 
+<!--
+  Which installer to put first. Windows visitors get the Windows block on top
+  with the button filled; everyone else keeps macOS on top. The architecture
+  comes from User-Agent Client Hints: arm with 64-bit picks ARM64, and every
+  other answer, a failure or a browser without the API picks x64, which is also
+  what the page shows without script.
+-->
+<script is:inline data-lite-download>
+  (() => {
+    const root = document.getElementById("install");
+    const list = root && root.querySelector("[data-install-list]");
+    if (!list) return;
+    const ua = navigator.userAgentData;
+    const windows = (ua && ua.platform === "Windows") || /Windows NT/.test(navigator.userAgent);
+    const show = (arch) => {
+      root.dataset.winArch = arch;
+      for (const el of root.querySelectorAll("[data-win-arch]")) el.hidden = el.dataset.winArch !== arch;
+      for (const el of root.querySelectorAll("[data-win-other]")) el.hidden = el.dataset.winOther === arch;
+    };
+    root.dataset.os = windows ? "windows" : "other";
+    list.prepend(list.querySelector(`[data-install-os="${windows ? "windows" : "mac"}"]`));
+    show("x64");
+    if (!windows || !ua || typeof ua.getHighEntropyValues !== "function") return;
+    ua.getHighEntropyValues(["architecture", "bitness"]).then(
+      (v) => show(v.architecture === "arm" && v.bitness === "64" ? "arm64" : "x64"),
+      () => show("x64"),
+    );
+  })();
+</script>
+
 <style>
+  /* The Windows download button: filled for Windows visitors, outlined for the
+     rest, whose own installer is the one above it. */
+  .win-download {
+    display: inline-flex;
+    min-height: 2.75rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    border: 1px solid var(--color-brand-1);
+    padding: 0.625rem 1.25rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-brand-1);
+    transition: background-color 150ms, color 150ms, border-color 150ms;
+  }
+  .win-download:hover {
+    border-color: var(--color-brand-2);
+    color: var(--color-brand-2);
+  }
+  .win-download[hidden] {
+    display: none;
+  }
+  [data-os="windows"] .win-download {
+    background: var(--color-brand-1);
+    color: var(--color-bg);
+  }
+  [data-os="windows"] .win-download:hover {
+    background: var(--color-brand-2);
+    border-color: var(--color-brand-2);
+    color: var(--color-bg);
+  }
+
   /* A small dot travels along the Lite-to-Core link to suggest traffic. */
   .flow-dot {
     position: absolute;
