@@ -78,3 +78,45 @@ export async function getLatestRelease(): Promise<string | null> {
     return null;
   }
 }
+
+// The latest ThinkWatch Lite release, fetched once per build. Asset names carry
+// the version, so the download links are taken from this release's own asset
+// list rather than built from a pattern. Returns null on any failure; the Lite
+// page then links to the releases page instead.
+export interface LiteRelease {
+  tag: string;
+  /** Asset file name → its download URL */
+  assets: Record<string, string>;
+}
+
+let liteCached: LiteRelease | null | undefined;
+
+export async function getLatestLiteRelease(): Promise<LiteRelease | null> {
+  if (liteCached !== undefined) return liteCached;
+  const headers: Record<string, string> = {
+    "User-Agent": "thinkwatch-site-build",
+    Accept: "application/vnd.github+json",
+  };
+  const token = typeof process !== "undefined" ? process.env.GITHUB_TOKEN : undefined;
+  if (token) headers.Authorization = `Bearer ${token}`;
+  try {
+    const res = await fetch("https://api.github.com/repos/ThinkWatchProject/ThinkWatch-Lite/releases/latest", {
+      headers,
+    });
+    if (!res.ok) {
+      liteCached = null;
+      return null;
+    }
+    const data: { tag_name?: string; assets?: { name?: string; browser_download_url?: string }[] } =
+      await res.json();
+    const assets: Record<string, string> = {};
+    for (const a of data.assets ?? []) {
+      if (a.name && a.browser_download_url) assets[a.name] = a.browser_download_url;
+    }
+    liteCached = data.tag_name ? { tag: data.tag_name, assets } : null;
+    return liteCached;
+  } catch {
+    liteCached = null;
+    return null;
+  }
+}

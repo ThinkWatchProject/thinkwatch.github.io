@@ -1,10 +1,10 @@
 # ThinkWatch Lite
 
-ThinkWatch Lite is a macOS menu-bar app that runs a local AI API gateway. It supervises [ThinkWatch Core](/docs/core) and displays its configuration, traffic and cost.
+ThinkWatch Lite is a desktop app that runs a local AI API gateway from the macOS menu bar or the Windows notification area. It supervises [ThinkWatch Core](/docs/core) and displays its configuration, traffic and cost.
 
 Claude Code, Codex CLI and other clients of the Anthropic, OpenAI and Gemini APIs send their requests to the gateway, and Lite shows what each request cost, which upstream served it and why, and what was sent along with it.
 
-> It runs on macOS 12 or later on Apple Silicon, is [installed](/docs/lite/install) with Homebrew or a disk image, and updates itself. Other platforms follow once the macOS version is complete.
+> It runs on macOS 12 or later on Apple Silicon and on Windows 10 or later on x64 or ARM64, is [installed](/docs/lite/install) with Homebrew, a disk image or the Windows installer, and updates itself.
 
 ## Usage and cost
 
@@ -42,6 +42,8 @@ Claude Code, Codex CLI, opencode, Zed and Aider can be pointed at the gateway fr
 
 The menu bar shows today's cost and the output rate; for a subscription account it shows the quota used and the time until it resets instead. The item is rendered as a bitmap because the menu bar cannot display two lines of text.
 
+On Windows the icon sits in the notification area. Hovering over it shows the gateway's state and today's tokens and cost; a left click opens the main window, and a right click opens the same menu, with quota bars written out as text. Notifications are native Windows notifications.
+
 System notifications report when the gateway stops forwarding, an upstream becomes unreachable, a subscription quota runs out or a credential stops working; each kind can be set to a system notification, in-app only, or off.
 
 ## Interface language
@@ -50,7 +52,7 @@ The interface is currently in Simplified Chinese; an English interface is in dev
 
 ## Relationship to ThinkWatch Core
 
-The gateway is implemented in ThinkWatch Core. Lite contains no routing, forwarding or accounting logic and communicates with Core over a unix socket. See [Architecture](/docs/lite/architecture).
+The gateway is implemented in ThinkWatch Core. Lite contains no routing, forwarding or accounting logic and communicates with Core over a unix socket on macOS and a loopback port on Windows, both carrying a per-launch credential. See [Architecture](/docs/lite/architecture).
 
 ## License
 

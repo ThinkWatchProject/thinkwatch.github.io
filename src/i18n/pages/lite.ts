@@ -1,22 +1,18 @@
 // Copy for the /lite product page. Facts come from the ThinkWatch Lite README:
-// released for macOS on Apple Silicon, installed with Homebrew or a disk image,
-// interface in Simplified Chinese while the English one is being built.
-//
-// The screenshots only appear on the Chinese page: the interface is Simplified
-// Chinese, and shots of it would tell an English reader little. They come back
-// here once the English interface ships.
+// released for macOS on Apple Silicon (Homebrew or a disk image) and for
+// Windows on x64 and ARM64 (an unsigned installer), updated by the app itself.
 
 export const liteCopy = {
   en: {
     meta: {
-      title: "ThinkWatch Lite — A local AI gateway in the macOS menu bar",
+      title: "ThinkWatch Lite — A local AI gateway for macOS and Windows",
       description:
-        "A menu-bar app for individual developers that reports what Claude Code and Codex sessions cost, where each request was routed, and what was sent with it. macOS 12 or later on Apple Silicon, installed with Homebrew or a disk image. MIT License.",
+        "A desktop app for individual developers that reports what Claude Code and Codex sessions cost, where each request was routed, and what was sent with it. macOS 12 or later on Apple Silicon, installed with Homebrew or a disk image; Windows 10 or later on x64 or ARM64, installed with an installer. MIT License.",
     },
     hero: {
       eyebrow: "ThinkWatch Lite · For individual developers",
       titleA: "A local AI gateway ",
-      titleHighlight: "in the macOS menu bar",
+      titleHighlight: "for macOS and Windows",
       sub: "Claude Code, Codex CLI and other clients of the Anthropic, OpenAI and Gemini APIs send their requests to a gateway on your own machine, and Lite shows what each request cost, which upstream served it and why, and what was sent along with it.",
       ctaPrimary: "Install",
       ctaSecondary: "Lite documentation",
@@ -25,7 +21,7 @@ export const liteCopy = {
     },
     status: {
       badge: "Available",
-      body: "macOS 12 or later on Apple Silicon, installed with Homebrew or a disk image, and updated by the app itself. Other platforms follow once the macOS version is complete.",
+      body: "macOS 12 or later on Apple Silicon, installed with Homebrew or a disk image. Windows 10 or later on x64 or ARM64, installed with an installer. On both, the app updates itself.",
     },
     features: {
       eyebrow: "What it shows",
@@ -65,7 +61,7 @@ export const liteCopy = {
     menubar: {
       eyebrow: "Always visible",
       title: "Fifty pixels in the menu bar",
-      body: "Today's cost and the output rate stay in the menu bar; for a subscription account, the quota used and the time until it resets take their place. System notifications report a gateway that stopped forwarding, an upstream that became unreachable, a quota that ran out or a credential that stopped working.",
+      body: "Today's cost and the output rate stay in the menu bar; for a subscription account, the quota used and the time until it resets take their place. On Windows the icon sits in the notification area: hovering over it shows today's tokens and cost, a left click opens the main window and a right click opens the menu. System notifications report a gateway that stopped forwarding, an upstream that became unreachable, a quota that ran out or a credential that stopped working.",
       costAlt: "Menu bar item: today's cost $24.72, output at 47 tokens per second",
       quotaAlt: "Menu bar item: 34% of the subscription quota used, resets in 2 hours",
     },
@@ -73,9 +69,9 @@ export const liteCopy = {
       eyebrow: "Architecture",
       lite: {
         title: "ThinkWatch Lite",
-        body: "A Tauri 2 shell with a React 19 window. Supervises Core and renders the menu bar.",
+        body: "A Tauri 2 shell with a React 19 window. Supervises Core and renders the menu bar or the notification-area menu.",
       },
-      link: "unix socket",
+      link: "local socket",
       core: {
         title: "ThinkWatch Core",
         body: "The gateway: routing, forwarding, and accounting. Lite contains none of this logic.",
@@ -87,12 +83,23 @@ export const liteCopy = {
     },
     install: {
       eyebrow: "Install",
-      title: "One command, gateway included",
+      title: "One download, gateway included",
       brewNote: "The gateway ships inside the app; nothing else needs to be installed.",
+      macLabel: "macOS 12 or later · Apple Silicon",
+      winLabel: "Windows 10 or later · x64 or ARM64",
       dmgTitle: "Or a disk image",
       dmgBody:
         "Download the arm64 disk image from the releases page and check it against the sha256 published beside it. The app is not signed by a registered Apple developer, so macOS quarantines a downloaded copy until the attribute is removed — or until Open Anyway is chosen in System Settings › Privacy & Security.",
       releases: "Releases",
+      winTitle: "Windows installer",
+      winBody:
+        "The installer sets the app up for all users in Program Files, so Windows asks for administrator permission. WebView2 is downloaded during installation if it is missing; Windows 11 already includes it.",
+      winDownload: { x64: "Download for Windows (x64)", arm64: "Download for Windows (ARM64)" },
+      winOther: "Other architecture: ",
+      winOtherLink: { x64: "x64 installer", arm64: "ARM64 installer" },
+      version: "Version",
+      winUnsigned:
+        "The installer is not code-signed. Running it brings up SmartScreen's full-screen warning, “Windows protected your PC”; choose More info, then Run anyway.",
       docs: "Installation guide",
       source: "Build from source",
     },
@@ -104,13 +111,13 @@ export const liteCopy = {
   },
   "zh-CN": {
     meta: {
-      title: "ThinkWatch Lite — 位于 macOS 菜单栏的本地 AI 网关",
+      title: "ThinkWatch Lite — 适用于 macOS 与 Windows 的本地 AI 网关",
       description:
-        "面向个人开发者的菜单栏应用，展示 Claude Code 与 Codex 会话的费用、每个请求的路由，以及随请求发出的内容。支持 macOS 12 及以上版本的 Apple Silicon 机型，可通过 Homebrew 或磁盘映像安装。采用 MIT 许可证。",
+        "面向个人开发者的桌面应用，展示 Claude Code 与 Codex 会话的费用、每个请求的路由，以及随请求发出的内容。支持 macOS 12 及以上版本的 Apple Silicon 机型，可通过 Homebrew 或磁盘映像安装；支持 Windows 10 及以上版本的 x64 与 ARM64 机型，通过安装程序安装。采用 MIT 许可证。",
     },
     hero: {
       eyebrow: "ThinkWatch Lite · 面向个人开发者",
-      titleA: "位于 macOS 菜单栏的",
+      titleA: "适用于 macOS 与 Windows 的",
       titleHighlight: "本地 AI 网关",
       sub: "Claude Code、Codex CLI 等使用 Anthropic、OpenAI、Gemini API 的客户端把请求发给本机上的网关，Lite 展示每个请求的费用、由哪个上游处理及其原因，以及随请求发出的内容。",
       ctaPrimary: "安装",
@@ -120,7 +127,7 @@ export const liteCopy = {
     },
     status: {
       badge: "已发布",
-      body: "支持 macOS 12 及以上版本的 Apple Silicon 机型，可通过 Homebrew 或磁盘映像安装，并由应用自动更新。其他系统将在 macOS 版本完成后适配。",
+      body: "支持 macOS 12 及以上版本的 Apple Silicon 机型，可通过 Homebrew 或磁盘映像安装；支持 Windows 10 及以上版本的 x64 与 ARM64 机型，通过安装程序安装。两个平台均由应用自动更新。",
     },
     features: {
       eyebrow: "界面",
@@ -160,7 +167,7 @@ export const liteCopy = {
     menubar: {
       eyebrow: "常驻可见",
       title: "菜单栏上的五十像素",
-      body: "菜单栏常驻显示今日费用与输出速率；使用订阅账号时，改为显示额度用量与重置倒计时。网关停止转发、上游无法连接、订阅额度用完、凭据失效等情况会发送系统通知。",
+      body: "菜单栏常驻显示今日费用与输出速率；使用订阅账号时，改为显示额度用量与重置倒计时。Windows 上图标位于通知区域：悬停显示今日 token 与费用，左键打开主界面，右键打开菜单。网关停止转发、上游无法连接、订阅额度用完、凭据失效等情况会发送系统通知。",
       costAlt: "菜单栏：今日费用 $24.72，输出速率 47 token/秒",
       quotaAlt: "菜单栏：订阅额度已用 34%，2 小时后重置",
     },
@@ -168,9 +175,9 @@ export const liteCopy = {
       eyebrow: "架构",
       lite: {
         title: "ThinkWatch Lite",
-        body: "Tauri 2 外壳与 React 19 窗口。负责托管 Core 并渲染菜单栏。",
+        body: "Tauri 2 外壳与 React 19 窗口。负责托管 Core 并渲染菜单栏或通知区域菜单。",
       },
-      link: "unix socket",
+      link: "本地 socket",
       core: {
         title: "ThinkWatch Core",
         body: "网关本体，负责路由、转发与成本核算。Lite 不包含这些逻辑。",
@@ -182,12 +189,23 @@ export const liteCopy = {
     },
     install: {
       eyebrow: "安装",
-      title: "一条命令，网关随应用一起装好",
+      title: "一次安装，网关随应用一起装好",
       brewNote: "网关在应用包内，没有第二样东西要装。",
+      macLabel: "macOS 12 及以上 · Apple Silicon",
+      winLabel: "Windows 10 及以上 · x64 或 ARM64",
       dmgTitle: "也可以用磁盘映像",
       dmgBody:
         "从 release 页面下载 arm64 磁盘映像，与同页发布的 sha256 校验值核对。应用未经 Apple 注册开发者签名，macOS 会为下载的副本添加隔离属性，移除该属性后即可打开；也可以在首次打开被拒绝后，在「系统设置 › 隐私与安全性」中点击「仍要打开」。",
       releases: "release 页面",
+      winTitle: "Windows 安装程序",
+      winBody:
+        "安装程序为所有用户安装，装入 Program Files，因此 Windows 会请求管理员权限。缺少 WebView2 时安装程序会自动下载，Windows 11 已自带。",
+      winDownload: { x64: "下载 Windows 版（x64）", arm64: "下载 Windows 版（ARM64）" },
+      winOther: "其他架构：",
+      winOtherLink: { x64: "x64 安装程序", arm64: "ARM64 安装程序" },
+      version: "版本",
+      winUnsigned:
+        "安装程序未经代码签名。运行时 SmartScreen 会显示全屏警告「Windows 已保护你的电脑」，依次点击「更多信息」→「仍要运行」即可继续安装。",
       docs: "安装指南",
       source: "从源码构建",
     },
