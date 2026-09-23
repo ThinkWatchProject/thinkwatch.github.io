@@ -44,11 +44,11 @@ The menu bar shows today's cost and the output rate; for a subscription account 
 
 On Windows the icon sits in the notification area. Hovering over it shows the gateway's state and today's tokens and cost; a left click opens the main window, and a right click opens the same menu, with quota bars written out as text. Notifications are native Windows notifications.
 
-System notifications report when the gateway stops forwarding, an upstream becomes unreachable, a subscription quota runs out or a credential stops working; each kind can be set to a system notification, in-app only, or off.
+System notifications report when the gateway stops forwarding, an upstream becomes unreachable, a subscription quota runs out or a credential stops working. One setting decides how all of them are delivered: as a system notification, in the app only, or not at all.
 
 ## Interface language
 
-The interface is currently in Simplified Chinese; an English interface is in development.
+The interface is available in Simplified Chinese and English. It follows the system language by default; another language can be chosen in Settings.
 
 ## Relationship to ThinkWatch Core
 
