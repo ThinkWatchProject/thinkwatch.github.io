@@ -1,6 +1,6 @@
 ---
 // The /lite product page: ThinkWatch Lite, the desktop app for individual
-// developers on macOS and Windows. Status copy must stay in line with the Lite
+// developers on macOS, Windows and Linux. Status copy must stay in line with the Lite
 // README.
 //
 // Each page shows the interface in its own language: the app ships in both,
@@ -38,6 +38,14 @@ const win = Object.fromEntries(
     { url: assetUrl(`-${arch}-setup.exe`) ?? latestPage, sha: assetUrl(`-${arch}-setup.exe.sha256`) },
   ]),
 ) as Record<(typeof winArchs)[number], { url: string; sha: string | null }>;
+const linuxArchs = ["x86_64", "aarch64"] as const;
+const linux = Object.fromEntries(
+  linuxArchs.map((arch) => [
+    arch,
+    { url: assetUrl(`-${arch}.AppImage`) ?? latestPage, sha: assetUrl(`-${arch}.AppImage.sha256`) },
+  ]),
+) as Record<(typeof linuxArchs)[number], { url: string; sha: string | null }>;
+const installScript = `${latestPage}/download/install.sh`;
 const dmg = { url: assetUrl("-arm64.dmg") ?? latestPage, sha: assetUrl("-arm64.dmg.sha256") };
 const liteVersion = liteRelease?.tag.replace(/^v/, "") ?? null;
 const installDocsHref = localePath(lang, "/docs/lite/install");
@@ -51,7 +59,8 @@ const jsonLd = [
     name: "ThinkWatch Lite",
     description: c.meta.description,
     applicationCategory: "DeveloperApplication",
-    operatingSystem: "macOS 12 or later (Apple Silicon); Windows 10 21H2 or later (x64, ARM64)",
+    operatingSystem:
+      "macOS 12 or later (Apple Silicon); Windows 10 21H2 or later (x64, ARM64); Linux: Ubuntu 22.04, Debian 12, Fedora 36 or later (x86_64, aarch64)",
     url: pageUrl,
     downloadUrl: latestPage,
     license: "https://opensource.org/licenses/MIT",
@@ -305,6 +314,51 @@ const archLabel = { x64: "x64", arm64: "ARM64" } as const;
               </p>
             </div>
           </div>
+          <div class="flex min-w-0 flex-col gap-4" data-install-os="linux">
+            <p class={platformLabel}>{c.install.linuxLabel}</p>
+            <div class="overflow-x-auto rounded-[14px] border border-[var(--color-border-strong)] bg-[var(--color-surface)] p-5 font-mono text-[15px] leading-relaxed sm:p-7 sm:text-base">
+              <code class="flex flex-col gap-2.5 whitespace-nowrap text-[#e6ebf2]">
+                <span><span class="select-none text-[var(--color-dim)]">$ </span>curl -fsSL {installScript} | sh</span>
+              </code>
+            </div>
+            <p class="m-0 text-[15px] leading-relaxed text-[var(--color-muted)] sm:text-base">{c.install.linuxScript}</p>
+            <div class="flex flex-col gap-4 rounded-[14px] border border-[var(--color-border-strong)] p-5 sm:p-7">
+              <h3 class="m-0 text-lg font-semibold sm:text-xl">{c.install.linuxTitle}</h3>
+              <p class="m-0 text-[15px] leading-relaxed text-[var(--color-muted)] sm:text-base">{c.install.linuxBody}</p>
+              <div class="flex flex-col items-start gap-2">
+                {linuxArchs.map((arch) => (
+                  <a href={linux[arch].url} class="dl-button" data-linux-arch={arch} hidden={arch !== "x86_64"}>
+                    {c.install.linuxDownload[arch]}
+                  </a>
+                ))}
+                {linuxArchs.map((arch) => (
+                  <p class="m-0 text-[15px] text-[var(--color-muted)]" data-linux-other={arch} hidden={arch === "x86_64"}>
+                    {c.install.linuxOther}<a href={linux[arch].url} class="font-medium text-[var(--color-brand-1)] transition-colors hover:text-[var(--color-brand-2)]">
+                      {c.install.linuxOtherLink[arch]}
+                    </a>
+                  </p>
+                ))}
+              </div>
+              {liteVersion && linuxArchs.some((arch) => linux[arch].sha) && (
+                <p class="m-0 font-mono text-[13px] text-[var(--color-muted)]">
+                  {c.install.version} {liteVersion}
+                  {linuxArchs.map((arch) =>
+                    linux[arch].sha && (
+                      <Fragment>
+                        {" · "}
+                        <a href={linux[arch].sha} class="text-[var(--color-brand-1)] transition-colors hover:text-[var(--color-brand-2)]">
+                          sha256 ({arch})
+                        </a>
+                      </Fragment>
+                    ),
+                  )}
+                </p>
+              )}
+              <p class="m-0 border-t border-[var(--color-border-strong)] pt-4 text-[15px] leading-relaxed text-[var(--color-muted)] sm:text-base">
+                {c.install.linuxNotes}
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -331,10 +385,12 @@ const archLabel = { x64: "x64", arm64: "ARM64" } as const;
 
 <!--
   Which installer to put first. Windows visitors get the Windows block on top
-  with the button filled; everyone else keeps macOS on top. The architecture
-  comes from User-Agent Client Hints: arm with 64-bit picks ARM64, and every
-  other answer, a failure or a browser without the API picks x64, which is also
-  what the page shows without script.
+  with the button filled, Linux visitors the Linux block; everyone else keeps
+  macOS on top. The architecture comes from User-Agent Client Hints, or for
+  Linux without them (Firefox) from the User-Agent string: arm with 64-bit picks
+  ARM64 / aarch64, and every other answer, a failure or a browser without the
+  API picks x64 / x86_64, which is also what the page shows without script.
+  Android also says "Linux" and is left out.
 -->
 <script is:inline data-lite-download>
   (() => {
@@ -342,19 +398,24 @@ const archLabel = { x64: "x64", arm64: "ARM64" } as const;
     const list = root && root.querySelector("[data-install-list]");
     if (!list) return;
     const ua = navigator.userAgentData;
-    const windows = (ua && ua.platform === "Windows") || /Windows NT/.test(navigator.userAgent);
-    const show = (arch) => {
-      root.dataset.winArch = arch;
-      for (const el of root.querySelectorAll("[data-win-arch]")) el.hidden = el.dataset.winArch !== arch;
-      for (const el of root.querySelectorAll("[data-win-other]")) el.hidden = el.dataset.winOther === arch;
+    const s = navigator.userAgent;
+    const windows = (ua && ua.platform === "Windows") || /Windows NT/.test(s);
+    const linux = !windows && !/Android/.test(s) && ((ua && ua.platform === "Linux") || /Linux/.test(s));
+    const os = windows ? "windows" : linux ? "linux" : "other";
+    const show = (arm) => {
+      const [key, arch] = linux ? ["linux", arm ? "aarch64" : "x86_64"] : ["win", arm ? "arm64" : "x64"];
+      for (const el of root.querySelectorAll(`[data-${key}-arch]`)) el.hidden = el.getAttribute(`data-${key}-arch`) !== arch;
+      for (const el of root.querySelectorAll(`[data-${key}-other]`)) el.hidden = el.getAttribute(`data-${key}-other`) === arch;
     };
-    root.dataset.os = windows ? "windows" : "other";
-    list.prepend(list.querySelector(`[data-install-os="${windows ? "windows" : "mac"}"]`));
-    show("x64");
-    if (!windows || !ua || typeof ua.getHighEntropyValues !== "function") return;
+    root.dataset.os = os;
+    list.prepend(list.querySelector(`[data-install-os="${windows ? "windows" : linux ? "linux" : "mac"}"]`));
+    if (!windows && !linux) return;
+    const guess = linux && /aarch64|arm64/.test(s);
+    show(guess);
+    if (!ua || typeof ua.getHighEntropyValues !== "function") return;
     ua.getHighEntropyValues(["architecture", "bitness"]).then(
-      (v) => show(v.architecture === "arm" && v.bitness === "64" ? "arm64" : "x64"),
-      () => show("x64"),
+      (v) => show(v.architecture === "arm" && v.bitness === "64"),
+      () => show(guess),
     );
   })();
 </script>
@@ -385,10 +446,15 @@ const archLabel = { x64: "x64", arm64: "ARM64" } as const;
   .win-download[hidden] {
     display: none;
   }
+  .dl-button[hidden] {
+    display: none;
+  }
+  [data-os="linux"] [data-linux-arch],
   [data-os="windows"] .win-download {
     background: var(--color-brand-1);
     color: var(--color-bg);
   }
+  [data-os="linux"] [data-linux-arch]:hover,
   [data-os="windows"] .win-download:hover {
     background: var(--color-brand-2);
     border-color: var(--color-brand-2);
