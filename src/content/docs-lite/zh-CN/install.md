@@ -1,6 +1,6 @@
 # 安装与更新
 
-ThinkWatch Lite 支持 macOS 12 及以上版本的 Apple Silicon 机型，以及 Windows 10 及以上版本的 x64 与 ARM64 机型。网关 ThinkWatch Core 在应用包内，没有第二样东西要装。
+ThinkWatch Lite 支持 macOS 12 及以上版本的 Apple Silicon 机型，以及 Windows 10 21H2 及以上版本的 x64 与 ARM64 机型。网关 ThinkWatch Core 在应用包内，没有第二样东西要装。
 
 ## macOS：Homebrew
 
@@ -12,7 +12,7 @@ cask 位于 [thinkwatchproject/tap](https://github.com/ThinkWatchProject/homebre
 
 ## macOS：磁盘映像
 
-从 [release 页面](https://github.com/ThinkWatchProject/ThinkWatch-Lite/releases)下载 `ThinkWatch-Lite-<版本>-arm64.dmg`，与同页发布的 sha256 校验值核对后打开，把 ThinkWatch Lite 拖入「应用程序」。
+从 [最新版本的 release 页面](https://github.com/ThinkWatchProject/ThinkWatch-Lite/releases/latest)下载 `ThinkWatch-Lite-<版本>-arm64.dmg`，与同页发布的 sha256 校验值核对后打开，把 ThinkWatch Lite 拖入「应用程序」。
 
 应用**未经 Apple 注册开发者签名**，macOS 会为下载的副本添加隔离属性并拒绝打开，需先移除该属性：
 
@@ -24,13 +24,13 @@ xattr -dr com.apple.quarantine "/Applications/ThinkWatch Lite.app"
 
 ## Windows
 
-从 [release 页面](https://github.com/ThinkWatchProject/ThinkWatch-Lite/releases)下载与本机架构对应的安装程序：大多数电脑用 `ThinkWatch-Lite-<版本>-x64-setup.exe`，ARM 处理器的电脑用 `ThinkWatch-Lite-<版本>-arm64-setup.exe`。[Lite 页面](/zh-CN/lite#install)提供最新版本两个安装程序的下载链接。下载后与同页发布的 sha256 校验值核对：
+从 [最新版本的 release 页面](https://github.com/ThinkWatchProject/ThinkWatch-Lite/releases/latest)下载与本机架构对应的安装程序：大多数电脑用 `ThinkWatch-Lite-<版本>-x64-setup.exe`，ARM 处理器的电脑用 `ThinkWatch-Lite-<版本>-arm64-setup.exe`。[Lite 页面](/zh-CN/lite#install)提供最新版本两个安装程序的下载链接。下载后与同页发布的 sha256 校验值核对：
 
 ```powershell
 Get-FileHash .\ThinkWatch-Lite-<版本>-x64-setup.exe
 ```
 
-安装程序为所有用户安装，装入 Program Files，因此 Windows 会请求管理员权限。需要 Windows 10 及以上版本；缺少 WebView2 时安装程序会自动下载（Windows 11 已自带）。
+安装程序为所有用户安装，装入 Program Files，因此 Windows 会请求管理员权限。需要 Windows 10 21H2 及以上版本；缺少 WebView2 时安装程序会自动下载（Windows 11 已自带）。
 
 安装程序**未经代码签名**，项目也不会购买证书。运行下载的安装程序时，SmartScreen 会显示全屏的蓝色警告「Windows 已保护你的电脑」，依次点击「更多信息」→「仍要运行」即可继续安装。
 

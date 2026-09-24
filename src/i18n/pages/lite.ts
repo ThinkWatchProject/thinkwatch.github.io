@@ -7,7 +7,7 @@ export const liteCopy = {
     meta: {
       title: "ThinkWatch Lite — A local AI gateway for macOS and Windows",
       description:
-        "A desktop app for individual developers that reports what Claude Code and Codex sessions cost, where each request was routed, and what was sent with it. macOS 12 or later on Apple Silicon, installed with Homebrew or a disk image; Windows 10 or later on x64 or ARM64, installed with an installer. MIT License.",
+        "A desktop app for individual developers that reports what Claude Code and Codex sessions cost, where each request was routed, and what was sent with it. macOS 12 or later on Apple Silicon, installed with Homebrew or a disk image; Windows 10 21H2 or later on x64 or ARM64, installed with an installer. MIT License.",
     },
     hero: {
       eyebrow: "ThinkWatch Lite · For individual developers",
@@ -21,7 +21,7 @@ export const liteCopy = {
     },
     status: {
       badge: "Available",
-      body: "macOS 12 or later on Apple Silicon, installed with Homebrew or a disk image. Windows 10 or later on x64 or ARM64, installed with an installer. On both, the app updates itself.",
+      body: "macOS 12 or later on Apple Silicon, installed with Homebrew or a disk image. Windows 10 21H2 or later on x64 or ARM64, installed with an installer. On both, the app updates itself.",
     },
     features: {
       eyebrow: "What it shows",
@@ -86,11 +86,12 @@ export const liteCopy = {
       title: "One download, gateway included",
       brewNote: "The gateway ships inside the app; nothing else needs to be installed.",
       macLabel: "macOS 12 or later · Apple Silicon",
-      winLabel: "Windows 10 or later · x64 or ARM64",
+      winLabel: "Windows 10 21H2 or later · x64 or ARM64",
       dmgTitle: "Or a disk image",
       dmgBody:
-        "Download the arm64 disk image from the releases page and check it against the sha256 published beside it. The app is not signed by a registered Apple developer, so macOS quarantines a downloaded copy until the attribute is removed — or until Open Anyway is chosen in System Settings › Privacy & Security.",
-      releases: "Releases",
+        "Check it against its sha256 after downloading. The app is not signed by a registered Apple developer, so macOS quarantines a downloaded copy until the attribute is removed — or until Open Anyway is chosen in System Settings › Privacy & Security.",
+      dmgDownload: "Download the disk image (Apple Silicon)",
+      releases: "All releases",
       winTitle: "Windows installer",
       winBody:
         "The installer sets the app up for all users in Program Files, so Windows asks for administrator permission. WebView2 is downloaded during installation if it is missing; Windows 11 already includes it.",
@@ -113,7 +114,7 @@ export const liteCopy = {
     meta: {
       title: "ThinkWatch Lite — 适用于 macOS 与 Windows 的本地 AI 网关",
       description:
-        "面向个人开发者的桌面应用，展示 Claude Code 与 Codex 会话的费用、每个请求的路由，以及随请求发出的内容。支持 macOS 12 及以上版本的 Apple Silicon 机型，可通过 Homebrew 或磁盘映像安装；支持 Windows 10 及以上版本的 x64 与 ARM64 机型，通过安装程序安装。采用 MIT 许可证。",
+        "面向个人开发者的桌面应用，展示 Claude Code 与 Codex 会话的费用、每个请求的路由，以及随请求发出的内容。支持 macOS 12 及以上版本的 Apple Silicon 机型，可通过 Homebrew 或磁盘映像安装；支持 Windows 10 21H2 及以上版本的 x64 与 ARM64 机型，通过安装程序安装。采用 MIT 许可证。",
     },
     hero: {
       eyebrow: "ThinkWatch Lite · 面向个人开发者",
@@ -127,7 +128,7 @@ export const liteCopy = {
     },
     status: {
       badge: "已发布",
-      body: "支持 macOS 12 及以上版本的 Apple Silicon 机型，可通过 Homebrew 或磁盘映像安装；支持 Windows 10 及以上版本的 x64 与 ARM64 机型，通过安装程序安装。两个平台均由应用自动更新。",
+      body: "支持 macOS 12 及以上版本的 Apple Silicon 机型，可通过 Homebrew 或磁盘映像安装；支持 Windows 10 21H2 及以上版本的 x64 与 ARM64 机型，通过安装程序安装。两个平台均由应用自动更新。",
     },
     features: {
       eyebrow: "界面",
@@ -192,11 +193,12 @@ export const liteCopy = {
       title: "一次安装，网关随应用一起装好",
       brewNote: "网关在应用包内，没有第二样东西要装。",
       macLabel: "macOS 12 及以上 · Apple Silicon",
-      winLabel: "Windows 10 及以上 · x64 或 ARM64",
+      winLabel: "Windows 10 21H2 及以上 · x64 或 ARM64",
       dmgTitle: "也可以用磁盘映像",
       dmgBody:
-        "从 release 页面下载 arm64 磁盘映像，与同页发布的 sha256 校验值核对。应用未经 Apple 注册开发者签名，macOS 会为下载的副本添加隔离属性，移除该属性后即可打开；也可以在首次打开被拒绝后，在「系统设置 › 隐私与安全性」中点击「仍要打开」。",
-      releases: "release 页面",
+        "下载后与 sha256 校验值核对。应用未经 Apple 注册开发者签名，macOS 会为下载的副本添加隔离属性，移除该属性后即可打开；也可以在首次打开被拒绝后，在「系统设置 › 隐私与安全性」中点击「仍要打开」。",
+      dmgDownload: "下载磁盘映像（Apple Silicon）",
+      releases: "全部版本",
       winTitle: "Windows 安装程序",
       winBody:
         "安装程序为所有用户安装，装入 Program Files，因此 Windows 会请求管理员权限。缺少 WebView2 时安装程序会自动下载，Windows 11 已自带。",

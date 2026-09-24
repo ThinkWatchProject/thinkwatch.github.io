@@ -4,7 +4,7 @@ ThinkWatch Lite is a desktop app that runs a local AI API gateway from the macOS
 
 Claude Code, Codex CLI and other clients of the Anthropic, OpenAI and Gemini APIs send their requests to the gateway, and Lite shows what each request cost, which upstream served it and why, and what was sent along with it.
 
-> It runs on macOS 12 or later on Apple Silicon and on Windows 10 or later on x64 or ARM64, is [installed](/docs/lite/install) with Homebrew, a disk image or the Windows installer, and updates itself.
+> It runs on macOS 12 or later on Apple Silicon and on Windows 10 21H2 or later on x64 or ARM64, is [installed](/docs/lite/install) with Homebrew, a disk image or the Windows installer, and updates itself.
 
 ## Usage and cost
 

@@ -4,7 +4,7 @@ ThinkWatch Lite 是运行本地 AI API 网关的桌面应用，常驻 macOS 菜�
 
 Claude Code、Codex CLI 等使用 Anthropic、OpenAI、Gemini API 的客户端把请求发给这个网关，Lite 展示每个请求的费用、由哪个上游处理及其原因，以及随请求发出的内容。
 
-> 支持 macOS 12 及以上版本的 Apple Silicon 机型，以及 Windows 10 及以上版本的 x64 与 ARM64 机型，可通过 Homebrew、磁盘映像或 Windows 安装程序[安装](/zh-CN/docs/lite/install)，并由应用自动更新。
+> 支持 macOS 12 及以上版本的 Apple Silicon 机型，以及 Windows 10 21H2 及以上版本的 x64 与 ARM64 机型，可通过 Homebrew、磁盘映像或 Windows 安装程序[安装](/zh-CN/docs/lite/install)，并由应用自动更新。
 
 ## 用量与费用
 
