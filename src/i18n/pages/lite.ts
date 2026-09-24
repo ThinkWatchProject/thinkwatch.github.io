@@ -14,8 +14,7 @@ export const liteCopy = {
       titleA: "A local AI gateway ",
       titleHighlight: "for macOS and Windows",
       sub: "Claude Code, Codex CLI and other clients of the Anthropic, OpenAI and Gemini APIs send their requests to a gateway on your own machine, and Lite shows what each request cost, which upstream served it and why, and what was sent along with it.",
-      ctaPrimary: "Install",
-      ctaSecondary: "Lite documentation",
+      ctaSecondary: "Other platforms and ways to install",
       shotAlt:
         "The usage overview: tokens, cost and requests, a 24-hour trend stacked by model, the leaderboard by model and the cache hit rate",
     },
@@ -121,8 +120,7 @@ export const liteCopy = {
       titleA: "适用于 macOS 与 Windows 的",
       titleHighlight: "本地 AI 网关",
       sub: "Claude Code、Codex CLI 等使用 Anthropic、OpenAI、Gemini API 的客户端把请求发给本机上的网关，Lite 展示每个请求的费用、由哪个上游处理及其原因，以及随请求发出的内容。",
-      ctaPrimary: "安装",
-      ctaSecondary: "Lite 文档",
+      ctaSecondary: "其他平台与安装方式",
       shotAlt:
         "ThinkWatch Lite 的用量概览：token、费用与请求数，按模型分层的 24 小时趋势，模型排行与缓存命中率",
     },
