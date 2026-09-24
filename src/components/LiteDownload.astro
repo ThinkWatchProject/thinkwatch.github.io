@@ -4,8 +4,9 @@
 //
 // The download URLs come from the latest release's asset list at build time
 // (the file names carry the version). Without script, or for a machine there is
-// no build for (Linux, a phone, an Intel Mac), the button leads to the install
-// section instead, which lists every option.
+// no build for (a phone, an Intel Mac), the button leads to the install
+// section instead, which lists every option. So does a Linux machine while the
+// latest release has no AppImage for it.
 import { getLang, localePath } from "~/i18n";
 import { getLatestLiteRelease } from "~/lib/github";
 
@@ -26,8 +27,8 @@ const version = release?.tag.replace(/^v/, "") ?? "";
 const install = `${localePath(lang, "/lite")}#install`;
 
 const t = zh
-  ? { install: "安装", mac: "下载 macOS 版", win: "下载 Windows 版", version: "版本" }
-  : { install: "Install", mac: "Download for macOS", win: "Download for Windows", version: "Version" };
+  ? { install: "安装", mac: "下载 macOS 版", win: "下载 Windows 版", linux: "下载 Linux 版", version: "版本" }
+  : { install: "Install", mac: "Download for macOS", win: "Download for Windows", linux: "Download for Linux", version: "Version" };
 
 const base =
   "inline-flex min-h-11 items-center justify-center rounded-[10px] px-[22px] py-3 text-base font-semibold transition-colors";
@@ -43,8 +44,11 @@ const look =
   data-mac={asset("-arm64.dmg")}
   data-x64={asset("-x64-setup.exe")}
   data-arm64={asset("-arm64-setup.exe")}
+  data-x86_64={asset("-x86_64.AppImage")}
+  data-aarch64={asset("-aarch64.AppImage")}
   data-label-mac={t.mac}
   data-label-win={t.win}
+  data-label-linux={t.linux}
   data-note={version ? `${t.version} ${version}` : ""}
 >
   <a href={install} class:list={[base, look]} data-dl-link>{t.install}</a>
@@ -62,7 +66,10 @@ const look =
   other answer, a failure or a browser without Client Hints. macOS: the one
   Apple Silicon build, unless Client Hints say x86, which means an Intel Mac,
   for which there is no build. An iPad also reports "Macintosh"; touch points
-  tell it apart. Anything else keeps the link to the install section.
+  tell it apart. Linux: the aarch64 AppImage when Client Hints say arm with
+  64-bit (or, without them, the User-Agent says aarch64), x86_64 otherwise;
+  Android also says "Linux" and is left out. Anything else, or a release without
+  the file, keeps the link to the install section.
 -->
 <script is:inline>
   (() => {
@@ -70,7 +77,8 @@ const look =
     const s = navigator.userAgent;
     const windows = (ua && ua.platform === "Windows") || /Windows NT/.test(s);
     const mac = !windows && ((ua && ua.platform === "macOS") || (/Macintosh/.test(s) && navigator.maxTouchPoints < 2));
-    if (!windows && !mac) return;
+    const linux = !windows && !mac && !/Android/.test(s) && ((ua && ua.platform === "Linux") || /Linux/.test(s));
+    if (!windows && !mac && !linux) return;
     const set = (el, url, label, arch) => {
       if (!url) return;
       const a = el.querySelector("[data-dl-link]");
@@ -86,16 +94,19 @@ const look =
       for (const el of document.querySelectorAll("[data-lite-dl]")) {
         if (windows) {
           set(el, arch === "arm64" ? el.dataset.arm64 : el.dataset.x64, el.dataset.labelWin, arch === "arm64" ? "ARM64" : "x64");
+        } else if (linux) {
+          set(el, el.dataset[arch], el.dataset.labelLinux, arch);
         } else if (arch !== "x86") {
           set(el, el.dataset.mac, el.dataset.labelMac, "Apple Silicon");
         }
       }
     };
+    const fallback = windows ? "x64" : linux ? (/aarch64|arm64/.test(s) ? "aarch64" : "x86_64") : "arm";
     const hints = ua && typeof ua.getHighEntropyValues === "function";
-    if (!hints) return apply(windows ? "x64" : "arm");
-    ua.getHighEntropyValues(["architecture", "bitness"]).then(
-      (v) => apply(windows ? (v.architecture === "arm" && v.bitness === "64" ? "arm64" : "x64") : v.architecture),
-      () => apply(windows ? "x64" : "arm"),
-    );
+    if (!hints) return apply(fallback);
+    ua.getHighEntropyValues(["architecture", "bitness"]).then((v) => {
+      const arm64 = v.architecture === "arm" && v.bitness === "64";
+      apply(windows ? (arm64 ? "arm64" : "x64") : linux ? (arm64 ? "aarch64" : "x86_64") : v.architecture);
+    }, () => apply(fallback));
   })();
 </script>

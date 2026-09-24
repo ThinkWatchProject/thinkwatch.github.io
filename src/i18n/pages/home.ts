@@ -9,7 +9,7 @@ export const homeCopy = {
     sub: "ThinkWatch routes, inspects, and meters model requests and MCP tool calls. It is available as a self-hosted server for organizations and as a desktop application for individual developers.",
     doors: {
       teams: { label: "For organizations", name: "ThinkWatch Enterprise", text: "Self-hosted AI API and MCP gateway.", cta: "Deploy ThinkWatch" },
-      machine: { label: "For individual developers", name: "ThinkWatch Lite", text: "Desktop application backed by a local gateway, for macOS on Apple Silicon and Windows on x64 or ARM64.", cta: "Install Lite" },
+      machine: { label: "For individual developers", name: "ThinkWatch Lite", text: "Desktop application backed by a local gateway, for macOS on Apple Silicon, Windows on x64 or ARM64, and Linux on x86_64 or aarch64.", cta: "Install Lite" },
     },
     trace: {
       tag: "Sample trace",
@@ -73,13 +73,13 @@ export const homeCopy = {
     },
     lite: {
       eyebrow: "ThinkWatch Lite · For individual developers",
-      title: "A local AI gateway for macOS and Windows",
+      title: "A local AI gateway for macOS, Windows and Linux",
       points: [
         { t: "Cost reporting", b: "Measured, estimated, and unpriced usage are reported separately and never combined; subscription usage is counted apart." },
         { t: "Request routing", b: "The matched rule, the group, and every upstream attempt, with a dry run for rules before any traffic." },
         { t: "Outbound inspection", b: "Secret redaction, tool-call inspection, and a scan of the client configuration files." },
       ],
-      pills: ["Available", "macOS · Apple Silicon", "Windows · x64 · ARM64", "MIT"],
+      pills: ["Available", "macOS · Apple Silicon", "Windows · x64 · ARM64", "Linux · x86_64 · aarch64", "MIT"],
       shotAlt:
         "The usage overview: tokens, cost and requests, a 24-hour trend stacked by model, the leaderboard by model and the cache hit rate",
       cta: "Explore ThinkWatch Lite",
@@ -104,9 +104,9 @@ export const homeCopy = {
         license: "BSL 1.1, free in production up to 10,000,000 billable tokens and 10,000 MCP tool calls per month",
       },
       lite: {
-        runsAs: "Desktop app in the macOS menu bar or the Windows notification area",
+        runsAs: "Desktop app in the macOS menu bar, the Windows notification area or the Linux system tray",
         builtFor: "Individual developers",
-        status: "Available · macOS on Apple Silicon, Homebrew or disk image · Windows on x64 or ARM64, installer",
+        status: "Available · macOS on Apple Silicon, Homebrew or disk image · Windows on x64 or ARM64, installer · Linux on x86_64 or aarch64, AppImage",
         license: "MIT",
       },
       core: {
@@ -125,7 +125,7 @@ export const homeCopy = {
     sub: "ThinkWatch 对模型请求与 MCP 工具调用进行路由、检查与计量，提供面向组织的自托管服务端，以及面向个人开发者的桌面应用。",
     doors: {
       teams: { label: "面向组织", name: "ThinkWatch 企业版", text: "自托管的 AI API 与 MCP 网关。", cta: "部署 ThinkWatch" },
-      machine: { label: "面向个人开发者", name: "ThinkWatch Lite", text: "基于本地网关的桌面应用，支持 Apple Silicon 机型的 macOS，以及 x64 与 ARM64 机型的 Windows。", cta: "安装 Lite" },
+      machine: { label: "面向个人开发者", name: "ThinkWatch Lite", text: "基于本地网关的桌面应用，支持 Apple Silicon 机型的 macOS、x64 与 ARM64 机型的 Windows，以及 x86_64 与 aarch64 机型的 Linux。", cta: "安装 Lite" },
     },
     trace: {
       tag: "示例追踪",
@@ -189,13 +189,13 @@ export const homeCopy = {
     },
     lite: {
       eyebrow: "ThinkWatch Lite · 面向个人开发者",
-      title: "适用于 macOS 与 Windows 的本地 AI 网关",
+      title: "适用于 macOS、Windows 与 Linux 的本地 AI 网关",
       points: [
         { t: "费用报告", b: "实测、估算与无法计价的用量分别显示，不合并计算；订阅制用量单独统计。" },
         { t: "请求路由", b: "展示每个请求命中的规则、策略组与每一次尝试，改规则前可以先试算。" },
         { t: "出站检查", b: "出站脱敏、工具调用审查，以及客户端配置文件的扫描。" },
       ],
-      pills: ["已发布", "macOS · Apple Silicon", "Windows · x64 · ARM64", "MIT"],
+      pills: ["已发布", "macOS · Apple Silicon", "Windows · x64 · ARM64", "Linux · x86_64 · aarch64", "MIT"],
       shotAlt:
         "ThinkWatch Lite 的用量概览：token、费用与请求数，按模型分层的 24 小时趋势，模型排行与缓存命中率",
       cta: "了解 ThinkWatch Lite",
@@ -220,9 +220,9 @@ export const homeCopy = {
         license: "BSL 1.1，生产环境每月不超过 10,000,000 计费 token 且不超过 10,000 次 MCP 工具调用时免费",
       },
       lite: {
-        runsAs: "桌面应用，常驻 macOS 菜单栏或 Windows 通知区域",
+        runsAs: "桌面应用，常驻 macOS 菜单栏、Windows 通知区域或 Linux 系统托盘",
         builtFor: "个人开发者",
-        status: "已发布 · macOS（Apple Silicon）：Homebrew 或磁盘映像 · Windows（x64、ARM64）：安装程序",
+        status: "已发布 · macOS（Apple Silicon）：Homebrew 或磁盘映像 · Windows（x64、ARM64）：安装程序 · Linux（x86_64、aarch64）：AppImage",
         license: "MIT",
       },
       core: {

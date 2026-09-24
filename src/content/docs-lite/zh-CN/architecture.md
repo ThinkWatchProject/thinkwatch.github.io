@@ -9,12 +9,12 @@ src/              React 19 + Tailwind 4 前端
 src-tauri/        Tauri 2 外壳：托管 core、渲染菜单栏
 ```
 
-- **`src-tauri/`** 为 Tauri 2 外壳，负责托管 ThinkWatch Core，在 macOS 上渲染菜单栏，在 Windows 上渲染通知区域的图标与菜单。在 macOS 上，托管器与 launchd 集成。
+- **`src-tauri/`** 为 Tauri 2 外壳，负责托管 ThinkWatch Core，在 macOS 上渲染菜单栏，在 Windows 上渲染通知区域的图标与菜单，在 Linux 上渲染系统托盘的图标与菜单。在 macOS 上，托管器与 launchd 集成。
 - **`src/`** 为前端，使用 React 19 与 Tailwind 4 编写。
 
 ## Lite 与 Core
 
-网关由 [ThinkWatch Core](/zh-CN/docs/core) 实现。本仓库不包含路由、转发或计量逻辑，Lite 在 macOS 上通过 unix socket、在 Windows 上通过回环端口与 Core 通信，两者都带一个每次启动生成的凭据。
+网关由 [ThinkWatch Core](/zh-CN/docs/core) 实现。本仓库不包含路由、转发或计量逻辑，Lite 在 macOS 与 Linux 上通过 unix socket、在 Windows 上通过回环端口与 Core 通信，两者都带一个每次启动生成的凭据。
 
 路由、转发、成本核算与脱敏均由 Core 负责。涉及数据通路的行为变更，应提交至 [ThinkWatch Core 仓库](https://github.com/ThinkWatchProject/ThinkWatch-Core)。
 
