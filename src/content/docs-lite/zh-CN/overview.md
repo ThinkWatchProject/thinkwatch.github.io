@@ -1,10 +1,10 @@
 # ThinkWatch Lite
 
-ThinkWatch Lite 是运行本地 AI API 网关的桌面应用，常驻 macOS 菜单栏或 Windows 通知区域。它托管 [ThinkWatch Core](/zh-CN/docs/core)，并展示其配置、流量与费用。
+ThinkWatch Lite 是运行本地 AI API 网关的桌面应用，常驻 macOS 菜单栏、Windows 通知区域或 Linux 系统托盘。它托管 [ThinkWatch Core](/zh-CN/docs/core)，并展示其配置、流量与费用。
 
 Claude Code、Codex CLI 等使用 Anthropic、OpenAI、Gemini API 的客户端把请求发给这个网关，Lite 展示每个请求的费用、由哪个上游处理及其原因，以及随请求发出的内容。
 
-> 支持 macOS 12 及以上版本的 Apple Silicon 机型，以及 Windows 10 21H2 及以上版本的 x64 与 ARM64 机型，可通过 Homebrew、磁盘映像或 Windows 安装程序[安装](/zh-CN/docs/lite/install)，并由应用自动更新。
+> 支持 macOS 12 及以上版本的 Apple Silicon 机型、Windows 10 21H2 及以上版本的 x64 与 ARM64 机型，以及 x86_64 与 aarch64 机型的 Linux，可通过 Homebrew、磁盘映像、Windows 安装程序或 AppImage [安装](/zh-CN/docs/lite/install)，并由应用自动更新。
 
 ## 用量与费用
 
@@ -44,6 +44,8 @@ Claude Code、Codex CLI、opencode、Zed 与 Aider 可以在应用内一键指�
 
 Windows 上图标位于通知区域：悬停显示网关状态与今日 token、费用；左键打开主界面，右键打开同一份菜单，其中的额度条改为文字。系统通知为 Windows 原生通知。
 
+Linux 上图标位于系统托盘：点击打开同一份菜单，第一项为「打开主界面」，额度条同样改为文字。系统通知通过桌面环境的通知服务发送。
+
 网关停止转发、上游无法连接、订阅额度用完、凭据失效等情况会发送提醒。提醒方式由一项设置统一决定：系统通知、仅在应用内显示或关闭。
 
 ## 界面语言
@@ -52,7 +54,7 @@ Windows 上图标位于通知区域：悬停显示网关状态与今日 token、
 
 ## 与 ThinkWatch Core 的关系
 
-网关本体在 ThinkWatch Core 中实现。Lite 不包含路由、转发或计费逻辑，在 macOS 上通过 unix socket、在 Windows 上通过回环端口与 Core 通信，两者都带一个每次启动生成的凭据。参见[架构](/zh-CN/docs/lite/architecture)。
+网关本体在 ThinkWatch Core 中实现。Lite 不包含路由、转发或计费逻辑，在 macOS 与 Linux 上通过 unix socket、在 Windows 上通过回环端口与 Core 通信，两者都带一个每次启动生成的凭据。参见[架构](/zh-CN/docs/lite/architecture)。
 
 ## 许可证
 

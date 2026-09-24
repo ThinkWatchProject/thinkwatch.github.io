@@ -1,6 +1,6 @@
 # Install and update
 
-ThinkWatch Lite runs on macOS 12 or later on Apple Silicon, and on Windows 10 21H2 or later on x64 or ARM64. The gateway, ThinkWatch Core, ships inside the app; nothing else needs to be installed.
+ThinkWatch Lite runs on macOS 12 or later on Apple Silicon, on Windows 10 21H2 or later on x64 or ARM64, and on Linux on x86_64 or aarch64. The gateway, ThinkWatch Core, ships inside the app; nothing else needs to be installed.
 
 ## macOS: Homebrew
 
@@ -36,6 +36,31 @@ The installer is **not code-signed**, and no certificate will be bought. Running
 
 Once installed, the app's icon sits in the notification area: a left click opens the main window, a right click opens the menu. Data is kept in `%APPDATA%\ThinkWatch`.
 
+## Linux
+
+```bash
+curl -fsSL https://github.com/ThinkWatchProject/ThinkWatch-Lite/releases/latest/download/install.sh | sh
+```
+
+The script downloads the AppImage for the machine's architecture, checks it against the sha256 published beside it, installs it as `~/Applications/ThinkWatch-Lite.AppImage` and starts it. Running it again installs the latest version over the old one.
+
+To install by hand, download `ThinkWatch-Lite-<version>-x86_64.AppImage` or `ThinkWatch-Lite-<version>-aarch64.AppImage` from the [latest release](https://github.com/ThinkWatchProject/ThinkWatch-Lite/releases/latest), check it with `sha256sum -c`, allow it to run (`chmod +x`, or Properties › "Allow executing file as program" in the file manager) and open it. Keep it in a folder the user can write to, such as `~/Applications`, so that it can update itself. The first launch adds ThinkWatch Lite to the application menu, together with its icon and the `thinkwatch://` link handler. Only the AppImage is published; there are no deb, rpm, Flatpak or Snap packages.
+
+It requires Ubuntu 22.04, Debian 12, Fedora 36 or a later distribution of the same generation. An AppImage mounts itself with FUSE and needs `fusermount3` from the fuse3 package (libfuse2 is not needed). Most desktops already include it; otherwise:
+
+| Distribution | Command |
+|---|---|
+| Ubuntu, Debian | `sudo apt install fuse3` |
+| Fedora | `sudo dnf install fuse3` |
+| Arch Linux | `sudo pacman -S fuse3` |
+| openSUSE | `sudo zypper install fuse3` |
+
+The tray icon relies on AppIndicator. Ubuntu ships the GNOME extension for it; Fedora's stock GNOME does not, and the AppIndicator extension has to be added. Without a tray, closing the window leaves the gateway running, and launching ThinkWatch Lite again from the application menu brings the window back. Data is kept in `~/.thinkwatch`.
+
+- **Blank window on NVIDIA under Wayland:** start the app with `WEBKIT_DISABLE_DMABUF_RENDERER=1`.
+- **Other machines cannot reach the gateway:** firewalld, which Fedora enables by default, blocks the gateway port until it is opened; Settings shows a note about this when the gateway listens on the local network.
+- **Uninstalling:** use Settings › Full uninstall first, which restores the clients the app configured and removes the autostart and application menu entries, then delete the AppImage.
+
 ## Updates
 
 The app looks for a new version shortly after it starts and once a day after that, reading a small manifest and nothing else. It can be turned off in Settings.
@@ -45,6 +70,8 @@ When there is one, a small window says so, and what happens next depends on how 
 **Downloaded from the releases page on macOS:** one press on the install button does the rest. The app downloads the update, verifies it against a key compiled into itself, waits for the requests the gateway is serving to finish — up to three minutes — then replaces itself and restarts. A task in the middle of a response is not cut off to make room for the update.
 
 **On Windows:** the same single press. The app downloads the new installer, verifies it against the key compiled into itself, waits for the requests in flight to finish in the same way, then runs the installer, and the new version starts once it is done. The app is installed for all users, so Windows asks for administrator permission at every update; declining leaves the current version running.
+
+**On Linux:** the same single press, and no password is asked for. The app downloads the new AppImage, verifies it against the key compiled into itself, waits for the requests in flight to finish, then replaces its own file and restarts. The AppImage has to be in a folder the user can write to.
 
 **Installed with Homebrew:** the window gives the command to copy, and the app never replaces itself. Homebrew records which version it put in `/Applications`; an app that overwrote it would be written back over by the next `brew upgrade`. The window only appears once the tap carries the new version, so the command always has something to install:
 

@@ -135,8 +135,8 @@ export const products: Product[] = [
     base: "/docs/lite",
     editUrl: "https://github.com/ThinkWatchProject/thinkwatch.github.io/tree/main/src/content/docs-lite",
     tagline: {
-      en: "The desktop app for a local AI API gateway on macOS and Windows: what it shows, how to install it, and how it is built.",
-      "zh-CN": "运行本地 AI API 网关的 macOS 与 Windows 桌面应用：它展示什么、怎么安装、怎么构建。",
+      en: "The desktop app for a local AI API gateway on macOS, Windows and Linux: what it shows, how to install it, and how it is built.",
+      "zh-CN": "运行本地 AI API 网关的 macOS、Windows 与 Linux 桌面应用：它展示什么、怎么安装、怎么构建。",
     },
     docs: [
       overview(),
@@ -146,8 +146,8 @@ export const products: Product[] = [
         locales: both,
         group: "getStarted",
         summary: {
-          en: "Homebrew, a disk image or the Windows installer, the quarantine attribute and SmartScreen, and how updates reach each kind of install.",
-          "zh-CN": "通过 Homebrew、磁盘映像或 Windows 安装程序安装，隔离属性与 SmartScreen 的处理，以及各种安装方式如何更新。",
+          en: "Homebrew, a disk image, the Windows installer or the Linux AppImage, the quarantine attribute and SmartScreen, and how updates reach each kind of install.",
+          "zh-CN": "通过 Homebrew、磁盘映像、Windows 安装程序或 Linux AppImage 安装，隔离属性与 SmartScreen 的处理，以及各种安装方式如何更新。",
         },
       },
       {
@@ -156,8 +156,8 @@ export const products: Product[] = [
         locales: both,
         group: "getStarted",
         summary: {
-          en: "Run a development build with pnpm tauri dev, or build a macOS bundle or a Windows installer.",
-          "zh-CN": "用 pnpm tauri dev 运行开发版本，或打包 macOS 应用与 Windows 安装程序。",
+          en: "Run a development build with pnpm tauri dev, or build a macOS bundle, a Windows installer or a Linux AppImage.",
+          "zh-CN": "用 pnpm tauri dev 运行开发版本，或打包 macOS 应用、Windows 安装程序与 Linux AppImage。",
         },
       },
       {
@@ -166,8 +166,8 @@ export const products: Product[] = [
         locales: both,
         group: "concepts",
         summary: {
-          en: "A Tauri 2 shell and a React 19 frontend that supervise Core and communicate with it over a unix socket on macOS and a loopback port on Windows.",
-          "zh-CN": "Tauri 2 外壳与 React 19 前端，负责托管 Core，在 macOS 上通过 unix socket、在 Windows 上通过回环端口与其通信。",
+          en: "A Tauri 2 shell and a React 19 frontend that supervise Core and communicate with it over a unix socket on macOS and Linux and a loopback port on Windows.",
+          "zh-CN": "Tauri 2 外壳与 React 19 前端，负责托管 Core，在 macOS 与 Linux 上通过 unix socket、在 Windows 上通过回环端口与其通信。",
         },
       },
       {

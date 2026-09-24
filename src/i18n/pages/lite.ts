@@ -1,18 +1,19 @@
 // Copy for the /lite product page. Facts come from the ThinkWatch Lite README:
 // released for macOS on Apple Silicon (Homebrew or a disk image) and for
-// Windows on x64 and ARM64 (an unsigned installer), updated by the app itself.
+// Windows on x64 and ARM64 (an unsigned installer) and for Linux on x86_64 and
+// aarch64 (an AppImage), updated by the app itself.
 
 export const liteCopy = {
   en: {
     meta: {
-      title: "ThinkWatch Lite — A local AI gateway for macOS and Windows",
+      title: "ThinkWatch Lite — A local AI gateway for macOS, Windows and Linux",
       description:
-        "A desktop app for individual developers that reports what Claude Code and Codex sessions cost, where each request was routed, and what was sent with it. macOS 12 or later on Apple Silicon, installed with Homebrew or a disk image; Windows 10 21H2 or later on x64 or ARM64, installed with an installer. MIT License.",
+        "A desktop app for individual developers that reports what Claude Code and Codex sessions cost, where each request was routed, and what was sent with it. macOS 12 or later on Apple Silicon, installed with Homebrew or a disk image; Windows 10 21H2 or later on x64 or ARM64, installed with an installer; Linux on x86_64 or aarch64, as an AppImage. MIT License.",
     },
     hero: {
       eyebrow: "ThinkWatch Lite · For individual developers",
       titleA: "A local AI gateway ",
-      titleHighlight: "for macOS and Windows",
+      titleHighlight: "for macOS, Windows and Linux",
       sub: "Claude Code, Codex CLI and other clients of the Anthropic, OpenAI and Gemini APIs send their requests to a gateway on your own machine, and Lite shows what each request cost, which upstream served it and why, and what was sent along with it.",
       ctaSecondary: "Other platforms and ways to install",
       shotAlt:
@@ -20,7 +21,7 @@ export const liteCopy = {
     },
     status: {
       badge: "Available",
-      body: "macOS 12 or later on Apple Silicon, installed with Homebrew or a disk image. Windows 10 21H2 or later on x64 or ARM64, installed with an installer. On both, the app updates itself.",
+      body: "macOS 12 or later on Apple Silicon, installed with Homebrew or a disk image. Windows 10 21H2 or later on x64 or ARM64, installed with an installer. Ubuntu 22.04, Debian 12, Fedora 36 or later on x86_64 or aarch64, as an AppImage. On every platform, the app updates itself.",
     },
     features: {
       eyebrow: "What it shows",
@@ -60,7 +61,7 @@ export const liteCopy = {
     menubar: {
       eyebrow: "Always visible",
       title: "Fifty pixels in the menu bar",
-      body: "Today's cost and the output rate stay in the menu bar; for a subscription account, the quota used and the time until it resets take their place. On Windows the icon sits in the notification area: hovering over it shows today's tokens and cost, a left click opens the main window and a right click opens the menu. System notifications report a gateway that stopped forwarding, an upstream that became unreachable, a quota that ran out or a credential that stopped working.",
+      body: "Today's cost and the output rate stay in the menu bar; for a subscription account, the quota used and the time until it resets take their place. On Windows the icon sits in the notification area: hovering over it shows today's tokens and cost, a left click opens the main window and a right click opens the menu. On Linux it sits in the system tray and opens the same menu. System notifications report a gateway that stopped forwarding, an upstream that became unreachable, a quota that ran out or a credential that stopped working.",
       costAlt: "Menu bar item: today's cost $24.72, output at 47 tokens per second",
       quotaAlt: "Menu bar item: 34% of the subscription quota used, resets in 2 hours",
     },
@@ -68,7 +69,7 @@ export const liteCopy = {
       eyebrow: "Architecture",
       lite: {
         title: "ThinkWatch Lite",
-        body: "A Tauri 2 shell with a React 19 window. Supervises Core and renders the menu bar or the notification-area menu.",
+        body: "A Tauri 2 shell with a React 19 window. Supervises Core and renders the menu bar, or the tray menu on Windows and Linux.",
       },
       link: "local socket",
       core: {
@@ -100,6 +101,17 @@ export const liteCopy = {
       version: "Version",
       winUnsigned:
         "The installer is not code-signed. Running it brings up SmartScreen's full-screen warning, “Windows protected your PC”; choose More info, then Run anyway.",
+      linuxLabel: "Ubuntu 22.04, Debian 12, Fedora 36 or later · x86_64 or aarch64",
+      linuxScript:
+        "The script downloads the AppImage for the machine's architecture, checks its sha256, installs it as ~/Applications/ThinkWatch-Lite.AppImage and starts it.",
+      linuxTitle: "Or the AppImage",
+      linuxBody:
+        "Check it against its sha256, allow it to run (chmod +x, or “Allow executing file as program” in the file manager's Properties) and open it. Keep it in a folder the user can write to, such as ~/Applications, so that it can update itself. The first launch adds ThinkWatch Lite to the application menu.",
+      linuxDownload: { x86_64: "Download the AppImage (x86_64)", aarch64: "Download the AppImage (aarch64)" },
+      linuxOther: "Other architecture: ",
+      linuxOtherLink: { x86_64: "x86_64 AppImage", aarch64: "aarch64 AppImage" },
+      linuxNotes:
+        "The AppImage needs fusermount3 from the fuse3 package, which most desktops include. The tray icon on GNOME needs the AppIndicator extension, which Ubuntu ships and Fedora does not; without it, launching the app again from the application menu brings the window back.",
       docs: "Installation guide",
       source: "Build from source",
     },
@@ -111,13 +123,13 @@ export const liteCopy = {
   },
   "zh-CN": {
     meta: {
-      title: "ThinkWatch Lite — 适用于 macOS 与 Windows 的本地 AI 网关",
+      title: "ThinkWatch Lite — 适用于 macOS、Windows 与 Linux 的本地 AI 网关",
       description:
-        "面向个人开发者的桌面应用，展示 Claude Code 与 Codex 会话的费用、每个请求的路由，以及随请求发出的内容。支持 macOS 12 及以上版本的 Apple Silicon 机型，可通过 Homebrew 或磁盘映像安装；支持 Windows 10 21H2 及以上版本的 x64 与 ARM64 机型，通过安装程序安装。采用 MIT 许可证。",
+        "面向个人开发者的桌面应用，展示 Claude Code 与 Codex 会话的费用、每个请求的路由，以及随请求发出的内容。支持 macOS 12 及以上版本的 Apple Silicon 机型，可通过 Homebrew 或磁盘映像安装；支持 Windows 10 21H2 及以上版本的 x64 与 ARM64 机型，通过安装程序安装；支持 x86_64 与 aarch64 机型的 Linux，以 AppImage 发布。采用 MIT 许可证。",
     },
     hero: {
       eyebrow: "ThinkWatch Lite · 面向个人开发者",
-      titleA: "适用于 macOS 与 Windows 的",
+      titleA: "适用于 macOS、Windows 与 Linux 的",
       titleHighlight: "本地 AI 网关",
       sub: "Claude Code、Codex CLI 等使用 Anthropic、OpenAI、Gemini API 的客户端把请求发给本机上的网关，Lite 展示每个请求的费用、由哪个上游处理及其原因，以及随请求发出的内容。",
       ctaSecondary: "其他平台与安装方式",
@@ -126,7 +138,7 @@ export const liteCopy = {
     },
     status: {
       badge: "已发布",
-      body: "支持 macOS 12 及以上版本的 Apple Silicon 机型，可通过 Homebrew 或磁盘映像安装；支持 Windows 10 21H2 及以上版本的 x64 与 ARM64 机型，通过安装程序安装。两个平台均由应用自动更新。",
+      body: "支持 macOS 12 及以上版本的 Apple Silicon 机型，可通过 Homebrew 或磁盘映像安装；支持 Windows 10 21H2 及以上版本的 x64 与 ARM64 机型，通过安装程序安装；支持 Ubuntu 22.04、Debian 12、Fedora 36 及以上版本的 x86_64 与 aarch64 机型，以 AppImage 发布。各平台均由应用自动更新。",
     },
     features: {
       eyebrow: "界面",
@@ -166,7 +178,7 @@ export const liteCopy = {
     menubar: {
       eyebrow: "常驻可见",
       title: "菜单栏上的五十像素",
-      body: "菜单栏常驻显示今日费用与输出速率；使用订阅账号时，改为显示额度用量与重置倒计时。Windows 上图标位于通知区域：悬停显示今日 token 与费用，左键打开主界面，右键打开菜单。网关停止转发、上游无法连接、订阅额度用完、凭据失效等情况会发送系统通知。",
+      body: "菜单栏常驻显示今日费用与输出速率；使用订阅账号时，改为显示额度用量与重置倒计时。Windows 上图标位于通知区域：悬停显示今日 token 与费用，左键打开主界面，右键打开菜单。Linux 上图标位于系统托盘，点击打开同一份菜单。网关停止转发、上游无法连接、订阅额度用完、凭据失效等情况会发送系统通知。",
       costAlt: "菜单栏：今日费用 $24.72，输出速率 47 token/秒",
       quotaAlt: "菜单栏：订阅额度已用 34%，2 小时后重置",
     },
@@ -174,7 +186,7 @@ export const liteCopy = {
       eyebrow: "架构",
       lite: {
         title: "ThinkWatch Lite",
-        body: "Tauri 2 外壳与 React 19 窗口。负责托管 Core 并渲染菜单栏或通知区域菜单。",
+        body: "Tauri 2 外壳与 React 19 窗口。负责托管 Core 并渲染菜单栏，或 Windows 与 Linux 上的托盘菜单。",
       },
       link: "本地 socket",
       core: {
@@ -206,6 +218,17 @@ export const liteCopy = {
       version: "版本",
       winUnsigned:
         "安装程序未经代码签名。运行时 SmartScreen 会显示全屏警告「Windows 已保护你的电脑」，依次点击「更多信息」→「仍要运行」即可继续安装。",
+      linuxLabel: "Ubuntu 22.04、Debian 12、Fedora 36 及以上 · x86_64 或 aarch64",
+      linuxScript:
+        "脚本下载与本机架构对应的 AppImage，核对 sha256 后安装为 ~/Applications/ThinkWatch-Lite.AppImage 并启动。",
+      linuxTitle: "也可以直接下载 AppImage",
+      linuxBody:
+        "下载后与 sha256 校验值核对，允许其执行（chmod +x，或在文件管理器的「属性」中勾选「允许作为程序执行文件」），然后打开。AppImage 应放在当前用户可写的目录中（如 ~/Applications），以便自动更新。首次启动时会把 ThinkWatch Lite 添加到应用菜单。",
+      linuxDownload: { x86_64: "下载 AppImage（x86_64）", aarch64: "下载 AppImage（aarch64）" },
+      linuxOther: "其他架构：",
+      linuxOtherLink: { x86_64: "x86_64 AppImage", aarch64: "aarch64 AppImage" },
+      linuxNotes:
+        "AppImage 需要 fuse3 软件包中的 fusermount3，多数桌面系统已自带。GNOME 上的托盘图标需要 AppIndicator 扩展，Ubuntu 已自带，Fedora 没有；没有托盘时，从应用菜单再次启动即可重新打开窗口。",
       docs: "安装指南",
       source: "从源码构建",
     },
