@@ -37,6 +37,7 @@ const win = Object.fromEntries(
     { url: assetUrl(`-${arch}-setup.exe`) ?? latestPage, sha: assetUrl(`-${arch}-setup.exe.sha256`) },
   ]),
 ) as Record<(typeof winArchs)[number], { url: string; sha: string | null }>;
+const dmg = { url: assetUrl("-arm64.dmg") ?? latestPage, sha: assetUrl("-arm64.dmg.sha256") };
 const liteVersion = liteRelease?.tag.replace(/^v/, "") ?? null;
 const docsHref = localePath(lang, "/docs/lite");
 const installDocsHref = localePath(lang, "/docs/lite/install");
@@ -50,9 +51,9 @@ const jsonLd = [
     name: "ThinkWatch Lite",
     description: c.meta.description,
     applicationCategory: "DeveloperApplication",
-    operatingSystem: "macOS 12 or later (Apple Silicon); Windows 10 or later (x64, ARM64)",
+    operatingSystem: "macOS 12 or later (Apple Silicon); Windows 10 21H2 or later (x64, ARM64)",
     url: pageUrl,
-    downloadUrl: releases,
+    downloadUrl: latestPage,
     license: "https://opensource.org/licenses/MIT",
     offers: { "@type": "Offer", price: 0, priceCurrency: "USD" },
     author: {
@@ -253,6 +254,14 @@ const archLabel = { x64: "x64", arm64: "ARM64" } as const;
             <div class="flex flex-col gap-2 rounded-[14px] border border-[var(--color-border-strong)] p-5 sm:p-7">
               <h3 class="m-0 text-lg font-semibold sm:text-xl">{c.install.dmgTitle}</h3>
               <p class="m-0 text-[15px] leading-relaxed text-[var(--color-muted)] sm:text-base">{c.install.dmgBody}</p>
+              <a href={dmg.url} class="dl-button self-start">{c.install.dmgDownload}</a>
+              {liteVersion && dmg.sha && (
+                <p class="m-0 font-mono text-[13px] text-[var(--color-muted)]">
+                  {c.install.version} {liteVersion}
+                  {" · "}
+                  <a href={dmg.sha} class="text-[var(--color-brand-1)] transition-colors hover:text-[var(--color-brand-2)]">sha256</a>
+                </p>
+              )}
               <a href={releases} target="_blank" rel="noopener" class:list={[textLink, "self-start"]}>
                 {c.install.releases}
                 <svg class="ml-1.5 h-4 w-4" viewBox="0 0 16 16" fill="none" aria-hidden="true">
@@ -355,8 +364,10 @@ const archLabel = { x64: "x64", arm64: "ARM64" } as const;
 </script>
 
 <style>
-  /* The Windows download button: filled for Windows visitors, outlined for the
-     rest, whose own installer is the one above it. */
+  /* Download buttons. Outlined by default; the Windows one is filled for Windows
+     visitors, whose installer that is. The disk image stays outlined: on a Mac
+     the Homebrew command above it is the first choice. */
+  .dl-button,
   .win-download {
     display: inline-flex;
     min-height: 2.75rem;
@@ -370,6 +381,7 @@ const archLabel = { x64: "x64", arm64: "ARM64" } as const;
     color: var(--color-brand-1);
     transition: background-color 150ms, color 150ms, border-color 150ms;
   }
+  .dl-button:hover,
   .win-download:hover {
     border-color: var(--color-brand-2);
     color: var(--color-brand-2);
