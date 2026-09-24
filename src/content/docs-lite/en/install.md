@@ -1,6 +1,6 @@
 # Install and update
 
-ThinkWatch Lite runs on macOS 12 or later on Apple Silicon, and on Windows 10 or later on x64 or ARM64. The gateway, ThinkWatch Core, ships inside the app; nothing else needs to be installed.
+ThinkWatch Lite runs on macOS 12 or later on Apple Silicon, and on Windows 10 21H2 or later on x64 or ARM64. The gateway, ThinkWatch Core, ships inside the app; nothing else needs to be installed.
 
 ## macOS: Homebrew
 
@@ -12,7 +12,7 @@ The cask lives in [thinkwatchproject/tap](https://github.com/ThinkWatchProject/h
 
 ## macOS: disk image
 
-Download `ThinkWatch-Lite-<version>-arm64.dmg` from the [releases page](https://github.com/ThinkWatchProject/ThinkWatch-Lite/releases), check it against the sha256 published beside it, open it, and drag ThinkWatch Lite into Applications.
+Download `ThinkWatch-Lite-<version>-arm64.dmg` from the [latest release](https://github.com/ThinkWatchProject/ThinkWatch-Lite/releases/latest), check it against the sha256 published beside it, open it, and drag ThinkWatch Lite into Applications.
 
 The app is **not signed by a registered Apple developer**, so macOS quarantines a downloaded copy and refuses to open it until the attribute is removed:
 
@@ -24,13 +24,13 @@ Without a terminal, the same takes one click after the first refused launch: Sys
 
 ## Windows
 
-Download the installer for the machine's architecture from the [releases page](https://github.com/ThinkWatchProject/ThinkWatch-Lite/releases): `ThinkWatch-Lite-<version>-x64-setup.exe` for most PCs, or `ThinkWatch-Lite-<version>-arm64-setup.exe` for a PC with an ARM processor. The [Lite page](/lite#install) links to both installers of the latest release. Check the download against the sha256 published beside it:
+Download the installer for the machine's architecture from the [latest release](https://github.com/ThinkWatchProject/ThinkWatch-Lite/releases/latest): `ThinkWatch-Lite-<version>-x64-setup.exe` for most PCs, or `ThinkWatch-Lite-<version>-arm64-setup.exe` for a PC with an ARM processor. The [Lite page](/lite#install) links to both installers of the latest release. Check the download against the sha256 published beside it:
 
 ```powershell
 Get-FileHash .\ThinkWatch-Lite-<version>-x64-setup.exe
 ```
 
-The installer sets the app up for all users in Program Files, so Windows asks for administrator permission. It requires Windows 10 or later; WebView2, which Windows 11 already includes, is downloaded during installation if it is missing.
+The installer sets the app up for all users in Program Files, so Windows asks for administrator permission. It requires Windows 10 21H2 or later; WebView2, which Windows 11 already includes, is downloaded during installation if it is missing.
 
 The installer is **not code-signed**, and no certificate will be bought. Running a downloaded copy brings up SmartScreen's full-screen warning, "Windows protected your PC". Choose **More info**, then **Run anyway**.
 
