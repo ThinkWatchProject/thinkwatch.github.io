@@ -3,6 +3,7 @@
 // language; see LitePage.astro.
 import { getLang, localePath } from "~/i18n";
 import { homeCopy } from "~/i18n/pages/home";
+import LiteDownload from "~/components/LiteDownload.astro";
 
 const lang = getLang(Astro);
 const c = homeCopy[lang].lite;
@@ -39,6 +40,9 @@ const zh = lang === "zh-CN";
         <span class="rounded-full border border-[var(--color-border-strong)] px-3 py-1.5 text-[13px] text-[#cbd5e1]">{pill}</span>
       ))}
     </div>
-    <a href={localePath(lang, "/lite")} class="inline-flex min-h-11 items-center self-start text-[17px] font-medium text-[var(--color-brand-1)] hover:text-[var(--color-brand-2)]">{c.cta}</a>
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:gap-5">
+      <LiteDownload />
+      <a href={localePath(lang, "/lite")} class="inline-flex min-h-11 items-center self-start text-[17px] font-medium text-[var(--color-brand-1)] hover:text-[var(--color-brand-2)]">{c.cta}</a>
+    </div>
   </div>
 </section>
