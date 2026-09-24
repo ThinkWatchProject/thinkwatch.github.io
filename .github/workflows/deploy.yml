@@ -25,6 +25,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # The sitemap's <lastmod> and the dates on doc pages come from git
+          # history; a shallow clone would leave them out.
+          fetch-depth: 0
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -42,6 +46,10 @@ jobs:
 
       - name: Build site
         run: pnpm build
+        env:
+          # The build reads versions and releases from the GitHub API; with a
+          # token the anonymous rate limit does not apply.
+          GITHUB_TOKEN: ${{ github.token }}
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

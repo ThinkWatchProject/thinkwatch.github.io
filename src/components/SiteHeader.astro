@@ -38,6 +38,9 @@ const currentDocMeta = currentDocSlug
   : undefined;
 
 function targetPath(target: Lang): string {
+  // The 404 page stands in for every missing path, and /404 itself does not
+  // exist: its language choice leads to the home page.
+  if (/^\/404(\.html)?\/?$/.test(cleanPath)) return "/";
   if (currentDocMeta && !currentDocMeta.locales.includes(target)) {
     // Untranslated doc: fall back to that product's docs home.
     return docMatch?.[1] ? `/docs/${docMatch[1]}` : "/docs";

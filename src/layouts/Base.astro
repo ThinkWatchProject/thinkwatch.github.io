@@ -2,70 +2,40 @@
 import "~/styles/global.css";
 import { getLang, t } from "~/i18n";
 import Seo from "~/components/Seo.astro";
-import { getLatestRelease } from "~/lib/github";
+import { ogImageAlt, ogImagePath, type OgCard } from "~/lib/og";
+import type { JsonLd } from "~/lib/structured-data";
 
 const lang = getLang(Astro);
 const i18n = t(lang);
 
-type JsonLdItem = Record<string, unknown>;
-
 interface Props {
-  title?: string;
-  description?: string;
-  ogImage?: string;
-  /** Suppress the default SoftwareApplication JSON-LD (e.g. on subpages where it would be redundant). */
-  noJsonLd?: boolean;
-  /** Additional JSON-LD items to inject (BreadcrumbList, TechArticle, etc.) */
-  jsonLd?: JsonLdItem[];
+  title: string;
+  description: string;
+  /** The Open Graph card shared for this page (see src/lib/og.ts); the site card by default */
+  ogCard?: OgCard;
+  /** "article" for documentation pages */
+  ogType?: "website" | "article";
+  /** For articles: first published and last changed, as ISO timestamps */
+  published?: string;
+  modified?: string;
+  /** Keep the page out of search results (the 404 page) */
+  noindex?: boolean;
+  /** JSON-LD items describing the page (a product, an article, breadcrumbs). The Organization is added on every page. */
+  jsonLd?: JsonLd[];
 }
 
-const DEFAULT_TITLE =
-  lang === "zh-CN"
-    ? "ThinkWatch — 面向组织与个人开发者的 AI 网关"
-    : "ThinkWatch — AI Gateways for Organizations and Individual Developers";
-
-const DEFAULT_DESCRIPTION =
-  lang === "zh-CN"
-    ? "ThinkWatch 提供对模型请求与 MCP 工具调用进行路由、检查和计量的 AI 网关，包括面向组织的自托管服务端 ThinkWatch 和面向个人开发者的桌面应用 ThinkWatch Lite，二者均基于 MIT 许可证的 ThinkWatch Core。"
-    : "ThinkWatch provides AI gateways that route, inspect, and meter model requests and MCP tool calls: ThinkWatch, a self-hosted server for organizations, and ThinkWatch Lite, a desktop application for individual developers. Both are built on the MIT-licensed ThinkWatch Core.";
-
 const {
-  title = DEFAULT_TITLE,
-  description = DEFAULT_DESCRIPTION,
-  ogImage = "/og-image.png",
-  noJsonLd = false,
-  jsonLd: extraJsonLd = [],
+  title,
+  description,
+  ogCard = "home",
+  ogType = "website",
+  published,
+  modified,
+  noindex = false,
+  jsonLd = [],
 } = Astro.props;
 
-const canonical = new URL(Astro.url.pathname, Astro.site).toString();
-const latestRelease = await getLatestRelease();
-
-const softwareApplicationLd: JsonLdItem = {
-  "@context": "https://schema.org",
-  "@type": "SoftwareApplication",
-  name: "ThinkWatch",
-  applicationCategory: "DeveloperApplication",
-  operatingSystem: "Linux, macOS, Windows (via Docker / Kubernetes)",
-  description,
-  url: "https://thinkwat.ch",
-  downloadUrl: "https://github.com/ThinkWatchProject/ThinkWatch",
-  ...(latestRelease ? { softwareVersion: latestRelease.replace(/^v/, "") } : {}),
-  license: "https://github.com/ThinkWatchProject/ThinkWatch/blob/main/LICENSE",
-  offers: {
-    "@type": "Offer",
-    price: "0",
-    priceCurrency: "USD",
-  },
-  author: {
-    "@type": "Organization",
-    name: "ThinkWatch Project",
-    url: "https://github.com/ThinkWatchProject",
-  },
-};
-
-const jsonLd: JsonLdItem[] = noJsonLd
-  ? [...extraJsonLd]
-  : [softwareApplicationLd, ...extraJsonLd];
+const canonical = noindex ? undefined : new URL(Astro.url.pathname, Astro.site).toString();
 
 const GA_ID = "G-R8LX8NCHCJ";
 ---
@@ -117,9 +87,14 @@ const GA_ID = "G-R8LX8NCHCJ";
     <Seo
       title={title}
       description={description}
-      ogImage={ogImage}
       canonical={canonical}
       lang={lang}
+      ogImage={ogImagePath(ogCard)}
+      ogImageAlt={ogImageAlt(ogCard, lang)}
+      ogType={ogType}
+      published={published}
+      modified={modified}
+      noindex={noindex}
       jsonLd={jsonLd}
     />
 

@@ -1,0 +1,201 @@
+---
+// The /changelog page: the releases of ThinkWatch Enterprise, ThinkWatch Lite
+// and ThinkWatch Core, newest first, filterable by product. Each release shows
+// its version and date and links to its page on GitHub; the Enterprise releases
+// written up on this site also show their notes. Copy lives in
+// src/i18n/pages/changelog.ts, the list in src/lib/changelog.ts.
+import { render } from "astro:content";
+import Base from "~/layouts/Base.astro";
+import SiteHeader from "~/components/SiteHeader.astro";
+import SiteFooter from "~/components/SiteFooter.astro";
+import { getLang } from "~/i18n";
+import { changelogCopy } from "~/i18n/pages/changelog";
+import { getChangelog, releaseProductName } from "~/lib/changelog";
+import { breadcrumbs, webPage } from "~/lib/structured-data";
+
+const lang = getLang(Astro);
+const c = changelogCopy[lang];
+const entries = await getChangelog(lang);
+
+const jsonLd = [
+  webPage(lang, "/changelog", c.meta.title, c.meta.description),
+  breadcrumbs(lang, "/changelog", c.meta.breadcrumbHome, c.meta.breadcrumbPage),
+];
+
+const typeStyles: Record<string, string> = {
+  release: "border-brand-1/40 bg-brand-1/10 text-brand-1",
+  feature: "border-white/15 bg-white/5 text-[var(--color-text)]",
+  fix: "border-emerald-500/30 bg-emerald-500/10 text-emerald-300",
+  security: "border-accent/40 bg-accent/10 text-accent",
+};
+
+// Release times are UTC; format them in UTC so the date does not depend on where the site is built.
+const fmt = new Intl.DateTimeFormat(c.dateLocale, { ...c.dateFormat, timeZone: "UTC" });
+
+const filters = [
+  { id: "all", label: c.all },
+  ...(["enterprise", "lite", "core"] as const).map((id) => ({ id, label: c.filters[id] })),
+];
+---
+
+<Base title={c.meta.title} description={c.meta.description} jsonLd={jsonLd}>
+  <SiteHeader />
+  <main id="main" class="container-page py-16 md:py-24">
+    <header class="max-w-3xl">
+      <div class="font-mono text-xs sm:text-[13px] uppercase tracking-[0.08em] text-[var(--color-brand-1)] reveal">
+        {c.eyebrow}
+      </div>
+      <h1 class="font-display mt-5 text-4xl leading-[1.1] md:text-[56px] reveal" style="animation-delay: 80ms">
+        {c.titleA}<span class="text-gradient">{c.titleHighlight}</span>
+      </h1>
+      <p class="mt-5 text-lg leading-relaxed text-[var(--color-muted)] reveal" style="animation-delay: 160ms">
+        {c.intro}<a href="/changelog.xml" class="text-[var(--color-text)] underline underline-offset-4 hover:text-[var(--color-brand-1)]">{c.rss}</a>{c.introEnd}
+      </p>
+    </header>
+
+    <div class="mt-10 md:mt-12 flex flex-wrap gap-2" role="group" aria-label={c.filterLabel}>
+      {filters.map((f, i) => (
+        <button
+          type="button"
+          data-filter-btn={f.id}
+          aria-pressed={i === 0 ? "true" : "false"}
+          class="filter-btn inline-flex min-h-11 items-center rounded-full border border-white/15 px-4 text-sm font-medium text-[var(--color-muted)] transition-colors hover:border-white/30 hover:text-[var(--color-text)]"
+        >
+          {f.label}
+        </button>
+      ))}
+    </div>
+
+    <ol class="changelog-list mt-12 max-w-3xl" data-filter="all">
+      {entries.map(async (entry) => {
+        const name = releaseProductName(entry.product, lang);
+        const notes = entry.notes;
+        const Content = notes ? (await render(notes)).Content : null;
+        return (
+          <li
+            id={entry.id}
+            data-product={entry.product}
+            class:list={[
+              "changelog-item relative scroll-mt-24 border-l border-[var(--color-border-strong)] pl-6 sm:pl-8",
+              notes ? "pb-12" : "pb-6",
+            ]}
+          >
+            <a
+              href={`#${entry.id}`}
+              class="timeline-dot absolute -left-[5px] top-2 size-2.5 rounded-full bg-[var(--color-brand-1)] ring-4 ring-[var(--color-bg)] transition-transform hover:scale-125"
+              aria-label={`${c.linkTo} ${name} ${entry.tag}`}
+            ></a>
+
+            <div class:list={["flex flex-wrap items-center gap-x-3 gap-y-2", notes && "mb-3"]}>
+              <span class="rounded-full border border-[var(--color-border-strong)] px-2 py-0.5 text-xs text-[var(--color-muted)]">
+                {name}
+              </span>
+              <span class="font-mono text-sm text-[var(--color-text)]">{entry.tag}</span>
+              {notes && (
+                <span class={`rounded-full border px-2 py-0.5 text-[10px] uppercase tracking-wider ${typeStyles[notes.data.type]}`}>
+                  {notes.data.type}
+                </span>
+              )}
+              <time class="text-xs text-[var(--color-dim)]" datetime={entry.date.toISOString()}>
+                {fmt.format(entry.date)}
+              </time>
+              {entry.url && (
+                <a
+                  href={entry.url}
+                  target="_blank"
+                  rel="noopener"
+                  class="inline-flex items-center text-xs text-[var(--color-brand-1)] transition-colors hover:text-[var(--color-brand-2)]"
+                >
+                  {c.github}
+                  <svg class="ml-1 h-3 w-3" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                    <path d="M5 11L11 5M6 5h5v5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+                  </svg>
+                </a>
+              )}
+            </div>
+
+            {notes && (
+              <Fragment>
+                <h2 class="mb-3 text-2xl font-semibold tracking-tight text-[var(--color-text)]">{notes.data.title}</h2>
+
+                {notes.data.highlights && (
+                  <ul class="mb-4 space-y-1.5 text-sm text-[var(--color-muted)]">
+                    {notes.data.highlights.map((h) => (
+                      <li class="flex gap-2">
+                        <span class="text-[var(--color-brand-1)]" aria-hidden="true">›</span>
+                        <span>{h}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+
+                <div class="prose prose-invert prose-sm max-w-none text-[var(--color-muted)]">
+                  {Content && <Content />}
+                </div>
+              </Fragment>
+            )}
+          </li>
+        );
+      })}
+    </ol>
+  </main>
+  <SiteFooter />
+</Base>
+
+<style>
+  .changelog-list[data-filter="enterprise"] .changelog-item:not([data-product="enterprise"]),
+  .changelog-list[data-filter="lite"]       .changelog-item:not([data-product="lite"]),
+  .changelog-list[data-filter="core"]       .changelog-item:not([data-product="core"]) {
+    display: none;
+  }
+
+  /* Active filter pill: teal. Driven by aria-pressed so the script only flips that attribute. */
+  .filter-btn[aria-pressed="true"] {
+    border-color: var(--color-brand-1);
+    background: color-mix(in oklab, var(--color-brand-1) 14%, transparent);
+    color: var(--color-brand-1);
+  }
+  .filter-btn:focus-visible {
+    outline: 2px solid var(--color-brand-1);
+    outline-offset: 2px;
+  }
+
+  /* The dot is 10px; give its anchor a larger invisible hit area. */
+  .timeline-dot::before {
+    content: "";
+    position: absolute;
+    inset: -14px;
+  }
+
+  /* Section headings inside changelog body */
+  .changelog-item :global(.prose h2) {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-brand-1);
+    margin-top: 1.25rem;
+    margin-bottom: 0.375rem;
+  }
+  .changelog-item :global(.prose h2:first-child) {
+    margin-top: 0;
+  }
+
+  /* Hide the # anchor link appended by rehypeAutolinkHeadings */
+  .changelog-item :global(.heading-anchor) {
+    display: none;
+  }
+</style>
+
+<script>
+  const list = document.querySelector(".changelog-list");
+  const buttons = document.querySelectorAll<HTMLButtonElement>("[data-filter-btn]");
+  if (list && buttons.length) {
+    buttons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        list.setAttribute("data-filter", btn.dataset.filterBtn || "all");
+        buttons.forEach((b) => b.setAttribute("aria-pressed", b === btn ? "true" : "false"));
+      });
+    });
+  }
+</script>

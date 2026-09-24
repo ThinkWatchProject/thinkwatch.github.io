@@ -1,20 +1,20 @@
+import fallbackReleases from "../data/releases.json";
+import { fetchReleases, githubHeaders, productRepos, type Product, type Release } from "./releases.mjs";
+
+export type { Product, Release };
+
 // Cached at module level so all imports during one build share the same fetch.
 // Falls back to null on failure (rate limit, network, repo missing) so callers
 // can render a graceful "—" instead of breaking the build.
 
-const REPO = "ThinkWatchProject/ThinkWatch";
+const REPO = productRepos.enterprise;
 
 let cached: number | null | undefined;
 
 export async function getStarCount(): Promise<number | null> {
   if (cached !== undefined) return cached;
   try {
-    const res = await fetch(`https://api.github.com/repos/${REPO}`, {
-      headers: {
-        "User-Agent": "thinkwatch-site-build",
-        Accept: "application/vnd.github+json",
-      },
-    });
+    const res = await fetch(`https://api.github.com/repos/${REPO}`, { headers: githubHeaders() });
     if (!res.ok) {
       cached = null;
       return null;
@@ -42,12 +42,7 @@ let releaseCached: string | null | undefined;
 
 export async function getLatestRelease(): Promise<string | null> {
   if (releaseCached !== undefined) return releaseCached;
-  const headers: Record<string, string> = {
-    "User-Agent": "thinkwatch-site-build",
-    Accept: "application/vnd.github+json",
-  };
-  const token = typeof process !== "undefined" ? process.env.GITHUB_TOKEN : undefined;
-  if (token) headers.Authorization = `Bearer ${token}`;
+  const headers = githubHeaders();
   try {
     const res = await fetch(`https://api.github.com/repos/${REPO}/releases/latest`, { headers });
     if (res.ok) {
@@ -79,44 +74,61 @@ export async function getLatestRelease(): Promise<string | null> {
   }
 }
 
-// The latest ThinkWatch Lite release, fetched once per build. Asset names carry
-// the version, so the download links are taken from this release's own asset
-// list rather than built from a pattern. Returns null on any failure; the Lite
-// page then links to the releases page instead.
-export interface LiteRelease {
+// The latest release of ThinkWatch Lite or ThinkWatch Core, fetched once per
+// build. Asset names carry the version, so download links are taken from the
+// release's own asset list rather than built from a pattern. Returns null on
+// any failure; the pages then link to the releases page instead and leave the
+// version out.
+export interface ProductRelease {
   tag: string;
   /** Asset file name → its download URL */
   assets: Record<string, string>;
 }
 
-let liteCached: LiteRelease | null | undefined;
+const latestCache = new Map<string, Promise<ProductRelease | null>>();
 
-export async function getLatestLiteRelease(): Promise<LiteRelease | null> {
-  if (liteCached !== undefined) return liteCached;
-  const headers: Record<string, string> = {
-    "User-Agent": "thinkwatch-site-build",
-    Accept: "application/vnd.github+json",
-  };
-  const token = typeof process !== "undefined" ? process.env.GITHUB_TOKEN : undefined;
-  if (token) headers.Authorization = `Bearer ${token}`;
-  try {
-    const res = await fetch("https://api.github.com/repos/ThinkWatchProject/ThinkWatch-Lite/releases/latest", {
-      headers,
-    });
-    if (!res.ok) {
-      liteCached = null;
-      return null;
-    }
-    const data: { tag_name?: string; assets?: { name?: string; browser_download_url?: string }[] } =
-      await res.json();
-    const assets: Record<string, string> = {};
-    for (const a of data.assets ?? []) {
-      if (a.name && a.browser_download_url) assets[a.name] = a.browser_download_url;
-    }
-    liteCached = data.tag_name ? { tag: data.tag_name, assets } : null;
-    return liteCached;
-  } catch {
-    liteCached = null;
-    return null;
+function getLatestProductRelease(repo: string): Promise<ProductRelease | null> {
+  let cached = latestCache.get(repo);
+  if (!cached) {
+    cached = (async () => {
+      try {
+        const res = await fetch(`https://api.github.com/repos/${repo}/releases/latest`, { headers: githubHeaders() });
+        if (!res.ok) return null;
+        const data: { tag_name?: string; assets?: { name?: string; browser_download_url?: string }[] } =
+          await res.json();
+        const assets: Record<string, string> = {};
+        for (const a of data.assets ?? []) {
+          if (a.name && a.browser_download_url) assets[a.name] = a.browser_download_url;
+        }
+        return data.tag_name ? { tag: data.tag_name, assets } : null;
+      } catch {
+        return null;
+      }
+    })();
+    latestCache.set(repo, cached);
   }
+  return cached;
+}
+
+export const getLatestLiteRelease = () => getLatestProductRelease(productRepos.lite);
+export const getLatestCoreRelease = () => getLatestProductRelease(productRepos.core);
+
+// Every published release of the three products, newest first, for the
+// changelog and its feed. A product whose releases cannot be fetched falls back
+// to src/data/releases.json (refreshed with `pnpm releases`), so a rate limit or
+// an offline build still lists what was known when that file was written.
+let releasesCached: Promise<Release[]> | undefined;
+
+export function getReleases(): Promise<Release[]> {
+  releasesCached ??= Promise.all(
+    (Object.keys(productRepos) as Product[]).map((product) =>
+      fetchReleases(product).catch((err: unknown) => {
+        console.warn(
+          `[releases] ${err instanceof Error ? err.message : err}; using src/data/releases.json for ${product}`,
+        );
+        return (fallbackReleases as Release[]).filter((r) => r.product === product);
+      }),
+    ),
+  ).then((lists) => lists.flat().sort((a, b) => b.date.localeCompare(a.date)));
+  return releasesCached;
 }
