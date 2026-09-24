@@ -5,6 +5,7 @@
 //
 // Each page shows the interface in its own language: the app ships in both,
 // and a screenshot of the other one says little to the reader.
+import LiteDownload from "~/components/LiteDownload.astro";
 import Base from "~/layouts/Base.astro";
 import SiteHeader from "~/components/SiteHeader.astro";
 import SiteFooter from "~/components/SiteFooter.astro";
@@ -39,7 +40,6 @@ const win = Object.fromEntries(
 ) as Record<(typeof winArchs)[number], { url: string; sha: string | null }>;
 const dmg = { url: assetUrl("-arm64.dmg") ?? latestPage, sha: assetUrl("-arm64.dmg.sha256") };
 const liteVersion = liteRelease?.tag.replace(/^v/, "") ?? null;
-const docsHref = localePath(lang, "/docs/lite");
 const installDocsHref = localePath(lang, "/docs/lite/install");
 const sourceDocsHref = localePath(lang, "/docs/lite/run-from-source");
 const pageUrl = new URL(Astro.url.pathname, Astro.site).toString();
@@ -111,15 +111,11 @@ const archLabel = { x64: "x64", arm64: "ARM64" } as const;
           <p class="reveal m-0 max-w-[36rem] text-[17px] leading-relaxed text-[#cbd5e1] sm:text-xl sm:leading-normal" style={delay(2)}>
             {c.hero.sub}
           </p>
-          <div class="reveal mt-1 flex flex-col gap-3 sm:mt-2 sm:flex-row sm:items-center sm:gap-5" style={delay(3)}>
+          <div class="reveal mt-1 flex flex-col gap-3 sm:mt-2 sm:flex-row sm:items-start sm:gap-5" style={delay(3)}>
+            {/* 直接下载这台机器要的那个文件；认不出、或者没有对应的包时去安装一节 */}
+            <LiteDownload />
             <a
               href="#install"
-              class="inline-flex min-h-11 items-center justify-center rounded-[10px] bg-[var(--color-brand-1)] px-[22px] py-3 text-base font-semibold text-[var(--color-bg)] transition-colors hover:bg-[var(--color-brand-2)]"
-            >
-              {c.hero.ctaPrimary}
-            </a>
-            <a
-              href={docsHref}
               class="inline-flex min-h-11 items-center justify-center text-base font-medium text-[var(--color-brand-1)] transition-colors hover:text-[var(--color-brand-2)] sm:justify-start"
             >
               {c.hero.ctaSecondary}

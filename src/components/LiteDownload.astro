@@ -1,0 +1,101 @@
+---
+// One button that downloads Lite for the visitor's machine, so getting the app
+// takes one click instead of home → Lite page → install section → button.
+//
+// The download URLs come from the latest release's asset list at build time
+// (the file names carry the version). Without script, or for a machine there is
+// no build for (Linux, a phone, an Intel Mac), the button leads to the install
+// section instead, which lists every option.
+import { getLang, localePath } from "~/i18n";
+import { getLatestLiteRelease } from "~/lib/github";
+
+interface Props {
+  /** Filled for the page's main action; outlined where it sits beside other actions. */
+  variant?: "solid" | "outline";
+}
+const { variant = "solid" } = Astro.props;
+const lang = getLang(Astro);
+const zh = lang === "zh-CN";
+
+const release = await getLatestLiteRelease();
+const asset = (suffix: string) => {
+  const name = Object.keys(release?.assets ?? {}).find((n) => n.endsWith(suffix));
+  return name ? release!.assets[name] : "";
+};
+const version = release?.tag.replace(/^v/, "") ?? "";
+const install = `${localePath(lang, "/lite")}#install`;
+
+const t = zh
+  ? { install: "安装", mac: "下载 macOS 版", win: "下载 Windows 版", version: "版本" }
+  : { install: "Install", mac: "Download for macOS", win: "Download for Windows", version: "Version" };
+
+const base =
+  "inline-flex min-h-11 items-center justify-center rounded-[10px] px-[22px] py-3 text-base font-semibold transition-colors";
+const look =
+  variant === "solid"
+    ? "bg-[var(--color-brand-1)] text-[var(--color-bg)] hover:bg-[var(--color-brand-2)]"
+    : "border border-[var(--color-brand-1)] text-[var(--color-brand-1)] hover:border-[var(--color-brand-2)] hover:text-[var(--color-brand-2)]";
+---
+
+<div
+  class="relative flex flex-col items-start gap-2"
+  data-lite-dl
+  data-mac={asset("-arm64.dmg")}
+  data-x64={asset("-x64-setup.exe")}
+  data-arm64={asset("-arm64-setup.exe")}
+  data-label-mac={t.mac}
+  data-label-win={t.win}
+  data-note={version ? `${t.version} ${version}` : ""}
+>
+  <a href={install} class:list={[base, look]} data-dl-link>{t.install}</a>
+  {/* 版本那一行比按钮宽。**并排的时候不让它占宽度**，悬在按钮下面 —— 占着的
+      话它会把整列撑宽，旁边那个链接就被推出去老远 */}
+  <p
+    class="m-0 font-mono text-[13px] text-[var(--color-muted)] sm:absolute sm:left-0 sm:top-full sm:mt-2 sm:whitespace-nowrap"
+    data-dl-note
+    hidden
+  ></p>
+</div>
+
+<!--
+  Which file. Windows: ARM64 when the browser says arm with 64-bit, x64 for every
+  other answer, a failure or a browser without Client Hints. macOS: the one
+  Apple Silicon build, unless Client Hints say x86, which means an Intel Mac,
+  for which there is no build. An iPad also reports "Macintosh"; touch points
+  tell it apart. Anything else keeps the link to the install section.
+-->
+<script is:inline>
+  (() => {
+    const ua = navigator.userAgentData;
+    const s = navigator.userAgent;
+    const windows = (ua && ua.platform === "Windows") || /Windows NT/.test(s);
+    const mac = !windows && ((ua && ua.platform === "macOS") || (/Macintosh/.test(s) && navigator.maxTouchPoints < 2));
+    if (!windows && !mac) return;
+    const set = (el, url, label, arch) => {
+      if (!url) return;
+      const a = el.querySelector("[data-dl-link]");
+      const note = el.querySelector("[data-dl-note]");
+      a.href = url;
+      a.textContent = label;
+      if (el.dataset.note) {
+        note.textContent = `${el.dataset.note} · ${arch}`;
+        note.hidden = false;
+      }
+    };
+    const apply = (arch) => {
+      for (const el of document.querySelectorAll("[data-lite-dl]")) {
+        if (windows) {
+          set(el, arch === "arm64" ? el.dataset.arm64 : el.dataset.x64, el.dataset.labelWin, arch === "arm64" ? "ARM64" : "x64");
+        } else if (arch !== "x86") {
+          set(el, el.dataset.mac, el.dataset.labelMac, "Apple Silicon");
+        }
+      }
+    };
+    const hints = ua && typeof ua.getHighEntropyValues === "function";
+    if (!hints) return apply(windows ? "x64" : "arm");
+    ua.getHighEntropyValues(["architecture", "bitness"]).then(
+      (v) => apply(windows ? (v.architecture === "arm" && v.bitness === "64" ? "arm64" : "x64") : v.architecture),
+      () => apply(windows ? "x64" : "arm"),
+    );
+  })();
+</script>
