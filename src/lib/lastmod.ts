@@ -1,12 +1,15 @@
 // When a page last changed, taken from git history: the last commit that
 // touched any of the files the page is built from. Used for <lastmod> in the
-// sitemap and for the dates on documentation articles.
+// sitemap and for the dates on documentation articles. Pages that show a
+// product's latest release also change when it is released; the sitemap adds
+// those dates (see pageReleases() and astro.config.mjs).
 //
 // A build time would claim that every page changed on every build, so without
 // history (a shallow clone, no git) the dates are left out instead. The deploy
 // workflow checks out the full history for this.
 import { execFileSync } from "node:child_process";
 import { existsSync } from "node:fs";
+import type { Product } from "./releases.mjs";
 
 interface FileDates {
   /** First commit that touched the file, as an ISO timestamp */
@@ -63,15 +66,19 @@ export function firstPublished(paths: string[]): string | undefined {
   return datesOf(paths).reduce<string | undefined>((min, d) => (!min || d.first < min ? d.first : min), undefined);
 }
 
+/** A page's language and its path without the language prefix, e.g. "/zh-CN/lite" → "/lite" */
+function splitPath(pathname: string): { lang: "en" | "zh-CN"; path: string } {
+  const zh = pathname === "/zh-CN" || pathname.startsWith("/zh-CN/");
+  return { lang: zh ? "zh-CN" : "en", path: zh ? pathname.slice("/zh-CN".length) || "/" : pathname };
+}
+
 /**
  * The files a page is built from, by its path (without a trailing slash). Only
  * the content counts: the page's copy and its own components, not the shared
  * layout, header or footer.
  */
 export function pageSources(pathname: string): string[] {
-  const zh = pathname === "/zh-CN" || pathname.startsWith("/zh-CN/");
-  const lang = zh ? "zh-CN" : "en";
-  const path = zh ? pathname.slice("/zh-CN".length) || "/" : pathname;
+  const { lang, path } = splitPath(pathname);
   // A doc without a translation is shown in English.
   const doc = (dir: string, slug: string) => {
     const own = `src/content/${dir}/${lang}/${slug}.md`;
@@ -80,7 +87,16 @@ export function pageSources(pathname: string): string[] {
 
   switch (path) {
     case "/":
-      return ["src/components/pages/HomePage.astro", "src/components/home", "src/i18n/pages/home.ts"];
+      return [
+        "src/components/pages/HomePage.astro",
+        "src/components/home",
+        "src/i18n/pages/home.ts",
+        // Components the home sections are built from.
+        "src/components/hero",
+        "src/components/ui/Terminal.tsx",
+        "src/components/mocks",
+        "src/components/LiteDownload.astro",
+      ];
     case "/lite":
       return ["src/components/pages/LitePage.astro", "src/i18n/pages/lite.ts", "src/components/LiteDownload.astro", "public/lite"];
     case "/core":
@@ -105,5 +121,28 @@ export function pageSources(pathname: string): string[] {
   if (product) return doc(`docs-${product[1]}`, product[2] ?? "overview");
   const guide = path.match(/^\/docs\/([^/]+)$/);
   if (guide) return doc("docs", guide[1]);
+  return [];
+}
+
+/**
+ * The products whose releases a page is built from, by its path (without a
+ * trailing slash): the version and downloads of the latest release, in the
+ * page itself or in its structured data, or the list of releases on the
+ * changelog. A release changes such a page as much as a commit does.
+ */
+export function pageReleases(pathname: string): Product[] {
+  switch (splitPath(pathname).path) {
+    case "/":
+      // The Lite download button, and the structured data of all three products.
+      return ["enterprise", "lite", "core"];
+    case "/lite":
+      return ["lite"];
+    case "/core":
+      return ["core"];
+    case "/thinkwatch":
+      return ["enterprise"];
+    case "/changelog":
+      return ["enterprise", "lite", "core"];
+  }
   return [];
 }

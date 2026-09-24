@@ -80,6 +80,8 @@ const filters = [
               notes ? "pb-12" : "pb-6",
             ]}
           >
+            {/* The anchor the release had while the page listed Enterprise alone (#v0.4.0). */}
+            {entry.legacyId && <span id={entry.legacyId} class="absolute top-0 scroll-mt-24" aria-hidden="true"></span>}
             <a
               href={`#${entry.id}`}
               class="timeline-dot absolute -left-[5px] top-2 size-2.5 rounded-full bg-[var(--color-brand-1)] ring-4 ring-[var(--color-bg)] transition-transform hover:scale-125"

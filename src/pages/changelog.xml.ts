@@ -9,6 +9,11 @@ import { getChangelog, releaseProductName } from "~/lib/changelog";
 export async function GET(context: APIContext) {
   const entries = await getChangelog("en");
   const page = new URL("/changelog/", context.site).href;
+  // The releases written up here (Enterprise v0.1.0–v0.4.0) were in the feed
+  // before it covered every product, linked as /changelog#v0.4.0. They keep
+  // that link, and with it their guid, so that readers do not show them again
+  // as new items; the page still has those anchors.
+  const writtenUp = new URL("/changelog", context.site).href;
 
   return rss({
     title: "ThinkWatch release notes",
@@ -22,7 +27,7 @@ export async function GET(context: APIContext) {
       return {
         title: notes ? `${name} ${entry.tag} — ${notes.title}` : `${name} ${entry.tag}`,
         pubDate: entry.date,
-        link: notes ? `${page}#${entry.id}` : entry.url!,
+        link: notes ? `${writtenUp}#${entry.legacyId!}` : entry.url!,
         ...(notes ? { description: notes.highlights?.join(" · ") ?? notes.title } : {}),
         categories: [name],
       };

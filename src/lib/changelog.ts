@@ -10,6 +10,12 @@ import { getReleases, type Product } from "~/lib/github";
 export interface ChangelogEntry {
   /** Anchor on the changelog page, e.g. "core-v0.47.0" */
   id: string;
+  /**
+   * The anchor an Enterprise release had while the page listed Enterprise
+   * alone, e.g. "v0.4.0". The page keeps it, so that links made back then and
+   * the feed items published back then still lead to the release.
+   */
+  legacyId?: string;
   product: Product;
   /** The git tag, e.g. "v0.47.0" */
   tag: string;
@@ -34,20 +40,32 @@ export async function getChangelog(lang: Lang): Promise<ChangelogEntry[]> {
   }
 
   const releases = await getReleases();
-  const entries: ChangelogEntry[] = releases.map((r) => ({
-    id: `${r.product}-${r.tag}`,
-    product: r.product,
-    tag: r.tag,
-    date: new Date(r.date),
-    url: r.url,
-    notes: r.product === "enterprise" ? notes.get(r.tag.replace(/^v/, "")) : undefined,
-  }));
+  const entries: ChangelogEntry[] = releases.map((r) => {
+    const enterprise = r.product === "enterprise";
+    const version = r.tag.replace(/^v/, "");
+    return {
+      id: `${r.product}-${r.tag}`,
+      legacyId: enterprise ? `v${version}` : undefined,
+      product: r.product,
+      tag: r.tag,
+      date: new Date(r.date),
+      url: r.url,
+      notes: enterprise ? notes.get(version) : undefined,
+    };
+  });
 
   // Notes for Enterprise versions that were never published as GitHub releases.
   const onGitHub = new Set(releases.filter((r) => r.product === "enterprise").map((r) => r.tag.replace(/^v/, "")));
   for (const [version, entry] of notes) {
     if (entry && !onGitHub.has(version)) {
-      entries.push({ id: `enterprise-v${version}`, product: "enterprise", tag: `v${version}`, date: entry.data.date, notes: entry });
+      entries.push({
+        id: `enterprise-v${version}`,
+        legacyId: `v${version}`,
+        product: "enterprise",
+        tag: `v${version}`,
+        date: entry.data.date,
+        notes: entry,
+      });
     }
   }
 

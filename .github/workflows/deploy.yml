@@ -10,10 +10,10 @@ on:
   schedule:
     - cron: "41 */3 * * *"
 
-permissions:
-  contents: read
-  pages: write
-  id-token: write
+# Each job gets only what it needs (below). The build runs third-party code from
+# npm with GITHUB_TOKEN in its environment, so it may only read; the Pages
+# permissions belong to the deploy job alone.
+permissions: {}
 
 concurrency:
   group: pages
@@ -22,6 +22,8 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -59,6 +61,9 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      pages: write # to deploy to GitHub Pages
+      id-token: write # to verify that the deployment comes from this workflow
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

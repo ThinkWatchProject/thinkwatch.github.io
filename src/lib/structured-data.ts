@@ -179,8 +179,6 @@ export async function coreLd(lang: Lang): Promise<JsonLd[]> {
   const binaries = Object.entries(release?.assets ?? {})
     .filter(([name]) => name.startsWith("twcore-") && !/\.(sha256|tar\.gz)$/.test(name))
     .map(([, href]) => href);
-  // "twcore · a complete, self-contained gateway binary" → the part after the name.
-  const binary = c.hero.cardTitle.split(" · ").pop() ?? c.hero.cardTitle;
   return [
     {
       "@context": CONTEXT,
@@ -200,7 +198,7 @@ export async function coreLd(lang: Lang): Promise<JsonLd[]> {
       "@type": "SoftwareApplication",
       "@id": ids.twcore,
       name: "twcore",
-      description: binary.charAt(0).toUpperCase() + binary.slice(1),
+      description: c.meta.twcoreDescription,
       applicationCategory: "DeveloperApplication",
       operatingSystem: "Linux, macOS, Windows",
       processorRequirements: processors[lang],

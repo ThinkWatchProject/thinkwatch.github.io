@@ -5,7 +5,7 @@ import sitemap, { ChangeFreqEnum } from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 import rehypeSlug from 'rehype-slug';
 import rehypeAutolinkHeadings from 'rehype-autolink-headings';
-import { lastModified, pageSources } from './src/lib/lastmod.ts';
+import { lastModified, pageReleases, pageSources } from './src/lib/lastmod.ts';
 import { getReleases } from './src/lib/github.ts';
 
 // https://astro.build/config
@@ -62,10 +62,15 @@ export default defineConfig({
           item.changefreq = ChangeFreqEnum.MONTHLY;
         }
 
-        // When the page's own files last changed in git; the changelog also
-        // changes whenever a product is released. Left out when unknown.
+        // When the page's own files last changed in git, or the latest release
+        // of a product the page shows came out, whichever is later. Left out
+        // when unknown.
         const dates = [lastModified(pageSources(pathname))];
-        if (isChangelog) dates.push((await getReleases())[0]?.date);
+        const products = pageReleases(pathname);
+        if (products.length) {
+          // Newest first: the first match is the latest release among them.
+          dates.push((await getReleases()).find((r) => products.includes(r.product))?.date);
+        }
         const times = dates.flatMap((d) => (d ? [Date.parse(d)] : []));
         if (times.length) item.lastmod = new Date(Math.max(...times)).toISOString();
         return item;

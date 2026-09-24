@@ -39,12 +39,15 @@ const site = Astro.site ?? new URL("https://thinkwat.ch");
 const abs = (path: string) => new URL(path.endsWith("/") ? path : `${path}/`, site).toString();
 const pageUrl = new URL(Astro.url.pathname, site).toString();
 
+// Home › Documentation › product › doc. ThinkWatch Enterprise's docs home is
+// the documentation home itself (/docs), so its guides skip the product step
+// rather than list the same page twice.
 const crumbs = [
   { name: zh ? "首页" : "Home", item: abs(localePath(lang, "/")) },
   { name: zh ? "文档" : "Documentation", item: abs(localePath(lang, "/docs")) },
   { name: productName(p, lang), item: slug ? abs(productHomeHref(lang, product)) : pageUrl },
   ...(slug ? [{ name: docLabel, item: pageUrl }] : []),
-];
+].filter((crumb, i, all) => i === 0 || crumb.item !== all[i - 1].item);
 
 const jsonLd: Record<string, unknown>[] = [
   {

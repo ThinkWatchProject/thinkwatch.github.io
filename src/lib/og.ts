@@ -5,7 +5,7 @@
 // platforms the product runs on, and nothing else. The text comes from the page
 // copy, so a card changes when its page does. Cards are drawn in English (the
 // name and platforms are the same in both languages); og:image:alt gives the
-// same text in the page's language.
+// same text in the page's language, without repeating what the headline says.
 //
 // Text is drawn as outlines from the Geist font files in node_modules, so the
 // image does not depend on the fonts installed on the machine that builds it:
@@ -72,10 +72,18 @@ export function cardText(card: OgCard, lang: Lang): CardText {
 /** A product page's h1, which is split in two for the highlight */
 const headline = (hero: { titleA: string; titleHighlight: string }) => `${hero.titleA}${hero.titleHighlight}`;
 
-/** og:image:alt: the card's text, in the page's language */
+/**
+ * og:image:alt: the card's text, in the page's language. Labels the headline
+ * already names are said once: the Lite headline lists the platforms itself.
+ */
 export function ogImageAlt(card: OgCard, lang: Lang): string {
   const { name, line, labels } = cardText(card, lang);
-  return lang === "zh-CN" ? `${name}：${line}（${labels.join("、")}）` : `${name}: ${line} (${labels.join(", ")})`;
+  const named = line.toLowerCase();
+  const rest = labels.filter((label) => !named.includes(label.toLowerCase()));
+  const zh = lang === "zh-CN";
+  const text = zh ? `${name}：${line}` : `${name}: ${line}`;
+  if (!rest.length) return text;
+  return zh ? `${text}（${rest.join("、")}）` : `${text} (${rest.join(", ")})`;
 }
 
 // ---------- Rendering ----------
