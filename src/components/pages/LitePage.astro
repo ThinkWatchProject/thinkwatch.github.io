@@ -9,12 +9,13 @@ import LiteDownload from "~/components/LiteDownload.astro";
 import Base from "~/layouts/Base.astro";
 import SiteHeader from "~/components/SiteHeader.astro";
 import SiteFooter from "~/components/SiteFooter.astro";
-import { getLang, localePath } from "~/i18n";
+import { getLang, localePath, t } from "~/i18n";
 import { liteCopy } from "~/i18n/pages/lite";
 import { getLatestLiteRelease } from "~/lib/github";
 
 const lang = getLang(Astro);
 const c = liteCopy[lang];
+const ui = t(lang).common;
 const zh = lang === "zh-CN";
 /** 英文界面的那一套图带 `-en`，见文件头 */
 const shot = (id: string) => `/lite/${id}${zh ? "" : "-en"}.webp`;
@@ -251,10 +252,11 @@ const archLabel = { x64: "x64", arm64: "ARM64" } as const;
         <div class="flex min-w-0 flex-col gap-8" data-install-list>
           <div class="flex min-w-0 flex-col gap-4" data-install-os="mac">
             <p class={platformLabel}>{c.install.macLabel}</p>
-            <div class="overflow-x-auto rounded-[14px] border border-[var(--color-border-strong)] bg-[var(--color-surface)] p-5 font-mono text-[15px] leading-relaxed sm:p-7 sm:text-base">
-              <code class="flex flex-col gap-2.5 whitespace-nowrap text-[#e6ebf2]">
-                <span><span class="select-none text-[var(--color-dim)]">$ </span>brew install --cask thinkwatchproject/tap/thinkwatch-lite</span>
+            <div class="flex items-center rounded-[14px] border border-[var(--color-border-strong)] bg-[var(--color-surface)] font-mono text-[15px] leading-relaxed sm:text-base">
+              <code class="min-w-0 flex-1 overflow-x-auto whitespace-nowrap p-5 text-[#e6ebf2] sm:p-7">
+                <span class="select-none text-[var(--color-dim)]">$ </span><span data-cmd>brew install --cask thinkwatchproject/tap/thinkwatch-lite</span>
               </code>
+              <button type="button" class="copy-cmd" data-copy="brew install --cask thinkwatchproject/tap/thinkwatch-lite" data-copied-label={ui.copied}>{ui.copy}</button>
             </div>
             <div class="flex flex-col gap-2 rounded-[14px] border border-[var(--color-border-strong)] p-5 sm:p-7">
               <h3 class="m-0 text-lg font-semibold sm:text-xl">{c.install.dmgTitle}</h3>
@@ -316,10 +318,11 @@ const archLabel = { x64: "x64", arm64: "ARM64" } as const;
           </div>
           <div class="flex min-w-0 flex-col gap-4" data-install-os="linux">
             <p class={platformLabel}>{c.install.linuxLabel}</p>
-            <div class="overflow-x-auto rounded-[14px] border border-[var(--color-border-strong)] bg-[var(--color-surface)] p-5 font-mono text-[15px] leading-relaxed sm:p-7 sm:text-base">
-              <code class="flex flex-col gap-2.5 whitespace-nowrap text-[#e6ebf2]">
-                <span><span class="select-none text-[var(--color-dim)]">$ </span>curl -fsSL {installScript} | sh</span>
+            <div class="flex items-center rounded-[14px] border border-[var(--color-border-strong)] bg-[var(--color-surface)] font-mono text-[15px] leading-relaxed sm:text-base">
+              <code class="min-w-0 flex-1 overflow-x-auto whitespace-nowrap p-5 text-[#e6ebf2] sm:p-7">
+                <span class="select-none text-[var(--color-dim)]">$ </span><span data-cmd>curl -fsSL {installScript} | sh</span>
               </code>
+              <button type="button" class="copy-cmd" data-copy={`curl -fsSL ${installScript} | sh`} data-copied-label={ui.copied}>{ui.copy}</button>
             </div>
             <p class="m-0 text-[15px] leading-relaxed text-[var(--color-muted)] sm:text-base">{c.install.linuxScript}</p>
             <div class="flex flex-col gap-4 rounded-[14px] border border-[var(--color-border-strong)] p-5 sm:p-7">
@@ -420,7 +423,39 @@ const archLabel = { x64: "x64", arm64: "ARM64" } as const;
   })();
 </script>
 
+<script is:inline data-copy-cmd>
+  for (const btn of document.querySelectorAll("#install [data-copy]")) {
+    const label = btn.textContent;
+    btn.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(btn.dataset.copy);
+      } catch {
+        // No clipboard access: select the command so it can be copied by hand.
+        getSelection().selectAllChildren(btn.parentElement.querySelector("[data-cmd]"));
+        return;
+      }
+      btn.textContent = btn.dataset.copiedLabel;
+      setTimeout(() => (btn.textContent = label), 1500);
+    });
+  }
+</script>
+
 <style>
+  /* Copy button beside an install command; the command scrolls, the button stays. */
+  .copy-cmd {
+    flex-shrink: 0;
+    align-self: stretch;
+    border-left: 1px solid var(--color-border-strong);
+    padding: 0 1.25rem;
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    color: var(--color-muted);
+    transition: color 150ms;
+  }
+  .copy-cmd:hover {
+    color: var(--color-brand-1);
+  }
+
   /* Download buttons. Outlined by default; the Windows one is filled for Windows
      visitors, whose installer that is. The disk image stays outlined: on a Mac
      the Homebrew command above it is the first choice. */
