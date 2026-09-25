@@ -1,0 +1,34 @@
+---
+// The site's fonts, Geist and Geist Mono, served from this site. They used to
+// come from Google Fonts, whose stylesheet blocks the first paint until it has
+// loaded; where Google cannot be reached, as in mainland China without a
+// proxy, a page then stayed blank for about 30 seconds.
+//
+// The files are the Fontsource builds of the Google Fonts releases, bundled by
+// Vite under hashed names. As on Google Fonts, each weight is split into
+// subsets by unicode-range, so a browser downloads only the subsets a page
+// uses (Latin, for these pages), and every face uses font-display: swap.
+// Chinese text is set in the system's own font (--font-sans in global.css), so
+// no CJK font is downloaded. Until Geist has loaded, text is set in a local
+// font adjusted to Geist's metrics ("Geist Fallback" in global.css), so the
+// swap does not move the layout.
+//
+// The Latin files of the weights on every page are preloaded: 400 for text,
+// 500 for navigation and buttons, 600 for headings, and Geist Mono 400 for the
+// labels above them. The Open Graph images are drawn from the same packages
+// (src/lib/og.ts).
+import "@fontsource/geist/400.css";
+import "@fontsource/geist/500.css";
+import "@fontsource/geist/600.css";
+import "@fontsource/geist/700.css";
+import "@fontsource/geist-mono/400.css";
+import "@fontsource/geist-mono/500.css";
+import geist400 from "@fontsource/geist/files/geist-latin-400-normal.woff2?url";
+import geist500 from "@fontsource/geist/files/geist-latin-500-normal.woff2?url";
+import geist600 from "@fontsource/geist/files/geist-latin-600-normal.woff2?url";
+import geistMono400 from "@fontsource/geist-mono/files/geist-mono-latin-400-normal.woff2?url";
+
+const preload = [geist400, geist500, geist600, geistMono400];
+---
+
+{preload.map((href) => <link rel="preload" href={href} as="font" type="font/woff2" crossorigin />)}
