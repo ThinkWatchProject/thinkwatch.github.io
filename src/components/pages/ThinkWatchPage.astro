@@ -1,6 +1,6 @@
 ---
 // The /thinkwatch product page (self-hosted enterprise edition). A new hero,
-// then the existing enterprise sections, a license teaser, and star history.
+// then the existing enterprise sections and a license teaser.
 import Base from "~/layouts/Base.astro";
 import SiteHeader from "~/components/SiteHeader.astro";
 import SiteFooter from "~/components/SiteFooter.astro";
@@ -11,7 +11,6 @@ import FeaturesSection from "~/components/sections/FeaturesSection.astro";
 import MCPAdvantage from "~/components/sections/MCPAdvantage.astro";
 import LivePanels from "~/components/sections/LivePanels.astro";
 import QuickStart from "~/components/sections/QuickStart.astro";
-import StarHistory from "~/components/sections/StarHistory.astro";
 import LogExplorerMock from "~/components/mocks/LogExplorerMock.tsx";
 import { getLang, localePath } from "~/i18n";
 import { getLatestRelease } from "~/lib/github";
@@ -134,8 +133,6 @@ const delay = (i: number) => `animation-delay: ${i * 90}ms;`;
         </div>
       </div>
     </section>
-
-    <StarHistory />
   </main>
   <SiteFooter />
 </Base>

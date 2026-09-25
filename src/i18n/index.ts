@@ -267,14 +267,6 @@ const dict = {
       ],
     },
 
-    star: {
-      eyebrow: "Community",
-      title: "Project ",
-      titleHighlight: "activity",
-      sub: "ThinkWatch is developed in the open. Star the repository to follow releases and contribute to the roadmap.",
-      cta: "Star on GitHub",
-    },
-
     footer: {
       tagline: "A gateway between AI clients and the models they call.",
       product: "Products",
@@ -559,14 +551,6 @@ const dict = {
           ctaLabel: "联系销售",
         },
       ],
-    },
-
-    star: {
-      eyebrow: "社区",
-      title: "项目",
-      titleHighlight: "动态",
-      sub: "ThinkWatch 采用开放开发模式。Star 仓库即可关注版本发布，并参与路线图讨论。",
-      cta: "在 GitHub 上 Star",
     },
 
     footer: {
