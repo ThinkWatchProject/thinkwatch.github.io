@@ -64,7 +64,7 @@ const look =
 <!--
   Which file. Windows: ARM64 when the browser says arm with 64-bit, x64 for every
   other answer, a failure or a browser without Client Hints. macOS: the one
-  Apple Silicon build, unless Client Hints say x86, which means an Intel Mac,
+  Apple silicon build, unless Client Hints say x86, which means an Intel Mac,
   for which there is no build. An iPad also reports "Macintosh"; touch points
   tell it apart. Linux: the aarch64 AppImage when Client Hints say arm with
   64-bit (or, without them, the User-Agent says aarch64), x86_64 otherwise;
@@ -97,7 +97,7 @@ const look =
         } else if (linux) {
           set(el, el.dataset[arch], el.dataset.labelLinux, arch);
         } else if (arch !== "x86") {
-          set(el, el.dataset.mac, el.dataset.labelMac, "Apple Silicon");
+          set(el, el.dataset.mac, el.dataset.labelMac, "Apple silicon");
         }
       }
     };
