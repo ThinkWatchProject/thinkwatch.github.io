@@ -1,5 +1,7 @@
 // Open Graph images: a 1200×630 card for the site and one for each product,
-// rendered at build time by src/pages/og/[card].png.ts.
+// rendered at build time by src/pages/og/[card].png.ts. The same cards at
+// GitHub's size are the social previews of the repositories (at the end of
+// this file).
 //
 // A card carries the product name, the headline of the product's page and the
 // platforms the product runs on, and nothing else. The text comes from the page
@@ -158,17 +160,18 @@ function logo(x: number, y: number, size: number): string {
   return svg.replace("<svg ", `<svg x="${x}" y="${y}" width="${size}" height="${size}" `);
 }
 
-export async function renderOgImage(card: OgCard): Promise<Buffer> {
-  const { name, line, labels } = cardText(card, "en");
-  const W = OG_WIDTH;
-  const H = OG_HEIGHT;
+export const renderOgImage = (card: OgCard) => renderCard(cardText(card, "en"), OG_WIDTH, OG_HEIGHT, card);
+
+/** A card of `W`×`H` pixels. `card` names it in errors. */
+async function renderCard({ name, line, labels }: CardText, W: number, H: number, card: string): Promise<Buffer> {
   const X = 80;
   const width = W - 2 * X;
 
-  // Name: shrink only if a longer name ever needs it.
+  // Name: shrink only if a longer name ever needs it. Its baseline is a little
+  // above the middle: 304 on a 630-pixel card.
   let nameSize = 88;
   while (measure(sans(600), name, nameSize, -0.025 * nameSize) > width) nameSize -= 2;
-  const nameY = 304;
+  const nameY = Math.round(H * 0.4825);
 
   // Headline: at most two lines, smaller type before a third line.
   let lineSize = 38;
@@ -231,4 +234,29 @@ export async function renderOgImage(card: OgCard): Promise<Buffer> {
 </svg>`;
 
   return sharp(Buffer.from(svg)).png({ compressionLevel: 9 }).toBuffer();
+}
+
+// ---------- GitHub ----------
+
+// Social preview images for the repositories on GitHub, rendered at build time
+// by src/pages/og/github/[card].png.ts. GitHub has no API for them: each is
+// uploaded by hand from /og/github/<card>.png, under Settings → General →
+// Social preview of its repository. They are the site's cards at the size
+// GitHub recommends, with a line that says what the repository holds, after
+// its description on GitHub (the organization's, for the profile repository).
+
+const GITHUB_WIDTH = 1280;
+const GITHUB_HEIGHT = 640;
+
+/** The repository each card is uploaded to, and the line under the name */
+const githubCards: Record<OgCard, { repo: string; line: string }> = {
+  home: { repo: ".github", line: "AI gateways for organizations and individual developers" },
+  lite: { repo: "ThinkWatch-Lite", line: "Desktop app for a local AI API gateway" },
+  core: { repo: "ThinkWatch-Core", line: "Rust crates and the twcore binary for an AI API gateway" },
+  enterprise: { repo: "ThinkWatch", line: "AI bastion host for secure AI API and MCP access" },
+};
+
+export function renderGithubPreview(card: OgCard): Promise<Buffer> {
+  const { name, labels } = cardText(card, "en");
+  return renderCard({ name, line: githubCards[card].line, labels }, GITHUB_WIDTH, GITHUB_HEIGHT, `github/${card}`);
 }
