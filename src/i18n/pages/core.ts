@@ -12,7 +12,7 @@ export const coreCopy = {
     meta: {
       title: "ThinkWatch Core — AI API gateway engine in Rust",
       description:
-        "Rust crates and the twcore binary for an AI API gateway: rule-based routing, mid-stream failover, cost accounting, outbound secret redaction and tool-call inspection. Runs inside ThinkWatch Lite or as a standalone gateway on a Linux server. MIT License.",
+        "Rust crates and the twcore binary for an AI API gateway: rule-based routing, failover before the first byte, cost accounting, outbound secret redaction and tool-call inspection. Runs inside ThinkWatch Lite or as a standalone gateway on a Linux server. MIT License.",
       twcoreDescription:
         "Self-contained AI API gateway binary: the local engine of ThinkWatch Lite, or a standalone gateway run by systemd on a Linux server.",
     },
@@ -39,7 +39,7 @@ export const coreCopy = {
           body: "Rules match on the model, the gateway key, the input size, tools, images and other properties of a request, and send it to an upstream or a group, rewrite its parameters or refuse it. When the client and the upstream use different API formats, the request is converted between Anthropic Messages, OpenAI Chat Completions, OpenAI Responses and Gemini.",
         },
         {
-          title: "Mid-stream failover",
+          title: "Failover before the first byte",
           body: "Until the first byte reaches the client, a failing upstream is replaced by the next one without the client noticing; after that point, the failure is reported. A circuit breaker keeps requests away from an upstream that keeps failing.",
         },
         {
@@ -70,13 +70,15 @@ export const coreCopy = {
       guide: "Server deployment guide",
       reference: "Configuration reference",
       scriptLabel: "Install on a Linux server",
-      pinNote: "A particular version, such as the one ThinkWatch Lite expects:",
+      pinNote: "The server has to run the core version that ThinkWatch Lite requires; the app shows that version when the two differ. To install it:",
+      /** Placeholder for the version number in the command that installs a particular version */
+      versionPlaceholder: "<version>",
       nextLabel: "Then",
       next: [
         { cmd: "twcore remote enable --allow 192.168.1.0/24", note: "# open the remote control port to a network" },
         { cmd: "sudo systemctl enable --now twcore", note: "# start the service" },
         { cmd: "twcore control-key", note: "# print the key ThinkWatch Lite connects with" },
-        { cmd: "sudo twcore upgrade --restart", note: "# later: install the latest release" },
+        { cmd: "sudo twcore upgrade --version <version> --restart", note: "# later: move to the version ThinkWatch Lite requires, newer or older" },
       ],
       serviceUser: "Commands that read the configuration run as the service user; the guide describes each step.",
       binariesTitle: "Prebuilt binaries",
@@ -129,7 +131,7 @@ export const coreCopy = {
     meta: {
       title: "ThinkWatch Core — 以 Rust 编写的 AI API 网关引擎",
       description:
-        "一组 Rust crate 与 twcore 二进制，提供 AI API 网关的规则路由、流式故障转移、费用核算、出站密钥脱敏与工具调用审查；随 ThinkWatch Lite 运行，也可作为独立网关部署在 Linux 服务器上。采用 MIT 许可证。",
+        "一组 Rust crate 与 twcore 二进制，提供 AI API 网关的规则路由、首字节前的故障转移、费用核算、出站密钥脱敏与工具调用审查；随 ThinkWatch Lite 运行，也可作为独立网关部署在 Linux 服务器上。采用 MIT 许可证。",
       twcoreDescription: "独立运行的 AI API 网关二进制：ThinkWatch Lite 的本地引擎，也可由 systemd 在 Linux 服务器上作为独立网关运行。",
     },
     hero: {
@@ -155,7 +157,7 @@ export const coreCopy = {
           body: "规则按模型、网关密钥、输入规模、是否携带工具或图片等请求属性匹配，将请求发往某个上游或策略组、改写其参数，或拒绝请求。客户端与上游的接口格式不同时，请求在 Anthropic Messages、OpenAI Chat Completions、OpenAI Responses 与 Gemini 之间转换。",
         },
         {
-          title: "流式故障转移",
+          title: "首字节前的故障转移",
           body: "首字节到达客户端之前，出错的上游由下一个上游替换，客户端无从察觉；此后发生的故障如实报告。熔断器使持续出错的上游暂不接收请求。",
         },
         {
@@ -186,13 +188,14 @@ export const coreCopy = {
       guide: "服务器部署指南",
       reference: "配置手册",
       scriptLabel: "在 Linux 服务器上安装",
-      pinNote: "安装指定版本，例如 ThinkWatch Lite 要求的版本：",
+      pinNote: "服务器上运行的 core 须为 ThinkWatch Lite 要求的版本；两者不一致时，应用会显示所需的版本。安装该版本：",
+      versionPlaceholder: "<版本号>",
       nextLabel: "随后",
       next: [
         { cmd: "twcore remote enable --allow 192.168.1.0/24", note: "# 向指定网段开放远程控制端口" },
         { cmd: "sudo systemctl enable --now twcore", note: "# 启动服务" },
         { cmd: "twcore control-key", note: "# 输出 ThinkWatch Lite 连接所用的密钥" },
-        { cmd: "sudo twcore upgrade --restart", note: "# 日后升级到最新版本" },
+        { cmd: "sudo twcore upgrade --version <版本号> --restart", note: "# 日后切换到 ThinkWatch Lite 要求的版本，升级或降级均可" },
       ],
       serviceUser: "读取配置的命令须以服务用户身份运行，各步骤详见部署指南。",
       binariesTitle: "预编译二进制",

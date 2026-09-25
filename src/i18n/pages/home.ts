@@ -87,7 +87,7 @@ export const homeCopy = {
       ],
       pills: ["Available", "macOS · Apple silicon", "Windows · x64 · ARM64", "Linux · x86_64 · aarch64", "MIT"],
       shotAlt:
-        "The usage overview: tokens, cost and requests, a 24-hour trend stacked by model, the leaderboard by model and the cache hit rate",
+        "The Overview page for the last 7 days: 83.1M tokens, $68.11 in cost including $0.441 estimated and 13 unpriced requests, and 1,339 requests of which 11 failed, each compared with the prior 7 days; a token trend stacked by model with the periods that had failures marked; and the models ranked by tokens",
       cta: "Explore ThinkWatch Lite",
     },
     core: {
@@ -211,7 +211,7 @@ export const homeCopy = {
       ],
       pills: ["已发布", "macOS · Apple silicon", "Windows · x64 · ARM64", "Linux · x86_64 · aarch64", "MIT"],
       shotAlt:
-        "ThinkWatch Lite 的用量概览：token、费用与请求数，按模型分层的 24 小时趋势，模型排行与缓存命中率",
+        "概览页（最近 7 天）：token 83.1M、费用 $68.11（含估算 $0.441，13 条无法计价）、请求 1,339 次（失败 11 次），均与上一个 7 天对比；按模型分层的 token 趋势，并标出存在失败的时段；以及按 token 排序的模型列表",
       cta: "了解 ThinkWatch Lite",
     },
     core: {

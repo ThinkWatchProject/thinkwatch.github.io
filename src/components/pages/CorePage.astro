@@ -171,7 +171,7 @@ const fileLink = "break-all text-[var(--color-brand-1)] transition-colors hover:
             <p class={label}>{c.install.scriptLabel}</p>
             <CopyCommand command={installCommand} />
             <p class="m-0 text-[15px] leading-relaxed text-[var(--color-muted)]">{c.install.pinNote}</p>
-            <CopyCommand command={`${installCommand} -s -- --version ${version ?? "X.Y.Z"}`} class="text-[#cbd5e1] text-[13px] sm:text-sm" />
+            <CopyCommand command={`${installCommand} -s -- --version ${c.install.versionPlaceholder}`} class="text-[#cbd5e1] text-[13px] sm:text-sm" />
             <p class:list={[label, "mt-4"]}>{c.install.nextLabel}</p>
             <div class="overflow-x-auto rounded-[14px] border border-[var(--color-border-strong)] bg-[var(--color-surface)] p-5 font-mono text-[13px] leading-normal sm:p-6 sm:text-[15px]">
               <ul class="m-0 flex list-none flex-col gap-3.5 p-0">
