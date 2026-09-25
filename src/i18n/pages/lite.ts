@@ -72,7 +72,7 @@ export const liteCopy = {
         {
           id: "routing",
           title: "Routing and failover",
-          body: "Each key uses a route, whose rules are checked in order against the model, the client's API format, input tokens, max_tokens, tools, images, extended thinking and other properties of a request. A rule forwards the request to an upstream or a group, or refuses it. A group picks its upstreams in order, by manual choice, in rotation, by lowest latency or by lowest cost, and moves on to the next when one is unavailable; sticky sessions keep a session on one upstream so that its prompt cache stays valid. Auxiliary requests that clients send on their own, such as title generation or warm-up, can be answered locally.",
+          body: "Each key uses a route, whose rules are checked in order against the model, the client's API format, input tokens, max_tokens, tools, images, extended thinking and other properties of a request. A rule forwards the request to an upstream or a group, or refuses it. A group picks its upstreams in order, by manual choice, in rotation, by lowest latency or by lowest cost, and moves on to the next when one is unavailable; in rotation, sticky sessions, on by default, keep each session on one upstream so that its prompt cache stays valid. Auxiliary requests that clients send on their own, such as title generation or warm-up, can be answered locally.",
           alt: "The Routing page: a map of how four keys lead through three routes and the groups main and budget to seven upstreams, with one rule refusing requests; below it, each route with its keys and its rules in order",
         },
         {
@@ -106,7 +106,7 @@ export const liteCopy = {
       title: "ThinkWatch Core on a server",
       body: [
         "The gateway can also run on a Linux server, where twcore runs as a systemd service and serves clients across the network. The app connects to it through the server's remote control port and shows that server's traffic, cost and configuration in the same pages.",
-        "A connection is added in Settings › Connection with the server's address, its control port and the key that twcore control-key prints. Before switching to a connection, the app tests it: it completes the handshake and compares versions. The app connects to one core at a time; while it is connected to a server, the core on the local computer stops and its data is kept. The Clients and MCP pages still act on the computer the app runs on, and the Clients page can point that computer's clients at the server's gateway.",
+        "A connection is added in Settings › Connection with the server's address, its control port and the key that twcore control-key prints. Before switching to a connection, the app tests it: it completes the handshake and compares versions, since the server has to run the core version the app requires; when they differ, sudo twcore upgrade --version <version> --restart on the server installs that version, newer or older. The app connects to one core at a time; while it is connected to a server, the core on the local computer stops and its data is kept. The Clients and MCP pages still act on the computer the app runs on, and the Clients page can point that computer's clients at the server's gateway.",
         "Every control connection, local or remote, is encrypted and authenticated by a Noise handshake keyed by listen.control.key in config.yaml; no certificates are involved. The app keeps connection keys in a file in its data directory that only the current user can read.",
       ],
       serverDocs: "Server deployment guide",
@@ -249,7 +249,7 @@ export const liteCopy = {
         {
           id: "routing",
           title: "路由与故障转移",
-          body: "每把密钥对应一条路由，路由中的规则按顺序与请求的模型、客户端 API 格式、输入 token、max_tokens、工具、图片、扩展思考等条件匹配。规则把请求交给某个上游或策略组，或者直接拒绝。策略组按顺序、手动选择、轮询、延迟最低或费用最低选用成员，某个上游不可用时换用下一个；开启会话粘滞后，同一会话固定使用同一上游，提示缓存因此持续有效。客户端自行发出的辅助请求（如生成标题、预热）可以由网关在本地应答。",
+          body: "每把密钥对应一条路由，路由中的规则按顺序与请求的模型、客户端 API 格式、输入 token、max_tokens、工具、图片、扩展思考等条件匹配。规则把请求交给某个上游或策略组，或者直接拒绝。策略组按顺序、手动选择、轮询、延迟最低或费用最低选用成员，某个上游不可用时换用下一个；轮询时默认开启会话粘滞，同一会话固定使用同一上游，提示缓存因此持续有效。客户端自行发出的辅助请求（如生成标题、预热）可以由网关在本地应答。",
           alt: "路由页：从四把密钥经三条路由与 main、budget 两个策略组到七个上游的链路图，其中一条规则直接拒绝请求；下方逐条列出每条路由的密钥与规则",
         },
         {
@@ -283,7 +283,7 @@ export const liteCopy = {
       title: "服务器上的 ThinkWatch Core",
       body: [
         "网关也可以部署在 Linux 服务器上：twcore 作为 systemd 服务运行，为网络中的客户端提供网关。应用通过服务器的远程控制端口连接它，在同样的页面中显示该服务器的流量、费用与配置。",
-        "在「设置 › 连接」中添加连接，填写服务器地址、控制端口，以及在服务器上执行 twcore control-key 得到的密钥。切换到某个连接之前，应用先测试该连接：完成握手并核对版本。应用同一时间只连接一个 core；连接服务器期间，本机的 core 停止运行，本机数据保留。客户端页与 MCP 页始终作用于运行应用的这台电脑，客户端页可以把这台电脑上的客户端改为指向服务器的网关。",
+        "在「设置 › 连接」中添加连接，填写服务器地址、控制端口，以及在服务器上执行 twcore control-key 得到的密钥。切换到某个连接之前，应用先测试该连接：完成握手并核对版本，服务器上的 core 须为应用要求的版本；版本不一致时，在服务器上执行 sudo twcore upgrade --version <版本号> --restart 即可换成该版本，升级或降级均可。应用同一时间只连接一个 core；连接服务器期间，本机的 core 停止运行，本机数据保留。客户端页与 MCP 页始终作用于运行应用的这台电脑，客户端页可以把这台电脑上的客户端改为指向服务器的网关。",
         "无论本机还是远程，每条控制连接都经过以 config.yaml 中 listen.control.key 为密钥的 Noise 握手加密与认证，不涉及证书。连接密钥保存在应用数据目录中仅当前用户可读的文件里。",
       ],
       serverDocs: "服务器部署指南",

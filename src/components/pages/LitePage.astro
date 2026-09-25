@@ -56,8 +56,8 @@ const liteVersion = liteRelease?.tag.replace(/^v/, "") ?? null;
 const installDocsHref = localePath(lang, "/docs/lite/install");
 const sourceDocsHref = localePath(lang, "/docs/lite/run-from-source");
 const remoteDocsHref = localePath(lang, "/docs/lite/remote-core");
-/** Installing and running twcore on a Linux server, in the Core repository */
-const serverDocsHref = `https://github.com/ThinkWatchProject/ThinkWatch-Core/blob/main/docs/server${zh ? ".zh-CN" : ""}.md`;
+/** Installing and running twcore on a Linux server, in the Core docs */
+const serverDocsHref = localePath(lang, "/docs/core/server-deployment");
 const jsonLd = await liteLd(lang);
 
 const delay = (i: number) => `animation-delay: ${i * 90}ms;`;
@@ -169,12 +169,7 @@ const archLabel = { x64: "x64", arm64: "ARM64" } as const;
               <p class="m-0 text-base leading-relaxed text-[var(--color-muted)] sm:text-[17px]">{p}</p>
             ))}
             <div class="flex flex-wrap items-center gap-x-6 gap-y-2">
-              <a href={serverDocsHref} target="_blank" rel="noopener" class={textLink}>
-                {c.remote.serverDocs}
-                <svg class="ml-1.5 h-4 w-4" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                  <path d="M5 11L11 5M6 5h5v5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
-                </svg>
-              </a>
+              <a href={serverDocsHref} class={textLink}>{c.remote.serverDocs}</a>
               <a href={remoteDocsHref} class={textLink}>{c.remote.docs}</a>
             </div>
           </div>

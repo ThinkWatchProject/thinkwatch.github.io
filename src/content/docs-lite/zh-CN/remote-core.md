@@ -2,13 +2,13 @@
 
 ThinkWatch Lite 默认控制它在本机启动的 core，也可以改为连接部署在服务器上的 ThinkWatch Core（在 Linux 上以 systemd 服务运行的 `twcore`），在同样的页面中显示该服务器的流量、费用与配置。此时网络中的客户端把请求发给服务器上的网关，桌面上的应用负责查看和修改服务器的运行情况。
 
-服务器的安装与配置见 ThinkWatch Core 仓库中的[服务器部署指南](https://github.com/ThinkWatchProject/ThinkWatch-Core/blob/main/docs/server.zh-CN.md)。本页说明应用一侧的操作。
+服务器的安装与配置见 ThinkWatch Core 文档中的[服务器部署](/zh-CN/docs/core/server-deployment)。本页说明应用一侧的操作。
 
 ## 服务器需要具备的条件
 
 - 已安装并运行 `twcore`，例如安装脚本设置好的 `twcore` systemd 服务；
 - 已开启远程控制端口，并把应用所在的网段写入 `listen.control.remote.allow_from`；
-- core 版本与应用一致。版本不一致时，应用会同时显示两边的版本，并给出需要在服务器上执行的命令。
+- core 版本为应用要求的版本。版本不一致时，应用会同时显示两边的版本；在服务器上执行 `sudo twcore upgrade --version <版本号> --restart` 并填入应用显示的版本，即可换成该版本，升级或降级均可。
 
 用安装脚本安装的服务器上，开启端口并查看密钥的命令如下：
 
@@ -35,7 +35,7 @@ sudo -u thinkwatch THINKWATCH_HOME=/var/lib/thinkwatch twcore control-key
 | 无法连接到该地址 | 地址或端口有误、防火墙拦截了该端口，或服务器配置中未启用 `listen.control.remote` |
 | 连接被服务器关闭 | 本机地址可能不在 `listen.control.remote.allow_from` 中 |
 | 密钥不正确 | 与服务器上的密钥不一致；在服务器上执行 `twcore control-key` 可查看当前密钥 |
-| 版本不一致 | 服务器上的 core 版本不同；在服务器上用 `twcore upgrade` 升级 |
+| 版本不一致 | 服务器上的 core 版本不同；在服务器上执行 `sudo twcore upgrade --version <版本号> --restart`，版本号为应用显示的版本 |
 
 ## 切换连接
 
@@ -67,6 +67,6 @@ sudo -u thinkwatch THINKWATCH_HOME=/var/lib/thinkwatch twcore control-key
 
 ## 下一步
 
-- [服务器部署指南](https://github.com/ThinkWatchProject/ThinkWatch-Core/blob/main/docs/server.zh-CN.md)：在 Linux 服务器上安装、配置、启动与升级 `twcore`。
+- [服务器部署](/zh-CN/docs/core/server-deployment)：在 Linux 服务器上安装、配置、启动与升级 `twcore`。
 - [架构](/zh-CN/docs/lite/architecture)：应用与 Core 之间的控制通道。
 - [概览](/zh-CN/docs/lite)：应用展示什么。

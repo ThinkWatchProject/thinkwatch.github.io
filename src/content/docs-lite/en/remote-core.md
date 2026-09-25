@@ -2,13 +2,13 @@
 
 ThinkWatch Lite normally controls the core it starts on the same computer. It can instead connect to ThinkWatch Core running on a server, where `twcore` runs as a systemd service on Linux, and show that server's traffic, cost and configuration in the same pages. Clients anywhere on the network then send their requests to the server's gateway, and the app on a desktop computer shows and changes what the server does.
 
-Installing and configuring the server is described in the [server deployment guide](https://github.com/ThinkWatchProject/ThinkWatch-Core/blob/main/docs/server.md) in the ThinkWatch Core repository. This page covers the app's side.
+Installing and configuring the server is described in [Server deployment](/docs/core/server-deployment) in the ThinkWatch Core documentation. This page covers the app's side.
 
 ## What the server needs
 
 - `twcore` installed and running, for example as the `twcore` systemd service that the install script sets up;
 - the remote control port open, with the networks the app connects from in `listen.control.remote.allow_from`;
-- the same core version as the app. When the versions differ, the app names both and shows the command to run on the server.
+- the core version that the app requires. When the versions differ, the app shows both; `sudo twcore upgrade --version <version> --restart` on the server, with the version the app shows, installs it whether it is newer or older than the running one.
 
 On a server installed with the script, the port is opened and the key shown with:
 
@@ -35,7 +35,7 @@ When the test fails, the app says why:
 | Cannot connect to the address | The address or the port is wrong, a firewall blocks the port, or `listen.control.remote` is not enabled on the server |
 | The server closed the connection | This computer's address is probably not in `listen.control.remote.allow_from` |
 | The key is not correct | The key differs from the server's; `twcore control-key` on the server shows the current one |
-| Version mismatch | The server runs a different core version; upgrade it with `twcore upgrade` on the server |
+| Version mismatch | The server runs a different core version; run `sudo twcore upgrade --version <version> --restart` on the server with the version the app shows |
 
 ## Switching between connections
 
@@ -67,6 +67,6 @@ The app stores the key in a file in its data directory that only the current use
 
 ## Next steps
 
-- [Server deployment guide](https://github.com/ThinkWatchProject/ThinkWatch-Core/blob/main/docs/server.md): install, configure, start and upgrade `twcore` on a Linux server.
+- [Server deployment](/docs/core/server-deployment): install, configure, start and upgrade `twcore` on a Linux server.
 - [Architecture](/docs/lite/architecture): the control channel between the app and Core.
 - [Overview](/docs/lite): what the app shows.

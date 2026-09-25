@@ -38,7 +38,7 @@ Request and response bodies are masked before they are displayed; a secret is ne
 
 Each key uses a route. A route's rules are checked in order against the model, the key, the client's API format, input tokens, `max_tokens`, the number of tools, images, extended thinking, streaming and the prompt cache, and the first rule that matches decides: it forwards the request to an upstream or a group, or refuses it with a message.
 
-A group picks its upstreams in order, by manual choice, in rotation, by lowest latency or by lowest cost, and moves on to the next when one is unavailable. With sticky sessions, a session stays on one upstream so that its prompt cache stays valid. Auxiliary requests that clients send on their own, such as health checks, warm-ups and title generation, can be answered locally at no cost, passed through, or handled by the routing rules, which can send them to a lower-cost upstream.
+A group picks its upstreams in order, by manual choice, in rotation, by lowest latency or by lowest cost, and moves on to the next when one is unavailable. In rotation, sticky sessions keep each session on one upstream so that its prompt cache stays valid; they are on by default and can be turned off for a group. Auxiliary requests that clients send on their own, such as health checks, warm-ups and title generation, can be answered locally at no cost, passed through, or handled by the routing rules, which can send them to a lower-cost upstream.
 
 A dry run takes a key, a model, a client format and the properties of a request, and shows where the request would go: the rule that matched, why each rule before it did not, the upstreams that would be tried and any format conversion. It sends nothing and costs nothing.
 
