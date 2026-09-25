@@ -106,6 +106,14 @@ export default defineConfig({
   },
   vite: {
     plugins: [tailwindcss()],
+    build: {
+      // Font files are always emitted as files (src/components/Fonts.astro).
+      // Vite would otherwise inline those under 4 KB, the smaller Unicode
+      // subsets of Geist, into the stylesheet as base64, and every page would
+      // download subsets it never uses before its first paint. Anything else
+      // keeps the default limit.
+      assetsInlineLimit: (file) => (/\.woff2?$/.test(file) ? false : undefined),
+    },
   },
   build: {
     inlineStylesheets: 'auto',
