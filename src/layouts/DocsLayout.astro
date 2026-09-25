@@ -14,12 +14,13 @@ import {
   type ProductId,
 } from "~/content/docs/_meta";
 import { getLang } from "~/i18n";
+import { docsOgCard, type OgCard } from "~/lib/og";
 
 type Heading = { depth: number; slug: string; text: string };
 
 interface Props {
   title: string;
-  description?: string;
+  description: string;
   /** Product whose docs are shown in the sidebar and switcher */
   product: ProductId;
   /** Slug of the currently displayed doc, e.g. "architecture"; "" for the product's docs home */
@@ -31,9 +32,29 @@ interface Props {
   next?: DocMeta;
   /** Extra JSON-LD items (BreadcrumbList, TechArticle, etc.) */
   jsonLd?: Record<string, unknown>[];
+  /** Shared as an article (a doc) or as a website page (the documentation home) */
+  ogType?: "website" | "article";
+  /** The Open Graph card; the product's card by default */
+  ogCard?: OgCard;
+  /** For articles: first published and last changed, as ISO timestamps */
+  published?: string;
+  modified?: string;
 }
 
-const { title, description, product, current, headings = [], prev, next, jsonLd = [] } = Astro.props;
+const {
+  title,
+  description,
+  product,
+  current,
+  headings = [],
+  prev,
+  next,
+  jsonLd = [],
+  ogType = "article",
+  ogCard = docsOgCard[product],
+  published,
+  modified,
+} = Astro.props;
 const lang = getLang(Astro);
 const zh = lang === "zh-CN";
 const p = getProduct(product);
@@ -61,7 +82,15 @@ const itemActive = "text-[var(--color-brand-1)] font-medium";
 const itemIdle = "text-[var(--color-text)]/80 hover:text-[var(--color-text)]";
 ---
 
-<Base title={title} description={description} noJsonLd jsonLd={jsonLd}>
+<Base
+  title={title}
+  description={description}
+  ogCard={ogCard}
+  ogType={ogType}
+  published={published}
+  modified={modified}
+  jsonLd={jsonLd}
+>
   <SiteHeader />
 
   <!-- Product switcher bar. data-docs-product scopes the search modal to this product. -->

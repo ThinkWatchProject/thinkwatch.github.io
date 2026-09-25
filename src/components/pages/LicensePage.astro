@@ -3,39 +3,22 @@
 import Base from "~/layouts/Base.astro";
 import SiteHeader from "~/components/SiteHeader.astro";
 import SiteFooter from "~/components/SiteFooter.astro";
-import { getLang, localePath } from "~/i18n";
+import { getLang } from "~/i18n";
 import { licenseCopy } from "~/i18n/pages/license";
+import { breadcrumbs, webPage } from "~/lib/structured-data";
 
 const lang = getLang(Astro);
 const c = licenseCopy[lang];
 
-const pageUrl = new URL(localePath(lang, "/license"), Astro.site).toString();
-const homeUrl = new URL(localePath(lang, "/"), Astro.site).toString();
-
 const jsonLd = [
-  {
-    "@context": "https://schema.org",
-    "@type": "WebPage",
-    name: c.meta.title,
-    description: c.meta.description,
-    url: pageUrl,
-    inLanguage: lang,
-    isPartOf: { "@type": "WebSite", name: "ThinkWatch", url: "https://thinkwat.ch" },
-  },
-  {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
-      { "@type": "ListItem", position: 1, name: c.meta.breadcrumbHome, item: homeUrl },
-      { "@type": "ListItem", position: 2, name: c.meta.breadcrumbPage, item: pageUrl },
-    ],
-  },
+  webPage(lang, "/license", c.meta.title, c.meta.description),
+  breadcrumbs(lang, "/license", c.meta.breadcrumbHome, c.meta.breadcrumbPage),
 ];
 
 const eyebrow = "font-mono text-xs sm:text-[13px] uppercase tracking-[0.08em]";
 ---
 
-<Base title={c.meta.title} description={c.meta.description} noJsonLd jsonLd={jsonLd}>
+<Base title={c.meta.title} description={c.meta.description} jsonLd={jsonLd}>
   <SiteHeader />
   <main id="main">
     <!-- Hero -->

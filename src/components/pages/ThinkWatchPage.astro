@@ -15,6 +15,7 @@ import StarHistory from "~/components/sections/StarHistory.astro";
 import LogExplorerMock from "~/components/mocks/LogExplorerMock.tsx";
 import { getLang, localePath } from "~/i18n";
 import { getLatestRelease } from "~/lib/github";
+import { enterpriseLd } from "~/lib/structured-data";
 import { thinkwatchCopy } from "~/i18n/pages/thinkwatch";
 
 const lang = getLang(Astro);
@@ -30,10 +31,12 @@ const pills: { label: string; title?: string }[] = [
   { label: c.hero.license },
 ];
 
+const jsonLd = await enterpriseLd(lang);
+
 const delay = (i: number) => `animation-delay: ${i * 90}ms;`;
 ---
 
-<Base title={c.meta.title} description={c.meta.description}>
+<Base title={c.meta.title} description={c.meta.description} ogCard="enterprise" jsonLd={jsonLd}>
   <SiteHeader />
   <main id="main">
     <section class="relative overflow-hidden">

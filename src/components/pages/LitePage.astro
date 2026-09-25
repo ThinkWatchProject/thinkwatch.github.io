@@ -12,6 +12,7 @@ import SiteFooter from "~/components/SiteFooter.astro";
 import { getLang, localePath, t } from "~/i18n";
 import { liteCopy } from "~/i18n/pages/lite";
 import { getLatestLiteRelease } from "~/lib/github";
+import { liteLd } from "~/lib/structured-data";
 
 const lang = getLang(Astro);
 const c = liteCopy[lang];
@@ -51,38 +52,7 @@ const dmg = { url: assetUrl("-arm64.dmg") ?? latestPage, sha: assetUrl("-arm64.d
 const liteVersion = liteRelease?.tag.replace(/^v/, "") ?? null;
 const installDocsHref = localePath(lang, "/docs/lite/install");
 const sourceDocsHref = localePath(lang, "/docs/lite/run-from-source");
-const pageUrl = new URL(Astro.url.pathname, Astro.site).toString();
-
-const jsonLd = [
-  {
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    name: "ThinkWatch Lite",
-    description: c.meta.description,
-    applicationCategory: "DeveloperApplication",
-    operatingSystem:
-      "macOS 12 or later (Apple Silicon); Windows 10 21H2 or later (x64, ARM64); Linux: Ubuntu 22.04, Debian 12, Fedora 36 or later (x86_64, aarch64)",
-    url: pageUrl,
-    downloadUrl: latestPage,
-    license: "https://opensource.org/licenses/MIT",
-    offers: { "@type": "Offer", price: 0, priceCurrency: "USD" },
-    author: {
-      "@type": "Organization",
-      name: "ThinkWatch Project",
-      url: "https://github.com/ThinkWatchProject",
-    },
-  },
-  {
-    "@context": "https://schema.org",
-    "@type": "SoftwareSourceCode",
-    name: "ThinkWatch Lite",
-    description: c.meta.description,
-    codeRepository: repo,
-    programmingLanguage: ["TypeScript", "Rust"],
-    license: "https://opensource.org/licenses/MIT",
-    url: pageUrl,
-  },
-];
+const jsonLd = await liteLd(lang);
 
 const delay = (i: number) => `animation-delay: ${i * 90}ms;`;
 const eyebrow = "font-mono text-[11px] uppercase tracking-[0.08em] text-[var(--color-muted)] sm:text-[13px]";
@@ -98,7 +68,7 @@ const platformLabel = "m-0 font-mono text-[13px] text-[var(--color-muted)]";
 const archLabel = { x64: "x64", arm64: "ARM64" } as const;
 ---
 
-<Base title={c.meta.title} description={c.meta.description} noJsonLd jsonLd={jsonLd}>
+<Base title={c.meta.title} description={c.meta.description} ogCard="lite" jsonLd={jsonLd}>
   <SiteHeader />
   <main id="main">
     <section class="relative overflow-hidden">
@@ -174,7 +144,7 @@ const archLabel = { x64: "x64", arm64: "ARM64" } as const;
                 loading="lazy"
                 decoding="async"
                 class={shotClass}
-                alt={item.title}
+                alt={item.alt}
               />
             </div>
           ))}

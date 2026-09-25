@@ -6,6 +6,9 @@ import { render } from "astro:content";
 import DocsLayout from "~/layouts/DocsLayout.astro";
 import { docHref, getNeighbours, getProduct, productHomeHref, type ProductId } from "~/content/docs/_meta";
 import { localePath, type Lang } from "~/i18n";
+import { firstPublished, lastModified } from "~/lib/lastmod";
+import { docsOgCard, ogImagePath } from "~/lib/og";
+import { organizationRef } from "~/lib/structured-data";
 import type { DocsEntry } from "./_lib";
 
 interface Props {
@@ -27,16 +30,24 @@ const docLabel = meta?.label[lang] ?? slug;
 const title = `${docLabel} · ${productName(p, lang)} ${zh ? "文档" : "Docs"}`;
 const description = meta?.summary?.[lang] ?? p.tagline[lang];
 
+// From git history: when the markdown file was added and last changed.
+const sources = entry.filePath ? [entry.filePath] : [];
+const published = firstPublished(sources);
+const modified = lastModified(sources);
+
 const site = Astro.site ?? new URL("https://thinkwat.ch");
 const abs = (path: string) => new URL(path.endsWith("/") ? path : `${path}/`, site).toString();
 const pageUrl = new URL(Astro.url.pathname, site).toString();
 
+// Home › Documentation › product › doc. ThinkWatch Enterprise's docs home is
+// the documentation home itself (/docs), so its guides skip the product step
+// rather than list the same page twice.
 const crumbs = [
   { name: zh ? "首页" : "Home", item: abs(localePath(lang, "/")) },
   { name: zh ? "文档" : "Documentation", item: abs(localePath(lang, "/docs")) },
   { name: productName(p, lang), item: slug ? abs(productHomeHref(lang, product)) : pageUrl },
   ...(slug ? [{ name: docLabel, item: pageUrl }] : []),
-];
+].filter((crumb, i, all) => i === 0 || crumb.item !== all[i - 1].item);
 
 const jsonLd: Record<string, unknown>[] = [
   {
@@ -51,13 +62,13 @@ const jsonLd: Record<string, unknown>[] = [
     description,
     inLanguage: lang,
     url: pageUrl,
-    about: { "@type": "SoftwareApplication", name: productName(p, lang) },
-    author: { "@type": "Organization", name: "ThinkWatch Project", url: "https://github.com/ThinkWatchProject" },
-    publisher: {
-      "@type": "Organization",
-      name: "ThinkWatch",
-      logo: { "@type": "ImageObject", url: "https://thinkwat.ch/icon.svg" },
-    },
+    ...(published ? { datePublished: published } : {}),
+    ...(modified ? { dateModified: modified } : {}),
+    image: new URL(ogImagePath(docsOgCard[product]), site).toString(),
+    // The product pages are /thinkwatch, /lite and /core.
+    about: { "@type": "SoftwareApplication", name: productName(p, lang), url: abs(localePath(lang, `/${p.id}`)) },
+    author: organizationRef,
+    publisher: organizationRef,
   },
 ];
 
@@ -74,6 +85,8 @@ const homeCards = slug ? [] : p.docs.filter((d) => d.slug);
   prev={prev}
   next={next}
   jsonLd={jsonLd}
+  published={published}
+  modified={modified}
 >
   <Content />
 

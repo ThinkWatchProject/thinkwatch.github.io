@@ -1,11 +1,12 @@
 ---
-// The /core page: ThinkWatch Core, the MIT-licensed Rust crates shared by
-// ThinkWatch Lite and the server edition.
+// The /core page: ThinkWatch Core, the MIT-licensed Rust crates and the twcore
+// binary shared by ThinkWatch Lite and ThinkWatch Enterprise.
 import Base from "~/layouts/Base.astro";
 import SiteHeader from "~/components/SiteHeader.astro";
 import SiteFooter from "~/components/SiteFooter.astro";
 import { getLang, localePath } from "~/i18n";
 import { coreCopy } from "~/i18n/pages/core";
+import { coreLd } from "~/lib/structured-data";
 
 const lang = getLang(Astro);
 const c = coreCopy[lang];
@@ -13,25 +14,7 @@ const zh = lang === "zh-CN";
 
 const repo = "https://github.com/ThinkWatchProject/ThinkWatch-Core";
 const docsHref = localePath(lang, "/docs/core");
-const pageUrl = new URL(Astro.url.pathname, Astro.site).toString();
-
-const jsonLd = [
-  {
-    "@context": "https://schema.org",
-    "@type": "SoftwareSourceCode",
-    name: "ThinkWatch Core",
-    description: c.meta.description,
-    codeRepository: repo,
-    programmingLanguage: "Rust",
-    license: "https://opensource.org/licenses/MIT",
-    url: pageUrl,
-    author: {
-      "@type": "Organization",
-      name: "ThinkWatch Project",
-      url: "https://github.com/ThinkWatchProject",
-    },
-  },
-];
+const jsonLd = await coreLd(lang);
 
 const delay = (i: number) => `animation-delay: ${i * 90}ms;`;
 const eyebrow = "font-mono text-[11px] uppercase tracking-[0.08em] text-[var(--color-muted)] sm:text-[13px]";
@@ -42,7 +25,7 @@ const textLink =
   "inline-flex min-h-11 items-center text-[17px] font-medium text-[var(--color-brand-1)] transition-colors hover:text-[var(--color-brand-2)]";
 ---
 
-<Base title={c.meta.title} description={c.meta.description} noJsonLd jsonLd={jsonLd}>
+<Base title={c.meta.title} description={c.meta.description} ogCard="core" jsonLd={jsonLd}>
   <SiteHeader />
   <main id="main">
     <section class="relative overflow-hidden">
