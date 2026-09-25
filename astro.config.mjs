@@ -64,15 +64,19 @@ export default defineConfig({
 
         // When the page's own files last changed in git, or the latest release
         // of a product the page shows came out, whichever is later. Left out
-        // when unknown.
-        const dates = [lastModified(pageSources(pathname))];
-        const products = pageReleases(pathname);
-        if (products.length) {
-          // Newest first: the first match is the latest release among them.
-          dates.push((await getReleases()).find((r) => products.includes(r.product))?.date);
+        // without git history: a release date alone does not say when the
+        // page itself last changed.
+        const committed = lastModified(pageSources(pathname));
+        if (committed) {
+          let latest = Date.parse(committed);
+          const products = pageReleases(pathname);
+          if (products.length) {
+            // Newest first: the first match is the latest release among them.
+            const release = (await getReleases()).find((r) => products.includes(r.product));
+            if (release) latest = Math.max(latest, Date.parse(release.date));
+          }
+          item.lastmod = new Date(latest).toISOString();
         }
-        const times = dates.flatMap((d) => (d ? [Date.parse(d)] : []));
-        if (times.length) item.lastmod = new Date(Math.max(...times)).toISOString();
         return item;
       },
     }),
