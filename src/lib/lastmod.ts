@@ -9,6 +9,7 @@
 // workflow checks out the full history for this.
 import { execFileSync } from "node:child_process";
 import { existsSync } from "node:fs";
+import { coreDocs, snapshotPath } from "./core-docs.mjs";
 import type { Product } from "./releases.mjs";
 
 interface FileDates {
@@ -96,11 +97,12 @@ export function pageSources(pathname: string): string[] {
         "src/components/ui/Terminal.tsx",
         "src/components/mocks",
         "src/components/LiteDownload.astro",
+        "src/components/CopyCommand.astro",
       ];
     case "/lite":
       return ["src/components/pages/LitePage.astro", "src/i18n/pages/lite.ts", "src/components/LiteDownload.astro", "public/lite"];
     case "/core":
-      return ["src/components/pages/CorePage.astro", "src/i18n/pages/core.ts"];
+      return ["src/components/pages/CorePage.astro", "src/i18n/pages/core.ts", "src/components/CopyCommand.astro"];
     case "/thinkwatch":
       return [
         "src/components/pages/ThinkWatchPage.astro",
@@ -118,6 +120,9 @@ export function pageSources(pathname: string): string[] {
       return ["src/pages/docs/_DocsHome.astro", "src/content/docs/_meta.ts"];
   }
   const product = path.match(/^\/docs\/(lite|core)(?:\/([^/]+))?$/);
+  // A Core document published from the Core repository: its committed copy.
+  const synced = product?.[1] === "core" && coreDocs.find((d) => d.slug === product[2]);
+  if (synced) return [snapshotPath(synced.files[lang])];
   if (product) return doc(`docs-${product[1]}`, product[2] ?? "overview");
   const guide = path.match(/^\/docs\/([^/]+)$/);
   if (guide) return doc("docs", guide[1]);

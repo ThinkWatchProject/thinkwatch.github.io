@@ -39,6 +39,8 @@ interface Props {
   /** For articles: first published and last changed, as ISO timestamps */
   published?: string;
   modified?: string;
+  /** Where the page's text is edited, when not with the product's other docs */
+  editUrl?: string;
 }
 
 const {
@@ -54,10 +56,12 @@ const {
   ogCard = docsOgCard[product],
   published,
   modified,
+  editUrl,
 } = Astro.props;
 const lang = getLang(Astro);
 const zh = lang === "zh-CN";
 const p = getProduct(product);
+const edit = editUrl ?? p.editUrl;
 const sidebar = getSidebar(product, lang);
 const currentDoc = p.docs.find((d) => d.slug === current);
 
@@ -211,7 +215,7 @@ const itemIdle = "text-[var(--color-text)]/80 hover:text-[var(--color-text)]";
         )}
 
         <a
-          href={p.editUrl}
+          href={edit}
           target="_blank"
           rel="noopener"
           class="mt-4 flex min-h-11 items-center gap-1.5 border-t border-[var(--color-border)] px-3 pt-3 text-xs text-[var(--color-muted)] hover:text-white"
@@ -250,7 +254,7 @@ const itemIdle = "text-[var(--color-text)]/80 hover:text-[var(--color-text)]";
 
         <div class="mt-8 border-t border-[var(--color-border)] pt-6 text-xs text-[var(--color-muted)]">
           <a
-            href={p.editUrl}
+            href={edit}
             target="_blank"
             rel="noopener"
             class="inline-flex items-center gap-1.5 transition-colors hover:text-white"

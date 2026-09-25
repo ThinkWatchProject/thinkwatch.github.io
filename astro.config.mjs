@@ -8,6 +8,27 @@ import rehypeAutolinkHeadings from 'rehype-autolink-headings';
 import { lastModified, pageReleases, pageSources } from './src/lib/lastmod.ts';
 import { getReleases } from './src/lib/github.ts';
 
+/**
+ * Wraps every markdown table in a container that scrolls sideways. The page
+ * clips horizontal overflow (global.css), so a table wider than a phone screen
+ * would otherwise be cut off rather than scroll.
+ */
+function rehypeScrollingTables() {
+  /** @param {any} node */
+  const visit = (node) => {
+    if (!Array.isArray(node.children)) return;
+    node.children = node.children.map((/** @type {any} */ child) => {
+      if (child.type === 'element' && child.tagName === 'table') {
+        // Focusable, like the code blocks, so that it can be scrolled from the keyboard.
+        return { type: 'element', tagName: 'div', properties: { className: ['table-scroll'], tabIndex: 0 }, children: [child] };
+      }
+      visit(child);
+      return child;
+    });
+  };
+  return (/** @type {any} */ tree) => visit(tree);
+}
+
 // https://astro.build/config
 export default defineConfig({
   site: 'https://thinkwat.ch',
@@ -87,6 +108,7 @@ export default defineConfig({
       wrap: false,
     },
     rehypePlugins: [
+      rehypeScrollingTables,
       rehypeSlug,
       [
         rehypeAutolinkHeadings,

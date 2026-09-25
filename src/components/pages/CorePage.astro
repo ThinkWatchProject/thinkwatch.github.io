@@ -1,11 +1,14 @@
 ---
 // The /core page: ThinkWatch Core, the MIT-licensed Rust crates and the twcore
-// binary shared by ThinkWatch Lite and ThinkWatch Enterprise.
+// binary. twcore is the gateway inside ThinkWatch Lite and also runs on its own
+// on a Linux server; ThinkWatch Enterprise depends on three of the crates.
 import Base from "~/layouts/Base.astro";
 import SiteHeader from "~/components/SiteHeader.astro";
 import SiteFooter from "~/components/SiteFooter.astro";
+import CopyCommand from "~/components/CopyCommand.astro";
 import { getLang, localePath } from "~/i18n";
 import { coreCopy } from "~/i18n/pages/core";
+import { getLatestCoreRelease, getReleases } from "~/lib/github";
 import { coreLd } from "~/lib/structured-data";
 
 const lang = getLang(Astro);
@@ -14,15 +17,48 @@ const zh = lang === "zh-CN";
 
 const repo = "https://github.com/ThinkWatchProject/ThinkWatch-Core";
 const docsHref = localePath(lang, "/docs/core");
+const serverDocsHref = localePath(lang, "/docs/core/server-deployment");
+const configDocsHref = localePath(lang, "/docs/core/configuration");
+const layersDocsHref = localePath(lang, "/docs/core/crate-layers");
 const jsonLd = await coreLd(lang);
+
+// The server install script, scripts/install.sh in the Core repository.
+const installScript = "https://raw.githubusercontent.com/ThinkWatchProject/ThinkWatch-Core/main/scripts/install.sh";
+const installCommand = `curl -fsSL ${installScript} | sudo sh`;
+// The service unit runs core as this user, with this data directory.
+const asServiceUser = "sudo -u thinkwatch THINKWATCH_HOME=/var/lib/thinkwatch twcore …";
+
+// Prebuilt binaries. The file names are fixed by Core's release workflow
+// (twcore upgrade and the install script depend on them as well). Links point
+// at the latest release read at build time, or at GitHub's redirect to the
+// latest release when GitHub could not be reached; the version then comes from
+// the committed list of releases (src/data/releases.json).
+const release = await getLatestCoreRelease();
+const tag = release?.tag ?? (await getReleases()).find((r) => r.product === "core")?.tag;
+const version = tag?.replace(/^v/, "");
+const download = (file: string) => release?.assets[file] ?? `${repo}/releases/latest/download/${file}`;
+const binaries: { label: string; file: string; archive?: string }[] = [
+  { label: c.install.platforms.mac, file: "twcore-aarch64-apple-darwin" },
+  { label: c.install.platforms.winX64, file: "twcore-x86_64-pc-windows-msvc.exe" },
+  { label: c.install.platforms.winArm, file: "twcore-aarch64-pc-windows-msvc.exe" },
+  { label: c.install.platforms.linuxX64, file: "twcore-x86_64-unknown-linux-gnu", archive: "twcore-x86_64-unknown-linux-gnu.tar.gz" },
+  { label: c.install.platforms.linuxArm, file: "twcore-aarch64-unknown-linux-gnu", archive: "twcore-aarch64-unknown-linux-gnu.tar.gz" },
+];
+const sourceCommands = [
+  "git clone https://github.com/ThinkWatchProject/ThinkWatch-Core.git",
+  "cd ThinkWatch-Core",
+  "cargo build --release -p twcore",
+];
 
 const delay = (i: number) => `animation-delay: ${i * 90}ms;`;
 const eyebrow = "font-mono text-[11px] uppercase tracking-[0.08em] text-[var(--color-muted)] sm:text-[13px]";
+const label = "m-0 font-mono text-[13px] uppercase tracking-[0.08em] text-[var(--color-muted)]";
 const h2 = zh
   ? "font-display m-0 text-[26px] leading-[1.35] sm:text-[32px] lg:text-[36px]"
   : "font-display m-0 text-[30px] leading-[1.15] sm:text-[36px] lg:text-[40px]";
 const textLink =
   "inline-flex min-h-11 items-center text-[17px] font-medium text-[var(--color-brand-1)] transition-colors hover:text-[var(--color-brand-2)]";
+const fileLink = "break-all text-[var(--color-brand-1)] transition-colors hover:text-[var(--color-brand-2)]";
 ---
 
 <Base title={c.meta.title} description={c.meta.description} ogCard="core" jsonLd={jsonLd}>
@@ -36,24 +72,36 @@ const textLink =
           </p>
           <h1
             class:list={[
-              "reveal font-display m-0 text-[var(--color-text)]",
+              "reveal font-display m-0 text-[var(--color-text)] [text-wrap:balance]",
               zh
-                ? "text-[30px] leading-[1.35] sm:text-[40px] lg:text-[48px]"
+                ? "text-[30px] leading-[1.35] sm:text-[40px] lg:text-[44px] xl:text-[48px]"
                 : "text-[36px] leading-[1.1] sm:text-[46px] lg:text-[56px] lg:leading-[1.05]",
             ]}
             style={delay(1)}
           >
-            {c.hero.titleA}<span class="text-shimmer">{c.hero.titleHighlight}</span>
+            {zh ? (
+              // Kept on one line, so that the break falls before the highlight
+              // rather than leaving "的" at the start of the second line.
+              <Fragment><span class="whitespace-nowrap">{c.hero.titleA.trimEnd()}</span>{c.hero.titleA.endsWith(" ") && " "}</Fragment>
+            ) : (
+              c.hero.titleA
+            )}<span class="text-shimmer">{c.hero.titleHighlight}</span>
           </h1>
-          <p class="reveal m-0 max-w-[36rem] text-[17px] leading-relaxed text-[#cbd5e1] sm:text-xl sm:leading-normal" style={delay(2)}>
+          <p class="reveal m-0 max-w-[38rem] text-[17px] leading-relaxed text-[#cbd5e1] sm:text-xl sm:leading-normal" style={delay(2)}>
             {c.hero.sub}
           </p>
-          <div class="reveal mt-1 flex flex-col gap-3 sm:mt-2 sm:flex-row sm:items-center sm:gap-5" style={delay(3)}>
+          <div class="reveal mt-1 flex flex-col gap-3 sm:mt-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-6 sm:gap-y-3" style={delay(3)}>
             <a
-              href={docsHref}
+              href="#install"
               class="inline-flex min-h-11 items-center justify-center rounded-[10px] bg-[var(--color-brand-1)] px-[22px] py-3 text-base font-semibold text-[var(--color-bg)] transition-colors hover:bg-[var(--color-brand-2)]"
             >
-              {c.hero.ctaPrimary}
+              {c.hero.ctaInstall}
+            </a>
+            <a
+              href={docsHref}
+              class="inline-flex min-h-11 items-center justify-center text-base font-medium text-[var(--color-brand-1)] transition-colors hover:text-[var(--color-brand-2)] sm:justify-start"
+            >
+              {c.hero.ctaDocs}
             </a>
             <a
               href={repo}
@@ -61,7 +109,7 @@ const textLink =
               rel="noopener"
               class="inline-flex min-h-11 items-center justify-center text-base font-medium text-[var(--color-brand-1)] transition-colors hover:text-[var(--color-brand-2)] sm:justify-start"
             >
-              {c.hero.ctaSecondary}
+              {c.hero.ctaGithub}
             </a>
           </div>
         </div>
@@ -93,7 +141,7 @@ const textLink =
     <section class="border-t border-[var(--color-border)] py-16 sm:py-20 lg:py-[88px]" aria-labelledby="core-does">
       <div class="container-page">
         <h2 id="core-does" class:list={[eyebrow, "m-0 font-normal"]}>{c.does.eyebrow}</h2>
-        <div class="mt-8 grid gap-7 sm:grid-cols-2 lg:grid-cols-5">
+        <div class="mt-8 grid gap-7 sm:grid-cols-2 lg:grid-cols-3 lg:gap-x-10 lg:gap-y-9">
           {c.does.items.map((item) => (
             <div class="flex flex-col gap-2.5 border-t border-[var(--color-border-strong)] pt-[18px]">
               <h3 class="m-0 text-lg font-semibold sm:text-[19px]">{item.title}</h3>
@@ -104,24 +152,99 @@ const textLink =
       </div>
     </section>
 
+    <section id="install" class="scroll-mt-20 border-t border-[var(--color-border)] py-16 sm:py-20 lg:py-[88px]" aria-labelledby="core-install">
+      <div class="container-page flex flex-col gap-12 lg:gap-16">
+        <div class="grid items-start gap-8 lg:grid-cols-2 lg:gap-16">
+          <div class="flex min-w-0 flex-col gap-4">
+            <p class:list={[eyebrow, "m-0"]}>{c.install.eyebrow}</p>
+            <h2 id="core-install" class={h2}>{c.install.title}</h2>
+            {c.install.body.map((text) => (
+              <p class="m-0 text-base leading-relaxed text-[#cbd5e1] sm:text-[17px]">{text}</p>
+            ))}
+            <div class="flex flex-wrap items-center gap-x-6 gap-y-2">
+              <a href={serverDocsHref} class={textLink}>{c.install.guide}</a>
+              <a href={configDocsHref} class={textLink}>{c.install.reference}</a>
+            </div>
+          </div>
+
+          <div class="flex min-w-0 flex-col gap-4">
+            <p class={label}>{c.install.scriptLabel}</p>
+            <CopyCommand command={installCommand} />
+            <p class="m-0 text-[15px] leading-relaxed text-[var(--color-muted)]">{c.install.pinNote}</p>
+            <CopyCommand command={`${installCommand} -s -- --version ${version ?? "X.Y.Z"}`} class="text-[#cbd5e1] text-[13px] sm:text-sm" />
+            <p class:list={[label, "mt-4"]}>{c.install.nextLabel}</p>
+            <div class="overflow-x-auto rounded-[14px] border border-[var(--color-border-strong)] bg-[var(--color-surface)] p-5 font-mono text-[13px] leading-normal sm:p-6 sm:text-[15px]">
+              <ul class="m-0 flex list-none flex-col gap-3.5 p-0">
+                {c.install.next.map((row) => (
+                  <li class="flex flex-col gap-0.5 whitespace-nowrap">
+                    <code class="text-[#e6ebf2]">{row.cmd}</code>
+                    <span class="text-[var(--color-muted)]">{row.note}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div class="flex min-w-0 flex-col gap-2 text-sm leading-relaxed text-[var(--color-muted)]">
+              <p class="m-0">{c.install.serviceUser}</p>
+              <code class="block overflow-x-auto whitespace-nowrap font-mono text-[13px] text-[#cbd5e1]">{asServiceUser}</code>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid items-start gap-6 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)] lg:gap-8">
+          <div class="flex min-w-0 flex-col gap-4 rounded-[14px] border border-[var(--color-border-strong)] p-5 sm:p-7">
+            <h3 class="m-0 text-lg font-semibold sm:text-xl">{c.install.binariesTitle}</h3>
+            <p class="m-0 text-[15px] leading-relaxed text-[var(--color-muted)] sm:text-base">{c.install.binariesBody}</p>
+            <ul class="m-0 flex list-none flex-col p-0">
+              {binaries.map((b) => (
+                <li class="flex flex-col gap-1.5 border-t border-[var(--color-border)] py-3 sm:flex-row sm:items-baseline sm:justify-between sm:gap-6">
+                  <span class="shrink-0 text-[15px] font-medium">{b.label}</span>
+                  <span class="flex min-w-0 flex-wrap items-baseline gap-x-3 gap-y-1 font-mono text-[13px] sm:justify-end">
+                    <a href={download(b.file)} class={fileLink}>{b.file}</a>
+                    <a href={download(`${b.file}.sha256`)} class={fileLink}>sha256</a>
+                    {b.archive && <a href={download(b.archive)} class={fileLink}>tar.gz</a>}
+                  </span>
+                </li>
+              ))}
+            </ul>
+            <p class="m-0 border-t border-[var(--color-border)] pt-3 font-mono text-[13px] text-[var(--color-muted)]">
+              {version && `${c.install.version} ${version} · `}
+              <a href={`${repo}/releases`} target="_blank" rel="noopener" class={fileLink}>{c.install.releases}</a>
+            </p>
+          </div>
+
+          <div class="flex min-w-0 flex-col gap-4 rounded-[14px] border border-[var(--color-border-strong)] p-5 sm:p-7">
+            <h3 class="m-0 text-lg font-semibold sm:text-xl">{c.install.sourceTitle}</h3>
+            <p class="m-0 text-[15px] leading-relaxed text-[var(--color-muted)] sm:text-base">{c.install.sourceBody}</p>
+            <div class="overflow-x-auto rounded-[10px] border border-[var(--color-border)] bg-[var(--color-surface)] p-4 font-mono text-[13px] leading-normal sm:p-5 sm:text-sm">
+              <ul class="m-0 flex list-none flex-col gap-2 p-0">
+                {sourceCommands.map((cmd) => (
+                  <li class="whitespace-nowrap text-[#e6ebf2]"><span class="select-none text-[var(--color-dim)]">$ </span>{cmd}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <section class="bg-[var(--color-surface)] py-16 sm:py-20 lg:py-[88px]" aria-labelledby="core-layers">
       <div class="container-page">
         <h2 id="core-layers" class:list={[eyebrow, "m-0 font-normal"]}>{c.layers.eyebrow}</h2>
         <ol class="m-0 mt-8 flex list-none flex-col gap-3 p-0">
-          {c.layers.rows.map((row, i) => (
+          {c.layers.rows.map((row) => (
             <li
               class:list={[
-                "grid items-start gap-2.5 rounded-xl border px-5 py-5 sm:px-[26px] sm:py-[22px] lg:grid-cols-[260px_minmax(0,1fr)_240px] lg:items-center lg:gap-6",
-                i === 0 ? "border-[var(--color-brand-1)]" : "border-[var(--color-border-strong)]",
+                "grid items-start gap-2.5 rounded-xl border px-5 py-5 sm:px-[26px] sm:py-[22px] lg:grid-cols-[320px_minmax(0,1fr)_auto] lg:items-center lg:gap-6",
+                row.mark === "shared" ? "border-[var(--color-brand-1)]" : "border-[var(--color-border-strong)]",
               ]}
             >
               <span class="text-[17px] font-semibold">{row.name}</span>
               <code class="break-words font-mono text-sm leading-relaxed text-[#cbd5e1] sm:text-[15px]">{row.crates}</code>
-              {i === 0 ? (
-                <span class="justify-self-start rounded-full border border-[var(--color-brand-1)] px-[11px] py-[5px] text-[13px] text-[var(--color-brand-1)] lg:justify-self-end">
+              {row.mark === "shared" ? (
+                <span class="justify-self-start rounded-full border border-[var(--color-brand-1)] px-[11px] py-[5px] text-[13px] text-[var(--color-brand-1)] lg:justify-self-end lg:whitespace-nowrap">
                   {c.layers.sharedTag}
                 </span>
-              ) : i >= 2 ? (
+              ) : row.mark === "local" ? (
                 <span class="text-[13px] text-[var(--color-muted)] lg:justify-self-end lg:text-right">{c.layers.localNote}</span>
               ) : (
                 <span class="hidden lg:block" aria-hidden="true"></span>
@@ -130,6 +253,7 @@ const textLink =
           ))}
         </ol>
         <p class="m-0 mt-6 max-w-3xl text-[15px] leading-relaxed text-[var(--color-muted)]">{c.layers.footnote}</p>
+        <a href={layersDocsHref} class:list={[textLink, "mt-3"]}>{c.layers.docs}</a>
       </div>
     </section>
 

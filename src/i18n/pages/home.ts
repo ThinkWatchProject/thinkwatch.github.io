@@ -6,7 +6,7 @@ export const homeCopy = {
     meta: {
       title: "ThinkWatch — AI Gateways for Organizations and Individual Developers",
       description:
-        "ThinkWatch provides AI gateways that route, inspect, and meter model requests and MCP tool calls: ThinkWatch, a self-hosted server for organizations, and ThinkWatch Lite, a desktop application for individual developers. Both are built on the MIT-licensed ThinkWatch Core.",
+        "ThinkWatch provides AI gateways that route, inspect, and meter model requests and MCP tool calls: ThinkWatch Enterprise, a self-hosted server for organizations, and ThinkWatch Lite, a desktop app for individual developers on macOS, Windows and Linux. Both share ThinkWatch Core, the MIT-licensed gateway engine, which also runs on its own on a Linux server.",
     },
     eyebrow: "AI API and MCP gateways",
     h1a: "AI gateways for",
@@ -14,7 +14,7 @@ export const homeCopy = {
     sub: "ThinkWatch routes, inspects, and meters model requests and MCP tool calls. It is available as a self-hosted server for organizations and as a desktop application for individual developers.",
     doors: {
       teams: { label: "For organizations", name: "ThinkWatch Enterprise", text: "Self-hosted AI API and MCP gateway.", cta: "Deploy ThinkWatch" },
-      machine: { label: "For individual developers", name: "ThinkWatch Lite", text: "Desktop application backed by a local gateway, for macOS on Apple Silicon, Windows on x64 or ARM64, and Linux on x86_64 or aarch64.", cta: "Install Lite" },
+      machine: { label: "For individual developers", name: "ThinkWatch Lite", text: "Desktop application backed by a local gateway, for macOS on Apple silicon, Windows on x64 or ARM64, and Linux on x86_64 or aarch64.", cta: "Install Lite" },
     },
     trace: {
       tag: "Sample trace",
@@ -80,19 +80,22 @@ export const homeCopy = {
       eyebrow: "ThinkWatch Lite · For individual developers",
       title: "A local AI gateway for macOS, Windows and Linux",
       points: [
-        { t: "Cost reporting", b: "Measured, estimated, and unpriced usage are reported separately and never combined; subscription usage is counted apart." },
+        { t: "Cost reporting", b: "Every request is priced from the price table; estimated amounts are marked as such, and requests that cannot be priced are counted as unpriced rather than as zero." },
         { t: "Request routing", b: "The matched rule, the group, and every upstream attempt, with a dry run for rules before any traffic." },
-        { t: "Outbound inspection", b: "Secret redaction, tool-call inspection, and a scan of the client configuration files." },
+        { t: "Security checks", b: "Five guards on requests and responses, from secret redaction and tool-call inspection to an output limit, and a scan of client configurations, skills and hooks for hidden characters, prompt injection and dangerous commands." },
+        { t: "Remote core", b: "The app can also connect to ThinkWatch Core running on a server, over an encrypted control channel." },
       ],
-      pills: ["Available", "macOS · Apple Silicon", "Windows · x64 · ARM64", "Linux · x86_64 · aarch64", "MIT"],
+      pills: ["Available", "macOS · Apple silicon", "Windows · x64 · ARM64", "Linux · x86_64 · aarch64", "MIT"],
       shotAlt:
         "The usage overview: tokens, cost and requests, a 24-hour trend stacked by model, the leaderboard by model and the cache hit rate",
       cta: "Explore ThinkWatch Lite",
     },
     core: {
-      a: "Both are built on ",
+      a: "ThinkWatch Enterprise and ThinkWatch Lite share ",
       name: "ThinkWatch Core",
-      b: ", a set of MIT-licensed Rust crates. Lite uses the complete engine; the server edition shares its protocol, provider, and resilience crates.",
+      b: ", MIT-licensed Rust crates and the twcore gateway binary. Lite runs the complete engine; Enterprise uses its format-conversion, guard and circuit-breaker crates. twcore also runs on its own on a Linux server, managed from ThinkWatch Lite.",
+      commandLabel: "Install twcore on a Linux server",
+      docs: "Server deployment guide",
     },
     compare: {
       eyebrow: "Compare editions",
@@ -111,13 +114,13 @@ export const homeCopy = {
       lite: {
         runsAs: "Desktop app in the macOS menu bar, the Windows notification area or the Linux system tray",
         builtFor: "Individual developers",
-        status: "Available · macOS on Apple Silicon, Homebrew or disk image · Windows on x64 or ARM64, installer · Linux on x86_64 or aarch64, AppImage",
+        status: "Available · macOS on Apple silicon, Homebrew or disk image · Windows on x64 or ARM64, installer · Linux on x86_64 or aarch64, AppImage",
         license: "MIT",
       },
       core: {
-        runsAs: "Rust crates and the twcore binary",
-        builtFor: "Developers building on the engine",
-        status: "Source available on GitHub",
+        runsAs: "Rust crates and the twcore binary, inside ThinkWatch Lite or as a systemd service on a Linux server",
+        builtFor: "Developers who build on the engine or run the gateway on a server",
+        status: "Released · prebuilt binaries for macOS, Windows and Linux · one-command install on Linux servers",
         license: "MIT",
       },
       link: "Full licensing details",
@@ -127,7 +130,7 @@ export const homeCopy = {
     meta: {
       title: "ThinkWatch — 面向组织与个人开发者的 AI 网关",
       description:
-        "ThinkWatch 提供对模型请求与 MCP 工具调用进行路由、检查和计量的 AI 网关，包括面向组织的自托管服务端 ThinkWatch 和面向个人开发者的桌面应用 ThinkWatch Lite，二者均基于 MIT 许可证的 ThinkWatch Core。",
+        "ThinkWatch 提供对模型请求与 MCP 工具调用进行路由、检查和计量的 AI 网关，包括面向组织的自托管服务端 ThinkWatch 企业版，以及面向个人开发者、支持 macOS、Windows 与 Linux 的桌面应用 ThinkWatch Lite。二者共用采用 MIT 许可证的网关引擎 ThinkWatch Core，它也可以独立运行在 Linux 服务器上。",
     },
     eyebrow: "AI API 与 MCP 网关",
     h1a: "面向组织与个人开发者的",
@@ -135,7 +138,7 @@ export const homeCopy = {
     sub: "ThinkWatch 对模型请求与 MCP 工具调用进行路由、检查与计量，提供面向组织的自托管服务端，以及面向个人开发者的桌面应用。",
     doors: {
       teams: { label: "面向组织", name: "ThinkWatch 企业版", text: "自托管的 AI API 与 MCP 网关。", cta: "部署 ThinkWatch" },
-      machine: { label: "面向个人开发者", name: "ThinkWatch Lite", text: "基于本地网关的桌面应用，支持 Apple Silicon 机型的 macOS、x64 与 ARM64 机型的 Windows，以及 x86_64 与 aarch64 机型的 Linux。", cta: "安装 Lite" },
+      machine: { label: "面向个人开发者", name: "ThinkWatch Lite", text: "基于本地网关的桌面应用，支持 Apple silicon 机型的 macOS、x64 与 ARM64 机型的 Windows，以及 x86_64 与 aarch64 机型的 Linux。", cta: "安装 Lite" },
     },
     trace: {
       tag: "示例追踪",
@@ -201,19 +204,22 @@ export const homeCopy = {
       eyebrow: "ThinkWatch Lite · 面向个人开发者",
       title: "适用于 macOS、Windows 与 Linux 的本地 AI 网关",
       points: [
-        { t: "费用报告", b: "实测、估算与无法计价的用量分别显示，不合并计算；订阅制用量单独统计。" },
+        { t: "费用报告", b: "每个请求按价目表计算费用；估算的金额另行标注，无法计价的请求单独计数，不按零计入。" },
         { t: "请求路由", b: "展示每个请求命中的规则、策略组与每一次尝试，改规则前可以先试算。" },
-        { t: "出站检查", b: "出站脱敏、工具调用审查，以及客户端配置文件的扫描。" },
+        { t: "安全检查", b: "五项防护作用于请求与响应，包括出站脱敏、工具调用审查与输出长度限制等；另可扫描客户端配置、技能与钩子，检查隐藏字符、提示注入与危险命令。" },
+        { t: "连接远程 core", b: "应用也可以通过加密的控制通道，连接运行在服务器上的 ThinkWatch Core。" },
       ],
-      pills: ["已发布", "macOS · Apple Silicon", "Windows · x64 · ARM64", "Linux · x86_64 · aarch64", "MIT"],
+      pills: ["已发布", "macOS · Apple silicon", "Windows · x64 · ARM64", "Linux · x86_64 · aarch64", "MIT"],
       shotAlt:
         "ThinkWatch Lite 的用量概览：token、费用与请求数，按模型分层的 24 小时趋势，模型排行与缓存命中率",
       cta: "了解 ThinkWatch Lite",
     },
     core: {
-      a: "两者均构建于 ",
+      a: "ThinkWatch 企业版与 ThinkWatch Lite 共用 ",
       name: "ThinkWatch Core",
-      b: " 之上，该项目是一组采用 MIT 许可证的 Rust crate。Lite 使用完整引擎，服务端版本共用其中的协议、Provider 适配与容错 crate。",
+      b: "：一组采用 MIT 许可证的 Rust crate 与 twcore 网关二进制。Lite 运行完整的引擎，企业版使用其中的格式转换、防护与熔断 crate。twcore 也可以独立运行在 Linux 服务器上，由 ThinkWatch Lite 远程管理。",
+      commandLabel: "在 Linux 服务器上安装 twcore",
+      docs: "服务器部署指南",
     },
     compare: {
       eyebrow: "产品对比",
@@ -232,13 +238,13 @@ export const homeCopy = {
       lite: {
         runsAs: "桌面应用，常驻 macOS 菜单栏、Windows 通知区域或 Linux 系统托盘",
         builtFor: "个人开发者",
-        status: "已发布 · macOS（Apple Silicon）：Homebrew 或磁盘映像 · Windows（x64、ARM64）：安装程序 · Linux（x86_64、aarch64）：AppImage",
+        status: "已发布 · macOS（Apple silicon）：Homebrew 或磁盘映像 · Windows（x64、ARM64）：安装程序 · Linux（x86_64、aarch64）：AppImage",
         license: "MIT",
       },
       core: {
-        runsAs: "Rust crate 与 twcore 二进制",
-        builtFor: "基于该引擎进行开发的开发者",
-        status: "源码托管于 GitHub",
+        runsAs: "Rust crate 与 twcore 二进制，随 ThinkWatch Lite 运行，或作为 systemd 服务运行在 Linux 服务器上",
+        builtFor: "基于该引擎开发，或在服务器上运行网关的开发者",
+        status: "已发布 · 提供 macOS、Windows 与 Linux 的预编译二进制 · Linux 服务器可一条命令安装",
         license: "MIT",
       },
       link: "查看完整许可证说明",

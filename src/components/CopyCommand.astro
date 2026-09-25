@@ -1,0 +1,58 @@
+---
+// A shell command with a copy button: the command scrolls, the button stays.
+// Used for the twcore install command on the Core page and on the home page.
+import { getLang, t } from "~/i18n";
+
+interface Props {
+  command: string;
+  /** Colour and size of the command text */
+  class?: string;
+}
+
+const { command, class: className = "text-[#e6ebf2] text-[15px] sm:text-base" } = Astro.props;
+const ui = t(getLang(Astro)).common;
+---
+
+<div
+  class="flex min-w-0 items-center rounded-[14px] border border-[var(--color-border-strong)] bg-[var(--color-surface)] font-mono leading-relaxed"
+  data-copy-command
+>
+  <code class:list={["min-w-0 flex-1 overflow-x-auto whitespace-nowrap p-5 sm:p-6", className]}>
+    <span class="select-none text-[var(--color-dim)]">$ </span><span data-cmd>{command}</span>
+  </code>
+  <button type="button" class="copy-button" data-copy={command} data-copied-label={ui.copied}>{ui.copy}</button>
+</div>
+
+<script>
+  for (const btn of document.querySelectorAll<HTMLButtonElement>("[data-copy-command] [data-copy]")) {
+    const label = btn.textContent;
+    btn.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(btn.dataset.copy ?? "");
+      } catch {
+        // No clipboard access: select the command so it can be copied by hand.
+        const cmd = btn.parentElement?.querySelector("[data-cmd]");
+        if (cmd) getSelection()?.selectAllChildren(cmd);
+        return;
+      }
+      btn.textContent = btn.dataset.copiedLabel ?? label;
+      setTimeout(() => (btn.textContent = label), 1500);
+    });
+  }
+</script>
+
+<style>
+  .copy-button {
+    flex-shrink: 0;
+    align-self: stretch;
+    border-left: 1px solid var(--color-border-strong);
+    padding: 0 1.25rem;
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    color: var(--color-muted);
+    transition: color 150ms;
+  }
+  .copy-button:hover {
+    color: var(--color-brand-1);
+  }
+</style>

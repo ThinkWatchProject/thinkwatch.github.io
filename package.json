@@ -11,6 +11,7 @@
     "pagefind": "pagefind --site dist --output-path dist/pagefind",
     "preview": "astro preview",
     "releases": "node scripts/update-releases.mjs",
+    "core-docs": "node scripts/update-core-docs.mjs",
     "favicons": "node scripts/generate-favicons.mjs",
     "astro": "astro"
   },
