@@ -8,8 +8,8 @@ const links = {
   licensingMd: "https://github.com/ThinkWatchProject/ThinkWatch/blob/main/LICENSING.md",
   liteLicense: "https://github.com/ThinkWatchProject/ThinkWatch-Lite/blob/main/LICENSE",
   coreLicense: "https://github.com/ThinkWatchProject/ThinkWatch-Core/blob/main/LICENSE",
-  sales: "mailto:hello@thinkwat.ch",
-  salesLabel: "hello@thinkwat.ch",
+  sales: "mailto:fylorn@outlook.com",
+  salesLabel: "fylorn@outlook.com",
 } as const;
 
 const tierNumbers = [
