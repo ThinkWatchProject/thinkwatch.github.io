@@ -112,7 +112,7 @@ export const liteCopy = {
       serverDocs: "Server deployment guide",
       docs: "Connecting to a remote core",
       addAlt:
-        "Adding a remote connection: the name homelab, the address 192.168.1.40, control port 24817 and the key, with a successful test that reports core 0.47.0 and the gateway at 192.168.1.40:8788",
+        "Adding a remote connection: the name homelab, the address 192.168.1.40, control port 24817 and the key, with a successful test that reports core 0.49.0 and the gateway at 192.168.1.40:8788",
       figures: [
         {
           id: "remote-switcher",
@@ -289,7 +289,7 @@ export const liteCopy = {
       serverDocs: "服务器部署指南",
       docs: "连接远程 core",
       addAlt:
-        "添加远程连接：名称 homelab、地址 192.168.1.40、控制端口 24817 与密钥，测试连接成功，显示 core 0.47.0 与网关地址 192.168.1.40:8788",
+        "添加远程连接：名称 homelab、地址 192.168.1.40、控制端口 24817 与密钥，测试连接成功，显示 core 0.49.0 与网关地址 192.168.1.40:8788",
       figures: [
         {
           id: "remote-switcher",
