@@ -135,8 +135,8 @@ export const products: Product[] = [
     base: "/docs/lite",
     editUrl: "https://github.com/ThinkWatchProject/thinkwatch.github.io/tree/main/src/content/docs-lite",
     tagline: {
-      en: "The desktop app for a local AI API gateway on macOS, Windows and Linux: what it shows, how to install it, and how it is built.",
-      "zh-CN": "运行本地 AI API 网关的 macOS、Windows 与 Linux 桌面应用：它展示什么、怎么安装、怎么构建。",
+      en: "The desktop app for a local AI API gateway on macOS, Windows and Linux: what it shows, how to install it, how to connect it to a core on a server, and how it is built.",
+      "zh-CN": "在本机运行 AI API 网关的 macOS、Windows 与 Linux 桌面应用：展示的内容、安装方法、连接服务器上的 core 的方法，以及构建方式。",
     },
     docs: [
       overview(),
@@ -148,6 +148,16 @@ export const products: Product[] = [
         summary: {
           en: "Homebrew, a disk image, the Windows installer or the Linux AppImage, the quarantine attribute and SmartScreen, and how updates reach each kind of install.",
           "zh-CN": "通过 Homebrew、磁盘映像、Windows 安装程序或 Linux AppImage 安装，隔离属性与 SmartScreen 的处理，以及各种安装方式如何更新。",
+        },
+      },
+      {
+        slug: "remote-core",
+        label: { en: "Connecting to a remote core", "zh-CN": "连接远程 core" },
+        locales: both,
+        group: "getStarted",
+        summary: {
+          en: "Connect the app to ThinkWatch Core on a server: what the server needs, the steps in the app, what changes while connected, and how the connection is secured.",
+          "zh-CN": "让应用连接部署在服务器上的 ThinkWatch Core：服务器需要具备的条件、应用中的操作步骤、连接期间的变化，以及连接如何加密。",
         },
       },
       {
@@ -166,8 +176,8 @@ export const products: Product[] = [
         locales: both,
         group: "concepts",
         summary: {
-          en: "A Tauri 2 shell and a React 19 frontend that supervise Core and communicate with it over a unix socket on macOS and Linux and a loopback port on Windows.",
-          "zh-CN": "Tauri 2 外壳与 React 19 前端，负责托管 Core，在 macOS 与 Linux 上通过 unix socket、在 Windows 上通过回环端口与其通信。",
+          en: "A Tauri 2 shell and a React 19 frontend that supervise Core and control it over a unix socket on macOS and Linux, a loopback port on Windows or a TCP port on a server, each with an encrypted handshake.",
+          "zh-CN": "Tauri 2 外壳与 React 19 前端，负责托管 Core，在 macOS 与 Linux 上通过 unix socket、在 Windows 上通过回环端口、连接服务器时通过 TCP 端口控制它，每种通道都经过加密握手。",
         },
       },
       {

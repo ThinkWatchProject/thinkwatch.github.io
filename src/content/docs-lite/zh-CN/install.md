@@ -1,6 +1,6 @@
 # 安装与更新
 
-ThinkWatch Lite 支持 macOS 12 及以上版本的 Apple Silicon 机型，Windows 10 21H2 及以上版本的 x64 与 ARM64 机型，以及 x86_64 与 aarch64 机型的 Linux。网关 ThinkWatch Core 在应用包内，没有第二样东西要装。
+ThinkWatch Lite 支持 macOS 12 及以上版本的 Apple silicon 机型，Windows 10 21H2 及以上版本的 x64 与 ARM64 机型，以及 x86_64 与 aarch64 机型的 Linux。网关 ThinkWatch Core 随应用一同安装，无需另行安装其他组件。
 
 ## macOS：Homebrew
 
@@ -85,4 +85,5 @@ brew update && brew upgrade --cask thinkwatch-lite
 
 - [概览](/zh-CN/docs/lite)：应用展示什么。
 - [从源码构建](/zh-CN/docs/lite/run-from-source)：在本机运行开发版本。
+- [连接远程 core](/zh-CN/docs/lite/remote-core)：使用部署在服务器上的网关。
 - [架构](/zh-CN/docs/lite/architecture)：应用的结构，以及它与 Core 的通信方式。

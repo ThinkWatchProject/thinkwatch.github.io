@@ -1,10 +1,13 @@
 ---
 // The /lite product page: ThinkWatch Lite, the desktop app for individual
 // developers on macOS, Windows and Linux. Status copy must stay in line with the Lite
-// README.
+// README; how the copy is checked is described in src/i18n/pages/lite.ts.
 //
 // Each page shows the interface in its own language: the app ships in both,
-// and a screenshot of the other one says little to the reader.
+// and a screenshot of the other one says little to the reader. The images in
+// public/lite come from the Lite repository's docs/screenshots/web: window
+// shots are 2360×1540, the menu 664×1120, the menu bar item 178×64, all at
+// twice the size they are shown at.
 import LiteDownload from "~/components/LiteDownload.astro";
 import Base from "~/layouts/Base.astro";
 import SiteHeader from "~/components/SiteHeader.astro";
@@ -52,6 +55,9 @@ const dmg = { url: assetUrl("-arm64.dmg") ?? latestPage, sha: assetUrl("-arm64.d
 const liteVersion = liteRelease?.tag.replace(/^v/, "") ?? null;
 const installDocsHref = localePath(lang, "/docs/lite/install");
 const sourceDocsHref = localePath(lang, "/docs/lite/run-from-source");
+const remoteDocsHref = localePath(lang, "/docs/lite/remote-core");
+/** Installing and running twcore on a Linux server, in the Core repository */
+const serverDocsHref = `https://github.com/ThinkWatchProject/ThinkWatch-Core/blob/main/docs/server${zh ? ".zh-CN" : ""}.md`;
 const jsonLd = await liteLd(lang);
 
 const delay = (i: number) => `animation-delay: ${i * 90}ms;`;
@@ -79,14 +85,15 @@ const archLabel = { x64: "x64", arm64: "ARM64" } as const;
           </p>
           <h1
             class:list={[
-              "reveal font-display m-0 text-[var(--color-text)]",
+              "reveal font-display m-0 text-[var(--color-text)] [text-wrap:balance]",
               zh
                 ? "text-[30px] leading-[1.35] sm:text-[40px] lg:text-[48px]"
                 : "text-[36px] leading-[1.1] sm:text-[46px] lg:text-[56px] lg:leading-[1.05]",
             ]}
             style={delay(1)}
           >
-            {c.hero.titleA}<span class="text-shimmer">{c.hero.titleHighlight}</span>
+            {/* Chinese breaks between any two characters: keep the highlighted noun on one line. */}
+            {c.hero.titleA}<span class:list={["text-shimmer", zh && "whitespace-nowrap"]}>{c.hero.titleHighlight}</span>
           </h1>
           <p class="reveal m-0 max-w-[36rem] text-[17px] leading-relaxed text-[#cbd5e1] sm:text-xl sm:leading-normal" style={delay(2)}>
             {c.hero.sub}
@@ -152,29 +159,85 @@ const archLabel = { x64: "x64", arm64: "ARM64" } as const;
       </div>
     </section>
 
+    <section class="border-t border-[var(--color-border-strong)] py-16 sm:py-20 lg:py-24" aria-labelledby="lite-remote">
+      <div class="container-page flex flex-col gap-12 sm:gap-14">
+        <div class="grid items-center gap-8 lg:grid-cols-2 lg:gap-14">
+          <div class="flex min-w-0 flex-col gap-4">
+            <p class:list={[eyebrow, "m-0"]}>{c.remote.eyebrow}</p>
+            <h2 id="lite-remote" class={h2}>{c.remote.title}</h2>
+            {c.remote.body.map((p) => (
+              <p class="m-0 text-base leading-relaxed text-[var(--color-muted)] sm:text-[17px]">{p}</p>
+            ))}
+            <div class="flex flex-wrap items-center gap-x-6 gap-y-2">
+              <a href={serverDocsHref} target="_blank" rel="noopener" class={textLink}>
+                {c.remote.serverDocs}
+                <svg class="ml-1.5 h-4 w-4" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                  <path d="M5 11L11 5M6 5h5v5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+                </svg>
+              </a>
+              <a href={remoteDocsHref} class={textLink}>{c.remote.docs}</a>
+            </div>
+          </div>
+          <img
+            src={shot("remote-add")}
+            width="2360"
+            height="1540"
+            loading="lazy"
+            decoding="async"
+            class={shotClass}
+            alt={c.remote.addAlt}
+          />
+        </div>
+        <div class="grid gap-10 md:grid-cols-2 lg:gap-14">
+          {c.remote.figures.map((figure) => (
+            <figure class="m-0 flex min-w-0 flex-col gap-3">
+              <img
+                src={shot(figure.id)}
+                width="2360"
+                height="1540"
+                loading="lazy"
+                decoding="async"
+                class={shotClass}
+                alt={figure.alt}
+              />
+              <figcaption class="text-[15px] leading-relaxed text-[var(--color-muted)] sm:text-base">{figure.caption}</figcaption>
+            </figure>
+          ))}
+        </div>
+      </div>
+    </section>
+
     <section class="pb-16 sm:pb-20 lg:pb-24" aria-labelledby="lite-menubar">
       <div class="container-page grid items-center gap-8 rounded-2xl border border-[var(--color-border-strong)] p-6 sm:p-10 lg:grid-cols-[minmax(0,1fr)_auto] lg:gap-14">
-        <div class="flex flex-col gap-3">
+        <div class="flex min-w-0 flex-col gap-3">
           <p class:list={[eyebrow, "m-0"]}>{c.menubar.eyebrow}</p>
           <h2 id="lite-menubar" class={h2}>{c.menubar.title}</h2>
+          {/* The menu bar item at its real size: the bitmap is drawn at 2×, 89 × 32 points. */}
+          <img src="/lite/menubar.png" width="178" height="64" loading="lazy" class="my-2 h-auto w-[89px]" alt={c.menubar.chipAlt} />
           <p class="m-0 text-base leading-relaxed text-[var(--color-muted)] sm:text-[17px]">{c.menubar.body}</p>
+          <p class="m-0 text-base leading-relaxed text-[var(--color-muted)] sm:text-[17px]">{c.menubar.notices}</p>
         </div>
-        <div class="flex flex-wrap items-center gap-4">
-          <img src="/lite/menubar-cost.png" width="420" height="64" loading="lazy" class="h-auto w-[420px] max-w-full" alt={c.menubar.costAlt} />
-          <img src="/lite/menubar-quota.png" width="420" height="64" loading="lazy" class="h-auto w-[420px] max-w-full" alt={c.menubar.quotaAlt} />
-        </div>
+        <img
+          src={shot("menubar-menu")}
+          width="664"
+          height="1120"
+          loading="lazy"
+          decoding="async"
+          class="mx-auto h-auto w-[332px] max-w-full"
+          alt={c.menubar.menuAlt}
+        />
       </div>
     </section>
 
     <section class="bg-[var(--color-surface)] py-16 sm:py-20 lg:py-[88px]" aria-labelledby="lite-built">
       <div class="container-page">
         <h2 id="lite-built" class:list={[eyebrow, "m-0 font-normal"]}>{c.built.eyebrow}</h2>
-        <div class="mt-8 grid items-stretch lg:mt-10 lg:grid-cols-[minmax(0,1fr)_120px_minmax(0,1fr)_120px_minmax(0,1fr)] lg:items-center">
+        <div class="mt-8 grid items-stretch lg:mt-10 lg:grid-cols-[minmax(0,1fr)_216px_minmax(0,1fr)_96px_minmax(0,1fr)] lg:items-center">
           {nodes.map((node, i) => (
             <Fragment>
               {i > 0 && (
                 <div
-                  class="flow-link relative flex items-center justify-center py-2 lg:py-0"
+                  class="flow-link relative flex flex-col items-center justify-center gap-3 py-3 lg:py-0"
                   data-active={i === 1 ? "true" : undefined}
                   aria-hidden={i === 1 ? undefined : "true"}
                 >
@@ -186,10 +249,17 @@ const archLabel = { x64: "x64", arm64: "ARM64" } as const;
                   >
                     {i === 1 && <span class="flow-dot" aria-hidden="true"></span>}
                   </div>
+                  {/* The channel between the app and core: under the line when the nodes sit
+                      side by side, below the vertical line when they are stacked. */}
                   {i === 1 && (
-                    <span class="absolute left-[calc(50%+14px)] font-mono text-xs text-[var(--color-muted)] lg:left-auto lg:top-[calc(50%+8px)]">
-                      {c.built.link}
-                    </span>
+                    <div class="text-center font-mono text-xs leading-relaxed text-[var(--color-muted)] lg:absolute lg:inset-x-2 lg:top-[calc(50%+12px)]">
+                      <p class="m-0 text-[var(--color-text)]">{c.built.link.title}</p>
+                      <ul class="m-0 list-none p-0">
+                        {c.built.link.lines.map((line) => (
+                          <li>{line}</li>
+                        ))}
+                      </ul>
+                    </div>
                   )}
                 </div>
               )}

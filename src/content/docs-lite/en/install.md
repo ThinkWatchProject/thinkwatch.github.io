@@ -1,6 +1,6 @@
 # Install and update
 
-ThinkWatch Lite runs on macOS 12 or later on Apple Silicon, on Windows 10 21H2 or later on x64 or ARM64, and on Linux on x86_64 or aarch64. The gateway, ThinkWatch Core, ships inside the app; nothing else needs to be installed.
+ThinkWatch Lite runs on macOS 12 or later on Apple silicon, on Windows 10 21H2 or later on x64 or ARM64, and on Linux on x86_64 or aarch64. The gateway, ThinkWatch Core, ships inside the app; nothing else needs to be installed.
 
 ## macOS: Homebrew
 
@@ -85,4 +85,5 @@ brew update && brew upgrade --cask thinkwatch-lite
 
 - [Overview](/docs/lite): what the app shows.
 - [Build from source](/docs/lite/run-from-source): run a development build.
+- [Connecting to a remote core](/docs/lite/remote-core): use a gateway that runs on a server.
 - [Architecture](/docs/lite/architecture): the structure of the app and how it communicates with Core.
