@@ -7,6 +7,8 @@ export const coreCopy = {
       title: "ThinkWatch Core — Shared core of the ThinkWatch gateways",
       description:
         "Routing, forwarding, observability, cost accounting, and data-plane guards, provided as MIT-licensed Rust crates. Used by ThinkWatch Lite and by the server edition.",
+      /** The twcore binary, in the structured data (JSON-LD) */
+      twcoreDescription: "A complete, self-contained gateway binary",
     },
     hero: {
       eyebrow: "ThinkWatch Core · Shared engine",
@@ -80,6 +82,8 @@ export const coreCopy = {
       title: "ThinkWatch Core — ThinkWatch 网关的共享核心",
       description:
         "路由、转发、可观测性、成本核算与数据面防护，以 MIT 许可证的 Rust crate 形式提供，供 ThinkWatch Lite 与服务端版本使用。",
+      /** The twcore binary, in the structured data (JSON-LD) */
+      twcoreDescription: "完整且可独立运行的网关二进制",
     },
     hero: {
       eyebrow: "ThinkWatch Core · 共享引擎",

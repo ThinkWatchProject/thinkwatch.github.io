@@ -1,0 +1,45 @@
+name: Check
+
+# Builds the site for every pull request, the same way the deploy workflow does,
+# so that a change that breaks the build (a share-image headline that no longer
+# fits, a page that fails to render) shows up before it reaches main.
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: check-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # The sitemap's <lastmod> and the dates on doc pages come from git history.
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build site
+        run: pnpm build
+        env:
+          GITHUB_TOKEN: ${{ github.token }}

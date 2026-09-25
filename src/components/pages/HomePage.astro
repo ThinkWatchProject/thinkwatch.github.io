@@ -10,52 +10,24 @@ import LiteBand from "~/components/home/LiteBand.astro";
 import CoreStrip from "~/components/home/CoreStrip.astro";
 import CompareEditions from "~/components/home/CompareEditions.astro";
 import { getLang } from "~/i18n";
+import { homeCopy } from "~/i18n/pages/home";
+import { coreLd, enterpriseLd, liteLd, webPage, website } from "~/lib/structured-data";
 
 const lang = getLang(Astro);
-const home = new URL(Astro.url.pathname, Astro.site).toString();
+const c = homeCopy[lang];
 
-// The home page introduces all three products, so it describes each of them
-// instead of the default ThinkWatch-only SoftwareApplication.
+// The home page introduces all three products, so it describes each of them,
+// the same way their own pages do.
 const jsonLd = [
-  {
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    name: "ThinkWatch",
-    applicationCategory: "DeveloperApplication",
-    operatingSystem: "Linux, macOS, Windows (via Docker / Kubernetes)",
-    url: "https://thinkwat.ch/thinkwatch",
-    downloadUrl: "https://github.com/ThinkWatchProject/ThinkWatch",
-    license: "https://github.com/ThinkWatchProject/ThinkWatch/blob/main/LICENSE",
-    offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-  },
-  {
-    "@context": "https://schema.org",
-    "@type": "SoftwareSourceCode",
-    name: "ThinkWatch Lite",
-    url: "https://thinkwat.ch/lite",
-    codeRepository: "https://github.com/ThinkWatchProject/ThinkWatch-Lite",
-    programmingLanguage: ["TypeScript", "Rust"],
-    license: "https://opensource.org/licenses/MIT",
-  },
-  {
-    "@context": "https://schema.org",
-    "@type": "SoftwareSourceCode",
-    name: "ThinkWatch Core",
-    url: "https://thinkwat.ch/core",
-    codeRepository: "https://github.com/ThinkWatchProject/ThinkWatch-Core",
-    programmingLanguage: "Rust",
-    license: "https://opensource.org/licenses/MIT",
-  },
-  {
-    "@context": "https://schema.org",
-    "@type": "WebPage",
-    url: home,
-    inLanguage: lang,
-  },
+  website,
+  webPage(lang, "/", c.meta.title, c.meta.description),
+  ...(await enterpriseLd(lang)),
+  ...(await liteLd(lang)),
+  ...(await coreLd(lang)),
 ];
 ---
 
-<Base noJsonLd jsonLd={jsonLd}>
+<Base title={c.meta.title} description={c.meta.description} jsonLd={jsonLd}>
   <SiteHeader />
   <main id="main">
     <HomeHero />
