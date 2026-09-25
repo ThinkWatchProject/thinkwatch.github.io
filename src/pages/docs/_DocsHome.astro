@@ -17,20 +17,20 @@ const copy = zh
   ? {
       title: "文档 · ThinkWatch",
       description:
-        "ThinkWatch、ThinkWatch Lite 与 ThinkWatch Core 的文档，涵盖架构、部署、配置、API 参考、安全模型、桌面应用与共享核心。",
+        "ThinkWatch 企业版、ThinkWatch Lite 与 ThinkWatch Core 的文档，涵盖架构、部署、配置、API 参考、安全模型、桌面应用与共享核心。",
       h1: "文档",
       intro:
-        "三个产品分别提供文档：面向团队与企业的 ThinkWatch、在本地运行的桌面应用 ThinkWatch Lite，以及二者共用的 ThinkWatch Core。可通过上方的切换器选择产品，或从下方卡片进入。",
+        "三个产品分别提供文档：面向组织的 ThinkWatch 企业版；桌面应用 ThinkWatch Lite，在本机运行网关，也可以连接服务器上的 ThinkWatch Core；以及 ThinkWatch Core，即 ThinkWatch Lite 所基于的网关引擎与 Rust crate，ThinkWatch 企业版也使用其中的三个 crate。可通过上方的切换器选择产品，或从下方卡片进入。",
       open: (name: string) => `进入 ${name} 文档`,
       more: "其他资源",
     }
   : {
       title: "Documentation · ThinkWatch",
       description:
-        "Documentation for ThinkWatch, ThinkWatch Lite, and ThinkWatch Core, covering architecture, deployment, configuration, API reference, the security model, the desktop application, and the shared core.",
+        "Documentation for ThinkWatch Enterprise, ThinkWatch Lite, and ThinkWatch Core, covering architecture, deployment, configuration, API reference, the security model, the desktop application, and the shared core.",
       h1: "Documentation",
       intro:
-        "Documentation is provided for three products: ThinkWatch, for teams and enterprises; ThinkWatch Lite, a desktop application that runs locally; and ThinkWatch Core, the crates both are built on. Select a product with the switcher above or from the cards below.",
+        "Documentation is provided for three products: ThinkWatch Enterprise, for organizations; ThinkWatch Lite, a desktop application that runs the gateway locally or connects to ThinkWatch Core on a server; and ThinkWatch Core, the gateway engine and Rust crates that ThinkWatch Lite is built on, three of which ThinkWatch Enterprise also uses. Select a product with the switcher above or from the cards below.",
       open: (name: string) => `Open ${name} docs`,
       more: "Additional resources",
     };

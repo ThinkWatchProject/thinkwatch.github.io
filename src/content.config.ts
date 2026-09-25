@@ -1,5 +1,6 @@
 import { defineCollection, z } from "astro:content";
 import { glob } from "astro/loaders";
+import { coreDocsLoader } from "./lib/core-docs-loader";
 
 const changelogSchema = z.object({
   version: z.string(),
@@ -39,4 +40,17 @@ const docs_core = defineCollection({
   schema: z.object({}).passthrough(),
 });
 
-export const collections = { changelog, changelog_zh, docs, docs_lite, docs_core };
+// Core documents whose text lives in the ThinkWatch Core repository (the
+// configuration reference, the server deployment guide): fetched from the latest
+// Core release at build time, see src/lib/core-docs.mjs. Same ids as docs_core.
+const docs_core_synced = defineCollection({
+  loader: coreDocsLoader(),
+  schema: z.object({
+    /** Path of the document in the Core repository */
+    source: z.string(),
+    /** The tag it was taken from */
+    ref: z.string(),
+  }),
+});
+
+export const collections = { changelog, changelog_zh, docs, docs_lite, docs_core, docs_core_synced };

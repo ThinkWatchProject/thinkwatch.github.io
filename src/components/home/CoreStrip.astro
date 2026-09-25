@@ -1,16 +1,31 @@
 ---
+// ThinkWatch Core on the home page: what the two products share, and the
+// command that installs twcore on a Linux server (see the /core page).
+import CopyCommand from "~/components/CopyCommand.astro";
 import { getLang, localePath } from "~/i18n";
 import { homeCopy } from "~/i18n/pages/home";
 
 const lang = getLang(Astro);
 const c = homeCopy[lang].core;
+
+const installCommand =
+  "curl -fsSL https://raw.githubusercontent.com/ThinkWatchProject/ThinkWatch-Core/main/scripts/install.sh | sudo sh";
 ---
 
 <div class="border-y border-[var(--color-border)]">
-  <div class="container-page flex flex-col gap-5 py-10 md:flex-row md:items-center md:justify-between md:gap-12 md:py-12">
-    <p class="max-w-3xl text-base leading-relaxed text-[#cbd5e1] sm:text-xl">
+  <div class="container-page grid gap-6 py-10 md:py-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-center lg:gap-12">
+    <p class="m-0 max-w-3xl text-base leading-relaxed text-[#cbd5e1] sm:text-xl">
       {c.a}<a href={localePath(lang, "/core")} class="font-semibold text-white underline decoration-[var(--color-brand-1)]/50 underline-offset-4 hover:text-[var(--color-brand-1)]">{c.name}</a>{c.b}
     </p>
-    <code class="shrink-0 self-start rounded-[10px] border border-[var(--color-border-strong)] bg-[var(--color-surface)] px-5 py-4 font-mono text-sm text-[var(--color-brand-1)] md:self-auto sm:text-[15px]">cargo run -p twcore -- serve</code>
+    <div class="flex min-w-0 flex-col gap-3">
+      <p class="m-0 font-mono text-[13px] uppercase tracking-[0.08em] text-[var(--color-muted)]">{c.commandLabel}</p>
+      <CopyCommand command={installCommand} class="text-[var(--color-brand-1)] text-sm sm:text-[15px]" />
+      <a
+        href={localePath(lang, "/docs/core/server-deployment")}
+        class="inline-flex min-h-11 items-center self-start text-[17px] font-medium text-[var(--color-brand-1)] transition-colors hover:text-[var(--color-brand-2)]"
+      >
+        {c.docs}
+      </a>
+    </div>
   </div>
 </div>

@@ -345,6 +345,22 @@
   font-size: 0.85rem;
   margin: 1.5em 0;
 }
+/* A table wider than the column scrolls inside its wrapper (rehypeScrollingTables
+   in astro.config.mjs). */
+.prose-tw .table-scroll {
+  overflow-x: auto;
+  margin: 1.5em 0;
+}
+.prose-tw .table-scroll > table { margin: 0; }
+@media (max-width: 40rem) {
+  /* On a phone a wide table keeps readable columns and scrolls, rather than
+     being squeezed into the width of the screen. */
+  .prose-tw .table-scroll > table {
+    width: max-content;
+    min-width: 100%;
+    max-width: 36rem;
+  }
+}
 .prose-tw thead { background: rgba(255,255,255,0.03); }
 .prose-tw th {
   text-align: left;

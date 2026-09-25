@@ -41,9 +41,15 @@ const free = { "@type": "Offer", price: 0, priceCurrency: "USD" };
 
 /** Platforms of the Lite downloads and the prebuilt twcore binaries, which match. */
 const processors: Record<Lang, string> = {
-  en: "Apple Silicon (arm64) on macOS; x64 or ARM64 on Windows; x86_64 or aarch64 on Linux",
-  "zh-CN": "macOS：Apple Silicon（arm64）；Windows：x64 或 ARM64；Linux：x86_64 或 aarch64",
+  en: "Apple silicon (arm64) on macOS; x64 or ARM64 on Windows; x86_64 or aarch64 on Linux",
+  "zh-CN": "macOS：Apple silicon（arm64）；Windows：x64 或 ARM64；Linux：x86_64 或 aarch64",
 };
+
+/** A description the page copy must provide: a missing one fails the build rather than leaving the field out. */
+function required(value: string | undefined, what: string): string {
+  if (!value?.trim()) throw new Error(`[structured-data] ${what} is missing`);
+  return value;
+}
 
 /** On every page. */
 export const organization: JsonLd = {
@@ -198,12 +204,13 @@ export async function coreLd(lang: Lang): Promise<JsonLd[]> {
       "@type": "SoftwareApplication",
       "@id": ids.twcore,
       name: "twcore",
-      description: c.meta.twcoreDescription,
+      description: required(c.meta.twcoreDescription, `coreCopy["${lang}"].meta.twcoreDescription`),
       applicationCategory: "DeveloperApplication",
       operatingSystem: "Linux, macOS, Windows",
       processorRequirements: processors[lang],
       ...(release ? { softwareVersion: release.tag.replace(/^v/, "") } : {}),
       url,
+      installUrl: `${url}#install`,
       downloadUrl: binaries.length ? binaries : `${repo}/releases/latest`,
       image: abs(ogImagePath("core")),
       license: MIT,

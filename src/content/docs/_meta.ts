@@ -188,8 +188,8 @@ export const products: Product[] = [
     base: "/docs/core",
     editUrl: "https://github.com/ThinkWatchProject/thinkwatch.github.io/tree/main/src/content/docs-core",
     tagline: {
-      en: "Shared core of the ThinkWatch gateways: MIT-licensed Rust crates and the twcore binary.",
-      "zh-CN": "ThinkWatch 网关的共享核心：采用 MIT 许可证的 Rust crate 与 twcore 二进制。",
+      en: "The gateway engine shared by ThinkWatch Lite and ThinkWatch Enterprise: MIT-licensed Rust crates and the twcore binary, which also runs on its own on a Linux server.",
+      "zh-CN": "ThinkWatch Lite 与 ThinkWatch 企业版共用的网关引擎：采用 MIT 许可证的 Rust crate 与 twcore 二进制，后者也可独立运行在 Linux 服务器上。",
     },
     docs: [
       overview(),
@@ -199,8 +199,19 @@ export const products: Product[] = [
         locales: both,
         group: "getStarted",
         summary: {
-          en: "Write, check, and serve a config with the twcore binary.",
-          "zh-CN": "使用 twcore 二进制生成、校验并启动配置。",
+          en: "Get twcore from a release or build it from source, write and check a configuration, and point a client at the gateway.",
+          "zh-CN": "从发布版本获取 twcore 或从源码构建，生成并校验配置，并将客户端指向网关。",
+        },
+      },
+      // Published from the Core repository (src/lib/core-docs.mjs).
+      {
+        slug: "server-deployment",
+        label: { en: "Server deployment", "zh-CN": "服务器部署" },
+        locales: both,
+        group: "getStarted",
+        summary: {
+          en: "Run twcore as a systemd service on Linux, open the remote control port, connect ThinkWatch Lite, and upgrade with twcore upgrade.",
+          "zh-CN": "在 Linux 上以 systemd 服务运行 twcore，开启远程控制端口，连接 ThinkWatch Lite，并用 twcore upgrade 升级。",
         },
       },
       {
@@ -209,8 +220,19 @@ export const products: Product[] = [
         locales: both,
         group: "concepts",
         summary: {
-          en: "The four layers, and why the bottom two are not shared with the server edition.",
-          "zh-CN": "四层结构，以及下面两层不与服务端版本共享的原因。",
+          en: "The sixteen crates grouped by role, the three that ThinkWatch Enterprise depends on, and what ThinkWatch Lite compiles.",
+          "zh-CN": "十六个 crate 按职责的分组、ThinkWatch 企业版依赖的三个 crate，以及 ThinkWatch Lite 编译的部分。",
+        },
+      },
+      // Published from the Core repository (src/lib/core-docs.mjs).
+      {
+        slug: "configuration",
+        label: { en: "Configuration reference", "zh-CN": "配置手册" },
+        locales: both,
+        group: "reference",
+        summary: {
+          en: "Every field of config.yaml: what it does, its default, the values it takes, and how a change reaches the running core.",
+          "zh-CN": "config.yaml 中每个字段的作用、默认值与可选值，以及改动如何进入正在运行的 core。",
         },
       },
       {
@@ -219,8 +241,8 @@ export const products: Product[] = [
         locales: both,
         group: "contributing",
         summary: {
-          en: "cargo test, scripts/smoke.sh, pull request checks, and mandatory rules.",
-          "zh-CN": "cargo test、scripts/smoke.sh、PR 前的检查，以及必须遵守的规则。",
+          en: "cargo test, scripts/smoke.sh, the checks before a pull request, releases, and the rules every change follows.",
+          "zh-CN": "cargo test、scripts/smoke.sh、提交 PR 前的检查、发布流程，以及每个改动都须遵守的规则。",
         },
       },
     ],
