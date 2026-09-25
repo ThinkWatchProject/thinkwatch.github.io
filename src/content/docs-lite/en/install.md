@@ -1,6 +1,6 @@
 # Install and update
 
-ThinkWatch Lite runs on macOS 12 or later on Apple Silicon, on Windows 10 21H2 or later on x64 or ARM64, and on Linux on x86_64 or aarch64. The gateway, ThinkWatch Core, ships inside the app; nothing else needs to be installed.
+ThinkWatch Lite runs on macOS 12 or later on Apple silicon, on Windows 10 21H2 or later on x64 or ARM64, and on Linux on x86_64 or aarch64. The gateway, ThinkWatch Core, ships inside the app; nothing else needs to be installed.
 
 ## macOS: Homebrew
 
@@ -63,9 +63,9 @@ The tray icon relies on AppIndicator. Ubuntu ships the GNOME extension for it; F
 
 ## Updates
 
-The app looks for a new version shortly after it starts and once a day after that, reading a small manifest and nothing else. It can be turned off in Settings.
+The app looks for a new version two minutes after it starts and once a day after that, reading a small manifest and nothing else. The automatic check can be turned off in Settings › About.
 
-When there is one, a small window says so, and what happens next depends on how the app was installed.
+When the automatic check finds a new version, the app posts a system notification, unless **Notices** in Settings › General is set to **In app only** or **Off**. The notification, the **Install Version** item in the menu bar or tray menu, and **Update to** in Settings › About open the update window; **Check for updates**, in the same menu or in Settings › About, opens it at once when there is a new version. What happens next depends on how the app was installed.
 
 **Downloaded from the releases page on macOS:** one press on the install button does the rest. The app downloads the update, verifies it against a key compiled into itself, waits for the requests the gateway is serving to finish — up to three minutes — then replaces itself and restarts. A task in the middle of a response is not cut off to make room for the update.
 
@@ -73,7 +73,7 @@ When there is one, a small window says so, and what happens next depends on how 
 
 **On Linux:** the same single press, and no password is asked for. The app downloads the new AppImage, verifies it against the key compiled into itself, waits for the requests in flight to finish, then replaces its own file and restarts. The AppImage has to be in a folder the user can write to.
 
-**Installed with Homebrew:** the window gives the command to copy, and the app never replaces itself. Homebrew records which version it put in `/Applications`; an app that overwrote it would be written back over by the next `brew upgrade`. The window only appears once the tap carries the new version, so the command always has something to install:
+**Installed with Homebrew:** the window gives the command to copy, and the app never replaces itself. Homebrew records which version it put in `/Applications`; an app that overwrote it would be written back over by the next `brew upgrade`. A Homebrew installation is offered a new version only once the tap carries it, so the command always has something to install:
 
 ```bash
 brew update && brew upgrade --cask thinkwatch-lite
@@ -85,4 +85,5 @@ brew update && brew upgrade --cask thinkwatch-lite
 
 - [Overview](/docs/lite): what the app shows.
 - [Build from source](/docs/lite/run-from-source): run a development build.
+- [Connecting to a remote core](/docs/lite/remote-core): use a gateway that runs on a server.
 - [Architecture](/docs/lite/architecture): the structure of the app and how it communicates with Core.

@@ -1,6 +1,6 @@
 # 安装与更新
 
-ThinkWatch Lite 支持 macOS 12 及以上版本的 Apple Silicon 机型，Windows 10 21H2 及以上版本的 x64 与 ARM64 机型，以及 x86_64 与 aarch64 机型的 Linux。网关 ThinkWatch Core 在应用包内，没有第二样东西要装。
+ThinkWatch Lite 支持 macOS 12 及以上版本的 Apple silicon 机型，Windows 10 21H2 及以上版本的 x64 与 ARM64 机型，以及 x86_64 与 aarch64 机型的 Linux。网关 ThinkWatch Core 随应用一同安装，无需另行安装其他组件。
 
 ## macOS：Homebrew
 
@@ -63,9 +63,9 @@ curl -fsSL https://github.com/ThinkWatchProject/ThinkWatch-Lite/releases/latest/
 
 ## 更新
 
-应用启动后不久检查一次新版本，此后每天检查一次，只读取一份很小的版本清单。可以在「设置」中关闭。
+应用启动两分钟后检查一次新版本，此后每天检查一次，只读取一份很小的版本清单。自动检查可以在「设置 › 关于」中关闭。
 
-有新版本时会弹出一个小窗口，之后的处理方式取决于安装方式。
+自动检查发现新版本时，应用会发送一条系统通知；「设置 › 通用」中的提醒设为「仅在应用内」或「关闭」时不发送。点按这条通知、菜单栏或托盘菜单中的「安装新版本」，或「设置 › 关于」中的「更新到」，都会打开更新窗口；在同一菜单或「设置 › 关于」中选择「检查更新」，发现新版本时也会立即打开它。之后的处理方式取决于安装方式。
 
 **在 macOS 上从 release 页面下载安装的**：点击一次安装按钮，其余步骤自动完成——下载更新包，用编译进应用的公钥验签，等待网关正在处理的请求结束（最多三分钟），然后替换并重新启动。正在输出的任务不会因更新而中断。
 
@@ -73,7 +73,7 @@ curl -fsSL https://github.com/ThinkWatchProject/ThinkWatch-Lite/releases/latest/
 
 **Linux 上**：同样点击一次即可，不需要输入密码。应用下载新版本的 AppImage，用编译进应用的公钥验签，等待进行中的请求结束，然后替换自身文件并重新启动。AppImage 须位于当前用户可写的目录中。
 
-**用 Homebrew 安装的**：窗口给出更新命令和复制按钮，应用不会替换自身。Homebrew 记录着它放入 `/Applications` 的版本，应用自行替换后，下一次 `brew upgrade` 会把旧版本写回。这个窗口只在 tap 已包含新版本时才会出现，因此给出的命令一定有可安装的内容：
+**用 Homebrew 安装的**：窗口给出更新命令和复制按钮，应用不会替换自身。Homebrew 记录着它放入 `/Applications` 的版本，应用自行替换后，下一次 `brew upgrade` 会把旧版本写回。通过 Homebrew 安装的应用只在 tap 已包含新版本时才会提示更新，因此给出的命令一定有可安装的内容：
 
 ```bash
 brew update && brew upgrade --cask thinkwatch-lite
@@ -85,4 +85,5 @@ brew update && brew upgrade --cask thinkwatch-lite
 
 - [概览](/zh-CN/docs/lite)：应用展示什么。
 - [从源码构建](/zh-CN/docs/lite/run-from-source)：在本机运行开发版本。
+- [连接远程 core](/zh-CN/docs/lite/remote-core)：使用部署在服务器上的网关。
 - [架构](/zh-CN/docs/lite/architecture)：应用的结构，以及它与 Core 的通信方式。
