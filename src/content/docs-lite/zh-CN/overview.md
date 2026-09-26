@@ -44,7 +44,7 @@ ThinkWatch Lite 是一款在本机运行 AI API 网关的桌面应用，支持 m
 
 ## 上游
 
-支持 Anthropic、OpenAI、Gemini、DeepSeek 等 API 密钥上游与任意兼容端点，在应用内登录的 ChatGPT 与 Z.ai 账号（ChatGPT 显示订阅额度及重置时间），OpenRouter 等中转服务，以及 Ollama 或其他兼容 OpenAI 接口的本机模型服务。
+支持 Anthropic、OpenAI、Gemini、DeepSeek 等 API 密钥上游与任意兼容端点，在应用内登录的 ChatGPT 与 Z.ai 账号，OpenRouter 等中转服务，以及 Ollama 或其他兼容 OpenAI 接口的本机模型服务。ChatGPT 账号与 Z.ai、BigModel 的 GLM Coding Plan 显示额度及重置时间。
 
 上游可以经 HTTP 或 SOCKS 出站代理连接，代理的连通性与认证可以在上游页检查。每个上游按 token 计费或不计费。价格来自默认价目表（每日更新的 LiteLLM 公开价格数据），也可以使用在其基础上设置倍率与单个模型价格的自定义价目表。
 
@@ -64,13 +64,17 @@ ThinkWatch Lite 是一款在本机运行 AI API 网关的桌面应用，支持 m
 
 ## MCP 服务器、技能与钩子
 
-MCP 页并列显示 Claude Code、Claude Desktop、Cursor、Codex、opencode 与 Zed 中配置的 MCP 服务器，标出远程与第三方服务器；同名服务器在两个客户端中配置不同时，可以逐字段对比。服务器可以复制到其他客户端或移除，写入前显示改动，并完整备份原文件。
+MCP 页并列显示 Claude Code、Claude Desktop、Cursor、Codex、opencode、Zed、Antigravity CLI 与 DeepSeek Harness 中配置的 MCP 服务器，标出远程与第三方服务器；同名服务器在两个客户端中配置不同时，可以逐字段对比。服务器可以复制到其他客户端或移除，写入前显示改动，并完整备份原文件。
 
 该页还列出钩子与技能，并扫描客户端配置、技能、钩子、斜杠命令、subagent 与项目指令，检查隐藏字符、提示注入、危险命令与过宽权限四类问题。扫描只报告，不修改任何文件。这些文件发生变化时会重新扫描，出现新发现时发送提醒。
 
 ## 客户端接管
 
-Claude Code、Codex、opencode、Zed 与 Aider 可以在应用内一键指向网关。写入前先显示改动差异并完整备份原文件，只修改端点与密钥两个字段，随时可以还原。Cursor、Continue 与 Gemini CLI 提供逐步的手动配置说明。
+Claude Code、Codex、opencode、Zed、Aider、Claude Desktop 与 DeepSeek Harness 可以在应用内一键指向网关。写入前先显示改动差异并完整备份原文件，只修改指向网关所需的设置，随时可以还原。Cursor、Continue 与 Antigravity CLI 提供逐步的手动配置说明。
+
+Claude Desktop 通过其第三方推理模式指向网关，完成后需完全退出再重新打开，此模式下的对话与原有对话分开保存；由组织统一管理的 Claude Desktop 不做修改。opencode 接管时写入该密钥可用的模型，上游或路由变化后，客户端页提示更新模型列表。Codex 还原后，接管期间开启的会话仍可打开。
+
+在 Windows 上，客户端页还列出各个 WSL 发行版。WSL 1 与使用 mirrored 网络模式的 WSL 2 中的 Claude Code 和 Codex 可以指向网关，经 127.0.0.1 访问，网关仍只监听本机。WSL 2 使用 NAT 网络时，客户端页可将其改为 mirrored 网络模式并重启 WSL；mirrored 网络模式需要 Windows 11 22H2 及以上。
 
 ## 密钥
 

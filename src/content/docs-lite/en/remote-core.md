@@ -43,7 +43,7 @@ The app connects to one core at a time. The connection is switched from the menu
 
 While the app is connected to a server, the core on this computer stops once its requests in progress have finished. Its configuration, keys and request history are kept, and switching back to this computer starts it again.
 
-Clients on this computer that point to the local gateway would fail while it is stopped. When there are such clients, the switch offers to point them at the server's gateway instead; the Clients page offers the same afterwards.
+Clients on this computer, including those inside WSL on Windows, that point to the local gateway would fail while it is stopped. When there are such clients, the switch offers to point them at the server's gateway instead; the Clients page offers the same afterwards.
 
 **Connect at startup** chooses between the last used connection and this computer. Holding Option on macOS or Alt on Windows while the app opens shows the choice of connection first; on every platform, the choice also appears when the two previous startups did not finish. When the server cannot be reached, the app keeps retrying and shows the connection's state, with the option to switch to this computer; it does not switch back on its own.
 
