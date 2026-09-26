@@ -54,7 +54,7 @@ export const liteCopy = {
         {
           id: "clients",
           title: "Client setup",
-          body: "Claude Code, Codex, opencode, Zed and Aider are pointed at the gateway from the app. Each change is shown as a diff before it is written, the original file is backed up, only the endpoint and the key are changed, and any client can be restored. Cursor, Continue and Gemini CLI come with step-by-step instructions. Each client's requests over the last 24 hours are listed beside it.",
+          body: "Claude Code, Codex, opencode, Zed, Aider, Claude Desktop and DeepSeek Harness are pointed at the gateway from the app. Each change is shown as a diff before it is written, the original file is backed up, only the settings that point the client at the gateway are changed, and any client can be restored. On Windows, Claude Code and Codex inside WSL are pointed at the gateway as well, under WSL 1 or under WSL 2 with mirrored networking. Cursor, Continue and Antigravity CLI come with step-by-step instructions. Each client's requests over the last 24 hours are listed beside it.",
           alt: "The Clients page: Claude Code and Codex in use, each with its own key and its requests over the last 24 hours; opencode not connected; Cursor set up by hand and in use; Continue and Gemini CLI not set up; Zed and Aider not detected",
         },
         {
@@ -66,7 +66,7 @@ export const liteCopy = {
         {
           id: "upstreams",
           title: "Upstreams and prices",
-          body: "API-key upstreams such as Anthropic, OpenAI, Gemini, DeepSeek or any compatible endpoint; ChatGPT and Z.ai accounts signed in from the app, with the ChatGPT usage limits and their reset times; relays such as OpenRouter; and local models served by Ollama. When a client and an upstream use different API formats, requests are converted between Anthropic Messages, OpenAI Chat Completions, OpenAI Responses and Gemini. Upstreams can connect through an outbound proxy. Costs follow LiteLLM's public prices, refreshed daily, or a custom price sheet with a multiplier and prices for individual models.",
+          body: "API-key upstreams such as Anthropic, OpenAI, Gemini, DeepSeek or any compatible endpoint; ChatGPT and Z.ai accounts signed in from the app; relays such as OpenRouter; and local models served by Ollama. The usage limits of ChatGPT accounts and of GLM Coding Plan keys on Z.ai and BigModel are shown with their reset times. When a client and an upstream use different API formats, requests are converted between Anthropic Messages, OpenAI Chat Completions, OpenAI Responses and Gemini. Upstreams can connect through an outbound proxy. Costs follow LiteLLM's public prices, refreshed daily, or a custom price sheet with a multiplier and prices for individual models.",
           alt: "The Upstreams page: seven upstreams, including Anthropic, a relay priced with a discounted price sheet, a ChatGPT Plus account with 58% of its 5-hour limit used, OpenRouter through a proxy, DeepSeek, Gemini and a local Ollama, each with its billing, its requests and cost over 24 hours and its median time to first byte; tabs for proxies and price sheets",
         },
         {
@@ -90,7 +90,7 @@ export const liteCopy = {
         {
           id: "mcp",
           title: "MCP servers, skills and hooks",
-          body: "The MCP servers configured in Claude Code, Claude Desktop, Cursor, Codex, opencode and Zed appear side by side, with remote and third-party servers marked and differences between clients highlighted; a server can be copied to another client or removed, with the change shown before it is written. Hooks and skills are listed as well. Client configuration, skills, hooks, slash commands, subagents and project instructions are scanned for hidden characters, prompt injection, dangerous commands and overly broad permissions. Findings are reported without changing any file, and a new finding raises a system notification.",
+          body: "The MCP servers configured in Claude Code, Claude Desktop, Cursor, Codex, opencode, Zed, Antigravity CLI and DeepSeek Harness appear side by side, with remote and third-party servers marked and differences between clients highlighted; a server can be copied to another client or removed, with the change shown before it is written. Hooks and skills are listed as well. Client configuration, skills, hooks, slash commands, subagents and project instructions are scanned for hidden characters, prompt injection, dangerous commands and overly broad permissions. Findings are reported without changing any file, and a new finding raises a system notification.",
           alt: "The MCP page: five MCP servers across Claude Code, Claude Desktop, Cursor, Codex, opencode and Zed, with context7 and linear marked as third-party remote servers and github marked as configured differently between clients; one high, one medium and one low finding from 11 scanned files",
         },
         {
@@ -231,7 +231,7 @@ export const liteCopy = {
         {
           id: "clients",
           title: "客户端接管",
-          body: "Claude Code、Codex、opencode、Zed 与 Aider 可以在应用内一键指向网关。写入前先显示改动差异，原文件完整备份，只修改端点与密钥，随时可以还原。Cursor、Continue 与 Gemini CLI 提供逐步的手动配置说明。每个客户端旁列出其最近 24 小时的请求。",
+          body: "Claude Code、Codex、opencode、Zed、Aider、Claude Desktop 与 DeepSeek Harness 可以在应用内一键指向网关。写入前先显示改动差异，原文件完整备份，只修改指向网关所需的设置，随时可以还原。在 Windows 上，WSL 中的 Claude Code 与 Codex 同样可以指向网关，适用于 WSL 1 和使用 mirrored 网络模式的 WSL 2。Cursor、Continue 与 Antigravity CLI 提供逐步的手动配置说明。每个客户端旁列出其最近 24 小时的请求。",
           alt: "客户端页：Claude Code 与 Codex 已接管，各用一把密钥，并列出最近 24 小时的请求；opencode 尚未接管；Cursor 已手动配置并在使用；Continue 与 Gemini CLI 尚未配置；Zed 与 Aider 未检测到",
         },
         {
@@ -243,7 +243,7 @@ export const liteCopy = {
         {
           id: "upstreams",
           title: "上游与价目表",
-          body: "支持 Anthropic、OpenAI、Gemini、DeepSeek 等 API 密钥上游与任意兼容端点，在应用内登录的 ChatGPT 与 Z.ai 账号（ChatGPT 显示订阅额度及重置时间），OpenRouter 等中转服务，以及 Ollama 提供的本机模型。客户端与上游的 API 格式不同时，请求在 Anthropic Messages、OpenAI Chat Completions、OpenAI Responses 与 Gemini 之间自动转换。上游可以经出站代理连接。费用按每日更新的 LiteLLM 公开价格计算，也可以使用设有倍率与单个模型价格的自定义价目表。",
+          body: "支持 Anthropic、OpenAI、Gemini、DeepSeek 等 API 密钥上游与任意兼容端点，在应用内登录的 ChatGPT 与 Z.ai 账号，OpenRouter 等中转服务，以及 Ollama 提供的本机模型。ChatGPT 账号与 Z.ai、BigModel 的 GLM Coding Plan 显示额度及重置时间。客户端与上游的 API 格式不同时，请求在 Anthropic Messages、OpenAI Chat Completions、OpenAI Responses 与 Gemini 之间自动转换。上游可以经出站代理连接。费用按每日更新的 LiteLLM 公开价格计算，也可以使用设有倍率与单个模型价格的自定义价目表。",
           alt: "上游页：七个上游，包括 Anthropic、按折扣价目表计价的中转、5 小时额度已用 58% 的 ChatGPT Plus 账号、经代理访问的 OpenRouter、DeepSeek、Gemini 与本机 Ollama，以及各自的计费方式、24 小时请求数与费用和首字节延迟中位数；另有代理与价目表两个标签",
         },
         {
@@ -267,7 +267,7 @@ export const liteCopy = {
         {
           id: "mcp",
           title: "MCP 服务器、技能与钩子",
-          body: "Claude Code、Claude Desktop、Cursor、Codex、opencode 与 Zed 中配置的 MCP 服务器并列显示，标出远程与第三方服务器以及各客户端之间不一致的配置；服务器可以复制到其他客户端或移除，写入前显示改动。钩子与技能同样逐一列出。客户端配置、技能、钩子、斜杠命令、subagent 与项目指令会被扫描，检查隐藏字符、提示注入、危险命令与过宽权限四类问题。扫描只报告、不修改任何文件，出现新发现时发送系统通知。",
+          body: "Claude Code、Claude Desktop、Cursor、Codex、opencode、Zed、Antigravity CLI 与 DeepSeek Harness 中配置的 MCP 服务器并列显示，标出远程与第三方服务器以及各客户端之间不一致的配置；服务器可以复制到其他客户端或移除，写入前显示改动。钩子与技能同样逐一列出。客户端配置、技能、钩子、斜杠命令、subagent 与项目指令会被扫描，检查隐藏字符、提示注入、危险命令与过宽权限四类问题。扫描只报告、不修改任何文件，出现新发现时发送系统通知。",
           alt: "MCP 页：五个 MCP 服务器在 Claude Code、Claude Desktop、Cursor、Codex、opencode 与 Zed 中的配置情况，context7 与 linear 标为第三方远程服务器，github 标为各客户端配置不一致；共扫描 11 个文件，发现高、中、低风险各一项",
         },
         {
