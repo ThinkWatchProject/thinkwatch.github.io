@@ -44,7 +44,7 @@ A dry run takes a key, a model, a client format and the properties of a request,
 
 ## Upstreams
 
-API-key upstreams such as Anthropic, OpenAI, Gemini, DeepSeek or any compatible endpoint; ChatGPT and Z.ai accounts signed in from the app, with the ChatGPT usage limits and their reset times; relays such as OpenRouter; and local models served by Ollama or another OpenAI-compatible server.
+API-key upstreams such as Anthropic, OpenAI, Gemini, DeepSeek or any compatible endpoint; ChatGPT and Z.ai accounts signed in from the app; relays such as OpenRouter; and local models served by Ollama or another OpenAI-compatible server. The usage limits of ChatGPT accounts and of GLM Coding Plan keys on Z.ai and BigModel are shown with their reset times.
 
 Upstreams can connect through an outbound HTTP or SOCKS proxy, whose connection and authentication can be checked from the Upstreams page. Each upstream is billed per token or free. Prices come from the default price sheet, LiteLLM's public price data refreshed daily, or from a custom price sheet that applies a multiplier and prices for individual models on top of it.
 
@@ -64,13 +64,17 @@ Each protection is Off, Observe or Enforce. Observe detects and records matches 
 
 ## MCP servers, skills and hooks
 
-The MCP page lists the MCP servers configured in Claude Code, Claude Desktop, Cursor, Codex, opencode and Zed side by side. Remote and third-party servers are marked, and a server configured differently in two clients can be compared field by field. A server can be copied to another client or removed; the change is shown before it is written, and the original file is backed up.
+The MCP page lists the MCP servers configured in Claude Code, Claude Desktop, Cursor, Codex, opencode, Zed, Antigravity CLI and DeepSeek Harness side by side. Remote and third-party servers are marked, and a server configured differently in two clients can be compared field by field. A server can be copied to another client or removed; the change is shown before it is written, and the original file is backed up.
 
 The page also lists hooks and skills, and scans client configuration, skills, hooks, slash commands, subagents and project instructions for hidden characters, prompt injection, dangerous commands and overly broad permissions. The scan reports what it finds and changes no file. The files are scanned again when they change, and a new finding raises a notification.
 
 ## Client setup
 
-Claude Code, Codex, opencode, Zed and Aider can be pointed at the gateway from the app. The change is shown as a diff before anything is written, the original file is backed up, only the endpoint and key fields change, and the change can be restored at any time. Cursor, Continue and Gemini CLI come with step-by-step instructions.
+Claude Code, Codex, opencode, Zed, Aider, Claude Desktop and DeepSeek Harness can be pointed at the gateway from the app. The change is shown as a diff before anything is written, the original file is backed up, only the settings that point the client at the gateway change, and the change can be restored at any time. Cursor, Continue and Antigravity CLI come with step-by-step instructions.
+
+Claude Desktop is pointed at the gateway through its third-party inference mode. It has to be quit completely and reopened afterwards, and conversations in that mode are kept apart from the others; a Claude Desktop managed by an organization is not changed. For opencode, the models the client's key can use are written into its configuration, and the Clients page says when that list needs updating after upstreams or routes change. After Codex is restored, the sessions started while it pointed at the gateway can still be opened.
+
+On Windows, the Clients page also lists each WSL distribution. Claude Code and Codex inside WSL can be pointed at the gateway under WSL 1, or under WSL 2 with mirrored networking; they reach it at 127.0.0.1, and the gateway keeps listening on this computer only. When WSL 2 uses NAT networking, the page can switch it to mirrored networking, which needs Windows 11 22H2 or later, and restart WSL.
 
 ## Keys
 
