@@ -129,7 +129,7 @@ export const liteCopy = {
     menubar: {
       eyebrow: "Outside the main window",
       title: "Menu bar, tray and notifications",
-      body: "On macOS, the menu bar item shows today's tokens and cost, which turn orange when a subscription quota is nearly used up and red once it has run out; it can also show only the icon or only the numbers. Its menu lists the gateway's state and output rate, each subscription quota with its reset time, today's requests, tokens and cost, and the requests in progress, with actions to copy the gateway address or the default key, undo the last configuration change and switch connection. On Windows the icon sits in the notification area and on Linux in the system tray, with the same menu in text form.",
+      body: "On macOS, the menu bar item shows today's tokens and cost, which turn orange when a subscription quota is nearly used up and red once it has run out; it can also show only the icon or only the numbers. Its menu lists the gateway's state and output rate, today's requests, tokens and cost, each subscription quota with its reset time, and the requests in progress, with actions to open the main window, copy the gateway address or the default key and switch connection. On Windows the icon sits in the notification area and on Linux in the system tray, with the same menu in text form.",
       notices:
         "System notifications report a gateway that stopped forwarding, a lost connection to a remote core, a subscription quota that ran out, a credential that expired, was rejected or could not be saved, an unreachable proxy, configuration that did not take effect, a tool call that matched a rule set to cut off, and suspicious content newly found in client configuration. An unreachable upstream is listed in the app without a system notification. One setting sends these notices as system notifications, keeps them in the app, or turns them off.",
       chipAlt: "The menu bar item: the ThinkWatch mark with today's 13.3M tokens above today's cost, $9.34",
@@ -306,7 +306,7 @@ export const liteCopy = {
     menubar: {
       eyebrow: "主窗口之外",
       title: "菜单栏、托盘与系统通知",
-      body: "在 macOS 上，菜单栏显示今日 token 与费用；订阅额度即将用完时数字变为橙色，用完后变为红色；也可以只显示标识或只显示数字。点开的菜单列出网关状态与输出速率、各订阅额度及其重置时间、今日请求数、token 与费用、进行中的请求，并提供复制网关地址、复制默认密钥、撤销上一次配置修改、切换连接等操作。Windows 上图标位于通知区域，Linux 上位于系统托盘，菜单内容相同，以文字呈现。",
+      body: "在 macOS 上，菜单栏显示今日 token 与费用；订阅额度即将用完时数字变为橙色，用完后变为红色；也可以只显示标识或只显示数字。点开的菜单列出网关状态与输出速率、今日请求数、token 与费用、各订阅额度及其重置时间、进行中的请求，并提供打开主界面、复制网关地址、复制默认密钥、切换连接等操作。Windows 上图标位于通知区域，Linux 上位于系统托盘，菜单内容相同，以文字呈现。",
       notices:
         "网关停止转发、与远程 core 的连接断开、订阅额度用完、凭据过期、被拒绝或未能保存、代理无法连接、配置未能生效、工具调用命中「切断」规则，以及客户端配置中出现新的可疑内容时，应用会发送系统通知。上游无法连接只在应用内列出，不发送系统通知。提醒方式由一项设置统一决定：系统通知、仅在应用内显示或关闭。",
       chipAlt: "菜单栏：ThinkWatch 标识，右侧上行为今日 token 13.3M，下行为今日费用 $9.34",

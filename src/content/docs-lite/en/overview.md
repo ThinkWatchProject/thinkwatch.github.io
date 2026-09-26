@@ -84,7 +84,7 @@ Clients connect to the gateway with gateway keys. Connecting a client creates a 
 
 On macOS, the menu bar shows today's tokens above today's cost. The numbers turn orange when a subscription quota is nearly used up and red once it has run out; the item can also show only the icon or only the numbers. The item is drawn as a bitmap because the menu bar cannot display two lines of text.
 
-Its menu shows the gateway's state and output rate, each subscription quota with its reset time, today's requests, tokens and cost, and the requests in progress, with items to copy the gateway address or the default key, undo the last configuration change, switch connection and check for updates.
+Its menu shows the gateway's state and output rate, today's requests, tokens and cost, each subscription quota with its reset time, and the requests in progress, with items to open the main window, copy the gateway address or the default key, switch connection and check for updates.
 
 On Windows the icon sits in the notification area. Hovering over it shows the gateway's state and today's tokens and cost; a left click opens the main window, and a right click opens the same menu, with quota bars written out as text. On Linux the icon sits in the system tray. Clicking it opens the same menu, with Open ThinkWatch Lite as its first item.
 
