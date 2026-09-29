@@ -1,0 +1,188 @@
+---
+// The link builder on the "Import links" page of the Lite docs. It runs in the
+// browser only: the values are checked with the same rules as the app
+// (src/lib/import-link.ts) and the two links are written with textContent.
+// Nothing is sent anywhere.
+import { getLang } from "~/i18n";
+import { PROTOCOLS } from "~/lib/import-link";
+
+const lang = getLang(Astro);
+const zh = lang === "zh-CN";
+
+const t = zh
+  ? {
+      heading: "链接生成器",
+      note: "在浏览器中生成，不发送任何内容。",
+      name: "名称（可选）",
+      url: "接口地址",
+      protocol: "接口协议",
+      auto: "自动识别（不写入链接）",
+      key: "API 密钥（可选）",
+      models: "手动模型清单（可选，逗号分隔）",
+      appLink: "应用链接",
+      webLink: "网页链接",
+      copy: "复制",
+      copied: "已复制",
+      fill: "填写接口地址后生成链接。",
+      problems: {
+        empty: "填写接口地址后生成链接。",
+        tooLong: "链接过长。",
+        unknownParam: "包含不支持的参数。",
+        duplicateParam: "同一参数出现了多次。",
+        emptyValue: "参数的值为空。",
+        missingUrl: "填写接口地址后生成链接。",
+        name: "名称不符合要求：最多 64 个字符，首尾无空白，不含 / \\ $ { } < > \" `，不以 __ 开头。",
+        url: "接口地址不符合要求：须为 https 地址（http 仅限 localhost、127.0.0.1、[::1]），不含账号、查询串、片段、空白与 % $ { } 等字符。",
+        protocol: "接口协议不受支持。",
+        key: "API 密钥只能包含字母、数字与 - _ . ~ + / = :，最长 512 个字符。",
+        models: "模型清单不符合要求：以逗号分隔，每项只含字母、数字与 - _ . : / @ +，最多 64 项。",
+      },
+    }
+  : {
+      heading: "Link builder",
+      note: "Runs in the browser; nothing is sent.",
+      name: "Name (optional)",
+      url: "Base URL",
+      protocol: "Protocol",
+      auto: "Auto-detect (left out of the link)",
+      key: "API key (optional)",
+      models: "Manual model list (optional, comma-separated)",
+      appLink: "App link",
+      webLink: "Web link",
+      copy: "Copy",
+      copied: "Copied",
+      fill: "Enter a base URL to generate the links.",
+      problems: {
+        empty: "Enter a base URL to generate the links.",
+        tooLong: "The link is too long.",
+        unknownParam: "The link contains an unsupported parameter.",
+        duplicateParam: "A parameter appears more than once.",
+        emptyValue: "A parameter has an empty value.",
+        missingUrl: "Enter a base URL to generate the links.",
+        name: "The name is not accepted: at most 64 characters, no leading or trailing spaces, none of / \\ $ { } < > \" `, and not starting with __.",
+        url: "The base URL is not accepted: it must be an https address (http only for localhost, 127.0.0.1 and [::1]) without credentials, a query, a fragment, spaces or characters such as % $ { }.",
+        protocol: "The protocol is not supported.",
+        key: "The API key may contain only letters, digits and - _ . ~ + / = :, up to 512 characters.",
+        models: "The model list is not accepted: comma-separated, each entry only letters, digits and - _ . : / @ +, at most 64 entries.",
+      },
+    };
+
+const input =
+  "w-full rounded-lg border border-[var(--color-border-strong)] bg-[var(--color-bg)] px-3 py-2 font-mono text-sm text-[var(--color-text)] outline-none focus:border-[var(--color-brand-1)]";
+const labelCls = "mb-1.5 block text-sm text-[var(--color-muted)]";
+---
+
+<section
+  class="mt-10 rounded-xl border border-[var(--color-border-strong)] bg-[var(--color-surface)]/60 p-5 sm:p-6"
+  data-link-builder
+  data-strings={JSON.stringify(t)}
+  data-pagefind-ignore
+>
+  <h2 class="text-xl font-semibold tracking-tight text-[var(--color-text)]">{t.heading}</h2>
+  <p class="mt-1 text-sm text-[var(--color-muted)]">{t.note}</p>
+
+  <form class="mt-5 grid gap-4" autocomplete="off">
+    <label>
+      <span class={labelCls}>{t.url}</span>
+      <input class={input} name="url" type="url" spellcheck="false" placeholder="https://api.relay.example/v1" />
+    </label>
+    <div class="grid gap-4 sm:grid-cols-2">
+      <label>
+        <span class={labelCls}>{t.name}</span>
+        <input class={input} name="name" type="text" spellcheck="false" placeholder="example-relay" />
+      </label>
+      <label>
+        <span class={labelCls}>{t.protocol}</span>
+        <select class={input} name="protocol">
+          <option value="">{t.auto}</option>
+          {PROTOCOLS.map((p) => <option value={p}>{p}</option>)}
+        </select>
+      </label>
+    </div>
+    <label>
+      <span class={labelCls}>{t.key}</span>
+      <input class={input} name="key" type="text" spellcheck="false" placeholder="sk-…" />
+    </label>
+    <label>
+      <span class={labelCls}>{t.models}</span>
+      <input class={input} name="models" type="text" spellcheck="false" placeholder="gpt-5,gpt-5-mini" />
+    </label>
+  </form>
+
+  <p class="mt-5 text-sm leading-relaxed text-[var(--color-muted)]" data-message role="status">{t.fill}</p>
+
+  <div class="mt-5 grid gap-4" data-output hidden>
+    {
+      (["app", "web"] as const).map((kind) => (
+        <div>
+          <p class={labelCls}>{kind === "app" ? t.appLink : t.webLink}</p>
+          <div class="flex min-w-0 items-stretch rounded-lg border border-[var(--color-border-strong)] bg-[var(--color-bg)]">
+            <code class="min-w-0 flex-1 break-all p-3 font-mono text-[13px] leading-relaxed text-[var(--color-text)]" data-link={kind} />
+            <button
+              type="button"
+              class="shrink-0 border-l border-[var(--color-border-strong)] px-4 text-sm text-[var(--color-muted)] transition-colors hover:text-[var(--color-brand-1)]"
+              data-copy={kind}
+            >
+              {t.copy}
+            </button>
+          </div>
+        </div>
+      ))
+    }
+  </div>
+</section>
+
+<script>
+  import { appLink, validate, webLink, type Problem } from "~/lib/import-link";
+
+  type Strings = { copy: string; copied: string; fill: string; problems: Record<Problem, string> };
+
+  for (const root of document.querySelectorAll<HTMLElement>("[data-link-builder]")) {
+    const s = JSON.parse(root.dataset.strings ?? "{}") as Strings;
+    const form = root.querySelector("form")!;
+    const message = root.querySelector<HTMLElement>("[data-message]")!;
+    const output = root.querySelector<HTMLElement>("[data-output]")!;
+    const code = (kind: string) => root.querySelector<HTMLElement>(`[data-link="${kind}"]`)!;
+    const value = (name: string) => {
+      const v = (form.elements.namedItem(name) as HTMLInputElement | HTMLSelectElement).value;
+      return v === "" ? undefined : v;
+    };
+
+    const update = () => {
+      const r = validate({
+        url: value("url") ?? "",
+        name: value("name"),
+        protocol: value("protocol"),
+        key: value("key"),
+        models: value("models"),
+      });
+      if (r.ok) {
+        code("app").textContent = appLink(r.link);
+        code("web").textContent = webLink(r.link);
+        output.hidden = false;
+        message.hidden = true;
+      } else {
+        output.hidden = true;
+        message.hidden = false;
+        message.textContent = s.problems[r.problem] ?? s.fill;
+      }
+    };
+    form.addEventListener("submit", (e) => e.preventDefault());
+    form.addEventListener("input", update);
+    update();
+
+    for (const btn of root.querySelectorAll<HTMLButtonElement>("[data-copy]")) {
+      btn.addEventListener("click", async () => {
+        const target = code(btn.dataset.copy ?? "");
+        try {
+          await navigator.clipboard.writeText(target.textContent ?? "");
+        } catch {
+          getSelection()?.selectAllChildren(target);
+          return;
+        }
+        btn.textContent = s.copied;
+        setTimeout(() => (btn.textContent = s.copy), 1500);
+      });
+    }
+  }
+</script>

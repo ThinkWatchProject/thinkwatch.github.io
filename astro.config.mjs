@@ -46,7 +46,8 @@ export default defineConfig({
         defaultLocale: 'en',
         locales: { en: 'en', 'zh-CN': 'zh-CN' },
       },
-      filter: (page) => !page.includes('/404'),
+      // The import page only reads the parameters of a link; it has nothing to index.
+      filter: (page) => !page.includes('/404') && !/\/(zh-CN\/)?import\/?$/.test(new URL(page).pathname),
       async serialize(item) {
         const url = new URL(item.url);
         const pathname = url.pathname.replace(/\/$/, '') || '/';
