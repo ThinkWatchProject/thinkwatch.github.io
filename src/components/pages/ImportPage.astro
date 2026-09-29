@@ -1,0 +1,253 @@
+---
+// /import: the web form of a ThinkWatch Lite import link.
+//
+// A relay links to https://thinkwat.ch/import#name=…&url=…&key=…. The
+// parameters stay in the fragment, which browsers never send to a server; the
+// script below reads them, checks them with the same rules as the app
+// (src/lib/import-link.ts), shows what would be imported and offers a button
+// that opens thinkwatch://import?… built from the checked values only.
+//
+// The page loads no third-party script (no analytics: the fragment may hold an
+// API key), is kept out of search results, renders every value with
+// textContent, and navigates nowhere but to that one app link.
+import Base from "~/layouts/Base.astro";
+import SiteHeader from "~/components/SiteHeader.astro";
+import SiteFooter from "~/components/SiteFooter.astro";
+import LiteDownload from "~/components/LiteDownload.astro";
+import { getLang, localePath } from "~/i18n";
+
+const lang = getLang(Astro);
+const zh = lang === "zh-CN";
+const docs = localePath(lang, "/docs/lite/import-links");
+
+const t = zh
+  ? {
+      title: "导入上游 · ThinkWatch Lite",
+      description: "把中转站或服务商提供的上游设置导入 ThinkWatch Lite。",
+      heading: "导入上游到 ThinkWatch Lite",
+      intro: "以下设置来自一条导入链接。ThinkWatch Lite 打开后会先请求确认，确认之前不保存任何设置。",
+      sendsTo: "请求内容与 API 密钥将发送至",
+      name: "名称",
+      nameAuto: "由应用按地址生成",
+      url: "接口地址",
+      protocol: "接口协议",
+      auto: "自动识别",
+      key: "API 密钥",
+      noKey: "未提供",
+      show: "显示",
+      hide: "隐藏",
+      models: "手动模型清单",
+      open: "在 ThinkWatch Lite 中打开",
+      notInstalled: "尚未安装 ThinkWatch Lite 时，先下载并安装，再回到此页面。",
+      invalidTitle: "此导入链接无效",
+      invalidBody: "链接的参数不完整或不符合要求，未显示任何内容。请联系提供链接的服务商。",
+      noscript: "此页面需要启用 JavaScript 读取链接中的参数。",
+      docs: "导入链接说明",
+      problems: {
+        empty: "链接中没有参数。",
+        tooLong: "链接过长。",
+        unknownParam: "链接包含不支持的参数",
+        duplicateParam: "同一参数出现了多次",
+        emptyValue: "参数的值为空",
+        missingUrl: "缺少接口地址（url）。",
+        name: "名称不符合要求。",
+        url: "接口地址不符合要求：须为 https 地址（http 仅限本机），且不含账号、查询串或片段。",
+        protocol: "接口协议不受支持。",
+        key: "API 密钥包含不支持的字符。",
+        models: "模型清单不符合要求。",
+      },
+    }
+  : {
+      title: "Import an upstream · ThinkWatch Lite",
+      description: "Import an upstream provided by a relay or vendor into ThinkWatch Lite.",
+      heading: "Import an upstream into ThinkWatch Lite",
+      intro:
+        "The settings below come from an import link. ThinkWatch Lite asks for confirmation when it opens, and saves nothing before that.",
+      sendsTo: "Request content and the API key will be sent to",
+      name: "Name",
+      nameAuto: "Chosen by the app from the address",
+      url: "Base URL",
+      protocol: "Protocol",
+      auto: "Auto-detect",
+      key: "API key",
+      noKey: "Not provided",
+      show: "Show",
+      hide: "Hide",
+      models: "Manual model list",
+      open: "Open in ThinkWatch Lite",
+      notInstalled: "If ThinkWatch Lite is not installed yet, download and install it, then return to this page.",
+      invalidTitle: "This import link is not valid",
+      invalidBody:
+        "The link's parameters are incomplete or not accepted, so nothing is shown. Contact the provider of the link.",
+      noscript: "This page needs JavaScript to read the parameters of the link.",
+      docs: "About import links",
+      problems: {
+        empty: "The link has no parameters.",
+        tooLong: "The link is too long.",
+        unknownParam: "The link contains an unsupported parameter",
+        duplicateParam: "A parameter appears more than once",
+        emptyValue: "A parameter has an empty value",
+        missingUrl: "The base URL (url) is missing.",
+        name: "The name is not accepted.",
+        url: "The base URL is not accepted: it must be an https address (http only for this computer) without credentials, a query or a fragment.",
+        protocol: "The protocol is not supported.",
+        key: "The API key contains unsupported characters.",
+        models: "The model list is not accepted.",
+      },
+    };
+
+const row = "grid gap-1 border-b border-[var(--color-border)] py-3 sm:grid-cols-[10rem_1fr] sm:gap-4";
+const label = "text-sm text-[var(--color-muted)]";
+const value = "min-w-0 break-all font-mono text-[15px] text-[var(--color-text)]";
+---
+
+<Base title={t.title} description={t.description} noindex analytics={false}>
+  <SiteHeader />
+  <main id="main" class="container-page py-16 md:py-24" data-import-page data-strings={JSON.stringify(t)}>
+    <div class="mx-auto max-w-2xl">
+      <h1 class="text-3xl font-semibold tracking-tight md:text-4xl">{t.heading}</h1>
+
+      <noscript>
+        <p class="mt-6 text-[var(--color-muted)]">{t.noscript}</p>
+      </noscript>
+
+      <section data-valid hidden>
+        <p class="mt-4 leading-relaxed text-[var(--color-muted)]">{t.intro}</p>
+
+        <div class="mt-8 rounded-xl border border-amber-400/40 bg-amber-400/10 px-5 py-4">
+          <p class="text-sm font-medium text-amber-200">{t.sendsTo}</p>
+          <p class="mt-1 break-all font-mono text-lg font-semibold text-[var(--color-text)]" data-field="host"></p>
+        </div>
+
+        <dl class="mt-6">
+          <div class={row}>
+            <dt class={label}>{t.name}</dt>
+            <dd class={value} data-field="name"></dd>
+          </div>
+          <div class={row}>
+            <dt class={label}>{t.url}</dt>
+            <dd class={value} data-field="url"></dd>
+          </div>
+          <div class={row}>
+            <dt class={label}>{t.protocol}</dt>
+            <dd class={value} data-field="protocol"></dd>
+          </div>
+          <div class={row}>
+            <dt class={label}>{t.key}</dt>
+            <dd class="flex min-w-0 items-center gap-3">
+              <span class={value} data-field="key"></span>
+              <button
+                type="button"
+                class="shrink-0 text-sm text-[var(--color-brand-1)] hover:text-[var(--color-brand-2)]"
+                data-toggle-key
+                hidden
+              ></button>
+            </dd>
+          </div>
+          <div class={row} data-models-row hidden>
+            <dt class={label}>{t.models}</dt>
+            <dd class={value} data-field="models"></dd>
+          </div>
+        </dl>
+
+        <div class="mt-8">
+          <button
+            type="button"
+            class="inline-flex min-h-11 items-center justify-center rounded-[10px] bg-[var(--color-brand-1)] px-[22px] py-3 text-base font-semibold text-[var(--color-bg)] transition-colors hover:bg-[var(--color-brand-2)]"
+            data-open
+          >
+            {t.open}
+          </button>
+        </div>
+
+        <div class="mt-12 border-t border-[var(--color-border)] pt-8">
+          <p class="mb-5 text-sm leading-relaxed text-[var(--color-muted)]">{t.notInstalled}</p>
+          <LiteDownload variant="outline" />
+        </div>
+      </section>
+
+      <section data-invalid hidden>
+        <div class="mt-8 rounded-xl border border-red-400/40 bg-red-400/10 px-5 py-4">
+          <p class="font-medium text-red-200">{t.invalidTitle}</p>
+          <p class="mt-1 text-sm leading-relaxed text-[var(--color-muted)]" data-problem></p>
+        </div>
+        <p class="mt-4 text-sm leading-relaxed text-[var(--color-muted)]">{t.invalidBody}</p>
+      </section>
+
+      <p class="mt-12 text-sm">
+        <a href={docs} class="text-[var(--color-brand-1)] hover:text-[var(--color-brand-2)]">{t.docs}</a>
+      </p>
+    </div>
+  </main>
+  <SiteFooter />
+</Base>
+
+<script>
+  import { appLink, parseParams, type Problem } from "~/lib/import-link";
+
+  type Strings = {
+    nameAuto: string;
+    auto: string;
+    noKey: string;
+    show: string;
+    hide: string;
+    problems: Record<Problem, string>;
+  };
+
+  const root = document.querySelector<HTMLElement>("[data-import-page]");
+  // Another import link opened while this page is showing only changes the
+  // fragment, and a page does not reload for that: read it from scratch.
+  window.addEventListener("hashchange", () => location.reload());
+  if (root) {
+    const s = JSON.parse(root.dataset.strings ?? "{}") as Strings;
+    const fragment = location.hash.slice(1);
+    // Take the parameters out of the address bar and the history entry: the
+    // fragment may hold an API key.
+    if (fragment) history.replaceState(null, "", location.pathname + location.search);
+
+    const result = parseParams(fragment);
+    const field = (name: string) => root.querySelector<HTMLElement>(`[data-field="${name}"]`)!;
+
+    if (result.ok) {
+      const l = result.link;
+      field("host").textContent = l.host;
+      field("name").textContent = l.name ?? s.nameAuto;
+      field("url").textContent = l.baseUrl;
+      field("protocol").textContent = l.protocol ?? s.auto;
+      const key = field("key");
+      const toggle = root.querySelector<HTMLButtonElement>("[data-toggle-key]")!;
+      if (l.key) {
+        let shown = false;
+        const paint = () => {
+          key.textContent = shown ? l.key! : "•".repeat(Math.min(l.key!.length, 24));
+          toggle.textContent = shown ? s.hide : s.show;
+          toggle.setAttribute("aria-pressed", String(shown));
+        };
+        toggle.hidden = false;
+        toggle.addEventListener("click", () => {
+          shown = !shown;
+          paint();
+        });
+        paint();
+      } else {
+        key.textContent = s.noKey;
+      }
+      if (l.models.length) {
+        field("models").textContent = l.models.join(", ");
+        root.querySelector<HTMLElement>("[data-models-row]")!.hidden = false;
+      }
+      // The only place this page navigates to, built from the checked values.
+      const target = appLink(l);
+      root.querySelector<HTMLButtonElement>("[data-open]")!.addEventListener("click", () => {
+        window.location.href = target;
+      });
+      root.querySelector<HTMLElement>("[data-valid]")!.hidden = false;
+    } else {
+      const text = s.problems[result.problem];
+      // The parameter name is shown only when it is short and plain.
+      const param = result.param && /^[A-Za-z0-9_-]{1,32}$/.test(result.param) ? `: ${result.param}` : "";
+      root.querySelector<HTMLElement>("[data-problem]")!.textContent = param ? `${text}${param}` : text;
+      root.querySelector<HTMLElement>("[data-invalid]")!.hidden = false;
+    }
+  }
+</script>

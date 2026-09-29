@@ -23,6 +23,11 @@ interface Props {
   noindex?: boolean;
   /** JSON-LD items describing the page (a product, an article, breadcrumbs). The Organization is added on every page. */
   jsonLd?: JsonLd[];
+  /**
+   * Load Google Analytics. Off for a page whose URL carries data that must stay
+   * in the browser (the import page keeps an API key in its fragment).
+   */
+  analytics?: boolean;
 }
 
 const {
@@ -34,6 +39,7 @@ const {
   modified,
   noindex = false,
   jsonLd = [],
+  analytics = true,
 } = Astro.props;
 
 const canonical = noindex ? undefined : new URL(Astro.url.pathname, Astro.site).toString();
@@ -97,8 +103,8 @@ const GA_ID = "G-R8LX8NCHCJ";
       never blocks first paint. No personal data is sent until the library
       has loaded.
     -->
-    <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}></script>
-    <script is:inline define:vars={{ GA_ID }}>
+    {analytics && <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}></script>}
+    {analytics && <script is:inline define:vars={{ GA_ID }}>
       (function () {
         try {
           if (navigator.doNotTrack === "1" || window.doNotTrack === "1") return;
@@ -109,7 +115,7 @@ const GA_ID = "G-R8LX8NCHCJ";
         gtag("js", new Date());
         gtag("config", GA_ID, { anonymize_ip: true });
       })();
-    </script>
+    </script>}
   </head>
   <body>
     <a

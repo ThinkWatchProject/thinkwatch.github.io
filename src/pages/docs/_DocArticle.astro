@@ -4,6 +4,7 @@ import { productName } from "~/content/docs/_meta";
 // with localized title, BreadcrumbList and TechArticle JSON-LD.
 import { render } from "astro:content";
 import DocsLayout from "~/layouts/DocsLayout.astro";
+import ImportLinkBuilder from "~/components/ImportLinkBuilder.astro";
 import { docHref, getNeighbours, getProduct, productHomeHref, type ProductId } from "~/content/docs/_meta";
 import { localePath, type Lang } from "~/i18n";
 import { CORE_REPO } from "~/lib/core-docs.mjs";
@@ -100,6 +101,8 @@ const homeCards = slug ? [] : p.docs.filter((d) => d.slug);
   <Content />
 
   <div slot="after">
+    {/* The "Import links" page ends with its link builder, which a markdown file cannot hold */}
+    {product === "lite" && slug === "import-links" && <ImportLinkBuilder />}
     {synced && (
       <p class="mt-12 border-t border-[var(--color-border)] pt-6 text-sm leading-relaxed text-[var(--color-muted)]" data-pagefind-ignore>
         {zh ? "本页取自 ThinkWatch Core 仓库 " : "This page is published from "}

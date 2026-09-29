@@ -181,6 +181,16 @@ export const products: Product[] = [
         },
       },
       {
+        slug: "import-links",
+        label: { en: "Import links", "zh-CN": "导入链接" },
+        locales: both,
+        group: "reference",
+        summary: {
+          en: "For relays and vendors: links that pre-fill a new upstream in the app, their parameters, what the app checks, and a link builder.",
+          "zh-CN": "面向中转站与服务商：在应用中预填新上游的链接、参数、应用所做的校验，以及链接生成器。",
+        },
+      },
+      {
         slug: "contributing",
         label: { en: "Contributing", "zh-CN": "贡献指南" },
         locales: both,
