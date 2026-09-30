@@ -1,6 +1,6 @@
 # 安装与更新
 
-ThinkWatch Lite 支持 macOS 12 及以上版本的 Apple silicon 机型，Windows 10 21H2 及以上版本的 x64 与 ARM64 机型，以及 x86_64 与 aarch64 机型的 Linux。网关 ThinkWatch Core 随应用一同安装，无需另行安装其他组件。
+ThinkWatch Lite 支持 macOS 12 及以上（Apple silicon）、Windows 10 21H2 及以上（x64、ARM64）和 Linux（x86_64、aarch64）。网关 ThinkWatch Core 随应用一同安装，无需另行安装其他组件。
 
 ## macOS：Homebrew
 

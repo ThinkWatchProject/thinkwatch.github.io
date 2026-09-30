@@ -14,7 +14,7 @@ export const homeCopy = {
     sub: "ThinkWatch routes, inspects, and meters model requests and MCP tool calls. It is available as a self-hosted server for organizations and as a desktop application for individual developers.",
     doors: {
       teams: { label: "For organizations", name: "ThinkWatch Enterprise", text: "Self-hosted AI API and MCP gateway.", cta: "Deploy ThinkWatch" },
-      machine: { label: "For individual developers", name: "ThinkWatch Lite", text: "Desktop application backed by a local gateway, for macOS on Apple silicon, Windows on x64 or ARM64, and Linux on x86_64 or aarch64.", cta: "Install Lite" },
+      machine: { label: "For individual developers", name: "ThinkWatch Lite", text: "A local gateway for Claude Code, Codex and other AI clients, on macOS, Windows and Linux.", cta: "Install Lite" },
     },
     trace: {
       tag: "Sample trace",
@@ -57,7 +57,7 @@ export const homeCopy = {
         { t: "AI API gateway", b: "OpenAI, Anthropic, Gemini, Azure OpenAI, and Bedrock behind one endpoint, with scoped virtual keys." },
         { t: "MCP gateway with per-user identity", b: "Per-user OAuth and tokens, tool-level RBAC, and an audit log for every call." },
         { t: "SSO and RBAC", b: "Five roles and support for any OIDC provider." },
-        { t: "Audit logs, rate limits, and budgets", b: "Sliding rate limits and token budgets per user, key, or provider." },
+        { t: "Audit logs, rate limits, and budgets", b: "Sliding-window request and token limits and spending budgets per user, API key or role." },
       ],
       stepsLabel: "Inside a ThinkWatch request",
       steps: [
@@ -78,12 +78,12 @@ export const homeCopy = {
     },
     lite: {
       eyebrow: "ThinkWatch Lite · For individual developers",
-      title: "A local AI gateway for macOS, Windows and Linux",
+      title: "A local gateway for Claude Code, Codex and other AI clients",
       points: [
-        { t: "Cost reporting", b: "Every request is priced from the price table; estimated amounts are marked as such, and requests that cannot be priced are counted as unpriced rather than as zero." },
-        { t: "Request routing", b: "The matched rule, the group, and every upstream attempt, with a dry run for rules before any traffic." },
-        { t: "Security checks", b: "Five guards on requests and responses, from secret redaction and tool-call inspection to an output limit, and a scan of client configurations, skills and hooks for hidden characters, prompt injection and dangerous commands." },
-        { t: "Remote core", b: "The app can also connect to ThinkWatch Core running on a server, over an encrypted control channel." },
+        { t: "Connect once, switch freely", b: "Each client is pointed at the gateway once; upstreams and models then change in the gateway, with no client to reconfigure or restart." },
+        { t: "Keys replaced before sending", b: "Outbound redaction can replace credentials before a request leaves, tool-call inspection can cut off dangerous commands, and MCP servers, skills and hooks are scanned." },
+        { t: "Every request traceable", b: "The matched rule, each upstream attempt and the cost of every request, with replay against another upstream." },
+        { t: "Costs stated as they are", b: "Estimated amounts are marked, and requests without a price are counted separately rather than as zero." },
       ],
       pills: ["Available", "macOS · Apple silicon", "Windows · x64 · ARM64", "Linux · x86_64 · aarch64", "MIT"],
       shotAlt:
@@ -138,7 +138,7 @@ export const homeCopy = {
     sub: "ThinkWatch 对模型请求与 MCP 工具调用进行路由、检查与计量，提供面向组织的自托管服务端，以及面向个人开发者的桌面应用。",
     doors: {
       teams: { label: "面向组织", name: "ThinkWatch 企业版", text: "自托管的 AI API 与 MCP 网关。", cta: "部署 ThinkWatch" },
-      machine: { label: "面向个人开发者", name: "ThinkWatch Lite", text: "基于本地网关的桌面应用，支持 Apple silicon 机型的 macOS、x64 与 ARM64 机型的 Windows，以及 x86_64 与 aarch64 机型的 Linux。", cta: "安装 Lite" },
+      machine: { label: "面向个人开发者", name: "ThinkWatch Lite", text: "Claude Code、Codex 等 AI 客户端的本地网关，支持 macOS、Windows 与 Linux。", cta: "安装 Lite" },
     },
     trace: {
       tag: "示例追踪",
@@ -181,7 +181,7 @@ export const homeCopy = {
         { t: "AI API 网关", b: "OpenAI、Anthropic、Gemini、Azure OpenAI 和 Bedrock 通过统一入口接入，并支持限定范围的虚拟密钥。" },
         { t: "基于用户身份的 MCP 网关", b: "每位用户使用本人的 OAuth 凭据，支持工具级 RBAC，每次调用均记录审计日志。" },
         { t: "SSO 与 RBAC", b: "五级角色，支持任意 OIDC 身份提供方。" },
-        { t: "审计、限流与预算", b: "按用户、密钥或上游服务商设置滑动窗口限流和 token 预算。" },
+        { t: "审计、限流与预算", b: "按用户、API 密钥或角色设置滑动窗口限流与费用预算。" },
       ],
       stepsLabel: "一次 ThinkWatch 请求的内部",
       steps: [
@@ -202,12 +202,12 @@ export const homeCopy = {
     },
     lite: {
       eyebrow: "ThinkWatch Lite · 面向个人开发者",
-      title: "适用于 macOS、Windows 与 Linux 的本地 AI 网关",
+      title: "Claude Code、Codex 等 AI 客户端的本地网关",
       points: [
-        { t: "费用报告", b: "每个请求按价目表计算费用；估算的金额另行标注，无法计价的请求单独计数，不按零计入。" },
-        { t: "请求路由", b: "展示每个请求命中的规则、策略组与每一次尝试，改规则前可以先试算。" },
-        { t: "安全检查", b: "五项防护作用于请求与响应，包括出站脱敏、工具调用审查与输出长度限制等；另可扫描客户端配置、技能与钩子，检查隐藏字符、提示注入与危险命令。" },
-        { t: "连接远程 core", b: "应用也可以通过加密的控制通道，连接运行在服务器上的 ThinkWatch Core。" },
+        { t: "一次接入，随时切换", b: "客户端只需接入一次，此后在网关中更换上游与模型，客户端无需改配置或重启。" },
+        { t: "发出前替换密钥", b: "出站脱敏可在请求发出前替换其中的凭据，工具调用审查可切断危险命令，MCP 服务器、技能与钩子也会被扫描。" },
+        { t: "每个请求都可追溯", b: "每个请求命中的规则、尝试过的上游与费用都有记录，也可以重放到另一个上游对比。" },
+        { t: "费用如实计算", b: "估算的金额单独标注，无法计价的请求单独计数，不按零计入。" },
       ],
       pills: ["已发布", "macOS · Apple silicon", "Windows · x64 · ARM64", "Linux · x86_64 · aarch64", "MIT"],
       shotAlt:

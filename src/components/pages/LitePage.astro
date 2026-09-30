@@ -130,7 +130,11 @@ const archLabel = { x64: "x64", arm64: "ARM64" } as const;
         <span class="shrink-0 rounded-full bg-[var(--color-brand-1)] px-3 py-1.5 font-mono text-xs font-medium uppercase tracking-[0.06em] text-[var(--color-bg)]">
           {c.status.badge}
         </span>
-        <p class="m-0 text-base leading-relaxed text-[#cbd5e1] sm:text-[17px]">{c.status.body}</p>
+        <ul class="m-0 flex list-none flex-wrap gap-x-5 gap-y-2 p-0 font-mono text-[13px] text-[#cbd5e1] sm:text-sm">
+          {c.status.items.map((item) => (
+            <li>{item}</li>
+          ))}
+        </ul>
       </div>
     </div>
 

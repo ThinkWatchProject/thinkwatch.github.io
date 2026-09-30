@@ -1,0 +1,86 @@
+# Features
+
+A page-by-page reference to what ThinkWatch Lite shows and does. The [Lite page](/lite) gives the short version.
+
+The main window has nine pages: Overview, Traffic, Clients, Keys, Upstreams, Routing, Security, MCP and Settings.
+
+## Usage and cost
+
+The Overview page reports tokens, cost and requests for the last 24 hours, 7 days, 30 days or a custom range, each against the period before; a live view follows the last ten minutes. A trend chart stacks tokens or cost by model, and the model ranking beneath it opens the matching requests. Further sections cover the prompt cache (hit rate, the net savings it brought and the hit rate per model), latency (median and 95th-percentile time to first token, per model and per upstream), generation speed (median tokens per second, per model and per upstream) and what each protection found.
+
+The cost figure states how much of it is estimated, for instance for a response that was cut off before it finished. Requests whose model has no price, and requests whose upstream reported no usage, are counted separately and never added in as zero. Prices come from price sheets: the default one follows LiteLLM's public prices and is refreshed once a day, and a custom one applies a multiplier and its own prices for particular models, as needed for a relay whose prices differ from the official ones. A subscription account such as a ChatGPT sign-in is priced from the price sheet like any other upstream, and an upstream such as a local model can be set to free. Each request's cost is fixed when the request finishes, and the request records the price sheet and the date of the prices it was costed with.
+
+## Traffic and sessions
+
+The Traffic page lists requests as they arrive: status, key, model, upstream, time to first token and total time (with the generation speed on hover), tokens and cost, with marks for a converted API format, redacted keys and a blocked or suspicious tool call. The list can be filtered by key, upstream and model, or narrowed to failed or unpriced requests. The Sessions view groups the requests of one conversation into turns, with the input tokens and the cost of each turn.
+
+A request opens into its timeline, its routing (the rule it matched, the group it went through and each attempt with its status and duration), the request and response bodies, and its usage and cost. A request from DeepSeek Harness also shows the size of the session log it carried, the whole conversation the client attaches to every request; the gateway removes it before a request goes to an upstream other than DeepSeek. A finished request can be sent again, unchanged, to another upstream after an estimate of its cost, and the two responses are shown side by side.
+
+## Client setup
+
+The Clients page points Claude Code, Claude Desktop, Codex, opencode, Zed, Aider and DeepSeek Harness at the gateway. Before anything is written, it lists the fields that change and what else the change affects (the ChatGPT desktop app, for instance, reads the same configuration file as Codex), shows the full diff and backs up the original file. Only the settings that point the client at the gateway change, and each client receives a key of its own. Claude Desktop is connected through its official third-party inference mode, and the page lists each of the files that change for it; a Claude Desktop managed by an organization is left as it is. A connected client can be restored at any time, on its own or together with all the others; a restored Codex keeps a plain OpenAI entry in place of the gateway's, so sessions started while it was connected can still be opened. opencode (v1 and v2) also gets the list of models its key can use on the gateway; when that list changes, the page offers to update it, through the same diff. Cursor, Continue and Antigravity CLI come with step-by-step instructions and a key created for them. For every client the page shows whether it is in use, waiting for its first request or not in effect, and its requests over the last 24 hours.
+
+On Windows, Claude Code and Codex installed inside WSL appear in a group of their own for each distribution, next to the clients on the computer itself. They are pointed at the gateway on Windows, restored and diagnosed the same way, each with a key separate from the Windows copy, and their files are edited through `\\wsl.localhost`. They are given `127.0.0.1`, the same address as the clients on Windows, which WSL reaches in two setups:
+
+- **WSL 1**, which shares the network with Windows.
+- **WSL 2 with mirrored networking**: `networkingMode=mirrored` under `[wsl2]` (or the older `[experimental]`) in `%USERPROFILE%\.wslconfig`. It needs Windows 11 22H2 or later and WSL 2.0.5 or later.
+
+WSL 2 uses NAT networking by default, and the gateway on Windows cannot be reached from inside WSL that way; the gateway does not listen on the WSL virtual adapter for it. The WSL group then explains this instead of offering to connect, and offers to switch to mirrored networking: `networkingMode` in `.wslconfig` is added or changed, and nothing else in the file is touched, through the same diff, confirmation and full backup as a client. The switch takes effect once WSL restarts, which the page also offers (`wsl --shutdown`, which stops every running distribution). A full uninstall leaves `.wslconfig` as it is, and its backup is kept. On Windows 10 and Windows 11 21H2, which have no mirrored networking, and with a WSL older than 2.0.5, the group says so. When connected to a remote core, clients in WSL are pointed at the server like those on Windows, whatever the networking.
+
+## Keys
+
+Clients reach the gateway with a key, on the local machine as well. The Keys page lists the default key, used by clients that were not given one of their own, and a key for each connected client, labelled with the client it belongs to so that its requests can be told apart in Traffic. Each key has a route, the models it may use (all, none, or chosen models and patterns such as `gpt-5*`), an optional limit on concurrent requests, and its requests and cost over the last 24 hours. A key can be disabled, which rejects every request made with it, or rotated; rotating writes the new key into the configuration of the client that uses it.
+
+## Upstreams
+
+Upstreams are the services requests are forwarded to: API keys for Anthropic, OpenAI, Google Gemini, DeepSeek or any compatible endpoint, Amazon Bedrock (with an API key, access keys or an AWS profile), a ChatGPT account or a Z.ai / BigModel account signed in from the app, relays such as OpenRouter, and local models such as Ollama. A ChatGPT account shows its usage limits and reset times. So does an upstream on a GLM Coding Plan, that is, one whose address is on `api.z.ai` or `open.bigmodel.cn`, whether it was signed in from the app or added with a key: its 5-hour and weekly limits and, on a plan billed in credits, the credits left (“1,976 / 2,000 credits left”). When a client and an upstream use different API formats, requests are converted between Anthropic Messages, OpenAI Chat Completions, OpenAI Responses and Gemini, and the fields that cannot be carried over are listed on the request. Upstreams can be reached through an outbound proxy and priced with a price sheet of their own; proxies and price sheets have tabs on the same page. A connection test times the DNS lookup and the TCP, TLS and proxy handshakes without incurring any cost; an inference test measures the time to first token and estimates its cost before it runs.
+
+API keys and header values can be written as `${NAME}` to read a system environment variable. On macOS these come from the login shell, so variables exported in `~/.zshrc` and similar files apply, and the same holds on Linux (`~/.bashrc`, `~/.profile` and so on); on Windows they are the environment variables configured in system settings. After a variable changes, reopening the app picks it up. Proxy variables such as `HTTPS_PROXY`, and `PATH`, are not read.
+
+A relay or vendor can hand out an import link, `thinkwatch://import?…` or its web form `https://thinkwat.ch/import#…`, that pre-fills a new upstream with a name, base URL, protocol, API key and model list. The app shows the settings and the host that will receive requests and the key in a confirmation dialog, and writes nothing and contacts nothing before Create is chosen. A link only ever adds one upstream: it cannot change existing ones, headers, proxies, pricing or routing, and a key that refers to an environment variable is rejected. The parameters and a link builder are in [Import links](/docs/lite/import-links).
+
+## Routing and failover
+
+Each key follows a route, and keys without one follow the default route. A route is a list of rules evaluated in order. A rule matches on the model, the key, the client's API format, input tokens, `max_tokens`, the number of tools, images, extended thinking, streaming, prompt caching or the kind of auxiliary request; it then forwards the request to an upstream or a group, or refuses it, and can rewrite the model, `max_tokens` or extended thinking. A group puts several upstreams behind one name and decides the order in which they are tried: as listed, manually selected, in turn, lowest latency first or lowest cost first. When an attempt fails, the request moves on to the next upstream, and by default a session stays on one upstream so that its prompt cache keeps hitting. A map at the top of the page traces every key through its route and groups to the upstreams.
+
+Auxiliary requests that clients send on their own (health checks, warm-ups, titles, topic detection and input suggestions) can be answered locally at no cost, passed through, or routed by the rules.
+
+Every request records the rule it matched, the group it went through and each attempt with its status and duration. A dry run evaluates the rules for a given request and shows where it would go and why, without sending anything and without incurring any cost.
+
+## Security
+
+The Security page holds five protections. They apply to every upstream and every key alike, and each runs in one of three modes: Off, Observe (detect and record, change nothing) or Enforce. The output limit starts Off and the other four start in Observe, so out of the box no request is changed or blocked.
+
+- **Outbound redaction** looks for credentials in a request before it leaves: API keys and tokens for Anthropic, OpenAI, GitHub, Slack, AWS, Google, GitLab, Stripe, npm, DigitalOcean and SendGrid, private keys, JWTs and passwords in connection strings. In Enforce mode they are replaced with placeholders and restored where the response repeats them. Rules for internal IP addresses and internal domains are included and start off.
+- **Tool-call inspection** checks the tool calls a model returns for commands that download or decode code and run it, send out environment variables or credential files, read private keys or cloud credentials, or install startup items and scheduled jobs. In Enforce mode such a call cuts the response off, so the client never receives a complete call to run. Deleting the home or root directory and making files world-writable are only recorded by default.
+- **Hidden characters** looks for Unicode tag characters and bidirectional control characters in what the client sends, tool results included, and in Enforce mode refuses the request.
+- **Content filter** matches keywords or regular expressions against the messages the client sends, tool results included, and in Enforce mode refuses a request that matches a blocking rule. Of the built-in rules, the three against explicit "ignore previous instructions" phrasing are on by default; rules for jailbreaks, persona manipulation, prompt extraction and their Chinese counterparts can be switched on.
+- **Output limit** stops an answer that grows past a set number of characters, 100,000 by default: a streamed answer is cut off at that point and a non-streamed one is replaced with an error. Reasoning and tool-call arguments do not count towards the limit.
+
+The page lists every rule. Built-in rules can be switched on or off one at a time, and those for tool calls and content can be set to act or only record in Enforce mode. Custom rules are regular expressions, or keywords for the content filter, and any rule can be tried on a sample text first. Everything the protections find is kept in the log on the first tab, together with the request it came from.
+
+## MCP
+
+The MCP page covers what clients load from their own configuration files, which does not pass through the gateway.
+
+- **Servers:** the MCP servers configured in Claude Code, Claude Desktop, Cursor, Codex, opencode, Antigravity CLI, Zed and DeepSeek Harness, side by side. A server can be copied from one client to another or removed from a client; the change is shown before anything is written, and the original file is backed up. Copying and removing work for Claude Code, Claude Desktop, Cursor and Codex; opencode, Antigravity CLI, Zed and DeepSeek Harness are listed but not written to. A remote server on another host is marked as third party, since using it sends the surrounding context to that host, and a server configured differently in different clients is marked as well and can be compared side by side.
+- **Skills and hooks:** the installed skills and configured hooks, with the client each belongs to.
+- **Findings:** client configuration, skills, hooks, slash commands, subagents and project instruction files are scanned for hidden characters, prompt injection, dangerous commands and overly broad permissions, and each finding is graded high, medium or low. The scan only reports; it never changes a file.
+
+The app watches these files while it runs, and a new finding raises a system notification.
+
+## Settings
+
+Settings has six sections. Connection lists the local core and the saved remote cores, described in [Connecting to a remote core](/docs/lite/remote-core). General sets the language, the appearance, what the menu bar item shows on macOS, launch at login, and whether notices arrive as system notifications, in the app only or not at all. Listening sets who can reach the gateway (this machine only, the local network of a chosen interface, or every interface), its port and the allowed address ranges. Log retention sets how long request payloads and request records are kept, and a size cap for payloads. About shows the version, checks for updates and produces a diagnostics bundle with keys and addresses masked. Uninstall restores every connected client and removes the autostart entry, and is meant to be run before the app is deleted.
+
+## Menu bar, system tray and notifications
+
+On macOS the menu bar shows today's tokens above today's cost; the numbers turn orange when a subscription quota is nearly used up and red when it is, and Settings can reduce the item to the icon or to the numbers.
+
+Clicking it opens a native menu with the gateway's address, its generation speed over the last minute and its state, unread notices, today's requests, tokens and cost, the quotas and reset times of each subscription account and GLM Coding Plan upstream (with the credits left under the bar on a plan billed in credits), and the requests in progress, followed by actions: choosing the upstream of a manually selected group, copying the gateway address or the default key, switching connections and checking for updates, all without opening the main window.
+
+On Windows the icon sits in the notification area. Hovering over it shows the gateway's state and today's tokens and cost; a left click opens the main window, and a right click opens the same menu, with quota bars written out as text.
+
+On Linux the icon sits in the system tray. Clicking it opens the same menu, with Open ThinkWatch Lite as its first item and quota bars written out as text.
+
+System notifications, native on macOS and Windows and sent through the desktop's notification service on Linux, report when the gateway stops forwarding or keeps restarting, the connection to a remote core drops, a subscription quota runs out, a sign-in expires or an upstream rejects its credential, a proxy cannot be reached, the configuration file fails validation, a tool call matches a rule that cuts the response off, or suspicious content appears in a client's configuration. A new version found by the automatic check is announced the same way (see [Updates](/docs/lite/install#updates)). An unreachable upstream, which a fallback usually covers, is only listed in the app. Notices as a whole can be set to system notifications, in-app only, or off. Marking a notice as read stops the bell from counting it; the notice stays in the list until the problem behind it clears or the list is cleared.
