@@ -250,8 +250,8 @@ export const products: Product[] = [
         locales: both,
         group: "concepts",
         summary: {
-          en: "The sixteen crates grouped by role, the three that ThinkWatch Enterprise depends on, and what ThinkWatch Lite compiles.",
-          "zh-CN": "十六个 crate 按职责的分组、ThinkWatch 企业版依赖的三个 crate，以及 ThinkWatch Lite 编译的部分。",
+          en: "The seventeen crates grouped by role, the four that ThinkWatch Enterprise depends on, and what ThinkWatch Lite compiles.",
+          "zh-CN": "十七个 crate 按职责的分组、ThinkWatch 企业版依赖的四个 crate，以及 ThinkWatch Lite 编译的部分。",
         },
       },
       // Published from the Core repository (src/lib/core-docs.mjs).

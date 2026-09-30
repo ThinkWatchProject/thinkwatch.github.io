@@ -93,7 +93,7 @@ export default function LogExplorerMock() {
   }, [inView]);
 
   return (
-    <div ref={ref} className="rounded-2xl border border-white/10 bg-[var(--color-surface)]/80 overflow-hidden backdrop-blur-sm h-full flex flex-col">
+    <div ref={ref} className="@container rounded-2xl border border-white/10 bg-[var(--color-surface)]/80 overflow-hidden backdrop-blur-sm h-full flex flex-col">
       {/* Top bar */}
       <div className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-3 border-b border-white/10 bg-black/40">
         <div className="hidden sm:flex gap-1.5 shrink-0">
@@ -111,17 +111,18 @@ export default function LogExplorerMock() {
         </div>
       </div>
 
-      {/* Column headers */}
+      {/* Column headers. Columns follow the panel's own width, not the window's: in the
+          hero it sits in half the page, where seven columns would all be cut short. */}
       <div
         className="grid gap-3 px-4 py-2 text-[10px] uppercase tracking-wider text-[var(--color-dim)] border-b border-white/5
-          grid-cols-[1fr_auto_56px] sm:grid-cols-[60px_1fr_1fr_56px_60px] lg:grid-cols-[70px_1fr_110px_1fr_70px_50px_56px]"
+          grid-cols-[1fr_auto_56px] @md:grid-cols-[60px_1fr_1fr_56px_60px] @2xl:grid-cols-[70px_1fr_110px_1fr_70px_50px_56px]"
       >
-        <div className="hidden sm:block">time</div>
+        <div className="hidden @md:block">time</div>
         <div>user</div>
-        <div className="hidden lg:block">key</div>
-        <div className="hidden sm:block">model</div>
-        <div className="hidden sm:block text-right">tokens</div>
-        <div className="hidden lg:block text-right">ms</div>
+        <div className="hidden @2xl:block">key</div>
+        <div className="hidden @md:block">model</div>
+        <div className="hidden @md:block text-right">tokens</div>
+        <div className="hidden @2xl:block text-right">ms</div>
         <div className="text-right">status</div>
       </div>
 
@@ -131,20 +132,20 @@ export default function LogExplorerMock() {
           <li
             key={r.id}
             className="grid gap-3 px-4 py-2.5 border-b border-white/5 hover:bg-white/[0.02] animate-[slideIn_400ms_ease-out]
-              grid-cols-[1fr_auto_56px] sm:grid-cols-[60px_1fr_1fr_56px_60px] lg:grid-cols-[70px_1fr_110px_1fr_70px_50px_56px]"
+              grid-cols-[1fr_auto_56px] @md:grid-cols-[60px_1fr_1fr_56px_60px] @2xl:grid-cols-[70px_1fr_110px_1fr_70px_50px_56px]"
             style={{ opacity: 1 - i * 0.04 }}
           >
-            <div className="hidden sm:block text-[var(--color-dim)]">{r.ts}</div>
+            <div className="hidden @md:block text-[var(--color-dim)]">{r.ts}</div>
             <div className="text-white truncate">{r.user}</div>
-            <div className="hidden lg:block text-[var(--color-brand-1)] truncate">{r.key}</div>
-            <div className="hidden sm:block text-[var(--color-brand-2)] truncate">{r.model}</div>
-            <div className="hidden sm:block text-right text-[var(--color-text)] tabular-nums">
+            <div className="hidden @2xl:block text-[var(--color-brand-1)] truncate">{r.key}</div>
+            <div className="hidden @md:block text-[var(--color-brand-2)] truncate">{r.model}</div>
+            <div className="hidden @md:block text-right text-[var(--color-text)] tabular-nums">
               {r.tokens.toLocaleString()}
             </div>
-            <div className="hidden lg:block text-right text-[var(--color-muted)] tabular-nums">{r.ms}</div>
+            <div className="hidden @2xl:block text-right text-[var(--color-muted)] tabular-nums">{r.ms}</div>
 
-            {/* Compact: visible only at < sm — collapses model + tokens onto user line */}
-            <div className="sm:hidden text-[10px] text-[var(--color-dim)] truncate">
+            {/* Compact: visible only when the panel is narrower than 28rem — collapses model + tokens onto user line */}
+            <div className="@md:hidden text-[10px] text-[var(--color-dim)] truncate">
               {r.model} · {r.tokens}t
             </div>
 
