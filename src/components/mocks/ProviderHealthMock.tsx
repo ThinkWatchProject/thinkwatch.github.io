@@ -94,7 +94,7 @@ export default function ProviderHealthMock() {
                       background:
                         p.status === "degraded"
                           ? "linear-gradient(90deg, #E5C07B, #F2A3B3)"
-                          : "linear-gradient(90deg, #3DDBD9, #8EEBEA)",
+                          : "linear-gradient(90deg, #22E5F2, #F05CD8)",
                     }}
                   />
                 </div>

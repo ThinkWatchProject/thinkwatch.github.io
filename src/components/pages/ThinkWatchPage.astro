@@ -42,7 +42,7 @@ const delay = (i: number) => `animation-delay: ${i * 90}ms;`;
       <div
         class="pointer-events-none absolute inset-0"
         aria-hidden="true"
-        style="background: radial-gradient(50% 60% at 85% 20%, rgba(61, 219, 217, 0.09), transparent 65%);"
+        style="background: radial-gradient(50% 60% at 85% 20%, rgba(34, 229, 242, 0.09), transparent 65%);"
       ></div>
       <div class="container-page relative grid items-center gap-12 py-14 sm:py-20 lg:grid-cols-2 lg:gap-16 lg:py-[88px]">
         <div class="flex min-w-0 flex-col gap-5 sm:gap-6">
@@ -60,13 +60,13 @@ const delay = (i: number) => `animation-delay: ${i * 90}ms;`;
           >
             {c.hero.titleA}<span class="text-shimmer">{c.hero.titleHighlight}</span>
           </h1>
-          <p class="reveal m-0 max-w-[36rem] text-[17px] leading-relaxed text-[#cbd5e1] sm:text-xl sm:leading-normal" style={delay(2)}>
+          <p class="reveal m-0 max-w-[36rem] text-[17px] leading-relaxed text-[#c3c7ce] sm:text-xl sm:leading-normal" style={delay(2)}>
             {c.hero.sub}
           </p>
           <div class="reveal mt-1 flex flex-col gap-3 sm:mt-2 sm:flex-row sm:items-center sm:gap-5" style={delay(3)}>
             <a
               href="#quickstart"
-              class="inline-flex min-h-11 items-center justify-center rounded-[10px] bg-[var(--color-brand-1)] px-[22px] py-3 text-base font-semibold text-[var(--color-bg)] transition-colors hover:bg-[var(--color-brand-2)]"
+              class="inline-flex min-h-11 items-center justify-center rounded-full bg-[#f7f8f8] px-[22px] py-3 text-base font-semibold text-[#08090a] transition hover:bg-white hover:shadow-[0_8px_30px_-8px_rgba(34,229,242,0.5)]"
             >
               {c.hero.ctaPrimary}
             </a>
@@ -80,7 +80,7 @@ const delay = (i: number) => `animation-delay: ${i * 90}ms;`;
           <ul class="reveal m-0 mt-1 flex list-none flex-wrap gap-2.5 p-0 sm:mt-2 sm:gap-3" style={delay(4)}>
             {pills.map((p) => (
               <li
-                class="rounded-full border border-[var(--color-border-strong)] px-3 py-1.5 text-[13px] text-[#cbd5e1]"
+                class="rounded-full border border-[var(--color-border-strong)] px-3 py-1.5 text-[13px] text-[#c3c7ce]"
                 title={p.title}
               >
                 {p.label}

@@ -1,0 +1,110 @@
+---
+// The ThinkWatch Lite mark as the desktop app draws it on its launch screen:
+// four strokes forming "TW", a neon gradient along them (the brand pair, which
+// the page's accent tokens follow), and optionally a blurred glow and a
+// stroke-by-stroke draw. Coordinates and lengths match the app
+// (ThinkWatch-Lite src/launch/LaunchScreen.tsx, src-tauri/icons/render.py).
+interface Props {
+  /** Unique per page: the gradient and filter are referenced by id */
+  id: string;
+  size?: number;
+  /** Draw the strokes one by one when the page loads */
+  draw?: boolean;
+  /** A soft glow behind the strokes that breathes */
+  glow?: boolean;
+  class?: string;
+}
+const { id, size = 20, draw = false, glow = false, class: className } = Astro.props;
+const V = Math.hypot(4.5, 8);
+const strokes: [string, number][] = [
+  ["M7 9H25", 18],
+  ["M16 9V17", 8],
+  ["M7 17L11.5 25L16 17", 2 * V],
+  ["M16 17L20.5 25L25 17", 2 * V],
+];
+---
+
+<svg viewBox="0 0 32 32" width={size} height={size} class:list={["tw-mark", className, draw && "tw-draw", glow && "tw-glowing"]} aria-hidden="true">
+  <defs>
+    <linearGradient id={`${id}-g`} x1="7" y1="0" x2="25" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" style="stop-color: var(--a1-hex, var(--color-brand-1))" />
+      <stop offset="1" style="stop-color: var(--a2-hex, var(--color-brand-3))" />
+    </linearGradient>
+    {glow && (
+      <filter id={`${id}-f`} x="-60%" y="-60%" width="220%" height="220%">
+        <feGaussianBlur stdDeviation="1.4" />
+      </filter>
+    )}
+  </defs>
+  {glow && (
+    <g class="tw-glow" filter={`url(#${id}-f)`}>
+      {strokes.map(([d]) => <path d={d} stroke={`url(#${id}-g)`} stroke-width="3.8" />)}
+    </g>
+  )}
+  {strokes.map(([d, len], i) => (
+    <path
+      d={d}
+      stroke={`url(#${id}-g)`}
+      stroke-width="2.8"
+      class="tw-stroke"
+      style={draw ? `stroke-dasharray:${len} ${len * 2};stroke-dashoffset:${len};animation-delay:${200 + i * 160}ms` : undefined}
+    />
+  ))}
+</svg>
+
+<style>
+  .tw-mark {
+    overflow: visible;
+    flex-shrink: 0;
+  }
+  .tw-mark path {
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .tw-draw .tw-stroke {
+    animation: tw-draw 520ms cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
+  }
+  @keyframes tw-draw {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+  .tw-glow {
+    opacity: 0.55;
+  }
+  .tw-draw .tw-glow {
+    opacity: 0;
+    animation:
+      tw-light 600ms ease-out 900ms forwards,
+      tw-breathe 3.2s ease-in-out 1.5s infinite;
+  }
+  .tw-glowing:not(.tw-draw) .tw-glow {
+    animation: tw-breathe 3.2s ease-in-out infinite;
+  }
+  @keyframes tw-light {
+    to {
+      opacity: 0.7;
+    }
+  }
+  @keyframes tw-breathe {
+    0%,
+    100% {
+      opacity: 0.7;
+    }
+    50% {
+      opacity: 0.3;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .tw-draw .tw-stroke {
+      animation: none;
+      stroke-dashoffset: 0 !important;
+    }
+    .tw-glow,
+    .tw-draw .tw-glow {
+      animation: none;
+      opacity: 0.55;
+    }
+  }
+</style>

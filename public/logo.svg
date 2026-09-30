@@ -1,25 +1,19 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 200" fill="none">
-  <!-- icon -->
-  <rect width="200" height="200" rx="40" fill="#1E2A4A"/>
-  <rect x="32" y="32" width="136" height="136" rx="28"
-        fill="none" stroke="#3DDBD9" stroke-width="10"/>
-  <line x1="62" y1="68" x2="138" y2="68"
-        stroke="#3DDBD9" stroke-width="12" stroke-linecap="round"/>
-  <line x1="100" y1="68" x2="100" y2="104"
-        stroke="#3DDBD9" stroke-width="12" stroke-linecap="round"/>
-  <polyline points="62,104 80,140 100,104"
-            fill="none" stroke="#3DDBD9" stroke-width="12"
-            stroke-linecap="round" stroke-linejoin="round"/>
-  <polyline points="100,104 120,140 138,104"
-            fill="none" stroke="#3DDBD9" stroke-width="12"
-            stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- icon: the desktop app's mark, neon strokes on a near-black tile -->
+  <defs>
+    <linearGradient id="tw-bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0d0f22"/><stop offset="1" stop-color="#020208"/></linearGradient>
+    <linearGradient id="tw-neon" x1="43.75" y1="0" x2="156.25" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#22e5f2"/><stop offset="1" stop-color="#f05cd8"/></linearGradient>
+  </defs>
+  <rect width="200" height="200" rx="46" fill="url(#tw-bg)"/>
+  <path d="M43.75 56.25H156.25M100 56.25V106.25M43.75 106.25L71.875 156.25L100 106.25M100 106.25L128.125 156.25L156.25 106.25"
+        fill="none" stroke="url(#tw-neon)" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
 
   <!-- wordmark -->
   <text x="240" y="128"
         font-family="Geist, 'Inter Display', Inter, system-ui, -apple-system, 'Helvetica Neue', sans-serif"
         font-size="92"
         letter-spacing="-2"
-        fill="#1E2A4A">
+        fill="#0b0c0e">
     <tspan font-weight="500">Think</tspan><tspan font-weight="700">Watch</tspan>
   </text>
 </svg>

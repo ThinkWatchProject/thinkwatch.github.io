@@ -87,13 +87,13 @@ const fileLink = "break-all text-[var(--color-brand-1)] transition-colors hover:
               c.hero.titleA
             )}<span class="text-shimmer">{c.hero.titleHighlight}</span>
           </h1>
-          <p class="reveal m-0 max-w-[38rem] text-[17px] leading-relaxed text-[#cbd5e1] sm:text-xl sm:leading-normal" style={delay(2)}>
+          <p class="reveal m-0 max-w-[38rem] text-[17px] leading-relaxed text-[#c3c7ce] sm:text-xl sm:leading-normal" style={delay(2)}>
             {c.hero.sub}
           </p>
           <div class="reveal mt-1 flex flex-col gap-3 sm:mt-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-6 sm:gap-y-3" style={delay(3)}>
             <a
               href="#install"
-              class="inline-flex min-h-11 items-center justify-center rounded-[10px] bg-[var(--color-brand-1)] px-[22px] py-3 text-base font-semibold text-[var(--color-bg)] transition-colors hover:bg-[var(--color-brand-2)]"
+              class="inline-flex min-h-11 items-center justify-center rounded-full bg-[#f7f8f8] px-[22px] py-3 text-base font-semibold text-[#08090a] transition hover:bg-white hover:shadow-[0_8px_30px_-8px_rgba(34,229,242,0.5)]"
             >
               {c.hero.ctaInstall}
             </a>
@@ -118,7 +118,7 @@ const fileLink = "break-all text-[var(--color-brand-1)] transition-colors hover:
           class="reveal min-w-0 overflow-hidden rounded-[14px] border border-[var(--color-border-strong)] bg-[var(--color-surface)] font-mono text-[13px] sm:text-[15px]"
           style={delay(3)}
         >
-          <div class="flex items-center gap-2.5 border-b border-[#22304f] px-5 py-3.5 text-[var(--color-muted)] sm:px-[22px]">
+          <div class="flex items-center gap-2.5 border-b border-[#26282c] px-5 py-3.5 text-[var(--color-muted)] sm:px-[22px]">
             <span class="h-2 w-2 shrink-0 rounded-full bg-[var(--color-brand-1)] pulse-dot" aria-hidden="true"></span>
             <span class="min-w-0">{c.hero.cardTitle}</span>
           </div>
@@ -159,7 +159,7 @@ const fileLink = "break-all text-[var(--color-brand-1)] transition-colors hover:
             <p class:list={[eyebrow, "m-0"]}>{c.install.eyebrow}</p>
             <h2 id="core-install" class={h2}>{c.install.title}</h2>
             {c.install.body.map((text) => (
-              <p class="m-0 text-base leading-relaxed text-[#cbd5e1] sm:text-[17px]">{text}</p>
+              <p class="m-0 text-base leading-relaxed text-[#c3c7ce] sm:text-[17px]">{text}</p>
             ))}
             <div class="flex flex-wrap items-center gap-x-6 gap-y-2">
               <a href={serverDocsHref} class={textLink}>{c.install.guide}</a>
@@ -171,7 +171,7 @@ const fileLink = "break-all text-[var(--color-brand-1)] transition-colors hover:
             <p class={label}>{c.install.scriptLabel}</p>
             <CopyCommand command={installCommand} />
             <p class="m-0 text-[15px] leading-relaxed text-[var(--color-muted)]">{c.install.pinNote}</p>
-            <CopyCommand command={`${installCommand} -s -- --version ${c.install.versionPlaceholder}`} class="text-[#cbd5e1] text-[13px] sm:text-sm" />
+            <CopyCommand command={`${installCommand} -s -- --version ${c.install.versionPlaceholder}`} class="text-[#c3c7ce] text-[13px] sm:text-sm" />
             <p class:list={[label, "mt-4"]}>{c.install.nextLabel}</p>
             <div class="overflow-x-auto rounded-[14px] border border-[var(--color-border-strong)] bg-[var(--color-surface)] p-5 font-mono text-[13px] leading-normal sm:p-6 sm:text-[15px]">
               <ul class="m-0 flex list-none flex-col gap-3.5 p-0">
@@ -185,7 +185,7 @@ const fileLink = "break-all text-[var(--color-brand-1)] transition-colors hover:
             </div>
             <div class="flex min-w-0 flex-col gap-2 text-sm leading-relaxed text-[var(--color-muted)]">
               <p class="m-0">{c.install.serviceUser}</p>
-              <code class="block break-all font-mono text-[13px] text-[#cbd5e1]">{asServiceUser}</code>
+              <code class="block break-all font-mono text-[13px] text-[#c3c7ce]">{asServiceUser}</code>
             </div>
           </div>
         </div>
@@ -239,7 +239,7 @@ const fileLink = "break-all text-[var(--color-brand-1)] transition-colors hover:
               ]}
             >
               <span class="text-[17px] font-semibold">{row.name}</span>
-              <code class="break-words font-mono text-sm leading-relaxed text-[#cbd5e1] sm:text-[15px]">{row.crates}</code>
+              <code class="break-words font-mono text-sm leading-relaxed text-[#c3c7ce] sm:text-[15px]">{row.crates}</code>
               {row.mark === "shared" ? (
                 <span class="justify-self-start rounded-full border border-[var(--color-brand-1)] px-[11px] py-[5px] text-[13px] text-[var(--color-brand-1)] lg:justify-self-end lg:whitespace-nowrap">
                   {c.layers.sharedTag}
@@ -262,7 +262,7 @@ const fileLink = "break-all text-[var(--color-brand-1)] transition-colors hover:
         <div class="flex flex-col gap-4">
           <p class:list={[eyebrow, "m-0"]}>{c.dev.eyebrow}</p>
           <h2 class={h2}>{c.dev.title}</h2>
-          <p class="m-0 text-base leading-relaxed text-[#cbd5e1] sm:text-[17px]">{c.dev.body}</p>
+          <p class="m-0 text-base leading-relaxed text-[#c3c7ce] sm:text-[17px]">{c.dev.body}</p>
         </div>
         <div class="overflow-x-auto rounded-[14px] border border-[var(--color-border-strong)] bg-[var(--color-surface)] p-5 font-mono text-[13px] leading-normal sm:p-7 sm:text-[15px]">
           <ul class="m-0 flex list-none flex-col gap-3.5 p-0">

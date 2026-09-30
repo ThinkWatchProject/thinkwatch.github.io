@@ -2,30 +2,32 @@
 
 /* ---------- Theme tokens ---------- */
 @theme {
-  /* Brand: the logo's navy and teal, with amber for warnings. */
-  --color-bg: #0b1220;
-  --color-surface: #111a2e;
-  --color-surface-2: #16213a;
-  --color-border: #1e2a4a;
-  --color-border-strong: #2a3a63;
-  --color-navy: #1e2a4a;
+  /* Near-black neutral ground; the accent is the desktop app mark's neon pair
+     (cyan to magenta), with amber for warnings. */
+  --color-bg: #08090a;
+  --color-surface: #0f1012;
+  --color-surface-2: #151619;
+  --color-border: #1c1d21;
+  --color-border-strong: #2a2c31;
+  --color-navy: #1c1d21;
 
-  --color-text: #e6ebf2;
-  --color-muted: #94a3b8;
-  --color-dim: #8a96ab;
+  --color-text: #f7f8f8;
+  --color-muted: #8a8f98;
+  --color-dim: #7a808a;
 
-  --color-brand-1: #3ddbd9;   /* logo teal */
-  --color-brand-2: #8eebea;   /* light teal */
+  --color-brand-1: #22e5f2;   /* mark cyan */
+  --color-brand-2: #8ff3f9;   /* light cyan, for hover */
+  --color-brand-3: #f05cd8;   /* mark magenta */
   --color-accent:  #e5c07b;   /* amber: flagged, held, warnings */
 
-  /* Legacy palette classes (cyan, violet, pink, purple, fuchsia) used across
-     older components are remapped onto the brand ramps, so every component
-     follows the logo without per-file edits. */
-  --color-cyan-50: #ecfdfc;  --color-cyan-100: #d2f9f8; --color-cyan-200: #a8f2f0; --color-cyan-300: #6fe6e4; --color-cyan-400: #3ddbd9;
-  --color-cyan-500: #22bfbd; --color-cyan-600: #189a99; --color-cyan-700: #167a7a; --color-cyan-800: #155f60; --color-cyan-900: #134e4f; --color-cyan-950: #062d2e;
-  --color-violet-50: #f0fefd; --color-violet-100: #ddfaf9; --color-violet-200: #c3f6f5; --color-violet-300: #a8f2f0; --color-violet-400: #8eebea;
-  --color-violet-500: #6fe6e4; --color-violet-600: #3ddbd9; --color-violet-700: #22bfbd; --color-violet-800: #189a99; --color-violet-900: #167a7a; --color-violet-950: #0b3f40;
-  --color-purple-300: #a8f2f0; --color-purple-400: #8eebea; --color-purple-500: #6fe6e4;
+  /* Legacy palette classes used across older components are remapped onto the
+     brand ramps: cyan onto the mark's cyan, violet and purple onto its magenta,
+     pink and fuchsia onto amber. */
+  --color-cyan-50: #ecfdfe;  --color-cyan-100: #cffafd; --color-cyan-200: #a5f4fa; --color-cyan-300: #67edf6; --color-cyan-400: #22e5f2;
+  --color-cyan-500: #0bc6d4; --color-cyan-600: #0a9eaa; --color-cyan-700: #0e7d87; --color-cyan-800: #12626a; --color-cyan-900: #134f56; --color-cyan-950: #05333a;
+  --color-violet-50: #fdf0fb; --color-violet-100: #fbdff6; --color-violet-200: #f7c0ed; --color-violet-300: #f39be3; --color-violet-400: #f05cd8;
+  --color-violet-500: #e03cc4; --color-violet-600: #c229a6; --color-violet-700: #9c2186; --color-violet-800: #7a1b69; --color-violet-900: #5e1651; --color-violet-950: #3a0b31;
+  --color-purple-300: #f39be3; --color-purple-400: #f05cd8; --color-purple-500: #e03cc4;
   --color-pink-50: #fbf6ec;  --color-pink-100: #f6eacf; --color-pink-200: #efd9a8; --color-pink-300: #e9cb8e; --color-pink-400: #e5c07b;
   --color-pink-500: #d6a95a; --color-pink-600: #b98a3f; --color-pink-700: #946b31; --color-pink-800: #74542b; --color-pink-900: #5f4526; --color-pink-950: #352413;
   --color-fuchsia-300: #e9cb8e; --color-fuchsia-400: #e5c07b; --color-fuchsia-500: #d6a95a;
@@ -136,8 +138,8 @@
     pointer-events: none;
     z-index: -2;
     background-image:
-      linear-gradient(to right, rgba(148,163,184,0.045) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(148,163,184,0.045) 1px, transparent 1px);
+      linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px);
     background-size: 56px 56px;
     mask-image: radial-gradient(ellipse at center, #000 30%, transparent 80%);
   }
@@ -150,24 +152,30 @@
     pointer-events: none;
     z-index: -1;
     background:
-      radial-gradient(60rem 40rem at 15% -10%, color-mix(in oklab, var(--color-brand-1) 16%, transparent), transparent 60%),
-      radial-gradient(50rem 35rem at 90% 10%, color-mix(in oklab, var(--color-border-strong) 70%, transparent), transparent 60%),
-      radial-gradient(40rem 30rem at 50% 100%, color-mix(in oklab, var(--color-brand-1) 6%, transparent), transparent 70%);
+      radial-gradient(60rem 40rem at 15% -10%, color-mix(in oklab, var(--color-brand-1) 9%, transparent), transparent 60%),
+      radial-gradient(50rem 35rem at 90% 5%, color-mix(in oklab, var(--color-brand-3) 7%, transparent), transparent 60%),
+      radial-gradient(40rem 30rem at 50% 100%, color-mix(in oklab, var(--color-brand-1) 4%, transparent), transparent 70%);
     filter: blur(20px);
   }
+}
+
+/* The brand pair as RGB triples, for colours with alpha: rgb(var(--a1) / 0.4) */
+:root {
+  --a1: 34 229 242;
+  --a2: 240 92 216;
 }
 
 /* ---------- Utilities ---------- */
 @layer utilities {
   .text-gradient {
-    background: linear-gradient(120deg, #3ddbd9 0%, #8eebea 55%, #d8fbfa 100%);
+    background: linear-gradient(100deg, var(--color-brand-1) 0%, #8fb8ff 50%, var(--color-brand-3) 100%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
   }
 
   .bg-brand-gradient {
-    background: linear-gradient(135deg, var(--color-brand-1) 0%, var(--color-brand-2) 100%);
+    background: linear-gradient(135deg, var(--color-brand-1) 0%, var(--color-brand-3) 100%);
   }
 
   /* Display headings use the product sans at a heavier weight. */
@@ -180,9 +188,9 @@
     letter-spacing: 0;
   }
 
-  /* Teal text with a light sweep passing through it. */
+  /* The mark's cyan-to-magenta, with a light sweep passing through it. */
   .text-shimmer {
-    background: linear-gradient(100deg, #3ddbd9 0%, #3ddbd9 35%, #d8fbfa 50%, #3ddbd9 65%, #3ddbd9 100%);
+    background: linear-gradient(100deg, var(--color-brand-1) 0%, #8fb8ff 30%, #f4f6ff 45%, var(--color-brand-3) 65%, var(--color-brand-3) 100%);
     background-size: 250% 100%;
     background-position: 100% 0;
     -webkit-background-clip: text;
@@ -209,7 +217,7 @@
     inset: 0;
     padding: 1px;
     border-radius: inherit;
-    background: linear-gradient(135deg, color-mix(in oklab, var(--color-brand-1) 60%, transparent), color-mix(in oklab, var(--color-brand-2) 60%, transparent));
+    background: linear-gradient(135deg, color-mix(in oklab, var(--color-brand-1) 60%, transparent), color-mix(in oklab, var(--color-brand-3) 60%, transparent));
     -webkit-mask:
       linear-gradient(#000 0 0) content-box,
       linear-gradient(#000 0 0);
@@ -221,7 +229,7 @@
   .glow {
     box-shadow:
       0 0 0 1px color-mix(in oklab, var(--color-brand-1) 40%, transparent),
-      0 10px 40px -10px color-mix(in oklab, var(--color-brand-2) 50%, transparent);
+      0 10px 40px -10px color-mix(in oklab, var(--color-brand-3) 45%, transparent);
   }
 
   .container-page {
@@ -266,7 +274,7 @@
 .prose-tw ul,
 .prose-tw ol,
 .prose-tw blockquote {
-  color: #cbd5e1;
+  color: #c3c7ce;
 }
 .prose-tw a {
   color: var(--color-brand-1);
@@ -311,8 +319,8 @@
   font-family: var(--font-mono);
   font-size: 0.85em;
   color: var(--color-brand-1);
-  background: rgba(61, 219, 217, 0.08);
-  border: 1px solid rgba(61, 219, 217, 0.2);
+  background: rgba(34, 229, 242, 0.08);
+  border: 1px solid rgba(34, 229, 242, 0.2);
   padding: 0.1em 0.4em;
   border-radius: 4px;
 }
@@ -320,7 +328,7 @@
 /* Code blocks (Shiki output) */
 .prose-tw pre.shiki,
 .prose-tw pre.astro-code {
-  background: #0d1526 !important;
+  background: #0c0d0f !important;
   border: 1px solid rgba(255,255,255,0.08);
   border-radius: 12px;
   padding: 1.1rem 1.25rem;
@@ -372,7 +380,7 @@
 .prose-tw td {
   padding: 0.6em 1em;
   border-bottom: 1px solid rgba(255,255,255,0.05);
-  color: #cbd5e1;
+  color: #c3c7ce;
 }
 .prose-tw tr:hover td { background: rgba(255,255,255,0.02); }
 

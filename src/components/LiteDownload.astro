@@ -31,11 +31,11 @@ const t = zh
   : { install: "Install", mac: "Download for macOS", win: "Download for Windows", linux: "Download for Linux", version: "Version" };
 
 const base =
-  "inline-flex min-h-11 items-center justify-center rounded-[10px] px-[22px] py-3 text-base font-semibold transition-colors";
+  "inline-flex min-h-11 items-center justify-center rounded-full px-[22px] py-3 text-base font-semibold transition";
 const look =
   variant === "solid"
-    ? "bg-[var(--color-brand-1)] text-[var(--color-bg)] hover:bg-[var(--color-brand-2)]"
-    : "border border-[var(--color-brand-1)] text-[var(--color-brand-1)] hover:border-[var(--color-brand-2)] hover:text-[var(--color-brand-2)]";
+    ? "bg-[#f7f8f8] text-[#08090a] hover:bg-white hover:shadow-[0_8px_30px_-8px_rgba(34,229,242,0.5)]"
+    : "border border-white/15 text-white hover:bg-white/5 hover:border-white/25";
 ---
 
 <div

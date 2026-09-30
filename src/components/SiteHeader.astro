@@ -3,6 +3,7 @@ import { getLang, t, localePath, type Lang } from "~/i18n";
 import { getStarCount, formatStars } from "~/lib/github";
 import { findDoc } from "~/content/docs/_meta";
 import SearchModal from "./SearchModal.astro";
+import TwMark from "./TwMark.astro";
 
 const lang = getLang(Astro);
 const s = t(lang);
@@ -58,17 +59,10 @@ const menuLabel = lang === "zh-CN" ? "菜单" : "Menu";
 const closeLabel = lang === "zh-CN" ? "关闭" : "Close";
 ---
 
-<header class="sticky top-0 z-50 backdrop-blur-md bg-[var(--color-bg)]/60 border-b border-white/5">
+<header class="sticky top-0 z-50 backdrop-blur-md backdrop-saturate-150 bg-[var(--color-bg)]/70 border-b border-white/[0.07]">
   <div class="container-page flex items-center justify-between h-16 gap-3">
     <a href={localePath(lang, "/")} class="flex items-center gap-2 sm:gap-2.5 group shrink-0">
-      <svg class="w-7 h-7 sm:w-8 sm:h-8 shrink-0" viewBox="0 0 200 200" fill="none" aria-hidden="true">
-        <rect width="200" height="200" rx="40" fill="#1E2A4A"/>
-        <rect x="32" y="32" width="136" height="136" rx="28" fill="none" stroke="#3DDBD9" stroke-width="10"/>
-        <line x1="62" y1="68" x2="138" y2="68" stroke="#3DDBD9" stroke-width="12" stroke-linecap="round"/>
-        <line x1="100" y1="68" x2="100" y2="104" stroke="#3DDBD9" stroke-width="12" stroke-linecap="round"/>
-        <polyline points="62,104 80,140 100,104" fill="none" stroke="#3DDBD9" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
-        <polyline points="100,104 120,140 138,104" fill="none" stroke="#3DDBD9" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
+      <TwMark id="m-header" size={26} />
       <span class="text-base sm:text-lg tracking-tight text-white">
         <span class="font-medium">Think</span><span class="font-bold">Watch</span>
       </span>
@@ -80,7 +74,7 @@ const closeLabel = lang === "zh-CN" ? "关闭" : "Close";
         <a
           href={l.href}
           aria-current={l.active ? "page" : undefined}
-          class:list={["transition-colors", l.active ? "text-[var(--color-brand-1)]" : "hover:text-white"]}
+          class:list={["transition-colors", l.active ? "text-white" : "hover:text-white"]}
         >
           {l.label}
         </a>
@@ -150,7 +144,7 @@ const closeLabel = lang === "zh-CN" ? "关闭" : "Close";
       <!-- Desktop CTA -->
       <a
         href={localePath(lang, "/thinkwatch#quickstart")}
-        class="hidden sm:inline-flex items-center text-sm font-medium px-4 h-9 rounded-md bg-brand-gradient text-black hover:brightness-110 transition"
+        class="hidden sm:inline-flex items-center text-sm font-medium px-4 h-9 rounded-full bg-[#f7f8f8] text-[#08090a] hover:bg-white hover:shadow-[0_8px_30px_-8px_rgba(34,229,242,0.5)] transition"
       >
         {s.common.getStarted}
       </a>
@@ -192,7 +186,7 @@ const closeLabel = lang === "zh-CN" ? "关闭" : "Close";
               aria-current={l.active ? "page" : undefined}
               class:list={[
                 "block py-3 text-base transition-colors border-b border-white/5",
-                l.active ? "text-[var(--color-brand-1)]" : "text-[var(--color-muted)] hover:text-white",
+                l.active ? "text-white" : "text-[var(--color-muted)] hover:text-white",
               ]}
             >
               {l.label}
@@ -202,7 +196,7 @@ const closeLabel = lang === "zh-CN" ? "关闭" : "Close";
         <li>
           <a
             href={localePath(lang, "/thinkwatch#quickstart")}
-            class="mt-4 inline-flex items-center justify-center w-full px-4 py-3 rounded-lg bg-brand-gradient text-black font-medium hover:brightness-110 transition"
+            class="mt-4 inline-flex items-center justify-center w-full px-4 py-3 rounded-full bg-[#f7f8f8] text-[#08090a] font-medium hover:bg-white transition"
           >
             {s.common.getStarted}
           </a>

@@ -13,7 +13,7 @@ const t = homeCopy[lang].trace;
       <div class="font-mono text-[13px] uppercase tracking-[0.08em] text-[var(--color-muted)]">{c.eyebrow}</div>
       <div class="flex flex-col gap-4">
         {c.items.map((item) => (
-          <div class="flex flex-col gap-2 rounded-2xl border border-[var(--color-border-strong)] bg-[#0f1729] p-6">
+          <div class="flex flex-col gap-2 rounded-2xl border border-[var(--color-border-strong)] bg-[#0f1012] p-6">
             <div class="font-mono text-[13px] text-[var(--color-brand-1)]">{item.tag}</div>
             <h3 class="text-xl font-semibold text-white sm:text-[22px]">{item.title}</h3>
             <p class="text-base leading-relaxed text-[var(--color-muted)]">{item.body}</p>
@@ -22,8 +22,8 @@ const t = homeCopy[lang].trace;
       </div>
     </div>
 
-    <div class="min-w-0 overflow-hidden rounded-[14px] border border-[var(--color-border-strong)] bg-[rgba(17,26,46,0.92)] font-mono text-[13px] shadow-[0_40px_120px_-40px_rgba(61,219,217,0.35)] sm:text-sm">
-      <div class="flex items-center justify-between gap-3 border-b border-[#22304f] px-4 py-3.5 text-[var(--color-muted)] sm:px-5">
+    <div class="min-w-0 overflow-hidden rounded-[14px] border border-[var(--color-border-strong)] bg-[rgba(15, 16, 18,0.92)] font-mono text-[13px] shadow-[0_40px_120px_-40px_rgba(34, 229, 242,0.35)] sm:text-sm">
+      <div class="flex items-center justify-between gap-3 border-b border-[#26282c] px-4 py-3.5 text-[var(--color-muted)] sm:px-5">
         <span class="flex items-center gap-2.5">
           <span class="flex gap-1.5" aria-hidden="true"><span class="h-2.5 w-2.5 rounded-full bg-[var(--color-border-strong)]"></span><span class="h-2.5 w-2.5 rounded-full bg-[var(--color-border-strong)]"></span><span class="h-2.5 w-2.5 rounded-full bg-[var(--color-border-strong)]"></span></span>
           <span><span class="text-[var(--color-brand-1)]">POST</span> /v1/messages</span>
@@ -39,7 +39,7 @@ const t = homeCopy[lang].trace;
         <div class="trace-row grid grid-cols-[88px_minmax(0,1fr)] gap-3 rounded-md p-1.5 sm:grid-cols-[110px_minmax(0,1fr)] sm:gap-4" style="animation-delay: 3.4s;"><span class="text-[var(--color-muted)]">{t.redaction[0]}</span><span class="text-[#e6ebf2]">{t.redaction[1]}</span></div>
         <div class="trace-row trace-flag grid grid-cols-[88px_minmax(0,1fr)] gap-3 rounded-md p-1.5 sm:grid-cols-[110px_minmax(0,1fr)] sm:gap-4" style="animation-delay: 4.1s;"><span class="text-[var(--color-muted)]">{t.tool[0]}</span><span class="text-[var(--color-accent)]">{t.tool[1]}<span class="blink ml-1 inline-block h-4 w-2 bg-[var(--color-brand-1)] align-[-2px]" aria-hidden="true"></span></span></div>
       </div>
-      <div class="border-t border-[#22304f] px-4 py-3 text-xs text-[var(--color-muted)] sm:px-5">{t.note}</div>
+      <div class="border-t border-[#26282c] px-4 py-3 text-xs text-[var(--color-muted)] sm:px-5">{t.note}</div>
     </div>
   </div>
 </section>
