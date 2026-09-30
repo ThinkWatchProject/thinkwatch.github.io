@@ -7,7 +7,7 @@ ThinkWatch Lite is a local gateway for Claude Code, Codex and other AI clients, 
 ## Highlights
 
 - **Connect once, switch freely.** Seven clients are pointed at the gateway in one step, with the change previewed and the original backed up; Cursor, Continue and Antigravity CLI come with instructions.
-- **Keys replaced before sending.** Outbound redaction, tool-call inspection, hidden-character detection, a content filter and an output limit apply to every request, each in Off, Observe or Enforce.
+- **Protection against relays.** A relay sees every request and can rewrite every answer. Outbound redaction can replace credentials before a request leaves, and tool-call inspection can cut off an answer that carries a dangerous tool call, such as download-and-run or sending out credential files, before the client runs it. Hidden-character detection, a content filter and an output limit complete the five protections, each in Off, Observe or Enforce.
 - **MCP servers, skills and hooks, scanned.** The MCP servers of eight clients side by side, and a scan of client configuration for hidden characters, prompt injection, dangerous commands and overly broad permissions.
 - **Every request traceable.** The matched rule, each attempt, any format conversion and the cost, with replay against another upstream.
 - **Routing and failover.** Rules by model, tools, images and more; groups that fail over before the answer begins and keep each session on one upstream.
