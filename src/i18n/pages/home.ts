@@ -57,7 +57,7 @@ export const homeCopy = {
         { t: "AI API gateway", b: "OpenAI, Anthropic, Gemini, Azure OpenAI, and Bedrock behind one endpoint, with scoped virtual keys." },
         { t: "MCP gateway with per-user identity", b: "Per-user OAuth and tokens, tool-level RBAC, and an audit log for every call." },
         { t: "SSO and RBAC", b: "Five roles and support for any OIDC provider." },
-        { t: "Audit logs, rate limits, and budgets", b: "Sliding rate limits and token budgets per user, key, or provider." },
+        { t: "Audit logs, rate limits, and budgets", b: "Sliding-window request and token limits and spending budgets per user, API key or role." },
       ],
       stepsLabel: "Inside a ThinkWatch request",
       steps: [
@@ -181,7 +181,7 @@ export const homeCopy = {
         { t: "AI API 网关", b: "OpenAI、Anthropic、Gemini、Azure OpenAI 和 Bedrock 通过统一入口接入，并支持限定范围的虚拟密钥。" },
         { t: "基于用户身份的 MCP 网关", b: "每位用户使用本人的 OAuth 凭据，支持工具级 RBAC，每次调用均记录审计日志。" },
         { t: "SSO 与 RBAC", b: "五级角色，支持任意 OIDC 身份提供方。" },
-        { t: "审计、限流与预算", b: "按用户、密钥或上游服务商设置滑动窗口限流和 token 预算。" },
+        { t: "审计、限流与预算", b: "按用户、API 密钥或角色设置滑动窗口限流与费用预算。" },
       ],
       stepsLabel: "一次 ThinkWatch 请求的内部",
       steps: [
