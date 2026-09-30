@@ -16,7 +16,7 @@ export default function Features({ modules }: { modules: readonly FeatureModule[
     <div className="mt-14">
       <div
         role="tablist"
-        className="flex gap-2 border-b border-white/10 pb-4 overflow-x-auto -mx-5 px-5 sm:mx-0 sm:px-0 sm:flex-wrap scrollbar-none snap-x snap-mandatory"
+        className="inline-flex max-w-full gap-1 overflow-x-auto rounded-xl border border-white/[0.14] bg-[var(--color-surface)] p-1 scrollbar-none snap-x snap-mandatory"
         style={{ scrollbarWidth: "none" }}
       >
         {modules.map((m) => {
@@ -27,22 +27,19 @@ export default function Features({ modules }: { modules: readonly FeatureModule[
               role="tab"
               aria-selected={isActive}
               onClick={() => setActive(m.id)}
-              className={`relative shrink-0 snap-start px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+              className={`relative shrink-0 snap-start px-4 py-2 rounded-[9px] text-sm font-medium transition-all ${
                 isActive
-                  ? "text-white bg-white/[0.06]"
+                  ? "text-white bg-[var(--color-surface-2)] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.14)]"
                   : "text-[var(--color-muted)] hover:text-white"
               }`}
             >
               {m.label}
-              {isActive && (
-                <span className="absolute inset-x-3 -bottom-[17px] h-px bg-gradient-to-r from-[var(--color-brand-1)] to-[var(--color-brand-2)]" />
-              )}
             </button>
           );
         })}
       </div>
 
-      <div className="mt-10 mb-8 max-w-2xl">
+      <div className="mt-10 mb-8 max-w-3xl">
         <p className="text-2xl md:text-3xl font-semibold tracking-tight text-gradient [text-wrap:balance]">
           {current.tagline}
         </p>
@@ -52,7 +49,7 @@ export default function Features({ modules }: { modules: readonly FeatureModule[
         {current.bullets.map((b, i) => (
           <div
             key={b.title}
-            className={`group rounded-xl border border-white/10 bg-[var(--color-surface)]/60 p-6 hover:border-white/25 transition-colors animate-[fadeUp_400ms_ease-out_both] ${spanClass(i, current.bullets.length)}`}
+            className={`group nx-tile p-6  animate-[fadeUp_400ms_ease-out_both] ${spanClass(i, current.bullets.length)}`}
             style={{ animationDelay: `${i * 60}ms` }}
           >
             <div className="flex items-center justify-between mb-4">

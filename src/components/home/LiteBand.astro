@@ -1,53 +1,114 @@
 ---
-// The Lite band on the home page. Each page shows the interface in its own
-// language; see LitePage.astro.
+// The Lite band on the home page: the local gateway, its four points, where it
+// runs, and a download, beside its overview screen. Each page shows the
+// interface in its own language; see LitePage.astro.
 import { getLang, localePath } from "~/i18n";
 import { homeCopy } from "~/i18n/pages/home";
 import LiteDownload from "~/components/LiteDownload.astro";
+import TwMark from "~/components/TwMark.astro";
 
 const lang = getLang(Astro);
 const c = homeCopy[lang].lite;
 const zh = lang === "zh-CN";
 ---
 
-<section class="container-page grid items-center gap-12 py-20 lg:grid-cols-2 lg:gap-[72px] lg:py-28">
-  <div class="order-2 min-w-0 lg:order-1">
-    <img
-      src={zh ? "/lite/overview.webp" : "/lite/overview-en.webp"}
-      width="2360"
-      height="1540"
-      loading="lazy"
-      decoding="async"
-      class="w-full rounded-[10px]"
-      alt={c.shotAlt}
-    />
-  </div>
-  <div class="order-1 flex flex-col gap-5 lg:order-2">
-    <div class="font-mono text-[13px] uppercase tracking-[0.08em] text-[var(--color-brand-1)]">{c.eyebrow}</div>
-    <h2
-      class:list={[
-        "font-display text-white [text-wrap:balance]",
-        lang === "zh-CN" ? "text-[28px] leading-[1.35] sm:text-[34px] lg:text-[40px]" : "text-[32px] leading-[1.15] sm:text-[40px] lg:text-[46px]",
-      ]}
-    >{c.title}</h2>
-    <div class="mt-2 grid gap-x-8 gap-y-5 sm:grid-cols-2">
-      {c.points.map((p) => (
-        <div class="flex flex-col gap-1.5">
-          <h3 class="m-0 text-[17px] font-semibold text-white">{p.t}</h3>
-          <p class="m-0 text-[15px] leading-relaxed text-[#c3c7ce]">{p.b}</p>
-        </div>
-      ))}
+<section class="nx-section nx-hairline lite-band">
+  <div class="glow" aria-hidden="true"></div>
+  <div class="container-page grid items-center gap-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
+    <div class="min-w-0">
+      <p class="nx-label nx-in flex items-center gap-2"><TwMark id="m-liteband" size={18} />{c.eyebrow}</p>
+      <h2 class="nx-h2 nx-in mt-3">{c.title}</h2>
+      <div class="points">
+        {c.points.map((p) => (
+          <div class="nx-in">
+            <h3 class="nx-h3">{p.t}</h3>
+            <p class="nx-body">{p.b}</p>
+          </div>
+        ))}
+      </div>
+      <div class="pills nx-in">
+        <span class="badge">{c.pills[0]}</span>
+        {c.pills.slice(1).map((pill) => <span class="pill">{pill}</span>)}
+      </div>
+      <div class="nx-actions nx-in">
+        <LiteDownload />
+        <a href={localePath(lang, "/lite")} class="nx-link">{c.cta}</a>
+      </div>
     </div>
-    {/* 第一项是状态，单独做成徽标；其余是平台与许可证 */}
-    <div class="flex flex-wrap items-center gap-2.5">
-      <span class="rounded-full bg-[var(--color-brand-1)] px-3 py-1 text-[13px] font-medium text-[var(--color-bg)]">{c.pills[0]}</span>
-      {c.pills.slice(1).map((pill) => (
-        <span class="rounded-full border border-[var(--color-border-strong)] px-3 py-1 text-[13px] text-[#c3c7ce]">{pill}</span>
-      ))}
-    </div>
-    <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:gap-5">
-      <LiteDownload />
-      <a href={localePath(lang, "/lite")} class="inline-flex min-h-11 items-center self-start text-[17px] font-medium text-[var(--color-brand-1)] hover:text-[var(--color-brand-2)]">{c.cta}</a>
+    <div class="shot nx-in">
+      <img
+        src={zh ? "/lite/overview.webp" : "/lite/overview-en.webp"}
+        width="2360"
+        height="1540"
+        loading="lazy"
+        decoding="async"
+        alt={c.shotAlt}
+      />
     </div>
   </div>
 </section>
+
+<style>
+  .lite-band {
+    position: relative;
+    overflow: hidden;
+  }
+  .glow {
+    position: absolute;
+    right: -10%;
+    top: 20%;
+    width: 60%;
+    height: 70%;
+    z-index: -1;
+    background: radial-gradient(closest-side, rgb(var(--a2) / 0.14), rgb(var(--a1) / 0.06) 60%, transparent);
+    filter: blur(30px);
+  }
+  .points {
+    margin-top: 32px;
+    display: grid;
+    gap: 22px 32px;
+  }
+  @media (min-width: 640px) {
+    .points {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  .pills {
+    margin-top: 28px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .badge {
+    border-radius: 999px;
+    background: linear-gradient(90deg, rgb(var(--a1)), rgb(var(--a2)));
+    padding: 3px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #08090a;
+  }
+  .pill {
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    padding: 3px 12px;
+    font-size: 12px;
+    color: #c3c7ce;
+  }
+  .shot {
+    border-radius: 14px;
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.14),
+      0 50px 120px -40px rgba(0, 0, 0, 0.9),
+      0 30px 100px -40px rgb(var(--a1) / 0.35);
+    overflow: hidden;
+    transition: transform 500ms cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+  .shot img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .shot:hover {
+    transform: translateY(-6px);
+  }
+</style>

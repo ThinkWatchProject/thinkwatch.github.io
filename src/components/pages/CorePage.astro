@@ -1,11 +1,12 @@
 ---
 // The /core page: ThinkWatch Core, the MIT-licensed Rust crates and the twcore
 // binary. twcore is the gateway inside ThinkWatch Lite and also runs on its own
-// on a Linux server; ThinkWatch Enterprise depends on three of the crates.
+// on a Linux server; ThinkWatch Enterprise depends on four of the crates.
 import Base from "~/layouts/Base.astro";
 import SiteHeader from "~/components/SiteHeader.astro";
 import SiteFooter from "~/components/SiteFooter.astro";
 import CopyCommand from "~/components/CopyCommand.astro";
+import NeonMotion from "~/components/NeonMotion.astro";
 import { getLang, localePath } from "~/i18n";
 import { coreCopy } from "~/i18n/pages/core";
 import { getLatestCoreRelease, getReleases } from "~/lib/github";
@@ -50,7 +51,12 @@ const sourceCommands = [
   "cargo build --release -p twcore",
 ];
 
-const delay = (i: number) => `animation-delay: ${i * 90}ms;`;
+/** What twcore serve prints once it is up: illustrative lines for the hero terminal */
+const serveLog = [
+  '<span class="ok">ready</span> gateway 127.0.0.1:8788 · control socket',
+  '<span class="dim">POST</span> /v1/messages claude-code → anthropic <span class="ok">200</span> 1.2 s',
+  '<span class="dim">POST</span> /v1/responses codex → chatgpt <span class="warn">429</span> → relay <span class="ok">200</span>',
+];
 const eyebrow = "font-mono text-[11px] uppercase tracking-[0.08em] text-[var(--color-muted)] sm:text-[13px]";
 const label = "m-0 font-mono text-[13px] uppercase tracking-[0.08em] text-[var(--color-muted)]";
 const h2 = zh
@@ -64,90 +70,97 @@ const fileLink = "break-all text-[var(--color-brand-1)] transition-colors hover:
 <Base title={c.meta.title} description={c.meta.description} ogCard="core" jsonLd={jsonLd}>
   <SiteHeader />
   <main id="main">
-    <section class="relative overflow-hidden">
-      <div class="container-page grid items-center gap-12 py-14 sm:py-20 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] lg:gap-16 lg:py-[88px]">
-        <div class="flex min-w-0 flex-col gap-5 sm:gap-6">
-          <p class="reveal m-0 font-mono text-[11px] uppercase tracking-[0.08em] text-[var(--color-brand-1)] sm:text-[13px]" style={delay(0)}>
-            {c.hero.eyebrow}
-          </p>
-          <h1
-            class:list={[
-              "reveal font-display m-0 text-[var(--color-text)] [text-wrap:balance]",
-              zh
-                ? "text-[30px] leading-[1.35] sm:text-[40px] lg:text-[44px] xl:text-[48px]"
-                : "text-[36px] leading-[1.1] sm:text-[46px] lg:text-[56px] lg:leading-[1.05]",
-            ]}
-            style={delay(1)}
-          >
-            {zh ? (
-              // Kept on one line, so that the break falls before the highlight
-              // rather than leaving "的" at the start of the second line.
-              <Fragment><span class="whitespace-nowrap">{c.hero.titleA.trimEnd()}</span>{c.hero.titleA.endsWith(" ") && " "}</Fragment>
-            ) : (
-              c.hero.titleA
-            )}<span class="text-shimmer">{c.hero.titleHighlight}</span>
+    <section class="nx-hero">
+      <div class="nx-aurora" aria-hidden="true"><i></i><i></i><i></i></div>
+      <div class="nx-gridbg" aria-hidden="true"></div>
+      <div class="container-page grid items-center gap-12 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] lg:gap-14">
+        <div class="min-w-0">
+          {version && (
+            <a class="nx-announce nx-rise" style="--d:0" href={`${repo}/releases/tag/v${version}`}><span class="dot"></span>{c.motion.announce(version)}<span class="chev">→</span></a>
+          )}
+          <h1 class="nx-h1 nx-rise" style="--d:1">
+            {zh ? <span class="whitespace-nowrap">{c.hero.titleA}</span> : c.hero.titleA}<span class:list={["nx-grad", zh && "whitespace-nowrap"]}>{c.hero.titleHighlight}</span>
           </h1>
-          <p class="reveal m-0 max-w-[38rem] text-[17px] leading-relaxed text-[#c3c7ce] sm:text-xl sm:leading-normal" style={delay(2)}>
-            {c.hero.sub}
-          </p>
-          <div class="reveal mt-1 flex flex-col gap-3 sm:mt-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-6 sm:gap-y-3" style={delay(3)}>
-            <a
-              href="#install"
-              class="inline-flex min-h-11 items-center justify-center rounded-full bg-[#f7f8f8] px-[22px] py-3 text-base font-semibold text-[#08090a] transition hover:bg-white hover:shadow-[0_8px_30px_-8px_rgba(34,229,242,0.5)]"
-            >
-              {c.hero.ctaInstall}
-            </a>
-            <a
-              href={docsHref}
-              class="inline-flex min-h-11 items-center justify-center text-base font-medium text-[var(--color-brand-1)] transition-colors hover:text-[var(--color-brand-2)] sm:justify-start"
-            >
-              {c.hero.ctaDocs}
-            </a>
-            <a
-              href={repo}
-              target="_blank"
-              rel="noopener"
-              class="inline-flex min-h-11 items-center justify-center text-base font-medium text-[var(--color-brand-1)] transition-colors hover:text-[var(--color-brand-2)] sm:justify-start"
-            >
-              {c.hero.ctaGithub}
-            </a>
+          <p class="nx-lede nx-rise" style="--d:2">{c.hero.sub}</p>
+          <div class="nx-actions nx-rise" style="--d:3">
+            <a href="#install" class="nx-pill">{c.hero.ctaInstall}</a>
+            <a href={docsHref} class="nx-ghost">{c.hero.ctaDocs}</a>
+            <a href={repo} target="_blank" rel="noopener" class="nx-link">{c.hero.ctaGithub}</a>
           </div>
         </div>
 
-        <div
-          class="reveal min-w-0 overflow-hidden rounded-[14px] border border-[var(--color-border-strong)] bg-[var(--color-surface)] font-mono text-[13px] sm:text-[15px]"
-          style={delay(3)}
-        >
-          <div class="flex items-center gap-2.5 border-b border-[#26282c] px-5 py-3.5 text-[var(--color-muted)] sm:px-[22px]">
-            <span class="h-2 w-2 shrink-0 rounded-full bg-[var(--color-brand-1)] pulse-dot" aria-hidden="true"></span>
-            <span class="min-w-0">{c.hero.cardTitle}</span>
+        <figure class="nx-panel term nx-rise" style="--d:3" data-term aria-label={c.hero.cardTitle}>
+          <div class="nx-panel-top">
+            <span class="nx-lights" aria-hidden="true"><i></i><i></i><i></i></span>
+            <span class="flex-1 font-mono">{c.hero.cardTitle}</span>
+            <span class="text-[var(--color-accent)]">{c.motion.sample}</span>
           </div>
-          <div class="overflow-x-auto">
-            <ol class="m-0 flex list-none flex-col gap-3.5 px-5 py-6 leading-normal sm:px-[22px]">
-              {c.hero.commands.map((row, i) => (
-                <li class="reveal flex flex-col gap-0.5 whitespace-nowrap" style={delay(5 + i * 2)}>
-                  <code class:list={[i === c.hero.commands.length - 1 ? "text-[var(--color-brand-1)]" : "text-[#e6ebf2]"]}>
-                    {row.cmd}
-                  </code>
-                  <span class="text-[var(--color-muted)]">{row.note}</span>
-                </li>
-              ))}
-            </ol>
-          </div>
-        </div>
+          <ol class="term-lines">
+            {c.hero.commands.map((row) => (
+              <Fragment>
+                <li class="term-cmd" data-term-line><span class="p">$</span> <code data-type={row.cmd}>{row.cmd}</code></li>
+                <li class="term-note" data-term-line>{row.note}</li>
+              </Fragment>
+            ))}
+            {serveLog.map((line) => (
+              <li class="term-log" data-term-line set:html={line} />
+            ))}
+          </ol>
+        </figure>
       </div>
     </section>
 
-    <section class="border-t border-[var(--color-border)] py-16 sm:py-20 lg:py-[88px]" aria-labelledby="core-does">
+    <section class="nx-section nx-hairline" aria-labelledby="core-does">
       <div class="container-page">
-        <h2 id="core-does" class:list={[eyebrow, "m-0 font-normal"]}>{c.does.eyebrow}</h2>
-        <div class="mt-8 grid gap-7 sm:grid-cols-2 lg:grid-cols-3 lg:gap-x-10 lg:gap-y-9">
-          {c.does.items.map((item) => (
-            <div class="flex flex-col gap-2.5 border-t border-[var(--color-border-strong)] pt-[18px]">
-              <h3 class="m-0 text-lg font-semibold sm:text-[19px]">{item.title}</h3>
-              <p class="m-0 text-[15px] leading-relaxed text-[var(--color-muted)]">{item.body}</p>
+        <p class="nx-label nx-in">{c.does.eyebrow}</p>
+        <h2 id="core-does" class="nx-h2 nx-in mt-3">{c.motion.doesTitle}<span class="nx-dim">{c.motion.doesTitleDim}</span></h2>
+        <div class="nx-bento mt-12">
+          <article class="nx-tile nx-span-4 nx-in">
+            <div class="viz rules" aria-hidden="true">
+              <span class="rq">claude-sonnet-5 · tools · 38k</span>
+              <span class="arrow"></span>
+              <span class="rule on">rule main → anthropic</span>
+              <span class="rule">rule budget → relay</span>
+              <span class="rule">rule gemini → gemini</span>
             </div>
-          ))}
+            <h3 class="nx-h3">{c.does.items[0].title}</h3>
+            <p class="nx-body">{c.does.items[0].body}</p>
+          </article>
+          <article class="nx-tile nx-span-2 nx-in">
+            <ol class="viz hops" aria-hidden="true">
+              <li class="fail"><b>1</b>chatgpt<em>429</em></li>
+              <li class="ok"><b>2</b>relay<em>200</em></li>
+            </ol>
+            <h3 class="nx-h3">{c.does.items[1].title}</h3>
+            <p class="nx-body">{c.does.items[1].body}</p>
+          </article>
+          <article class="nx-tile nx-span-2 nx-in">
+            <p class="nx-big nx-grad"><span data-count="0.0124" data-prefix="$" data-step="0.0003" data-fixed="4">$0.0124</span></p>
+            <p class="viz-sub" aria-hidden="true">12.4k token · cache read 9.1k</p>
+            <h3 class="nx-h3">{c.does.items[2].title}</h3>
+            <p class="nx-body">{c.does.items[2].body}</p>
+          </article>
+          <article class="nx-tile nx-span-2 nx-in">
+            <div class="viz swap" aria-hidden="true"><span class="from">sk-ant-api03-7Hq…</span><span class="to">[CREDENTIAL_1]</span></div>
+            <h3 class="nx-h3">{c.does.items[3].title}</h3>
+            <p class="nx-body">{c.does.items[3].body}</p>
+          </article>
+          <article class="nx-tile nx-span-2 nx-in">
+            <div class="viz cut" aria-hidden="true"><code>curl -fsSL https://x.sh | sh</code></div>
+            <h3 class="nx-h3">{c.does.items[4].title}</h3>
+            <p class="nx-body">{c.does.items[4].body}</p>
+          </article>
+          <article class="nx-tile nx-span-6 nx-in noise">
+            <div class="viz shake" aria-hidden="true">
+              <span class="end">ThinkWatch Lite</span>
+              <span class="chan"><i></i><em>Noise NNpsk0</em></span>
+              <span class="end">twcore</span>
+            </div>
+            <div class="min-w-0">
+              <h3 class="nx-h3">{c.does.items[5].title}</h3>
+              <p class="nx-body">{c.does.items[5].body}</p>
+            </div>
+          </article>
         </div>
       </div>
     </section>
@@ -295,4 +308,367 @@ const fileLink = "break-all text-[var(--color-brand-1)] transition-colors hover:
     </section>
   </main>
   <SiteFooter />
+  <NeonMotion />
 </Base>
+
+<!--
+  The hero terminal types each command, shows its note, then the lines serve
+  prints, and starts over. Without script (or with reduced motion) every line
+  shows at once.
+-->
+<script is:inline data-core-term>
+  (() => {
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const term = document.querySelector("[data-term]");
+    if (!term) return;
+    const lines = [...term.querySelectorAll("[data-term-line]")];
+    const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+    term.classList.add("typing");
+    const run = async () => {
+      for (;;) {
+        lines.forEach((l) => l.classList.remove("shown"));
+        await wait(500);
+        for (const l of lines) {
+          const code = l.querySelector("[data-type]");
+          l.classList.add("shown");
+          if (code) {
+            const full = code.dataset.type;
+            for (let i = 1; i <= full.length; i++) {
+              code.textContent = full.slice(0, i);
+              await wait(45);
+            }
+            await wait(350);
+          } else {
+            await wait(l.classList.contains("term-log") ? 700 : 450);
+          }
+        }
+        await wait(4000);
+      }
+    };
+    run();
+  })();
+</script>
+
+<style>
+  .term {
+    font-family: var(--font-mono);
+  }
+  .term-lines {
+    margin: 0;
+    padding: 18px 22px 22px;
+    list-style: none;
+    font-size: 13.5px;
+    line-height: 1.9;
+    min-height: 300px;
+  }
+  .term-cmd {
+    color: var(--color-text);
+    margin-top: 6px;
+  }
+  .term-cmd:first-child {
+    margin-top: 0;
+  }
+  .term-cmd .p {
+    color: rgb(var(--a1));
+  }
+  .term-note {
+    color: var(--color-dim);
+  }
+  .term-log {
+    color: #c3c7ce;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .term-log:first-of-type {
+    margin-top: 10px;
+  }
+  .term-log :global(.ok) {
+    color: #6ee7a8;
+  }
+  .term-log :global(.warn) {
+    color: var(--color-accent);
+  }
+  .term-log :global(.dim) {
+    color: var(--color-dim);
+  }
+  .typing [data-term-line] {
+    visibility: hidden;
+  }
+  .typing [data-term-line].shown {
+    visibility: visible;
+  }
+
+  .viz {
+    margin-bottom: 22px;
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+  }
+  .rules {
+    display: grid;
+    grid-template-columns: auto auto;
+    grid-auto-flow: column;
+    grid-template-rows: repeat(3, auto);
+    align-items: center;
+    justify-content: start;
+    gap: 8px 24px;
+  }
+  .rules .rq {
+    grid-row: 1 / 4;
+    border: 1px solid rgb(var(--a1) / 0.5);
+    border-radius: 10px;
+    padding: 10px 12px;
+    color: var(--color-text);
+    background: rgb(var(--a1) / 0.06);
+  }
+  .rules .arrow {
+    display: none;
+  }
+  .rule {
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    padding: 6px 10px;
+    color: #62666d;
+    animation: rule 6s ease-in-out infinite;
+  }
+  .rule:nth-of-type(2) {
+    animation-delay: 2s;
+  }
+  .rule:nth-of-type(3) {
+    animation-delay: 4s;
+  }
+  @keyframes rule {
+    0%,
+    30% {
+      color: var(--color-text);
+      border-color: rgb(var(--a1) / 0.55);
+      box-shadow: 0 0 18px -6px rgb(var(--a1) / 0.6);
+    }
+    36%,
+    100% {
+      color: #62666d;
+      border-color: rgba(255, 255, 255, 0.08);
+      box-shadow: none;
+    }
+  }
+  .hops {
+    margin: 0 0 22px;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .hops li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    padding: 7px 10px;
+    color: var(--color-text);
+  }
+  .hops b {
+    font-weight: 400;
+    color: var(--color-dim);
+  }
+  .hops em {
+    margin-left: auto;
+    font-style: normal;
+  }
+  .hops .fail {
+    animation: hop-fail 5s ease-in-out infinite;
+  }
+  .hops .fail em {
+    color: var(--color-accent);
+  }
+  .hops .ok {
+    animation: hop-ok 5s ease-in-out infinite;
+  }
+  .hops .ok em {
+    color: #6ee7a8;
+  }
+  @keyframes hop-fail {
+    0%,
+    20% {
+      opacity: 1;
+    }
+    30%,
+    100% {
+      opacity: 0.45;
+      text-decoration: line-through;
+    }
+  }
+  @keyframes hop-ok {
+    0%,
+    28% {
+      opacity: 0.3;
+      border-color: rgba(255, 255, 255, 0.08);
+    }
+    38%,
+    100% {
+      opacity: 1;
+      border-color: rgb(var(--a1) / 0.55);
+    }
+  }
+  .viz-sub {
+    margin: 8px 0 22px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--color-dim);
+  }
+  .swap {
+    position: relative;
+    height: 40px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .swap span {
+    position: absolute;
+    left: 12px;
+    top: 10px;
+    white-space: nowrap;
+  }
+  .swap .from {
+    color: var(--color-accent);
+    animation: swap-out 5s ease-in-out infinite;
+  }
+  .swap .to {
+    color: rgb(var(--a1));
+    animation: swap-in 5s ease-in-out infinite;
+  }
+  @keyframes swap-out {
+    0%,
+    35% {
+      opacity: 1;
+      transform: none;
+    }
+    45%,
+    90% {
+      opacity: 0;
+      transform: translateY(-14px);
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+  @keyframes swap-in {
+    0%,
+    35% {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+    45%,
+    90% {
+      opacity: 1;
+      transform: none;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+  .cut {
+    border: 1px solid rgba(255, 107, 107, 0.3);
+    border-radius: 8px;
+    padding: 10px 12px;
+    background: rgba(255, 107, 107, 0.05);
+  }
+  .cut code {
+    position: relative;
+    color: #ff8a8a;
+  }
+  .cut code::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 52%;
+    height: 1.5px;
+    width: 0;
+    background: #ff6b6b;
+    animation: strike 4s ease-in-out infinite;
+  }
+  @keyframes strike {
+    0%,
+    25% {
+      width: 0;
+    }
+    45%,
+    100% {
+      width: 100%;
+    }
+  }
+  .noise {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: center;
+    gap: 28px;
+  }
+  .shake {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .shake .end {
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 10px;
+    padding: 10px 12px;
+    color: var(--color-text);
+    white-space: nowrap;
+  }
+  .chan {
+    position: relative;
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, rgb(var(--a1) / 0.6), rgb(var(--a2) / 0.6));
+  }
+  .chan i {
+    position: absolute;
+    top: -3px;
+    left: 0;
+    width: 7px;
+    height: 7px;
+    border-radius: 99px;
+    background: #fff;
+    box-shadow: 0 0 12px rgb(var(--a1));
+    animation: chan 2.4s ease-in-out infinite alternate;
+  }
+  .chan em {
+    position: absolute;
+    left: 50%;
+    top: -26px;
+    transform: translateX(-50%);
+    font-style: normal;
+    font-size: 11px;
+    color: var(--color-dim);
+    white-space: nowrap;
+  }
+  @keyframes chan {
+    to {
+      left: calc(100% - 7px);
+    }
+  }
+  @media (max-width: 860px) {
+    .noise {
+      grid-template-columns: 1fr;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .rule,
+    .hops .fail,
+    .hops .ok,
+    .swap .from,
+    .swap .to,
+    .cut code::after,
+    .chan i {
+      animation: none;
+    }
+    .swap .to {
+      display: none;
+    }
+    .cut code::after {
+      width: 100%;
+    }
+  }
+</style>
