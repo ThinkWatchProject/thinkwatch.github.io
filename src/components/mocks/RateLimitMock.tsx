@@ -3,11 +3,18 @@ import { useInView } from "../hooks/useInView";
 
 const BUCKETS = 30;
 const LIMIT = 100;
+const TYPICAL = 62;
 
-function genBucket(seed: number, base: number) {
+/**
+ * One bucket's request count: a step from the previous one that drifts back
+ * towards the typical load, capped at the limit, since a limiter never lets a
+ * bucket past it.
+ */
+function genBucket(seed: number, prev: number) {
   seed = (seed * 9301 + 49297) % 233280;
   const r = seed / 233280;
-  return Math.max(0, Math.round(base + (r - 0.4) * 35));
+  const base = prev * 0.6 + TYPICAL * 0.4;
+  return Math.min(LIMIT, Math.max(0, Math.round(base + (r - 0.5) * 40)));
 }
 
 export default function RateLimitMock() {
@@ -60,7 +67,7 @@ export default function RateLimitMock() {
           const pct = Math.min(100, (b / LIMIT) * 100);
           const over = b > LIMIT * 0.9;
           return (
-            <div key={i} className="flex-1 flex flex-col justify-end">
+            <div key={i} className="flex h-full flex-1 flex-col justify-end">
               <div
                 className="w-full rounded-sm transition-all duration-500"
                 style={{

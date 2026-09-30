@@ -26,7 +26,8 @@ const zh = lang === "zh-CN";
       >
         {c.h1a} <span class="text-shimmer">{c.h1b}</span>
       </h1>
-      <p class="reveal text-pretty text-[17px] leading-relaxed text-[#cbd5e1] sm:text-xl" style="animation-delay: 260ms;">{c.sub}</p>
+      {/* 背景图形从这一段后面穿过：一圈深色阴影让字压得住它 */}
+      <p class="reveal text-pretty text-[17px] leading-relaxed text-[#dbe3ee] [text-shadow:0_0_14px_rgba(11,18,32,0.95),0_0_4px_rgba(11,18,32,0.9)] sm:text-xl" style="animation-delay: 260ms;">{c.sub}</p>
 
       <div class="reveal mt-2 grid gap-4 sm:grid-cols-2" style="animation-delay: 400ms;">
         <a href={localePath(lang, "/thinkwatch")} class="door group flex h-full flex-col gap-2.5 rounded-[14px] border border-[var(--color-border-strong)] bg-[rgba(17,26,46,0.85)] p-6 backdrop-blur-sm">
