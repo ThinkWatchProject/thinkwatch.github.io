@@ -185,7 +185,7 @@ const fileLink = "break-all text-[var(--color-brand-1)] transition-colors hover:
             </div>
             <div class="flex min-w-0 flex-col gap-2 text-sm leading-relaxed text-[var(--color-muted)]">
               <p class="m-0">{c.install.serviceUser}</p>
-              <code class="block overflow-x-auto whitespace-nowrap font-mono text-[13px] text-[#cbd5e1]">{asServiceUser}</code>
+              <code class="block break-all font-mono text-[13px] text-[#cbd5e1]">{asServiceUser}</code>
             </div>
           </div>
         </div>
@@ -218,7 +218,7 @@ const fileLink = "break-all text-[var(--color-brand-1)] transition-colors hover:
             <div class="overflow-x-auto rounded-[10px] border border-[var(--color-border)] bg-[var(--color-surface)] p-4 font-mono text-[13px] leading-normal sm:p-5 sm:text-sm">
               <ul class="m-0 flex list-none flex-col gap-2 p-0">
                 {sourceCommands.map((cmd) => (
-                  <li class="whitespace-nowrap text-[#e6ebf2]"><span class="select-none text-[var(--color-dim)]">$ </span>{cmd}</li>
+                  <li class="break-all text-[#e6ebf2]"><span class="select-none text-[var(--color-dim)]">$ </span>{cmd}</li>
                 ))}
               </ul>
             </div>
