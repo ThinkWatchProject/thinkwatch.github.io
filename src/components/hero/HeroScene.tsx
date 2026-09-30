@@ -3,8 +3,8 @@ import { Suspense, useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 
 // Brand palette: logo teal flowing in, light teal flowing out, a faint amber halo.
-const COLOR_CYAN = new THREE.Color("#3DDBD9");
-const COLOR_VIOLET = new THREE.Color("#8EEBEA");
+const COLOR_CYAN = new THREE.Color("#22E5F2");
+const COLOR_VIOLET = new THREE.Color("#F05CD8");
 const COLOR_PINK = new THREE.Color("#E5C07B");
 
 /**

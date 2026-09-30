@@ -48,7 +48,7 @@ export default function TiltCard({ children, className = "", max = 7 }: Props) {
         className="pointer-events-none absolute inset-0 rounded-[inherit] opacity-0 group-hover:opacity-100 transition-opacity"
         style={{
           background:
-            "radial-gradient(400px circle at var(--mx,50%) var(--my,50%), rgba(34,211,238,0.10), transparent 40%)",
+            "radial-gradient(400px circle at var(--mx,50%) var(--my,50%), rgba(34,229,242,0.10), transparent 40%)",
         }}
       />
     </div>

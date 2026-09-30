@@ -145,13 +145,13 @@ function wrap(f: Font, text: string, size: number, width: number): string[] {
 }
 
 const colors = {
-  bg: "#0b1220",
-  text: "#e6ebf2",
-  sub: "#cbd5e1",
-  brand: "#3ddbd9",
-  dim: "#8a96ab",
-  borderStrong: "#2a3a63",
-  grid: "#94a3b8",
+  bg: "#08090a",
+  text: "#f7f8f8",
+  sub: "#c3c7ce",
+  brand: "#22e5f2",
+  brand2: "#f05cd8",
+  dim: "#7a808a",
+  grid: "#ffffff",
 };
 
 /** The logo, placed as a nested SVG */
@@ -201,20 +201,20 @@ async function renderCard({ name, line, labels }: CardText, W: number, H: number
   });
   if (labelX > X + width) throw new Error(`[og] the labels of "${card}" do not fit on the card`);
 
-  // Background as on the site: the brand navy, a teal glow from the top left,
-  // and the faint grid fading out towards the edges.
+  // Background as on the site: near black, a cyan glow from the top left and a
+  // magenta one from the top right, and the faint grid fading out towards the edges.
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
   <defs>
     <radialGradient id="glow" cx="0.15" cy="-0.1" r="0.9">
-      <stop offset="0" stop-color="${colors.brand}" stop-opacity="0.16"/>
+      <stop offset="0" stop-color="${colors.brand}" stop-opacity="0.14"/>
       <stop offset="0.6" stop-color="${colors.brand}" stop-opacity="0"/>
     </radialGradient>
     <radialGradient id="glow2" cx="0.9" cy="0.1" r="0.7">
-      <stop offset="0" stop-color="${colors.borderStrong}" stop-opacity="0.55"/>
-      <stop offset="0.6" stop-color="${colors.borderStrong}" stop-opacity="0"/>
+      <stop offset="0" stop-color="${colors.brand2}" stop-opacity="0.12"/>
+      <stop offset="0.6" stop-color="${colors.brand2}" stop-opacity="0"/>
     </radialGradient>
     <pattern id="grid" width="56" height="56" patternUnits="userSpaceOnUse">
-      <path d="M56 0H0V56" fill="none" stroke="${colors.grid}" stroke-opacity="0.06" stroke-width="1"/>
+      <path d="M56 0H0V56" fill="none" stroke="${colors.grid}" stroke-opacity="0.035" stroke-width="1"/>
     </pattern>
     <radialGradient id="fade" cx="0.5" cy="0.5" r="0.6">
       <stop offset="0.3" stop-color="#fff" stop-opacity="1"/>

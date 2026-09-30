@@ -21,7 +21,7 @@ const c = homeCopy[lang].tw;
             lang === "zh-CN" ? "text-[28px] leading-[1.35] sm:text-[34px] lg:text-[40px]" : "text-[32px] leading-[1.15] sm:text-[40px] lg:text-[46px]",
           ]}
         >{c.title}</h2>
-        <p class="text-[17px] leading-relaxed text-[#cbd5e1] sm:text-lg">{c.sub}</p>
+        <p class="text-[17px] leading-relaxed text-[#c3c7ce] sm:text-lg">{c.sub}</p>
         <a href={localePath(lang, "/thinkwatch")} class="inline-flex min-h-11 items-center self-start text-[17px] font-medium text-[var(--color-brand-1)] hover:text-[var(--color-brand-2)]">{c.cta}</a>
       </div>
       <div class="grid gap-7 sm:grid-cols-2">
@@ -73,7 +73,7 @@ const c = homeCopy[lang].tw;
         >
           {c.quoteA}<span class="text-shimmer">{c.quoteEm}</span>{c.quoteB}
         </p>
-        <p class="max-w-3xl text-[17px] leading-relaxed text-[#cbd5e1] sm:text-lg">{c.quoteBody}</p>
+        <p class="max-w-3xl text-[17px] leading-relaxed text-[#c3c7ce] sm:text-lg">{c.quoteBody}</p>
       </div>
     </div>
   </div>
@@ -82,8 +82,8 @@ const c = homeCopy[lang].tw;
 <style>
   .step { animation: step-cycle 12s ease-in-out infinite; }
   @keyframes step-cycle {
-    0%, 15% { border-color: #3ddbd9; background: #15223d; box-shadow: 0 10px 36px -16px rgba(61, 219, 217, 0.6); }
-    18%, 100% { border-color: #2a3a63; background: transparent; box-shadow: none; }
+    0%, 15% { border-color: #22e5f2; background: #16171a; box-shadow: 0 10px 36px -16px rgba(34, 229, 242, 0.6); }
+    18%, 100% { border-color: #2a2c31; background: transparent; box-shadow: none; }
   }
   @media (prefers-reduced-motion: reduce) {
     .step { animation: none; }

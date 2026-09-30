@@ -78,7 +78,7 @@ const stats: Stat[] = [
     value: 8_420_137,
     format: (v) => fmtCompact.format(v),
     delta: "+12.4%",
-    color: "#3DDBD9",
+    color: "#22E5F2",
     spark: sparkPoints(7),
   },
   {
