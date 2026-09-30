@@ -4,46 +4,26 @@ import { getLang, t } from "~/i18n";
 const s = t(getLang(Astro)).compatible;
 
 // Only clients the ThinkWatch README names as drop-in compatible.
-const items = [
-  "Claude Code",
-  "Cursor",
-  "Continue",
-  "Cline",
-  "OpenAI SDK",
-  "Anthropic SDK",
-];
-// Doubled for seamless loop
-const doubled = [...items, ...items];
+const items = ["Claude Code", "Cursor", "Continue", "Cline", "OpenAI SDK", "Anthropic SDK"];
 ---
 
-<section class="py-14 border-t border-white/5" aria-label="Compatible clients and SDKs">
-  <div class="container-page flex flex-col md:flex-row md:items-center gap-6 md:gap-10">
-    <p class="shrink-0 text-[10px] uppercase tracking-[0.2em] text-[var(--color-dim)] font-mono">
-      {s.label}
-    </p>
-    <div class="compat-track-wrap flex-1 overflow-hidden relative">
-      <ul class="compat-track flex gap-10 w-max animate-[marquee_32s_linear_infinite]" aria-hidden="false">
-        {doubled.map((name) => (
-          <li class="font-mono text-[13px] tracking-tight text-[var(--color-muted)] whitespace-nowrap hover:text-white transition-colors">
-            {name}
-          </li>
-        ))}
-      </ul>
-    </div>
+<section class="wall" aria-label={s.label}>
+  <p class="nx-label wall-label">{s.label}</p>
+  <div class="nx-marquee">
+    <ul class="nx-track">
+      {[...items, ...items, ...items].map((name, i) => <li aria-hidden={i >= items.length ? "true" : undefined}>{name}</li>)}
+    </ul>
   </div>
 </section>
 
 <style>
-  .compat-track-wrap {
-    -webkit-mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
-            mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+  .wall {
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 32px 0;
   }
-  @keyframes marquee {
-    from { transform: translateX(0); }
-    to   { transform: translateX(-50%); }
+  .wall-label {
+    margin: 0 0 18px;
+    text-align: center;
   }
-  @media (prefers-reduced-motion: reduce) {
-    .compat-track { animation: none !important; }
-  }
-  .compat-track-wrap:hover .compat-track { animation-play-state: paused; }
 </style>

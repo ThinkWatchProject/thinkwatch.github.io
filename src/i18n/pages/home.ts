@@ -8,6 +8,9 @@ export const homeCopy = {
       description:
         "ThinkWatch provides AI gateways that route, inspect, and meter model requests and MCP tool calls: ThinkWatch Enterprise, a self-hosted server for organizations, and ThinkWatch Lite, a desktop app for individual developers on macOS, Windows and Linux. Both share ThinkWatch Core, the MIT-licensed gateway engine, which also runs on its own on a Linux server.",
     },
+    announce: (lite: string | null, ent: string | null) =>
+      [ent && `Enterprise ${ent}`, lite && `Lite ${lite}`].filter(Boolean).join(" and ") + " released",
+    wallLabel: "Works with the clients and SDKs teams already use",
     eyebrow: "AI API and MCP gateways",
     h1a: "AI gateways for",
     h1b: "organizations and individual developers",
@@ -132,6 +135,9 @@ export const homeCopy = {
       description:
         "ThinkWatch 提供对模型请求与 MCP 工具调用进行路由、检查和计量的 AI 网关，包括面向组织的自托管服务端 ThinkWatch 企业版，以及面向个人开发者、支持 macOS、Windows 与 Linux 的桌面应用 ThinkWatch Lite。二者共用采用 MIT 许可证的网关引擎 ThinkWatch Core，它也可以独立运行在 Linux 服务器上。",
     },
+    announce: (lite: string | null, ent: string | null) =>
+      [ent && `企业版 ${ent}`, lite && `Lite ${lite}`].filter(Boolean).join(" 与 ") + " 已发布",
+    wallLabel: "兼容团队已在使用的客户端与 SDK",
     eyebrow: "AI API 与 MCP 网关",
     h1a: "面向组织与个人开发者的",
     h1b: "AI 网关",

@@ -12,20 +12,31 @@ const installCommand =
   "curl -fsSL https://raw.githubusercontent.com/ThinkWatchProject/ThinkWatch-Core/main/scripts/install.sh | sudo sh";
 ---
 
-<div class="border-y border-[var(--color-border)]">
-  <div class="container-page grid gap-6 py-10 md:py-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-center lg:gap-12">
-    <p class="m-0 max-w-3xl text-base leading-relaxed text-[#c3c7ce] sm:text-xl">
-      {c.a}<a href={localePath(lang, "/core")} class="font-semibold text-white underline decoration-[var(--color-brand-1)]/50 underline-offset-4 hover:text-[var(--color-brand-1)]">{c.name}</a>{c.b}
+<section class="nx-section-tight nx-hairline">
+  <div class="container-page grid gap-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:items-center lg:gap-14">
+    <p class="statement nx-in">
+      {c.a}<a href={localePath(lang, "/core")} class="core-name">{c.name}</a>{c.b}
     </p>
-    <div class="flex min-w-0 flex-col gap-3">
-      <p class="m-0 font-mono text-[13px] uppercase tracking-[0.08em] text-[var(--color-muted)]">{c.commandLabel}</p>
-      <CopyCommand command={installCommand} class="text-[var(--color-brand-1)] text-sm sm:text-[15px]" />
-      <a
-        href={localePath(lang, "/docs/core/server-deployment")}
-        class="inline-flex min-h-11 items-center self-start text-[17px] font-medium text-[var(--color-brand-1)] transition-colors hover:text-[var(--color-brand-2)]"
-      >
-        {c.docs}
-      </a>
+    <div class="flex min-w-0 flex-col gap-3 nx-in">
+      <p class="nx-label m-0">{c.commandLabel}</p>
+      <CopyCommand command={installCommand} class="text-[var(--color-text)] text-sm sm:text-[15px]" />
+      <a href={localePath(lang, "/docs/core/server-deployment")} class="nx-link self-start">{c.docs}</a>
     </div>
   </div>
-</div>
+</section>
+
+<style>
+  .statement {
+    margin: 0;
+    font-size: clamp(18px, 1.9vw, 22px);
+    line-height: 1.6;
+    color: var(--color-muted);
+  }
+  .core-name {
+    font-weight: 600;
+    background: linear-gradient(90deg, rgb(var(--a1)), rgb(var(--a2)));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+</style>
