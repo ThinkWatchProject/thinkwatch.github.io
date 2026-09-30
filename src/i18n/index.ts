@@ -29,26 +29,6 @@ const dict = {
       githubShort: "GitHub →",
     },
 
-    hero: {
-      badge: (v: string) => `v${v} · public preview`,
-      titleA: "The secure gateway",
-      titleB: "for ",
-      titleHighlight: "all AI traffic",
-      sub: "ThinkWatch is the single control plane through which all model requests and MCP tool calls pass. Each request is authenticated, authorized, rate-limited, logged, and metered.",
-      ctaPrimary: "Quick start",
-      stack: ["Rust + Axum", "2 MB distroless", "OpenAI · Anthropic · Gemini · Bedrock", "BSL 1.1"],
-      stats: [
-        { value: "2 MB", label: "Distroless image" },
-        { value: "3+1", label: "API formats" },
-        { value: "Per-user", label: "MCP OAuth" },
-        { value: "Rust", label: "One binary" },
-      ],
-      live: {
-        label: "LIVE",
-        reqPerSec: "req/s",
-        tokensPerMin: "tokens/min",
-      },
-    },
 
     compatible: {
       label: "Drop-in compatible with",
@@ -231,40 +211,6 @@ const dict = {
       ],
     },
 
-    license: {
-      eyebrow: "License",
-      title: "Source-available, ",
-      titleHighlight: "with a free production tier",
-      sub: "ThinkWatch is licensed under the Business Source License 1.1. Non-production use is free without time limit, and production use is free up to monthly thresholds; a commercial license is required above them.",
-      mostTeams: "Most teams",
-      footnote: ["\"Billable Token\" and \"MCP Tool Call\" definitions, the tiering model, and the changeover to GPL-2.0-or-later are all detailed in ", "LICENSING.md", "."],
-      tiers: [
-        {
-          name: "Non-production",
-          price: "Free",
-          priceNote: "forever",
-          audience: "Development, staging, evaluation, internal demos.",
-          features: ["Unlimited tokens", "Unlimited MCP tool calls", "All gateway features", "All security features", "Community support"],
-          ctaLabel: "Self-host",
-        },
-        {
-          name: "Production · Free Tier",
-          price: "Free",
-          priceNote: "up to thresholds",
-          audience: "Small teams running production workloads.",
-          features: ["Up to 10,000,000 billable tokens / month", "Up to 10,000 MCP tool calls / month", "All features included", "BSL 1.1 license", "Auto-converts to GPL-2.0-or-later after change date"],
-          ctaLabel: "Read the license",
-        },
-        {
-          name: "Production · Commercial",
-          price: "Tiered",
-          priceNote: "by usage",
-          audience: "Organizations exceeding the free thresholds.",
-          features: ["Above 10M tokens or 10K MCP calls per UTC month", "Commercial license required", "Priced by usage tiers", "Priority support available", "Custom deployment guidance"],
-          ctaLabel: "Contact sales",
-        },
-      ],
-    },
 
     footer: {
       tagline: "A gateway between AI clients and the models they call.",
@@ -314,26 +260,6 @@ const dict = {
       githubShort: "GitHub →",
     },
 
-    hero: {
-      badge: (v: string) => `v${v} · 公开预览`,
-      titleA: "面向所有 AI 流量",
-      titleB: "的",
-      titleHighlight: "安全网关",
-      sub: "ThinkWatch 是组织内所有模型请求与 MCP 工具调用的统一控制平面。每一次访问均经过认证、授权、限流、记录与计量。",
-      ctaPrimary: "快速开始",
-      stack: ["Rust + Axum", "2 MB Distroless", "OpenAI · Anthropic · Gemini · Bedrock", "BSL 1.1"],
-      stats: [
-        { value: "2 MB", label: "Distroless 镜像" },
-        { value: "3+1", label: "API 格式" },
-        { value: "Per-user", label: "MCP OAuth" },
-        { value: "Rust", label: "单一二进制" },
-      ],
-      live: {
-        label: "实时",
-        reqPerSec: "req/s",
-        tokensPerMin: "tokens/min",
-      },
-    },
 
     compatible: {
       label: "原生兼容",
@@ -516,40 +442,6 @@ const dict = {
       ],
     },
 
-    license: {
-      eyebrow: "许可证",
-      title: "源码可用，",
-      titleHighlight: "提供生产环境免费额度",
-      sub: "ThinkWatch 采用 Business Source License 1.1。非生产环境永久免费；生产环境在每月阈值内同样免费，超出阈值需获取商业许可证。",
-      mostTeams: "适合大多数团队",
-      footnote: ["「计费 token」和「MCP 工具调用」的定义、阶梯计费模型，以及到 GPL-2.0-or-later 的转换条款，详见 ", "LICENSING.md", "。"],
-      tiers: [
-        {
-          name: "非生产环境",
-          price: "免费",
-          priceNote: "永久",
-          audience: "开发、预发、评估、内部演示。",
-          features: ["token 不限量", "MCP 工具调用不限量", "全部网关功能", "全部安全功能", "社区支持"],
-          ctaLabel: "自托管部署",
-        },
-        {
-          name: "生产环境 · 免费层",
-          price: "免费",
-          priceNote: "阈值内",
-          audience: "运行生产负载的小团队。",
-          features: ["每月最多 10,000,000 计费 token", "每月最多 10,000 次 MCP 工具调用", "包含全部功能", "BSL 1.1 许可证", "Change Date 后自动转为 GPL-2.0-or-later"],
-          ctaLabel: "阅读许可证条款",
-        },
-        {
-          name: "生产环境 · 商业",
-          price: "阶梯",
-          priceNote: "按用量",
-          audience: "超出免费阈值的组织。",
-          features: ["每 UTC 月超过 1000 万 token 或 1 万次 MCP 调用", "需要商业许可证", "按用量阶梯计费", "可选优先支持", "定制部署咨询"],
-          ctaLabel: "联系销售",
-        },
-      ],
-    },
 
     footer: {
       tagline: "位于 AI 客户端与模型之间的网关。",
