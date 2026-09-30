@@ -34,7 +34,15 @@ export const liteCopy = {
     },
     status: {
       badge: "Available",
-      items: ["macOS 12+ · Apple silicon", "Windows 10 21H2+ · x64 · ARM64", "Linux · x86_64 · aarch64", "English · 简体中文", "Updates itself", "MIT"],
+      items: [
+        {
+          label: "Platforms",
+          lines: ["macOS 12 or later, Apple silicon", "Windows 10 21H2 or later, x64 or ARM64", "Linux, x86_64 or aarch64"],
+        },
+        { label: "Interface", lines: ["English and Simplified Chinese"] },
+        { label: "Updates", lines: ["Installed by the app itself; through Homebrew for a Homebrew installation"] },
+        { label: "License", lines: ["MIT, free and open source"] },
+      ],
     },
     features: {
       eyebrow: "Features",
@@ -204,7 +212,15 @@ export const liteCopy = {
     },
     status: {
       badge: "已发布",
-      items: ["macOS 12+ · Apple silicon", "Windows 10 21H2+ · x64 · ARM64", "Linux · x86_64 · aarch64", "English · 简体中文", "自动更新", "MIT"],
+      items: [
+        {
+          label: "支持平台",
+          lines: ["macOS 12 及以上（Apple silicon）", "Windows 10 21H2 及以上（x64、ARM64）", "Linux（x86_64、aarch64）"],
+        },
+        { label: "界面语言", lines: ["英文、简体中文"] },
+        { label: "更新", lines: ["应用自动更新；通过 Homebrew 安装的随 Homebrew 更新"] },
+        { label: "许可证", lines: ["MIT，免费开源"] },
+      ],
     },
     features: {
       eyebrow: "功能",
