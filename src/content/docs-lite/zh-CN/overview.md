@@ -4,7 +4,7 @@ ThinkWatch Lite 是一款在本机运行 AI API 网关的桌面应用，支持 m
 
 网关本体是 [ThinkWatch Core](/zh-CN/docs/core)。它随应用在本机运行，也可以部署在 Linux 服务器上，由应用远程连接，参见[连接远程 core](/zh-CN/docs/lite/remote-core)。
 
-> 支持 macOS 12 及以上版本的 Apple silicon 机型、Windows 10 21H2 及以上版本的 x64 与 ARM64 机型，以及 x86_64 与 aarch64 机型的 Linux，可通过 Homebrew、磁盘映像、Windows 安装程序或 AppImage [安装](/zh-CN/docs/lite/install)，并由应用自动更新。
+> 支持 macOS 12 及以上（Apple silicon）、Windows 10 21H2 及以上（x64、ARM64）和 Linux（x86_64、aarch64），可用 Homebrew、磁盘映像、Windows 安装程序或 AppImage [安装](/zh-CN/docs/lite/install)，安装后自动更新。
 
 ## 页面
 

@@ -211,7 +211,7 @@ export const liteCopy = {
     },
     status: {
       badge: "已发布",
-      body: "支持 macOS 12 及以上版本的 Apple silicon 机型，可通过 Homebrew 或磁盘映像安装；支持 Windows 10 21H2 及以上版本的 x64 与 ARM64 机型，通过安装程序安装；支持 Ubuntu 22.04、Debian 12、Fedora 36 及以上版本的 x86_64 与 aarch64 机型，以 AppImage 发布。界面提供英文与简体中文；应用自动更新，通过 Homebrew 安装的由 Homebrew 更新。",
+      body: "macOS 12 及以上（Apple silicon），用 Homebrew 或磁盘映像安装；Windows 10 21H2 及以上（x64、ARM64），用安装程序安装；Ubuntu 22.04、Debian 12、Fedora 36 及以上（x86_64、aarch64），用 AppImage 运行。界面有英文和简体中文。应用自动更新，用 Homebrew 安装的随 Homebrew 更新。",
     },
     features: {
       eyebrow: "各页功能",
