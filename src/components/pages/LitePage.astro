@@ -70,7 +70,6 @@ const textLink =
 const nodes = [c.built.lite, c.built.core, c.built.upstreams];
 /** 截图外的一圈：和窗口自带的阴影配合，不再加边框 */
 const shotClass = "w-full rounded-[10px]";
-const platformLabel = "m-0 font-mono text-[13px] text-[var(--color-muted)]";
 const archLabel = { x64: "x64", arm64: "ARM64" } as const;
 ---
 
@@ -283,129 +282,131 @@ const archLabel = { x64: "x64", arm64: "ARM64" } as const;
       </div>
     </section>
 
-    <section id="install" data-os="other" class="scroll-mt-20 py-16 sm:py-20 lg:py-[88px]">
-      <div class="container-page grid items-start gap-8 lg:grid-cols-2 lg:gap-16">
-        <div class="flex min-w-0 flex-col gap-4">
-          <p class:list={[eyebrow, "m-0"]}>{c.install.eyebrow}</p>
-          <h2 class={h2}>{c.install.title}</h2>
-          <p class="m-0 text-base leading-relaxed text-[var(--color-muted)] sm:text-[17px]">{c.install.brewNote}</p>
-          <div class="flex flex-wrap items-center gap-x-6 gap-y-2">
+    <section id="install" data-os="mac" class="scroll-mt-20 py-16 sm:py-20 lg:py-[88px]">
+      <div class="container-page flex flex-col gap-8">
+        <div class="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between lg:gap-10">
+          <div class="flex min-w-0 flex-col gap-3">
+            <p class:list={[eyebrow, "m-0"]}>{c.install.eyebrow}</p>
+            <h2 class={h2}>{c.install.title}</h2>
+            <p class="m-0 text-base leading-relaxed text-[var(--color-muted)] sm:text-[17px]">{c.install.intro}</p>
+          </div>
+          <div class="flex shrink-0 flex-wrap items-center gap-x-6 gap-y-1">
             <a href={installDocsHref} class={textLink}>{c.install.docs}</a>
             <a href={sourceDocsHref} class={textLink}>{c.install.source}</a>
+            <a href={releases} target="_blank" rel="noopener" class={textLink}>{c.install.releases}</a>
           </div>
         </div>
-        <div class="flex min-w-0 flex-col gap-8" data-install-list>
-          <div class="flex min-w-0 flex-col gap-4" data-install-os="mac">
-            <p class={platformLabel}>{c.install.macLabel}</p>
-            <div class="flex items-center rounded-[14px] border border-[var(--color-border-strong)] bg-[var(--color-surface)] font-mono text-[15px] leading-relaxed sm:text-base">
-              <code class="min-w-0 flex-1 overflow-x-auto whitespace-nowrap p-5 text-[#e6ebf2] sm:p-7">
-                <span class="select-none text-[var(--color-dim)]">$ </span><span data-cmd>brew install --cask thinkwatchproject/tap/thinkwatch-lite</span>
-              </code>
-              <button type="button" class="copy-cmd" data-copy="brew install --cask thinkwatchproject/tap/thinkwatch-lite" data-copied-label={ui.copied}>{ui.copy}</button>
+
+        {/* 一个系统一栏，默认选中访客自己的系统（见页尾脚本）；没有脚本时三栏都显示 */}
+        <div role="tablist" aria-label={c.install.tabsLabel} class="install-tabs" data-install-tabs hidden>
+          {(["mac", "windows", "linux"] as const).map((os) => (
+            <button type="button" role="tab" id={`install-tab-${os}`} aria-controls={`install-${os}`} data-tab={os}>
+              {c.install.tabs[os]}
+            </button>
+          ))}
+        </div>
+
+        <div class="flex flex-col gap-12">
+          <div id="install-mac" role="tabpanel" aria-labelledby="install-tab-mac" class="install-panel" data-panel="mac">
+            <p class="install-req">{c.install.mac.req}</p>
+            <div class="grid gap-4 lg:grid-cols-[3fr_2fr]">
+              <div class="install-card">
+                <div class="flex items-center gap-2.5">
+                  <h3 class="install-card-title">{c.install.mac.brewTitle}</h3>
+                  <span class="install-tag">{c.install.recommended}</span>
+                </div>
+                <p class="install-card-body">{c.install.mac.brewBody}</p>
+                <div class="install-cmd">
+                  <code><span class="select-none text-[var(--color-dim)]">$ </span><span data-cmd>brew install --cask thinkwatchproject/tap/thinkwatch-lite</span></code>
+                  <button type="button" class="copy-cmd" data-copy="brew install --cask thinkwatchproject/tap/thinkwatch-lite" data-copied-label={ui.copied}>{ui.copy}</button>
+                </div>
+              </div>
+              <div class="install-card">
+                <h3 class="install-card-title">{c.install.mac.dmgTitle}</h3>
+                <p class="install-card-body">{c.install.mac.dmgBody}</p>
+                <div class="mt-auto flex flex-wrap items-center gap-x-4 gap-y-2">
+                  <a href={dmg.url} class="dl-button">{c.install.mac.dmgDownload}</a>
+                  {liteVersion && (
+                    <p class="install-meta">
+                      {c.install.version} {liteVersion}
+                      {dmg.sha && <Fragment>{" · "}<a href={dmg.sha}>{c.install.sha}</a></Fragment>}
+                    </p>
+                  )}
+                </div>
+              </div>
             </div>
-            <div class="flex flex-col gap-2 rounded-[14px] border border-[var(--color-border-strong)] p-5 sm:p-7">
-              <h3 class="m-0 text-lg font-semibold sm:text-xl">{c.install.dmgTitle}</h3>
-              <p class="m-0 text-[15px] leading-relaxed text-[var(--color-muted)] sm:text-base">{c.install.dmgBody}</p>
-              <a href={dmg.url} class="dl-button self-start">{c.install.dmgDownload}</a>
-              {liteVersion && dmg.sha && (
-                <p class="m-0 font-mono text-[13px] text-[var(--color-muted)]">
-                  {c.install.version} {liteVersion}
-                  {" · "}
-                  <a href={dmg.sha} class="text-[var(--color-brand-1)] transition-colors hover:text-[var(--color-brand-2)]">sha256</a>
-                </p>
-              )}
-              <a href={releases} target="_blank" rel="noopener" class:list={[textLink, "self-start"]}>
-                {c.install.releases}
-                <svg class="ml-1.5 h-4 w-4" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                  <path d="M5 11L11 5M6 5h5v5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
-                </svg>
-              </a>
-            </div>
+            <p class="install-note">{c.install.mac.note}</p>
           </div>
-          <div class="flex min-w-0 flex-col gap-4" data-install-os="windows">
-            <p class={platformLabel}>{c.install.winLabel}</p>
-            <div class="flex flex-col gap-4 rounded-[14px] border border-[var(--color-border-strong)] p-5 sm:p-7">
-              <h3 class="m-0 text-lg font-semibold sm:text-xl">{c.install.winTitle}</h3>
-              <p class="m-0 text-[15px] leading-relaxed text-[var(--color-muted)] sm:text-base">{c.install.winBody}</p>
-              <div class="flex flex-col items-start gap-2">
+
+          <div id="install-windows" role="tabpanel" aria-labelledby="install-tab-windows" class="install-panel" data-panel="windows">
+            <p class="install-req">{c.install.windows.req}</p>
+            <div class="install-card">
+              <h3 class="install-card-title">{c.install.windows.title}</h3>
+              <p class="install-card-body">{c.install.windows.body}</p>
+              <div class="flex flex-wrap items-center gap-x-5 gap-y-2">
                 {winArchs.map((arch) => (
-                  <a href={win[arch].url} class="win-download" data-win-arch={arch} hidden={arch !== "x64"}>
-                    {c.install.winDownload[arch]}
+                  <a href={win[arch].url} class="dl-button dl-primary" data-win-arch={arch} hidden={arch !== "x64"}>
+                    {c.install.windows.download[arch]}
                   </a>
                 ))}
                 {winArchs.map((arch) => (
-                  <p class="m-0 text-[15px] text-[var(--color-muted)]" data-win-other={arch} hidden={arch === "x64"}>
-                    {c.install.winOther}<a href={win[arch].url} class="font-medium text-[var(--color-brand-1)] transition-colors hover:text-[var(--color-brand-2)]">
-                      {c.install.winOtherLink[arch]}
-                    </a>
+                  <p class="install-meta" data-win-other={arch} hidden={arch === "x64"}>
+                    {c.install.other}<a href={win[arch].url}>{c.install.windows.otherLink[arch]}</a>
                   </p>
                 ))}
               </div>
               {liteVersion && (
-                <p class="m-0 font-mono text-[13px] text-[var(--color-muted)]">
+                <p class="install-meta">
                   {c.install.version} {liteVersion}
                   {winArchs.map((arch) =>
-                    win[arch].sha && (
-                      <Fragment>
-                        {" · "}
-                        <a href={win[arch].sha} class="text-[var(--color-brand-1)] transition-colors hover:text-[var(--color-brand-2)]">
-                          sha256 ({archLabel[arch]})
-                        </a>
-                      </Fragment>
-                    ),
+                    win[arch].sha && <Fragment>{" · "}<a href={win[arch].sha}>{c.install.sha} ({archLabel[arch]})</a></Fragment>,
                   )}
                 </p>
               )}
-              <p class="m-0 border-t border-[var(--color-border-strong)] pt-4 text-[15px] leading-relaxed text-[var(--color-muted)] sm:text-base">
-                {c.install.winUnsigned}
-              </p>
             </div>
+            <p class="install-note">{c.install.windows.note}</p>
           </div>
-          <div class="flex min-w-0 flex-col gap-4" data-install-os="linux">
-            <p class={platformLabel}>{c.install.linuxLabel}</p>
-            <div class="flex items-center rounded-[14px] border border-[var(--color-border-strong)] bg-[var(--color-surface)] font-mono text-[15px] leading-relaxed sm:text-base">
-              <code class="min-w-0 flex-1 overflow-x-auto whitespace-nowrap p-5 text-[#e6ebf2] sm:p-7">
-                <span class="select-none text-[var(--color-dim)]">$ </span><span data-cmd>curl -fsSL {installScript} | sh</span>
-              </code>
-              <button type="button" class="copy-cmd" data-copy={`curl -fsSL ${installScript} | sh`} data-copied-label={ui.copied}>{ui.copy}</button>
-            </div>
-            <p class="m-0 text-[15px] leading-relaxed text-[var(--color-muted)] sm:text-base">{c.install.linuxScript}</p>
-            <div class="flex flex-col gap-4 rounded-[14px] border border-[var(--color-border-strong)] p-5 sm:p-7">
-              <h3 class="m-0 text-lg font-semibold sm:text-xl">{c.install.linuxTitle}</h3>
-              <p class="m-0 text-[15px] leading-relaxed text-[var(--color-muted)] sm:text-base">{c.install.linuxBody}</p>
-              <div class="flex flex-col items-start gap-2">
-                {linuxArchs.map((arch) => (
-                  <a href={linux[arch].url} class="dl-button" data-linux-arch={arch} hidden={arch !== "x86_64"}>
-                    {c.install.linuxDownload[arch]}
-                  </a>
-                ))}
-                {linuxArchs.map((arch) => (
-                  <p class="m-0 text-[15px] text-[var(--color-muted)]" data-linux-other={arch} hidden={arch === "x86_64"}>
-                    {c.install.linuxOther}<a href={linux[arch].url} class="font-medium text-[var(--color-brand-1)] transition-colors hover:text-[var(--color-brand-2)]">
-                      {c.install.linuxOtherLink[arch]}
-                    </a>
-                  </p>
-                ))}
+
+          <div id="install-linux" role="tabpanel" aria-labelledby="install-tab-linux" class="install-panel" data-panel="linux">
+            <p class="install-req">{c.install.linux.req}</p>
+            <div class="grid gap-4">
+              <div class="install-card">
+                <div class="flex items-center gap-2.5">
+                  <h3 class="install-card-title">{c.install.linux.scriptTitle}</h3>
+                  <span class="install-tag">{c.install.recommended}</span>
+                </div>
+                <p class="install-card-body">{c.install.linux.scriptBody}</p>
+                <div class="install-cmd">
+                  <code><span class="select-none text-[var(--color-dim)]">$ </span><span data-cmd>curl -fsSL {installScript} | sh</span></code>
+                  <button type="button" class="copy-cmd" data-copy={`curl -fsSL ${installScript} | sh`} data-copied-label={ui.copied}>{ui.copy}</button>
+                </div>
               </div>
-              {liteVersion && linuxArchs.some((arch) => linux[arch].sha) && (
-                <p class="m-0 font-mono text-[13px] text-[var(--color-muted)]">
-                  {c.install.version} {liteVersion}
-                  {linuxArchs.map((arch) =>
-                    linux[arch].sha && (
-                      <Fragment>
-                        {" · "}
-                        <a href={linux[arch].sha} class="text-[var(--color-brand-1)] transition-colors hover:text-[var(--color-brand-2)]">
-                          sha256 ({arch})
-                        </a>
-                      </Fragment>
-                    ),
-                  )}
-                </p>
-              )}
-              <p class="m-0 border-t border-[var(--color-border-strong)] pt-4 text-[15px] leading-relaxed text-[var(--color-muted)] sm:text-base">
-                {c.install.linuxNotes}
-              </p>
+              <div class="install-card">
+                <h3 class="install-card-title">{c.install.linux.appimageTitle}</h3>
+                <p class="install-card-body">{c.install.linux.appimageBody}</p>
+                <div class="mt-auto flex flex-wrap items-center gap-x-5 gap-y-2">
+                  {linuxArchs.map((arch) => (
+                    <a href={linux[arch].url} class="dl-button" data-linux-arch={arch} hidden={arch !== "x86_64"}>
+                      {c.install.linux.download[arch]}
+                    </a>
+                  ))}
+                  {linuxArchs.map((arch) => (
+                    <p class="install-meta" data-linux-other={arch} hidden={arch === "x86_64"}>
+                      {c.install.other}<a href={linux[arch].url}>{c.install.linux.otherLink[arch]}</a>
+                    </p>
+                  ))}
+                </div>
+                {liteVersion && linuxArchs.some((arch) => linux[arch].sha) && (
+                  <p class="install-meta">
+                    {c.install.version} {liteVersion}
+                    {linuxArchs.map((arch) =>
+                      linux[arch].sha && <Fragment>{" · "}<a href={linux[arch].sha}>{c.install.sha} ({arch})</a></Fragment>,
+                    )}
+                  </p>
+                )}
+              </div>
             </div>
+            <p class="install-note">{c.install.linux.note}</p>
           </div>
         </div>
       </div>
@@ -432,9 +433,9 @@ const archLabel = { x64: "x64", arm64: "ARM64" } as const;
 </Base>
 
 <!--
-  Which installer to put first. Windows visitors get the Windows block on top
-  with the button filled, Linux visitors the Linux block; everyone else keeps
-  macOS on top. The architecture comes from User-Agent Client Hints, or for
+  Which system's tab is open. Windows visitors get Windows, Linux visitors
+  Linux, everyone else macOS. Without script there are no tabs and all three
+  panels show. The architecture comes from User-Agent Client Hints, or for
   Linux without them (Firefox) from the User-Agent string: arm with 64-bit picks
   ARM64 / aarch64, and every other answer, a failure or a browser without the
   API picks x64 / x86_64, which is also what the page shows without script.
@@ -443,27 +444,49 @@ const archLabel = { x64: "x64", arm64: "ARM64" } as const;
 <script is:inline data-lite-download>
   (() => {
     const root = document.getElementById("install");
-    const list = root && root.querySelector("[data-install-list]");
-    if (!list) return;
+    const tabs = root && root.querySelector("[data-install-tabs]");
+    if (!tabs) return;
     const ua = navigator.userAgentData;
     const s = navigator.userAgent;
     const windows = (ua && ua.platform === "Windows") || /Windows NT/.test(s);
     const linux = !windows && !/Android/.test(s) && ((ua && ua.platform === "Linux") || /Linux/.test(s));
-    const os = windows ? "windows" : linux ? "linux" : "other";
-    const show = (arm) => {
-      const [key, arch] = linux ? ["linux", arm ? "aarch64" : "x86_64"] : ["win", arm ? "arm64" : "x64"];
+    const select = (os) => {
+      root.dataset.os = os;
+      for (const b of tabs.querySelectorAll("[data-tab]")) {
+        const on = b.dataset.tab === os;
+        b.setAttribute("aria-selected", String(on));
+        b.tabIndex = on ? 0 : -1;
+      }
+      for (const p of root.querySelectorAll("[data-panel]")) p.hidden = p.dataset.panel !== os;
+    };
+    tabs.hidden = false;
+    select(windows ? "windows" : linux ? "linux" : "mac");
+    tabs.addEventListener("click", (e) => {
+      const b = e.target.closest("[data-tab]");
+      if (b) select(b.dataset.tab);
+    });
+    tabs.addEventListener("keydown", (e) => {
+      if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+      const all = [...tabs.querySelectorAll("[data-tab]")];
+      const i = all.findIndex((b) => b.getAttribute("aria-selected") === "true");
+      const next = all[(i + (e.key === "ArrowRight" ? 1 : all.length - 1)) % all.length];
+      select(next.dataset.tab);
+      next.focus();
+    });
+    const show = (key, arch) => {
       for (const el of root.querySelectorAll(`[data-${key}-arch]`)) el.hidden = el.getAttribute(`data-${key}-arch`) !== arch;
       for (const el of root.querySelectorAll(`[data-${key}-other]`)) el.hidden = el.getAttribute(`data-${key}-other`) === arch;
     };
-    root.dataset.os = os;
-    list.prepend(list.querySelector(`[data-install-os="${windows ? "windows" : linux ? "linux" : "mac"}"]`));
-    if (!windows && !linux) return;
+    const apply = (arm) => {
+      show("win", arm && windows ? "arm64" : "x64");
+      show("linux", arm && linux ? "aarch64" : "x86_64");
+    };
     const guess = linux && /aarch64|arm64/.test(s);
-    show(guess);
-    if (!ua || typeof ua.getHighEntropyValues !== "function") return;
+    apply(guess);
+    if (!(windows || linux) || !ua || typeof ua.getHighEntropyValues !== "function") return;
     ua.getHighEntropyValues(["architecture", "bitness"]).then(
-      (v) => show(v.architecture === "arm" && v.bitness === "64"),
-      () => show(guess),
+      (v) => apply(v.architecture === "arm" && v.bitness === "64"),
+      () => apply(guess),
     );
   })();
 </script>
@@ -501,11 +524,132 @@ const archLabel = { x64: "x64", arm64: "ARM64" } as const;
     color: var(--color-brand-1);
   }
 
-  /* Download buttons. Outlined by default; the Windows one is filled for Windows
-     visitors, whose installer that is. The disk image stays outlined: on a Mac
-     the Homebrew command above it is the first choice. */
-  .dl-button,
-  .win-download {
+  /* Install section: tabs, cards, the command box and download buttons. */
+  .install-tabs {
+    display: inline-flex;
+    align-self: flex-start;
+    gap: 0.25rem;
+    border: 1px solid var(--color-border-strong);
+    border-radius: 12px;
+    padding: 0.25rem;
+    background: var(--color-surface);
+  }
+  .install-tabs[hidden] {
+    display: none;
+  }
+  .install-tabs button {
+    min-height: 2.5rem;
+    border-radius: 9px;
+    padding: 0 1.25rem;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: var(--color-muted);
+    transition: background-color 150ms, color 150ms;
+  }
+  .install-tabs button:hover {
+    color: var(--color-text);
+  }
+  .install-tabs button[aria-selected="true"] {
+    background: var(--color-surface-2);
+    color: var(--color-text);
+    box-shadow: inset 0 0 0 1px var(--color-border-strong);
+  }
+  .install-tabs button:focus-visible {
+    outline: 2px solid var(--color-brand-1);
+    outline-offset: 2px;
+  }
+  .install-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .install-panel[hidden] {
+    display: none;
+  }
+  .install-req {
+    margin: 0;
+    font-size: 1rem;
+    color: var(--color-text);
+  }
+  .install-card {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 0.75rem;
+    border: 1px solid var(--color-border-strong);
+    border-radius: 14px;
+    background: var(--color-surface);
+    padding: 1.5rem;
+  }
+  @media (min-width: 640px) {
+    .install-card {
+      padding: 1.75rem;
+    }
+  }
+  .install-card-title {
+    margin: 0;
+    font-size: 1.125rem;
+    font-weight: 600;
+  }
+  .install-card-body {
+    margin: 0;
+    font-size: 0.9375rem;
+    line-height: 1.65;
+    color: var(--color-muted);
+  }
+  .install-tag {
+    border-radius: 999px;
+    background: rgba(61, 219, 217, 0.12);
+    padding: 0.125rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--color-brand-1);
+  }
+  .install-cmd {
+    margin-top: auto;
+    display: flex;
+    min-width: 0;
+    align-items: stretch;
+    border: 1px solid var(--color-border-strong);
+    border-radius: 10px;
+    background: var(--color-bg);
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+  }
+  .install-cmd code {
+    min-width: 0;
+    flex: 1;
+    overflow-x: auto;
+    white-space: nowrap;
+    padding: 0.875rem 1rem;
+    color: var(--color-text);
+  }
+  .install-meta {
+    margin: 0;
+    font-size: 0.875rem;
+    color: var(--color-muted);
+  }
+  .install-meta[hidden] {
+    display: none;
+  }
+  .install-meta a {
+    color: var(--color-brand-1);
+    transition: color 150ms;
+  }
+  .install-meta a:hover {
+    color: var(--color-brand-2);
+  }
+  .install-note {
+    margin: 0;
+    border-left: 2px solid var(--color-border-strong);
+    padding-left: 0.875rem;
+    font-size: 0.9375rem;
+    line-height: 1.65;
+    color: var(--color-muted);
+  }
+
+  /* Download buttons: outlined, or filled where the button is the way to install. */
+  .dl-button {
     display: inline-flex;
     min-height: 2.75rem;
     align-items: center;
@@ -518,26 +662,19 @@ const archLabel = { x64: "x64", arm64: "ARM64" } as const;
     color: var(--color-brand-1);
     transition: background-color 150ms, color 150ms, border-color 150ms;
   }
-  .dl-button:hover,
-  .win-download:hover {
+  .dl-button:hover {
     border-color: var(--color-brand-2);
     color: var(--color-brand-2);
-  }
-  .win-download[hidden] {
-    display: none;
   }
   .dl-button[hidden] {
     display: none;
   }
-  [data-os="linux"] [data-linux-arch],
-  [data-os="windows"] .win-download {
+  .dl-primary {
     background: var(--color-brand-1);
     color: var(--color-bg);
   }
-  [data-os="linux"] [data-linux-arch]:hover,
-  [data-os="windows"] .win-download:hover {
+  .dl-primary:hover {
     background: var(--color-brand-2);
-    border-color: var(--color-brand-2);
     color: var(--color-bg);
   }
 
