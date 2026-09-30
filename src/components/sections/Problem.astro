@@ -18,10 +18,10 @@ const icons: Record<string, string> = {
 <section id="problem" class="py-20 sm:py-28 border-t border-white/5 relative">
   <div class="container-page relative z-10">
     <div class="max-w-3xl">
-      <div class="text-xs uppercase tracking-[0.18em] text-[var(--color-accent)] font-medium mb-4">
+      <div class="nx-label mb-3 nx-in">
         {s.eyebrow}
       </div>
-      <h2 class="text-3xl sm:text-4xl md:text-5xl font-semibold tracking-tight [text-wrap:balance]">
+      <h2 class="nx-h2 nx-in">
         {s.title}<span class="text-gradient">{s.titleHighlight}</span>
       </h2>
       <p class="mt-4 sm:mt-5 text-base sm:text-lg text-[var(--color-muted)] leading-relaxed">
@@ -33,7 +33,7 @@ const icons: Record<string, string> = {
       {s.pains.map((p, i) => (
         <div class:list={["pain-item", spanClass(i, s.pains.length, "sm")]} style={`--pain-delay:${i * 80}ms`}>
           <TiltCard client:visible className="rounded-2xl">
-            <div class="relative rounded-2xl border border-white/10 bg-[var(--color-surface)]/60 p-5 sm:p-6 hover:border-white/25 transition-colors overflow-hidden h-full">
+            <div class="relative nx-tile p-5 sm:p-6  overflow-hidden h-full">
               <div class="flex items-start justify-between mb-4">
                 <svg class="w-7 h-7 text-[var(--color-brand-1)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={icons[p.icon] ?? ""}></svg>
                 <span class="font-mono text-[11px] tracking-[0.12em] text-[var(--color-dim)]">

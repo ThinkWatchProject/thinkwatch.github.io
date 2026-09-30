@@ -1,62 +1,118 @@
 ---
-import HeroVisual from "~/components/hero/HeroVisual.tsx";
+// Home hero: both products at a glance. Copy on the left with a door into each
+// product, a request typed through the gateway on the right.
 import Terminal from "~/components/ui/Terminal.tsx";
 import { getLang, localePath } from "~/i18n";
 import { homeCopy } from "~/i18n/pages/home";
+import { getLatestLiteRelease, getLatestRelease } from "~/lib/github";
 
 const lang = getLang(Astro);
 const c = homeCopy[lang];
 const zh = lang === "zh-CN";
+const lite = (await getLatestLiteRelease())?.tag.replace(/^v/, "") ?? null;
+const ent = (await getLatestRelease())?.replace(/^v/, "") ?? null;
 ---
 
-<section class="home-hero relative overflow-hidden lg:min-h-[88vh]">
-  <HeroVisual client:load />
-
-  <div class="container-page relative z-10 grid items-center gap-12 pb-20 pt-12 sm:pt-20 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:gap-12 lg:pb-32 lg:pt-24">
-    <div class="flex min-w-0 flex-col gap-6">
-      <div class="reveal font-mono text-[11px] uppercase tracking-[0.08em] text-[var(--color-brand-1)] sm:text-[13px]">{c.eyebrow}</div>
-      <h1
-        class:list={[
-          "reveal font-display text-white [text-wrap:balance]",
-          zh
-            ? "text-[30px] leading-[1.35] sm:text-[40px] lg:text-[46px] xl:text-[50px] lg:leading-[1.3]"
-            : "text-[36px] leading-[1.1] sm:text-[48px] lg:text-[56px] xl:text-[60px] lg:leading-[1.05]",
-        ]}
-        style="animation-delay: 120ms;"
-      >
-        {c.h1a} <span class="text-shimmer">{c.h1b}</span>
+<section class="nx-hero home-hero">
+  <div class="nx-aurora" aria-hidden="true"><i></i><i></i><i></i></div>
+  <div class="nx-gridbg" aria-hidden="true"></div>
+  <div class="container-page grid items-center gap-12 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] lg:gap-14">
+    <div class="min-w-0">
+      {(lite || ent) && (
+        <a class="nx-announce nx-rise" style="--d:0" href={localePath(lang, "/changelog")}><span class="dot"></span>{c.announce(lite, ent)}<span class="chev">→</span></a>
+      )}
+      <h1 class="nx-h1 nx-rise" style="--d:1">
+        {c.h1a}{zh ? "" : " "}<span class="nx-grad">{c.h1b}</span>
       </h1>
-      {/* 背景图形从这一段后面穿过：一圈深色阴影让字压得住它 */}
-      <p class="reveal text-pretty text-[17px] leading-relaxed text-[#dbe3ee] [text-shadow:0_0_14px_rgba(8, 9, 10,0.95),0_0_4px_rgba(8, 9, 10,0.9)] sm:text-xl" style="animation-delay: 260ms;">{c.sub}</p>
+      <p class="nx-lede nx-rise" style="--d:2">{c.sub}</p>
 
-      <div class="reveal mt-2 grid gap-4 sm:grid-cols-2" style="animation-delay: 400ms;">
-        <a href={localePath(lang, "/thinkwatch")} class="door group flex h-full flex-col gap-2.5 rounded-[14px] border border-[var(--color-border-strong)] bg-[rgba(15, 16, 18,0.85)] p-6 backdrop-blur-sm">
-          <span class="font-mono text-xs uppercase tracking-[0.08em] text-[var(--color-muted)]">{c.doors.teams.label}</span>
-          <span class="text-2xl font-semibold tracking-tight text-white">{c.doors.teams.name}</span>
-          <span class="text-[15px] leading-normal text-[#c3c7ce]">{c.doors.teams.text}</span>
-          <span class="cta mt-auto inline-flex min-h-11 items-center self-start rounded-full bg-[#f7f8f8] px-[18px] text-[15px] font-semibold text-[#08090a]">{c.doors.teams.cta}</span>
+      <div class="doors nx-rise" style="--d:3">
+        <a href={localePath(lang, "/thinkwatch")} class="nx-tile door">
+          <span class="nx-label">{c.doors.teams.label}</span>
+          <span class="door-name">{c.doors.teams.name}</span>
+          <span class="nx-body">{c.doors.teams.text}</span>
+          <span class="door-cta">{c.doors.teams.cta}</span>
         </a>
-        <a href={localePath(lang, "/lite")} class="door group flex h-full flex-col gap-2.5 rounded-[14px] border border-[var(--color-border-strong)] bg-[rgba(15, 16, 18,0.85)] p-6 backdrop-blur-sm">
-          <span class="font-mono text-xs uppercase tracking-[0.08em] text-[var(--color-muted)]">{c.doors.machine.label}</span>
-          <span class="text-2xl font-semibold tracking-tight text-white">{c.doors.machine.name}</span>
-          <span class="text-[15px] leading-normal text-[#c3c7ce]">{c.doors.machine.text}</span>
-          <span class="cta mt-auto inline-flex min-h-11 items-center self-start rounded-full border border-white/15 px-[17px] text-[15px] font-semibold text-white">{c.doors.machine.cta}</span>
+        <a href={localePath(lang, "/lite")} class="nx-tile door">
+          <span class="nx-label">{c.doors.machine.label}</span>
+          <span class="door-name">{c.doors.machine.name}</span>
+          <span class="nx-body">{c.doors.machine.text}</span>
+          <span class="door-cta">{c.doors.machine.cta}</span>
         </a>
       </div>
     </div>
 
-    <div class="reveal relative hidden min-w-0 sm:block" style="animation-delay: 520ms;">
+    <div class="terminal-wrap nx-rise hidden min-w-0 sm:block" style="--d:3">
+      <div class="term-glow" aria-hidden="true"></div>
       <Terminal client:visible sampleLabel={zh ? "示例" : "Sample"} />
-      <div class="absolute -inset-6 -z-10 rounded-3xl bg-gradient-to-br from-cyan-500/20 via-cyan-500/5 to-transparent blur-2xl" aria-hidden="true"></div>
     </div>
   </div>
-
-  <div class="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-b from-transparent to-[var(--color-bg)] sm:h-32" aria-hidden="true"></div>
 </section>
 
 <style>
-  .door { transition: border-color 250ms ease, box-shadow 250ms ease, transform 250ms ease; }
-  .door:hover { border-color: var(--color-brand-1); box-shadow: 0 0 0 1px rgba(34, 229, 242, 0.35), 0 18px 48px -18px rgba(34, 229, 242, 0.45); transform: translateY(-2px); }
-  .door:hover .cta { box-shadow: 0 8px 32px -6px rgba(34, 229, 242, 0.55); }
-  .door:focus-visible { outline: 2px solid var(--color-brand-1); outline-offset: 3px; }
+  .home-hero {
+    padding-top: 80px;
+    padding-bottom: 88px;
+  }
+  .doors {
+    margin-top: 36px;
+    display: grid;
+    gap: 12px;
+  }
+  @media (min-width: 640px) {
+    .doors {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  .door {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 22px;
+  }
+  .door-name {
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: #fff;
+  }
+  .door .nx-body {
+    margin: 0;
+    flex: 1;
+  }
+  .door-cta {
+    margin-top: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-text);
+  }
+  .door-cta::after {
+    content: "→";
+    color: var(--color-dim);
+    transition: transform 150ms, color 150ms;
+  }
+  .door:hover .door-cta::after {
+    transform: translateX(3px);
+    color: rgb(var(--a1));
+  }
+  .terminal-wrap {
+    position: relative;
+  }
+  .term-glow {
+    position: absolute;
+    inset: -30px;
+    z-index: -1;
+    border-radius: 32px;
+    background: radial-gradient(closest-side, rgb(var(--a1) / 0.16), rgb(var(--a2) / 0.08) 60%, transparent);
+    filter: blur(20px);
+    animation: nx-halo 6s ease-in-out infinite;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .term-glow {
+      animation: none;
+    }
+  }
 </style>

@@ -1,0 +1,48 @@
+---
+// Page motion for the neon design language (see "Neon design language" in
+// src/styles/global.css): blocks marked .nx-in move into place as they come
+// into view, .nx-tile surfaces light up under the pointer, and figures marked
+// data-count tick up while the page is visible. Everything reads the same
+// without it; with reduced motion only the pointer light stays.
+---
+
+<script is:inline data-neon-motion>
+  (() => {
+    const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    document.querySelectorAll(".nx-tile").forEach((t) => {
+      t.addEventListener("pointermove", (e) => {
+        const r = t.getBoundingClientRect();
+        t.style.setProperty("--mx", `${e.clientX - r.left}px`);
+        t.style.setProperty("--my", `${e.clientY - r.top}px`);
+      });
+    });
+    if (reduce) return;
+    document.documentElement.classList.add("nx-motion");
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (!e.isIntersecting) continue;
+          e.target.setAttribute("data-in", "");
+          io.unobserve(e.target);
+        }
+      },
+      { rootMargin: "0px 0px -8% 0px" },
+    );
+    document.querySelectorAll(".nx-in").forEach((el) => io.observe(el));
+    const counters = [...document.querySelectorAll("[data-count]")];
+    if (counters.length) {
+      setInterval(() => {
+        if (document.hidden) return;
+        counters.forEach((el) => {
+          if (Math.random() < 0.55) return;
+          const v = parseFloat(el.dataset.count) + parseFloat(el.dataset.step) * (0.5 + Math.random());
+          el.dataset.count = String(v);
+          el.textContent = (el.dataset.prefix || "") + v.toFixed(Number(el.dataset.fixed || 1)) + (el.dataset.unit || "");
+          el.classList.remove("nx-tick");
+          void el.offsetWidth;
+          el.classList.add("nx-tick");
+        });
+      }, 1400);
+    }
+  })();
+</script>

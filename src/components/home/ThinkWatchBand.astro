@@ -1,4 +1,7 @@
 ---
+// ThinkWatch Enterprise on the home page: what it is, its four pillars as
+// tiles, the six stages of a request as a pipeline a light runs along, the
+// console preview, and per-user identity for MCP.
 import DashboardMock from "~/components/mocks/DashboardMock.tsx";
 import LogExplorerMock from "~/components/mocks/LogExplorerMock.tsx";
 import ProviderHealthMock from "~/components/mocks/ProviderHealthMock.tsx";
@@ -8,51 +11,56 @@ import { homeCopy } from "~/i18n/pages/home";
 
 const lang = getLang(Astro);
 const c = homeCopy[lang].tw;
+/** Line icons for the four pillars, in the order of the copy */
+const icons = [
+  '<path d="M4 7h16M4 12h10M4 17h13"/><circle cx="18" cy="12" r="2"/>',
+  '<circle cx="8" cy="8" r="3"/><circle cx="16" cy="16" r="3"/><path d="M10.5 10.5l3 3"/><path d="M16 5v3M19 8h-3"/>',
+  '<circle cx="12" cy="8" r="3.5"/><path d="M5 20c1.2-3.6 4-5.5 7-5.5s5.8 1.9 7 5.5"/>',
+  '<path d="M4 19V9M10 19V5M16 19v-7M22 19H2"/>',
+];
 ---
 
-<section class="border-y border-[var(--color-border)] bg-[var(--color-surface)]">
-  <div class="container-page py-20 lg:py-28">
-    <div class="grid gap-12 lg:grid-cols-2 lg:items-end lg:gap-[72px]">
-      <div class="flex flex-col gap-5">
-        <div class="font-mono text-[13px] uppercase tracking-[0.08em] text-[var(--color-brand-1)]">{c.eyebrow}</div>
-        <h2
-          class:list={[
-            "font-display text-white [text-wrap:balance]",
-            lang === "zh-CN" ? "text-[28px] leading-[1.35] sm:text-[34px] lg:text-[40px]" : "text-[32px] leading-[1.15] sm:text-[40px] lg:text-[46px]",
-          ]}
-        >{c.title}</h2>
-        <p class="text-[17px] leading-relaxed text-[#c3c7ce] sm:text-lg">{c.sub}</p>
-        <a href={localePath(lang, "/thinkwatch")} class="inline-flex min-h-11 items-center self-start text-[17px] font-medium text-[var(--color-brand-1)] hover:text-[var(--color-brand-2)]">{c.cta}</a>
+<section class="nx-section nx-hairline band">
+  <div class="container-page">
+    <div class="head">
+      <div class="min-w-0">
+        <p class="nx-label nx-in">{c.eyebrow}</p>
+        <h2 class="nx-h2 nx-in mt-3">{c.title}</h2>
+        <p class="nx-sub nx-in">{c.sub}</p>
       </div>
-      <div class="grid gap-7 sm:grid-cols-2">
-        {c.features.map((f) => (
-          <div class="flex flex-col gap-1.5">
-            <div class="text-[17px] font-semibold text-white">{f.t}</div>
-            <div class="text-[15px] leading-normal text-[var(--color-muted)]">{f.b}</div>
-          </div>
-        ))}
-      </div>
+      <a href={localePath(lang, "/thinkwatch")} class="nx-link nx-in shrink-0">{c.cta}</a>
     </div>
 
-    <div class="mt-16 font-mono text-[13px] uppercase tracking-[0.08em] text-[var(--color-muted)]">{c.stepsLabel}</div>
-    <ol class="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+    <div class="nx-bento mt-12">
+      {c.features.map((f, i) => (
+        <article class="nx-tile nx-span-3 nx-in">
+          <svg viewBox="0 0 24 24" class="icon" aria-hidden="true" set:html={icons[i] ?? ""}></svg>
+          <h3 class="nx-h3">{f.t}</h3>
+          <p class="nx-body">{f.b}</p>
+        </article>
+      ))}
+    </div>
+
+    <p class="nx-label mt-16 nx-in">{c.stepsLabel}</p>
+    <ol class="pipe nx-in">
       {c.steps.map((s, i) => (
-        <li class="step flex flex-col gap-2 rounded-xl border border-[var(--color-border-strong)] p-[18px]" style={`animation-delay: ${i * 2}s;`}>
-          <span class="font-mono text-xs text-[var(--color-brand-1)]">{String(i + 1).padStart(2, "0")}</span>
-          <span class="text-base font-semibold text-white">{s.t}</span>
-          <span class="text-[13px] leading-snug text-[var(--color-muted)]">{s.b}</span>
+        <li class="stage" style={`--i:${i}`}>
+          <span class="node" aria-hidden="true"></span>
+          <span class="num">{String(i + 1).padStart(2, "0")}</span>
+          <span class="t">{s.t}</span>
+          <span class="b">{s.b}</span>
         </li>
       ))}
     </ol>
 
     <div class="mt-16 flex items-center justify-between gap-4">
-      <div class="font-mono text-[13px] uppercase tracking-[0.08em] text-[var(--color-muted)]">{c.consoleLabel}</div>
-      <span class="rounded-full border border-[var(--color-accent)] px-2.5 py-1 font-mono text-xs uppercase text-[var(--color-accent)]">{c.sample}</span>
+      <p class="nx-label">{c.consoleLabel}</p>
+      <span class="rounded-full border border-[var(--color-accent)]/60 px-2.5 py-1 text-xs text-[var(--color-accent)]">{c.sample}</span>
     </div>
-    <div class="mt-5">
+    <div class="mt-5 nx-in">
       <DashboardMock client:visible />
     </div>
-    <div class="mt-4 grid items-stretch gap-4 lg:grid-cols-[1.35fr_1fr]">
+    <div class="mt-4 grid items-stretch gap-4 lg:grid-cols-[1.35fr_1fr] nx-in">
       <div class="min-w-0">
         <LogExplorerMock client:visible />
       </div>
@@ -62,30 +70,162 @@ const c = homeCopy[lang].tw;
       </div>
     </div>
 
-    <div class="mt-20 grid gap-6 border-t border-[var(--color-border-strong)] pt-14 lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-16">
-      <div class="font-mono text-[13px] uppercase tracking-[0.08em] text-[var(--color-muted)] lg:pt-3.5">{c.quoteLabel}</div>
-      <div class="flex flex-col gap-5">
-        <p
-          class:list={[
-            "font-display text-white [text-wrap:balance]",
-            lang === "zh-CN" ? "text-[22px] leading-[1.5] sm:text-[26px] lg:text-[30px]" : "text-[24px] leading-[1.3] sm:text-[28px] lg:text-[32px]",
-          ]}
-        >
-          {c.quoteA}<span class="text-shimmer">{c.quoteEm}</span>{c.quoteB}
-        </p>
-        <p class="max-w-3xl text-[17px] leading-relaxed text-[#c3c7ce] sm:text-lg">{c.quoteBody}</p>
-      </div>
+    <div class="quote nx-in">
+      <p class="nx-label">{c.quoteLabel}</p>
+      <p class="q">{c.quoteA}<span class="nx-grad">{c.quoteEm}</span>{c.quoteB}</p>
+      <p class="nx-sub">{c.quoteBody}</p>
     </div>
   </div>
 </section>
 
 <style>
-  .step { animation: step-cycle 12s ease-in-out infinite; }
-  @keyframes step-cycle {
-    0%, 15% { border-color: #22e5f2; background: #16171a; box-shadow: 0 10px 36px -16px rgba(34, 229, 242, 0.6); }
-    18%, 100% { border-color: #2a2c31; background: transparent; box-shadow: none; }
+  .head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px 48px;
+  }
+  .icon {
+    width: 26px;
+    height: 26px;
+    margin-bottom: 18px;
+    fill: none;
+    stroke: rgb(var(--a1));
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    filter: drop-shadow(0 0 6px rgb(var(--a1) / 0.4));
+  }
+  /* The pipeline: six stages on one line; the lit stage walks along it */
+  .pipe {
+    position: relative;
+    margin: 20px 0 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .pipe::before {
+    content: "";
+    position: absolute;
+    left: 6px;
+    right: 6px;
+    top: 5px;
+    height: 1px;
+    background: linear-gradient(90deg, rgb(var(--a1) / 0.5), rgb(var(--a2) / 0.5));
+  }
+  .pipe::after {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 0;
+    width: 7px;
+    height: 7px;
+    border-radius: 99px;
+    background: #fff;
+    box-shadow: 0 0 12px rgb(var(--a1)), 0 0 24px rgb(var(--a2) / 0.6);
+    animation: run 12s linear infinite;
+  }
+  .stage {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding-top: 26px;
+  }
+  .node {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 11px;
+    height: 11px;
+    border-radius: 99px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    background: #08090a;
+  }
+  .num {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--color-dim);
+  }
+  .t {
+    font-size: 16px;
+    font-weight: 600;
+    color: #fff;
+  }
+  .b {
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--color-muted);
+  }
+  @keyframes run {
+    from {
+      left: 0;
+    }
+    to {
+      left: calc(100% - 7px);
+    }
+  }
+  .stage .node {
+    animation: node 12s ease-in-out infinite;
+    animation-delay: calc(var(--i) * 2s);
+  }
+  @keyframes node {
+    0%,
+    14% {
+      border-color: rgb(var(--a1));
+      background: rgb(var(--a1));
+      box-shadow: 0 0 12px rgb(var(--a1));
+    }
+    18%,
+    100% {
+      border-color: rgba(255, 255, 255, 0.25);
+      background: #08090a;
+      box-shadow: none;
+    }
+  }
+  @media (max-width: 1023px) {
+    .pipe {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      row-gap: 24px;
+    }
+    .pipe::before,
+    .pipe::after {
+      display: none;
+    }
+  }
+  @media (max-width: 560px) {
+    .pipe {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  .quote {
+    margin-top: 80px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding-top: 48px;
+    display: grid;
+    gap: 16px;
+  }
+  .q {
+    margin: 0;
+    max-width: 900px;
+    font-size: clamp(24px, 3vw, 34px);
+    line-height: 1.3;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: #fff;
+    text-wrap: balance;
+  }
+  :global(:lang(zh-CN)) .q {
+    line-height: 1.45;
+    letter-spacing: 0;
   }
   @media (prefers-reduced-motion: reduce) {
-    .step { animation: none; }
+    .pipe::after,
+    .stage .node {
+      animation: none;
+    }
   }
 </style>

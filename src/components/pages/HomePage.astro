@@ -9,6 +9,7 @@ import ThinkWatchBand from "~/components/home/ThinkWatchBand.astro";
 import LiteBand from "~/components/home/LiteBand.astro";
 import CoreStrip from "~/components/home/CoreStrip.astro";
 import CompareEditions from "~/components/home/CompareEditions.astro";
+import NeonMotion from "~/components/NeonMotion.astro";
 import { getLang } from "~/i18n";
 import { homeCopy } from "~/i18n/pages/home";
 import { coreLd, enterpriseLd, liteLd, webPage, website } from "~/lib/structured-data";
@@ -39,4 +40,5 @@ const jsonLd = [
     <CompareEditions />
   </main>
   <SiteFooter />
+  <NeonMotion />
 </Base>

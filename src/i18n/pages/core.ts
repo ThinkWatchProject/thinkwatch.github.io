@@ -31,6 +31,12 @@ export const coreCopy = {
         { cmd: "twcore serve", note: "# start the gateway and the control plane" },
       ],
     },
+    motion: {
+      announce: (v: string) => `Core ${v} released`,
+      doesTitle: "One binary, ",
+      doesTitleDim: "the whole gateway.",
+      sample: "Sample",
+    },
     does: {
       eyebrow: "Capabilities",
       items: [
@@ -148,6 +154,12 @@ export const coreCopy = {
         { cmd: "twcore check", note: "# 仅校验配置，不启动" },
         { cmd: "twcore serve", note: "# 启动网关与控制面" },
       ],
+    },
+    motion: {
+      announce: (v: string) => `Core ${v} 已发布`,
+      doesTitle: "一个二进制，",
+      doesTitleDim: "就是完整的网关。",
+      sample: "示例",
     },
     does: {
       eyebrow: "功能",

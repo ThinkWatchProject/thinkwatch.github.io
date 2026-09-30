@@ -12,6 +12,7 @@ import MCPAdvantage from "~/components/sections/MCPAdvantage.astro";
 import LivePanels from "~/components/sections/LivePanels.astro";
 import QuickStart from "~/components/sections/QuickStart.astro";
 import LogExplorerMock from "~/components/mocks/LogExplorerMock.tsx";
+import NeonMotion from "~/components/NeonMotion.astro";
 import { getLang, localePath } from "~/i18n";
 import { getLatestRelease } from "~/lib/github";
 import { enterpriseLd } from "~/lib/structured-data";
@@ -38,66 +39,34 @@ const delay = (i: number) => `animation-delay: ${i * 90}ms;`;
 <Base title={c.meta.title} description={c.meta.description} ogCard="enterprise" jsonLd={jsonLd}>
   <SiteHeader />
   <main id="main">
-    <section class="relative overflow-hidden">
-      <div
-        class="pointer-events-none absolute inset-0"
-        aria-hidden="true"
-        style="background: radial-gradient(50% 60% at 85% 20%, rgba(34, 229, 242, 0.09), transparent 65%);"
-      ></div>
-      <div class="container-page relative grid items-center gap-12 py-14 sm:py-20 lg:grid-cols-2 lg:gap-16 lg:py-[88px]">
-        <div class="flex min-w-0 flex-col gap-5 sm:gap-6">
-          <p class="reveal font-mono text-[11px] uppercase tracking-[0.08em] text-[var(--color-brand-1)] sm:text-[13px]" style={delay(0)}>
-            {c.hero.eyebrow}
-          </p>
-          <h1
-            class:list={[
-              "reveal font-display m-0 text-[var(--color-text)]",
-              zh
-                ? "text-[30px] leading-[1.35] sm:text-[40px] lg:text-[48px]"
-                : "text-[36px] leading-[1.1] sm:text-[46px] lg:text-[56px] lg:leading-[1.05]",
-            ]}
-            style={delay(1)}
-          >
-            {c.hero.titleA}<span class="text-shimmer">{c.hero.titleHighlight}</span>
+    <section class="nx-hero">
+      <div class="nx-aurora" aria-hidden="true"><i></i><i></i><i></i></div>
+      <div class="nx-gridbg" aria-hidden="true"></div>
+      <div class="container-page grid items-center gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:gap-14">
+        <div class="min-w-0">
+          {version && (
+            <a class="nx-announce nx-rise" style="--d:0" href={localePath(lang, "/changelog")}><span class="dot"></span>{c.hero.announce(version.replace(/^v/, ""))}<span class="chev">→</span></a>
+          )}
+          <h1 class="nx-h1 nx-rise" style="--d:1">
+            {c.hero.titleA}<span class:list={["nx-grad", zh && "whitespace-nowrap"]}>{c.hero.titleHighlight}</span>
           </h1>
-          <p class="reveal m-0 max-w-[36rem] text-[17px] leading-relaxed text-[#c3c7ce] sm:text-xl sm:leading-normal" style={delay(2)}>
-            {c.hero.sub}
-          </p>
-          <div class="reveal mt-1 flex flex-col gap-3 sm:mt-2 sm:flex-row sm:items-center sm:gap-5" style={delay(3)}>
-            <a
-              href="#quickstart"
-              class="inline-flex min-h-11 items-center justify-center rounded-full bg-[#f7f8f8] px-[22px] py-3 text-base font-semibold text-[#08090a] transition hover:bg-white hover:shadow-[0_8px_30px_-8px_rgba(34,229,242,0.5)]"
-            >
-              {c.hero.ctaPrimary}
-            </a>
-            <a
-              href={localePath(lang, "/docs")}
-              class="inline-flex min-h-11 items-center justify-center text-base font-medium text-[var(--color-brand-1)] transition-colors hover:text-[var(--color-brand-2)] sm:justify-start"
-            >
-              {c.hero.ctaSecondary}
-            </a>
+          <p class="nx-lede nx-rise" style="--d:2">{c.hero.sub}</p>
+          <div class="nx-actions nx-rise" style="--d:3">
+            <a href="#quickstart" class="nx-pill">{c.hero.ctaPrimary}</a>
+            <a href={localePath(lang, "/docs")} class="nx-ghost">{c.hero.ctaSecondary}</a>
           </div>
-          <ul class="reveal m-0 mt-1 flex list-none flex-wrap gap-2.5 p-0 sm:mt-2 sm:gap-3" style={delay(4)}>
+          <ul class="hero-pills nx-rise" style="--d:4">
             {pills.map((p) => (
-              <li
-                class="rounded-full border border-[var(--color-border-strong)] px-3 py-1.5 text-[13px] text-[#c3c7ce]"
-                title={p.title}
-              >
-                {p.label}
-              </li>
+              <li title={p.title}>{p.label}</li>
             ))}
           </ul>
         </div>
 
-        <figure class="reveal m-0 min-w-0" style={delay(3)}>
-          <figcaption class="mb-3 flex items-center justify-between gap-3 font-mono text-[11px] uppercase tracking-[0.08em]">
-            <span class="text-[var(--color-muted)]">{c.hero.mockTitle}</span>
-            <span class="text-[var(--color-accent)]">{c.hero.mockSample}</span>
-          </figcaption>
-          <div class="h-[420px] overflow-hidden rounded-2xl sm:h-[500px]">
+        <figure class="nx-panel hero-log nx-rise m-0" style="--d:3">
+          <div class="log-host" aria-label={`${c.hero.mockTitle} · ${c.hero.mockSample}`}>
             <LogExplorerMock client:visible />
           </div>
-          <p class="mt-3 text-xs text-[var(--color-dim)]">{c.hero.mockNote}</p>
+          <figcaption class="log-note"><span class="text-[var(--color-accent)]">{c.hero.mockSample}</span> · {c.hero.mockNote}</figcaption>
         </figure>
       </div>
     </section>
@@ -135,4 +104,39 @@ const delay = (i: number) => `animation-delay: ${i * 90}ms;`;
     </section>
   </main>
   <SiteFooter />
+  <NeonMotion />
 </Base>
+
+<style>
+  .hero-pills {
+    margin: 28px 0 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .hero-pills li {
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    padding: 3px 12px;
+    font-size: 12px;
+    color: #c3c7ce;
+  }
+  .log-host {
+    height: 440px;
+    overflow: hidden;
+  }
+  /* The mock brings its own card; inside the window it only needs its content */
+  .log-host :global(> div) {
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+  }
+  .log-note {
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 10px 16px;
+    font-size: 12px;
+    color: var(--color-dim);
+  }
+</style>
