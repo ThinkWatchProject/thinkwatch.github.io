@@ -124,17 +124,23 @@ const archLabel = { x64: "x64", arm64: "ARM64" } as const;
 
     <div class="container-page">
       <div
-        class="reveal flex flex-col items-start gap-3 rounded-[14px] border border-[var(--color-border-strong)] bg-[var(--color-surface)] px-5 py-5 sm:flex-row sm:items-center sm:gap-7 sm:px-7 sm:py-6"
+        class="reveal flex flex-col items-start gap-4 rounded-[14px] border border-[var(--color-border-strong)] bg-[var(--color-surface)] px-5 py-5 sm:px-7 sm:py-6 lg:flex-row lg:gap-8"
         style={delay(5)}
       >
         <span class="shrink-0 rounded-full bg-[var(--color-brand-1)] px-3 py-1.5 font-mono text-xs font-medium uppercase tracking-[0.06em] text-[var(--color-bg)]">
           {c.status.badge}
         </span>
-        <ul class="m-0 flex list-none flex-wrap gap-x-5 gap-y-2 p-0 font-mono text-[13px] text-[#cbd5e1] sm:text-sm">
+        {/* 每栏一个标签：外人一眼看出哪几项是平台、哪一项是语言或许可证 */}
+        <dl class="m-0 grid w-full gap-x-8 gap-y-4 sm:grid-cols-2 lg:grid-cols-[minmax(0,1.6fr)_repeat(3,minmax(0,1fr))]">
           {c.status.items.map((item) => (
-            <li>{item}</li>
+            <div class="flex min-w-0 flex-col gap-1">
+              <dt class="text-[13px] text-[var(--color-muted)]">{item.label}</dt>
+              {item.lines.map((line) => (
+                <dd class="m-0 text-[15px] leading-relaxed text-[#cbd5e1]">{line}</dd>
+              ))}
+            </div>
           ))}
-        </ul>
+        </dl>
       </div>
     </div>
 
