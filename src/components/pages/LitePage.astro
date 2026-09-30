@@ -67,7 +67,6 @@ const h2 = zh
   : "font-display m-0 text-[30px] leading-[1.15] sm:text-[36px] lg:text-[40px]";
 const textLink =
   "inline-flex min-h-11 items-center text-[17px] font-medium text-[var(--color-brand-1)] transition-colors hover:text-[var(--color-brand-2)]";
-const nodes = [c.built.lite, c.built.core, c.built.upstreams];
 /** 截图外的一圈：和窗口自带的阴影配合，不再加边框 */
 const shotClass = "w-full rounded-[10px]";
 const archLabel = { x64: "x64", arm64: "ARM64" } as const;
@@ -234,51 +233,59 @@ const archLabel = { x64: "x64", arm64: "ARM64" } as const;
     </section>
 
     <section class="bg-[var(--color-surface)] py-16 sm:py-20 lg:py-[88px]" aria-labelledby="lite-built">
-      <div class="container-page">
-        <h2 id="lite-built" class:list={[eyebrow, "m-0 font-normal"]}>{c.built.eyebrow}</h2>
-        <div class="mt-8 grid items-stretch lg:mt-10 lg:grid-cols-[minmax(0,1fr)_216px_minmax(0,1fr)_96px_minmax(0,1fr)] lg:items-center">
-          {nodes.map((node, i) => (
+      <div class="container-page flex flex-col gap-10">
+        <div class="flex max-w-[46rem] flex-col gap-3">
+          <p class:list={[eyebrow, "m-0"]}>{c.built.eyebrow}</p>
+          <h2 id="lite-built" class={h2}>{c.built.title}</h2>
+          <p class="m-0 text-base leading-relaxed text-[var(--color-muted)] sm:text-[17px]">{c.built.intro}</p>
+        </div>
+        {/* 三个节点等高；连线上各一个标签，第一条（应用到 core）带流动的点 */}
+        <div class="grid items-stretch lg:grid-cols-[minmax(0,1fr)_minmax(140px,180px)_minmax(0,1fr)_minmax(120px,150px)_minmax(0,1fr)]">
+          {c.built.nodes.map((node, i) => (
             <Fragment>
               {i > 0 && (
-                <div
-                  class="flow-link relative flex flex-col items-center justify-center gap-3 py-3 lg:py-0"
-                  data-active={i === 1 ? "true" : undefined}
-                  aria-hidden={i === 1 ? undefined : "true"}
-                >
+                <div class="flow-link relative flex items-center justify-center py-8 lg:py-0" aria-hidden={i === 1 ? undefined : "true"}>
                   <div
                     class:list={[
-                      "flow-line relative h-10 w-px lg:h-px lg:w-full",
+                      "flow-line absolute left-1/2 top-0 h-full w-px -translate-x-1/2 lg:left-0 lg:top-1/2 lg:h-px lg:w-full lg:translate-x-0 lg:-translate-y-1/2",
                       i === 1 ? "bg-[var(--color-brand-1)]" : "bg-[var(--color-border-strong)]",
                     ]}
                   >
                     {i === 1 && <span class="flow-dot" aria-hidden="true"></span>}
                   </div>
-                  {/* The channel between the app and core: under the line when the nodes sit
-                      side by side, below the vertical line when they are stacked. */}
-                  {i === 1 && (
-                    <div class="text-center font-mono text-xs leading-relaxed text-[var(--color-muted)] lg:absolute lg:inset-x-2 lg:top-[calc(50%+12px)]">
-                      <p class="m-0 text-[var(--color-text)]">{c.built.link.title}</p>
-                      <ul class="m-0 list-none p-0">
-                        {c.built.link.lines.map((line) => (
-                          <li>{line}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
+                  <span
+                    class:list={[
+                      "relative whitespace-nowrap rounded-full border bg-[var(--color-surface)] px-3 py-1 text-[13px]",
+                      i === 1
+                        ? "border-[var(--color-brand-1)]/60 text-[var(--color-brand-1)]"
+                        : "border-[var(--color-border-strong)] text-[var(--color-muted)]",
+                    ]}
+                  >
+                    {c.built.links[i - 1]}
+                  </span>
                 </div>
               )}
               <div
                 class:list={[
-                  "flex flex-col gap-2.5 rounded-[14px] border bg-[var(--color-bg)]/30 p-6 sm:p-7",
-                  i === 0 ? "border-[var(--color-brand-1)]" : "border-[var(--color-border-strong)]",
+                  "flex flex-col gap-3 rounded-[14px] border bg-[var(--color-bg)]/40 p-6 sm:p-7",
+                  i === 0 ? "border-[var(--color-brand-1)]/70" : "border-[var(--color-border-strong)]",
                 ]}
               >
+                <p class="m-0 text-[13px] text-[var(--color-muted)]">{node.role}</p>
                 <h3 class="m-0 text-xl font-semibold sm:text-[22px]">{node.title}</h3>
-                <p class="m-0 text-[15px] leading-normal text-[var(--color-muted)]">{node.body}</p>
+                <ul class="m-0 flex list-none flex-col gap-2 p-0">
+                  {node.items.map((item) => (
+                    <li class="flex items-start gap-2.5 text-[15px] leading-snug text-[#cbd5e1]">
+                      <span class="mt-[0.45em] size-1.5 shrink-0 rounded-full bg-[var(--color-brand-1)]/80" aria-hidden="true"></span>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
               </div>
             </Fragment>
           ))}
         </div>
+        <p class="m-0 max-w-[52rem] text-[15px] leading-relaxed text-[var(--color-muted)]">{c.built.note}</p>
       </div>
     </section>
 

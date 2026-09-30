@@ -139,22 +139,15 @@ export const liteCopy = {
     },
     built: {
       eyebrow: "Architecture",
-      lite: {
-        title: "ThinkWatch Lite",
-        body: "A Tauri 2 shell with a React 19 window. It starts and supervises the local core or connects to a core on a server, and renders the menu bar on macOS and the tray menu on Windows and Linux.",
-      },
-      link: {
-        title: "Control channel",
-        lines: ["macOS and Linux: Unix socket", "Windows: loopback port", "Remote core: TCP port", "Every connection: encrypted handshake"],
-      },
-      core: {
-        title: "ThinkWatch Core",
-        body: "The gateway, twcore: routing, forwarding, format conversion, cost accounting and the security protections. It runs beside the app or as a systemd service on a Linux server; Lite contains none of this logic.",
-      },
-      upstreams: {
-        title: "Upstreams",
-        body: "The Anthropic, OpenAI and Gemini APIs, accounts signed in from the app, relays and local models.",
-      },
+      title: "The app is the interface; the gateway is ThinkWatch Core",
+      intro: "Lite holds no routing, forwarding or accounting logic. All of it is in ThinkWatch Core, which runs beside the app or on a Linux server.",
+      nodes: [
+        { role: "Desktop app", title: "ThinkWatch Lite", items: ["Main window, menu bar and tray", "Starts and supervises the local core", "Or connects to a core on a server"] },
+        { role: "Gateway", title: "ThinkWatch Core", items: ["Routing, failover and format conversion", "Cost accounting and request records", "The five security protections"] },
+        { role: "Upstreams", title: "Model services", items: ["Anthropic, OpenAI and Gemini APIs", "Amazon Bedrock and signed-in accounts", "Relays and local models"] },
+      ],
+      links: ["Encrypted control channel", "Forwards requests"],
+      note: "The control channel is a Unix socket on macOS and Linux, a loopback port on Windows and a TCP port to a core on a server; every connection is encrypted and authenticated by a Noise handshake.",
     },
     install: {
       eyebrow: "Install",
@@ -324,22 +317,15 @@ export const liteCopy = {
     },
     built: {
       eyebrow: "架构",
-      lite: {
-        title: "ThinkWatch Lite",
-        body: "Tauri 2 外壳与 React 19 窗口。负责启动并托管本机的 core，或连接服务器上的 core；在 macOS 上渲染菜单栏，在 Windows 与 Linux 上渲染托盘菜单。",
-      },
-      link: {
-        title: "控制通道",
-        lines: ["macOS、Linux：unix socket", "Windows：本机回环端口", "远程 core：TCP 端口", "每条连接都经加密握手"],
-      },
-      core: {
-        title: "ThinkWatch Core",
-        body: "网关本体 twcore，负责路由、转发、格式转换、成本核算与安全防护。它随应用在本机运行，也可以作为 systemd 服务运行在 Linux 服务器上；Lite 不包含这些逻辑。",
-      },
-      upstreams: {
-        title: "上游服务",
-        body: "Anthropic、OpenAI 与 Gemini API，在应用内登录的账号，以及中转服务与本机模型。",
-      },
+      title: "应用负责界面，网关是 ThinkWatch Core",
+      intro: "Lite 不含路由、转发与计费逻辑，这些都在 ThinkWatch Core 中；core 随应用在本机运行，也可以部署在 Linux 服务器上。",
+      nodes: [
+        { role: "桌面应用", title: "ThinkWatch Lite", items: ["主窗口、菜单栏与托盘", "启动并守护本机的 core", "或连接服务器上的 core"] },
+        { role: "网关", title: "ThinkWatch Core", items: ["路由、故障转移与格式转换", "费用核算与请求记录", "五项安全防护"] },
+        { role: "上游", title: "模型服务", items: ["Anthropic、OpenAI、Gemini API", "Amazon Bedrock 与登录的账号", "中转服务与本机模型"] },
+      ],
+      links: ["加密控制通道", "转发请求"],
+      note: "控制通道在 macOS 与 Linux 上是 unix socket，在 Windows 上是本机回环端口，连接服务器时是 TCP 端口；每条连接都经 Noise 握手加密与认证。",
     },
     install: {
       eyebrow: "安装",
