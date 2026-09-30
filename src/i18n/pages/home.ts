@@ -81,11 +81,11 @@ export const homeCopy = {
       title: "A local gateway for Claude Code, Codex and other AI clients",
       points: [
         { t: "Connect once, switch freely", b: "Each client is pointed at the gateway once; upstreams and models then change in the gateway, with no client to reconfigure or restart." },
-        { t: "Keys replaced before sending", b: "Outbound redaction can replace credentials before a request leaves, tool-call inspection can cut off dangerous commands, and MCP servers, skills and hooks are scanned." },
+        { t: "Protection against relays", b: "Credentials can be replaced before a request leaves, so a relay never holds them, and dangerous tool calls a relay slips into an answer can be cut off before the client runs them. MCP servers, skills and hooks are scanned as well." },
         { t: "Every request traceable", b: "The matched rule, each upstream attempt and the cost of every request, with replay against another upstream." },
         { t: "Costs stated as they are", b: "Estimated amounts are marked, and requests without a price are counted separately rather than as zero." },
       ],
-      pills: ["Available", "macOS · Apple silicon", "Windows · x64 · ARM64", "Linux · x86_64 · aarch64", "MIT"],
+      pills: ["Available", "macOS (Apple silicon)", "Windows (x64, ARM64)", "Linux (x86_64, aarch64)", "MIT open source"],
       shotAlt:
         "The Overview page for the last 7 days: 83.1M tokens, $68.11 in cost including $0.441 estimated and 13 unpriced requests, and 1,339 requests of which 11 failed, each compared with the prior 7 days; a token trend stacked by model with the periods that had failures marked; and the models ranked by tokens",
       cta: "Explore ThinkWatch Lite",
@@ -114,13 +114,13 @@ export const homeCopy = {
       lite: {
         runsAs: "Desktop app in the macOS menu bar, the Windows notification area or the Linux system tray",
         builtFor: "Individual developers",
-        status: "Available · macOS on Apple silicon, Homebrew or disk image · Windows on x64 or ARM64, installer · Linux on x86_64 or aarch64, AppImage",
+        status: "Available for macOS on Apple silicon (Homebrew or disk image), Windows on x64 or ARM64 (installer) and Linux on x86_64 or aarch64 (AppImage)",
         license: "MIT",
       },
       core: {
         runsAs: "Rust crates and the twcore binary, inside ThinkWatch Lite or as a systemd service on a Linux server",
         builtFor: "Developers who build on the engine or run the gateway on a server",
-        status: "Released · prebuilt binaries for macOS, Windows and Linux · one-command install on Linux servers",
+        status: "Released, with prebuilt binaries for macOS, Windows and Linux and a one-command install for Linux servers",
         license: "MIT",
       },
       link: "Full licensing details",
@@ -205,11 +205,11 @@ export const homeCopy = {
       title: "Claude Code、Codex 等 AI 客户端的本地网关",
       points: [
         { t: "一次接入，随时切换", b: "客户端只需接入一次，此后在网关中更换上游与模型，客户端无需改配置或重启。" },
-        { t: "发出前替换密钥", b: "出站脱敏可在请求发出前替换其中的凭据，工具调用审查可切断危险命令，MCP 服务器、技能与钩子也会被扫描。" },
+        { t: "防范中转站", b: "请求发出前可替换其中的凭据，中转站拿不到原值；中转站在回答中塞入的危险工具调用，可在客户端执行前切断。MCP 服务器、技能与钩子也会被扫描。" },
         { t: "每个请求都可追溯", b: "每个请求命中的规则、尝试过的上游与费用都有记录，也可以重放到另一个上游对比。" },
         { t: "费用如实计算", b: "估算的金额单独标注，无法计价的请求单独计数，不按零计入。" },
       ],
-      pills: ["已发布", "macOS · Apple silicon", "Windows · x64 · ARM64", "Linux · x86_64 · aarch64", "MIT"],
+      pills: ["已发布", "macOS（Apple silicon）", "Windows（x64、ARM64）", "Linux（x86_64、aarch64）", "MIT 开源"],
       shotAlt:
         "概览页（最近 7 天）：token 83.1M、费用 $68.11（含估算 $0.441，13 条无法计价）、请求 1,339 次（失败 11 次），均与上一个 7 天对比；按模型分层的 token 趋势，并标出存在失败的时段；以及按 token 排序的模型列表",
       cta: "了解 ThinkWatch Lite",
@@ -238,13 +238,13 @@ export const homeCopy = {
       lite: {
         runsAs: "桌面应用，常驻 macOS 菜单栏、Windows 通知区域或 Linux 系统托盘",
         builtFor: "个人开发者",
-        status: "已发布 · macOS（Apple silicon）：Homebrew 或磁盘映像 · Windows（x64、ARM64）：安装程序 · Linux（x86_64、aarch64）：AppImage",
+        status: "已发布：macOS（Apple silicon）用 Homebrew 或磁盘映像安装，Windows（x64、ARM64）用安装程序，Linux（x86_64、aarch64）用 AppImage",
         license: "MIT",
       },
       core: {
         runsAs: "Rust crate 与 twcore 二进制，随 ThinkWatch Lite 运行，或作为 systemd 服务运行在 Linux 服务器上",
         builtFor: "基于该引擎开发，或在服务器上运行网关的开发者",
-        status: "已发布 · 提供 macOS、Windows 与 Linux 的预编译二进制 · Linux 服务器可一条命令安装",
+        status: "已发布，提供 macOS、Windows 与 Linux 的预编译二进制，Linux 服务器可一条命令安装",
         license: "MIT",
       },
       link: "查看完整许可证说明",

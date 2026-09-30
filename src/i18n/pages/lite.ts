@@ -22,13 +22,13 @@ export const liteCopy = {
     meta: {
       title: "ThinkWatch Lite — Local gateway for Claude Code, Codex and other AI clients",
       description:
-        "A local gateway for Claude Code, Codex and other AI clients on macOS, Windows and Linux. Connect each client once and switch upstreams freely, replace API keys before a request leaves, stop dangerous tool calls, and see the cost and route of every request. MIT License.",
+        "A local gateway for Claude Code, Codex and other AI clients on macOS, Windows and Linux. Connect each client once and switch upstreams freely, replace API keys before a request leaves, cut off dangerous tool calls a relay slips into an answer, and see the cost and route of every request. MIT License.",
     },
     hero: {
       eyebrow: "ThinkWatch Lite · For individual developers",
       titleA: "A local gateway for ",
       titleHighlight: "Claude Code, Codex and other AI clients",
-      sub: "Each client is connected once; after that, upstreams and models change without touching its configuration. Every request is recorded with its cost and route, and the API keys in it can be replaced before it leaves the machine. For macOS, Windows and Linux, under the MIT License.",
+      sub: "Each client is connected once; after that, upstreams and models change without touching its configuration. Every request is recorded with its cost and route; the API keys in it can be replaced before it leaves the machine, and dangerous tool calls a relay slips into an answer can be cut off before the client runs them. For macOS, Windows and Linux, under the MIT License.",
       ctaSecondary: "Other platforms and installation methods",
       shotAlt: overviewAlt.en,
     },
@@ -55,8 +55,8 @@ export const liteCopy = {
         },
         {
           id: "security",
-          title: "Keys replaced before sending, dangerous commands stopped",
-          body: "Outbound redaction swaps API keys, private keys, JWTs and connection-string passwords for placeholders before a request leaves and restores them in the response, so a relay never sees the real values. Tool-call inspection cuts off download-and-run commands and similar calls before the client can run them, and hidden characters and prompt injection can be refused. The five protections start in Observe, recording without changing anything, and each switches to Enforce on its own.",
+          title: "Protection against relays: keys replaced, malicious tool calls cut off",
+          body: "A relay sees every request in full and can rewrite every answer. Outbound redaction swaps API keys, private keys, JWTs and connection-string passwords for placeholders before a request leaves and restores them in the response, so the relay never holds the real values. When an answer carries a tool call that downloads and runs code, sends out environment variables or credential files, reads private keys or installs a startup item or scheduled job, tool-call inspection cuts the answer off before the client can run it; hidden characters and prompt injection can be refused as well. The five protections start in Observe, recording without changing anything, and each switches to Enforce on its own.",
           alt: "The Security page log: credentials replaced before a request left, one of them matched by a custom rule; a download-and-run tool call cut off; and hidden characters, a delete command and an injected instruction recorded, each with the key, client, model and upstream of its request",
         },
         {
@@ -145,7 +145,7 @@ export const liteCopy = {
       },
       link: {
         title: "Control channel",
-        lines: ["Unix socket · macOS, Linux", "Loopback port · Windows", "TCP port · remote core", "Encrypted handshake on each"],
+        lines: ["macOS and Linux: Unix socket", "Windows: loopback port", "Remote core: TCP port", "Every connection: encrypted handshake"],
       },
       core: {
         title: "ThinkWatch Core",
@@ -200,13 +200,13 @@ export const liteCopy = {
     meta: {
       title: "ThinkWatch Lite — Claude Code、Codex 等 AI 客户端的本地网关",
       description:
-        "Claude Code、Codex 等 AI 客户端的本地网关，支持 macOS、Windows 与 Linux。客户端接入一次即可随时切换上游，请求发出前可替换其中的 API 密钥、切断危险的工具调用，每个请求的费用与去向都有记录。MIT 开源。",
+        "Claude Code、Codex 等 AI 客户端的本地网关，支持 macOS、Windows 与 Linux。客户端接入一次即可随时切换上游，请求发出前可替换其中的 API 密钥，中转站塞入的危险工具调用可在执行前切断，每个请求的费用与去向都有记录。MIT 开源。",
     },
     hero: {
       eyebrow: "ThinkWatch Lite · 面向个人开发者",
       titleA: "Claude Code、Codex 等 AI 客户端的",
       titleHighlight: "本地网关",
-      sub: "客户端只需接入一次，此后更换上游或模型无需改动客户端配置。每个请求的费用与去向都有记录，发出前可替换其中的 API 密钥。支持 macOS、Windows 与 Linux，MIT 开源。",
+      sub: "客户端只需接入一次，此后更换上游或模型无需改动客户端配置。每个请求的费用与去向都有记录；发出前可替换其中的 API 密钥，中转站在回答中塞入的危险工具调用也可以在客户端执行前拦下。支持 macOS、Windows 与 Linux，MIT 开源。",
       ctaSecondary: "其他平台与安装方式",
       shotAlt: overviewAlt["zh-CN"],
     },
@@ -233,8 +233,8 @@ export const liteCopy = {
         },
         {
           id: "security",
-          title: "发出前替换密钥，拦下危险命令",
-          body: "出站脱敏在请求发出前把 API 密钥、私钥、JWT 与连接串口令换成占位符，并在响应中还原，中转服务看不到原值。工具调用审查在客户端执行之前切断下载即执行等危险命令，隐藏字符与提示注入也可以直接拒绝。五项防护出厂只记录、不改动请求，逐项切换到拦截即可生效。",
+          title: "防范中转站：替换密钥，拦截恶意工具调用",
+          body: "中转站能看到请求的全部内容，也能改写每一次回答。出站脱敏在请求发出前把 API 密钥、私钥、JWT 与连接串口令换成占位符，并在响应中还原，中转站拿不到原值。回答中若出现下载即执行、外发环境变量或凭据文件、读取私钥、写入开机启动项或定时任务之类的工具调用，工具调用审查会在客户端执行之前切断回答；隐藏字符与提示注入也可以直接拒绝。五项防护出厂只记录、不改动请求，逐项切换到拦截即可生效。",
           alt: "安全页日志：请求发出前替换的凭据（其中一条由自定义规则命中）、被切断的下载即执行工具调用，以及记录在案的隐藏字符、删除命令与注入指令，每条都注明所属请求的密钥、客户端、模型与上游",
         },
         {
@@ -323,7 +323,7 @@ export const liteCopy = {
       },
       link: {
         title: "控制通道",
-        lines: ["unix socket · macOS、Linux", "回环端口 · Windows", "TCP 端口 · 远程 core", "均经加密握手"],
+        lines: ["macOS、Linux：unix socket", "Windows：本机回环端口", "远程 core：TCP 端口", "每条连接都经加密握手"],
       },
       core: {
         title: "ThinkWatch Core",
