@@ -1,5 +1,6 @@
 ---
-// A shell command with a copy button: the command scrolls, the button stays.
+// A shell command with a copy button. A long command wraps rather than
+// scrolling out of sight, so the whole of it can be read before it is run.
 // Used for the twcore install command on the Core page and on the home page.
 import { getLang, t } from "~/i18n";
 
@@ -17,9 +18,8 @@ const ui = t(getLang(Astro)).common;
   class="flex min-w-0 items-center rounded-[14px] border border-[var(--color-border-strong)] bg-[var(--color-surface)] font-mono leading-relaxed"
   data-copy-command
 >
-  <code class:list={["min-w-0 flex-1 overflow-x-auto whitespace-nowrap p-5 sm:p-6", className]}>
-    <span class="select-none text-[var(--color-dim)]">$ </span><span data-cmd>{command}</span>
-  </code>
+  {/* One line: the command wraps with white-space: pre-wrap, which would keep indentation as a leading space */}
+  <code class:list={["min-w-0 flex-1 whitespace-pre-wrap break-all p-5 sm:p-6", className]}><span class="select-none text-[var(--color-dim)]">$ </span><span data-cmd>{command}</span></code>
   <button type="button" class="copy-button" data-copy={command} data-copied-label={ui.copied}>{ui.copy}</button>
 </div>
 

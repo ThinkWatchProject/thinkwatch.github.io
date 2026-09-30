@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { spanClass } from "~/lib/grid";
 
 export type FeatureModule = {
   id: string;
@@ -42,16 +43,16 @@ export default function Features({ modules }: { modules: readonly FeatureModule[
       </div>
 
       <div className="mt-10 mb-8 max-w-2xl">
-        <p className="text-2xl md:text-3xl font-semibold tracking-tight text-gradient">
+        <p className="text-2xl md:text-3xl font-semibold tracking-tight text-gradient [text-wrap:balance]">
           {current.tagline}
         </p>
       </div>
 
-      <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-6">
         {current.bullets.map((b, i) => (
           <div
             key={b.title}
-            className="group rounded-xl border border-white/10 bg-[var(--color-surface)]/60 p-6 hover:border-white/25 transition-colors animate-[fadeUp_400ms_ease-out_both]"
+            className={`group rounded-xl border border-white/10 bg-[var(--color-surface)]/60 p-6 hover:border-white/25 transition-colors animate-[fadeUp_400ms_ease-out_both] ${spanClass(i, current.bullets.length)}`}
             style={{ animationDelay: `${i * 60}ms` }}
           >
             <div className="flex items-center justify-between mb-4">

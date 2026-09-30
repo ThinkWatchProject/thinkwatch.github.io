@@ -1,9 +1,9 @@
 # Crate layers
 
-ThinkWatch Core consists of sixteen crates and one binary, `twcore`. The workspace divides the crates in two: the three that ThinkWatch Enterprise depends on, and the crates of the gateway that `twcore` runs, which ThinkWatch Enterprise does not use. Within the second part, the crates are grouped by role.
+ThinkWatch Core consists of seventeen crates and one binary, `twcore`. The workspace divides the crates in two: the four that ThinkWatch Enterprise depends on, and the crates of the gateway that `twcore` runs, which ThinkWatch Enterprise does not use. Within the second part, the crates are grouped by role.
 
 ```
-tw-dialect · tw-guard · tw-breaker                                   ← shared with ThinkWatch Enterprise
+tw-dialect · tw-guard · tw-breaker · tw-bedrock                      ← shared with ThinkWatch Enterprise
 tw-types · tw-engine · tw-pricing · tw-yaml · tw-secret · tw-watch   ← domain logic
 tw-api · tw-link                                                     ← control-plane contract
 tw-config · tw-store · tw-observe                                    ← assembly
@@ -17,6 +17,7 @@ No crate depends on a group below its own.
 | Shared with ThinkWatch Enterprise | `tw-dialect` | Conversion of requests, responses and streams between Anthropic Messages, OpenAI Chat Completions, OpenAI Responses and Gemini; usage parsing |
 | | `tw-guard` | Outbound redaction and restoration, inspection of the tool calls an upstream returns, hidden characters, content filtering and the output length limit |
 | | `tw-breaker` | The circuit-breaker state machine |
+| | `tw-bedrock` | Amazon Bedrock on the wire: SigV4 signing, event-stream framing, addresses and the model catalog |
 | Domain logic | `tw-types` | Messages for people: a stable code, its arguments and the English sentence |
 | | `tw-engine` | The routing rule engine and strategy groups |
 | | `tw-pricing` | The public price table, price sheets, and cost in three states: measured, estimated and unpriced |
@@ -33,7 +34,7 @@ No crate depends on a group below its own.
 
 ## Shared with ThinkWatch Enterprise
 
-ThinkWatch Enterprise depends on the first group and nothing else: format conversion and usage parsing (`tw-dialect`), the guards (`tw-guard`) and the circuit breaker (`tw-breaker`). These three depend only on each other, which a test in `tw-dialect` enforces, and CI builds ThinkWatch Enterprise against every change to them. A component that only one product uses lives in that product's repository rather than in Core.
+ThinkWatch Enterprise depends on the first group and nothing else: format conversion and usage parsing (`tw-dialect`), the guards (`tw-guard`), the circuit breaker (`tw-breaker`) and Amazon Bedrock's wire protocol (`tw-bedrock`). These four depend only on each other, which a test in `tw-dialect` enforces, and CI builds ThinkWatch Enterprise against every change to them. A component that only one product uses lives in that product's repository rather than in Core.
 
 ## Used by ThinkWatch Lite
 

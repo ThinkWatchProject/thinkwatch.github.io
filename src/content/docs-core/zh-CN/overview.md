@@ -1,6 +1,6 @@
 # ThinkWatch Core
 
-ThinkWatch Core 是 ThinkWatch 各产品共用的网关引擎，由一组采用 MIT 许可证的 Rust crate 和独立运行的 AI API 网关二进制 `twcore` 组成。`twcore` 是桌面应用 [ThinkWatch Lite](/zh-CN/docs/lite) 内置的网关，也可以作为 systemd 服务独立运行在 Linux 服务器上。ThinkWatch 企业版依赖其中的三个 crate：`tw-dialect`、`tw-guard` 与 `tw-breaker`。
+ThinkWatch Core 是 ThinkWatch 各产品共用的网关引擎，由一组采用 MIT 许可证的 Rust crate 和独立运行的 AI API 网关二进制 `twcore` 组成。`twcore` 是桌面应用 [ThinkWatch Lite](/zh-CN/docs/lite) 内置的网关，也可以作为 systemd 服务独立运行在 Linux 服务器上。ThinkWatch 企业版依赖其中的四个 crate：`tw-dialect`、`tw-guard`、`tw-breaker` 与 `tw-bedrock`。
 
 ## Core 的定位
 

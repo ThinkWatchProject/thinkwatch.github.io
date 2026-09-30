@@ -22,7 +22,7 @@
 curl -fsSL https://raw.githubusercontent.com/ThinkWatchProject/ThinkWatch-Core/main/scripts/install.sh | sudo sh
 ```
 
-如需从源码构建，需要 Rust 稳定版工具链（1.85 或更新）：
+如需从源码构建，需要 Rust 稳定版工具链（1.94.1 或更新）：
 
 ```sh
 git clone https://github.com/ThinkWatchProject/ThinkWatch-Core.git

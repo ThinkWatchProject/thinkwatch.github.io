@@ -22,7 +22,7 @@ On a Linux server, the install script does this in one step, and also creates a 
 curl -fsSL https://raw.githubusercontent.com/ThinkWatchProject/ThinkWatch-Core/main/scripts/install.sh | sudo sh
 ```
 
-To build from source instead, with a stable Rust toolchain (1.85 or newer):
+To build from source instead, with a stable Rust toolchain (1.94.1 or newer):
 
 ```sh
 git clone https://github.com/ThinkWatchProject/ThinkWatch-Core.git

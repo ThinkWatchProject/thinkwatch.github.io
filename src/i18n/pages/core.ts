@@ -2,7 +2,7 @@
 // README and CONTRIBUTING (what the crates do, how releases are built), the
 // workspace Cargo.toml and each crate's dependencies (the groups under "Crate
 // layers"), docs/server.md and scripts/install.sh (server deployment), and from
-// ThinkWatch Enterprise's Cargo.toml for the three crates it depends on.
+// ThinkWatch Enterprise's Cargo.toml for the four crates it depends on.
 //
 // meta.twcoreDescription describes the twcore binary in the structured data
 // (src/lib/structured-data.ts); the build fails without it.
@@ -20,7 +20,7 @@ export const coreCopy = {
       eyebrow: "ThinkWatch Core · Gateway engine",
       titleA: "An AI API gateway engine ",
       titleHighlight: "for desktops and servers",
-      sub: "MIT-licensed Rust crates and the twcore binary. twcore is the gateway inside ThinkWatch Lite, and runs on its own as a systemd service on a Linux server, managed from ThinkWatch Lite over an encrypted control channel. ThinkWatch Enterprise uses its format-conversion, guard and circuit-breaker crates.",
+      sub: "MIT-licensed Rust crates and the twcore binary. twcore is the gateway inside ThinkWatch Lite, and runs on its own as a systemd service on a Linux server, managed from ThinkWatch Lite over an encrypted control channel. ThinkWatch Enterprise uses its format-conversion, guard, circuit-breaker and Bedrock crates.",
       ctaInstall: "Install twcore",
       ctaDocs: "Core documentation",
       ctaGithub: "View on GitHub",
@@ -40,7 +40,7 @@ export const coreCopy = {
         },
         {
           title: "Failover before the first byte",
-          body: "Until the first byte reaches the client, a failing upstream is replaced by the next one without the client noticing; after that point, the failure is reported. A circuit breaker keeps requests away from an upstream that keeps failing.",
+          body: "Until the first byte reaches the client, a failing upstream is replaced by the next one without the client noticing; after that point, the failure is reported. A failing upstream is paused for as long as its reason calls for: an exhausted balance, a used-up quota until its reset, a rate limit for the wait it asks.",
         },
         {
           title: "Cost accounting",
@@ -48,11 +48,11 @@ export const coreCopy = {
         },
         {
           title: "Outbound redaction",
-          body: "Credentials in a request are replaced with placeholders before the request leaves, and restored when the model echoes them back.",
+          body: "A relay sees every request in full. Credentials in a request can be replaced with placeholders before it leaves, so the relay never holds the real values, and are restored where the answer repeats them.",
         },
         {
-          title: "Tool-call inspection",
-          body: "Tool calls returned by a model are checked against rules, and a dangerous call can be cut off mid-stream. Together with checks for hidden characters, content rules and an output limit, these form five guards, each set to off, observe or enforce.",
+          title: "Malicious tool calls cut off",
+          body: "A relay can rewrite an answer and slip in a tool call for the client to run. Tool calls in an answer are checked against rules for download-and-run, sending out credentials and similar commands, and a dangerous call can be cut off mid-stream. Together with checks for hidden characters, content rules and an output limit, these form five guards, each set to off, observe or enforce.",
         },
         {
           title: "Encrypted control plane",
@@ -94,7 +94,7 @@ export const coreCopy = {
       releases: "All releases",
       version: "Version",
       sourceTitle: "Build from source",
-      sourceBody: "With a stable Rust toolchain, 1.85 or newer. The binary is written to target/release/twcore.",
+      sourceBody: "With a stable Rust toolchain, 1.94.1 or newer. The binary is written to target/release/twcore.",
     },
     layers: {
       eyebrow: "Crate layers",
@@ -102,14 +102,14 @@ export const coreCopy = {
       sharedTag: "Also used by ThinkWatch Enterprise",
       localNote: "Single-machine implementation",
       rows: [
-        { name: "Conversion, guards and circuit breaker", crates: "tw-dialect · tw-guard · tw-breaker", mark: "shared" },
+        { name: "Conversion, guards, circuit breaker and Bedrock", crates: "tw-dialect · tw-guard · tw-breaker · tw-bedrock", mark: "shared" },
         { name: "Domain logic", crates: "tw-types · tw-engine · tw-pricing · tw-yaml · tw-secret · tw-watch", mark: null },
         { name: "Control-plane contract", crates: "tw-api · tw-link", mark: null },
         { name: "Assembly", crates: "tw-config · tw-store · tw-observe", mark: "local" },
         { name: "Data plane and control plane", crates: "tw-gateway · tw-control", mark: "local" },
       ],
       footnote:
-        "ThinkWatch Enterprise depends on the first group and nothing else. Those three crates depend only on each other, which a test enforces, and CI builds ThinkWatch Enterprise against every change to them. No crate depends on a group below its own. The last two groups are the single-machine implementation (SQLite, the local control channel and the optional remote port) and are intentionally not shared: single-machine SQLite and multi-tenant Postgres differ too much for one abstraction to serve both.",
+        "ThinkWatch Enterprise depends on the first group and nothing else. Those four crates depend only on each other, which a test enforces, and CI builds ThinkWatch Enterprise against every change to them. No crate depends on a group below its own. The last two groups are the single-machine implementation (SQLite, the local control channel and the optional remote port) and are intentionally not shared: single-machine SQLite and multi-tenant Postgres differ too much for one abstraction to serve both.",
       docs: "Crate layers in detail",
     },
     dev: {
@@ -138,7 +138,7 @@ export const coreCopy = {
       eyebrow: "ThinkWatch Core · 网关引擎",
       titleA: "适用于桌面与服务器的 ",
       titleHighlight: "AI API 网关引擎",
-      sub: "采用 MIT 许可证的 Rust crate 与 twcore 二进制。twcore 是 ThinkWatch Lite 内置的网关，也可以作为 systemd 服务独立运行在 Linux 服务器上，由 ThinkWatch Lite 通过加密的控制通道远程管理。ThinkWatch 企业版使用其中的格式转换、防护与熔断 crate。",
+      sub: "采用 MIT 许可证的 Rust crate 与 twcore 二进制。twcore 是 ThinkWatch Lite 内置的网关，也可以作为 systemd 服务独立运行在 Linux 服务器上，由 ThinkWatch Lite 通过加密的控制通道远程管理。ThinkWatch 企业版使用其中的格式转换、防护、熔断与 Bedrock crate。",
       ctaInstall: "安装 twcore",
       ctaDocs: "Core 文档",
       ctaGithub: "在 GitHub 上查看",
@@ -158,7 +158,7 @@ export const coreCopy = {
         },
         {
           title: "首字节前的故障转移",
-          body: "首字节到达客户端之前，出错的上游由下一个上游替换，客户端无从察觉；此后发生的故障如实报告。熔断器使持续出错的上游暂不接收请求。",
+          body: "首字节到达客户端之前，出错的上游由下一个上游替换，客户端无从察觉；此后发生的故障如实报告。出错的上游按原因暂停：余额不足、额度用完（到重置时间为止）与限流（按上游要求的等待时间）各有时长。",
         },
         {
           title: "费用核算",
@@ -166,11 +166,11 @@ export const coreCopy = {
         },
         {
           title: "出站脱敏",
-          body: "请求发出之前，其中的凭据替换为占位符；模型回显时再恢复原值。",
+          body: "中转站能看到请求的全部内容。请求发出之前，其中的凭据可以替换为占位符，中转站拿不到原值；回答中重复出现时再恢复原值。",
         },
         {
-          title: "工具调用审查",
-          body: "模型返回的工具调用按规则审查，高危调用可在流式传输中途截断。它与隐藏字符检查、内容规则和输出长度限制合为五项防护，每项可设为关闭、观察或拦截。",
+          title: "拦截恶意工具调用",
+          body: "中转站可以改写回答，塞入让客户端执行的工具调用。回答中的工具调用按下载即执行、外发凭据等危险命令规则审查，高危调用可在流式传输中途截断。它与隐藏字符检查、内容规则和输出长度限制合为五项防护，每项可设为关闭、观察或拦截。",
         },
         {
           title: "加密的控制面",
@@ -211,21 +211,21 @@ export const coreCopy = {
       releases: "全部发布版本",
       version: "版本",
       sourceTitle: "从源码构建",
-      sourceBody: "需要 Rust 稳定版工具链（1.85 或更新）。生成的二进制位于 target/release/twcore。",
+      sourceBody: "需要 Rust 稳定版工具链（1.94.1 或更新）。生成的二进制位于 target/release/twcore。",
     },
     layers: {
       eyebrow: "crate 分层",
       sharedTag: "ThinkWatch 企业版同样使用",
       localNote: "单机实现",
       rows: [
-        { name: "格式转换、防护与熔断", crates: "tw-dialect · tw-guard · tw-breaker", mark: "shared" },
+        { name: "格式转换、防护、熔断与 Bedrock", crates: "tw-dialect · tw-guard · tw-breaker · tw-bedrock", mark: "shared" },
         { name: "领域逻辑", crates: "tw-types · tw-engine · tw-pricing · tw-yaml · tw-secret · tw-watch", mark: null },
         { name: "控制面契约", crates: "tw-api · tw-link", mark: null },
         { name: "装配", crates: "tw-config · tw-store · tw-observe", mark: "local" },
         { name: "数据面与控制面", crates: "tw-gateway · tw-control", mark: "local" },
       ],
       footnote:
-        "ThinkWatch 企业版只依赖第一组。这三个 crate 只依赖彼此，由一项测试保证；每次改动它们，CI 都会用 ThinkWatch 企业版编译一遍。任何 crate 都不依赖排在其所在组下方的组。最后两组是单机实现（SQLite、本地控制通道与可选的远程端口），有意不共享：单机 SQLite 与多租户 Postgres 差异过大，统一的抽象难以同时满足两者。",
+        "ThinkWatch 企业版只依赖第一组。这四个 crate 只依赖彼此，由一项测试保证；每次改动它们，CI 都会用 ThinkWatch 企业版编译一遍。任何 crate 都不依赖排在其所在组下方的组。最后两组是单机实现（SQLite、本地控制通道与可选的远程端口），有意不共享：单机 SQLite 与多租户 Postgres 差异过大，统一的抽象难以同时满足两者。",
       docs: "crate 分层详解",
     },
     dev: {

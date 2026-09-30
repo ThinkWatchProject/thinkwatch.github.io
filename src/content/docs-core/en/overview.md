@@ -1,6 +1,6 @@
 # ThinkWatch Core
 
-ThinkWatch Core is the gateway engine of the ThinkWatch products: a set of MIT-licensed Rust crates and `twcore`, a self-contained AI API gateway binary. `twcore` is the gateway inside the desktop app, [ThinkWatch Lite](/docs/lite), and also runs on its own as a systemd service on a Linux server. ThinkWatch Enterprise depends on three of the crates: `tw-dialect`, `tw-guard` and `tw-breaker`.
+ThinkWatch Core is the gateway engine of the ThinkWatch products: a set of MIT-licensed Rust crates and `twcore`, a self-contained AI API gateway binary. `twcore` is the gateway inside the desktop app, [ThinkWatch Lite](/docs/lite), and also runs on its own as a systemd service on a Linux server. ThinkWatch Enterprise depends on four of the crates: `tw-dialect`, `tw-guard`, `tw-breaker` and `tw-bedrock`.
 
 ## Scope of Core
 
