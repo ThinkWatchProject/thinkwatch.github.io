@@ -135,11 +135,21 @@ export const products: Product[] = [
     base: "/docs/lite",
     editUrl: "https://github.com/ThinkWatchProject/thinkwatch.github.io/tree/main/src/content/docs-lite",
     tagline: {
-      en: "The desktop app for a local AI API gateway on macOS, Windows and Linux: what it shows, how to install it, how to connect it to a core on a server, and how it is built.",
-      "zh-CN": "在本机运行 AI API 网关的 macOS、Windows 与 Linux 桌面应用：展示的内容、安装方法、连接服务器上的 core 的方法，以及构建方式。",
+      en: "The local gateway for Claude Code, Codex and other AI clients on macOS, Windows and Linux: what it does, how to install it, how to connect it to a core on a server, and how it is built.",
+      "zh-CN": "Claude Code、Codex 等 AI 客户端的本地网关，支持 macOS、Windows 与 Linux：功能、安装方法、连接服务器上的 core 的方法，以及构建方式。",
     },
     docs: [
       overview(),
+      {
+        slug: "features",
+        label: { en: "Features", "zh-CN": "功能详解" },
+        locales: both,
+        group: "getStarted",
+        summary: {
+          en: "Page by page: usage and cost, traffic, client setup, keys, upstreams, routing, the five protections, MCP, settings, the menu bar and notifications.",
+          "zh-CN": "逐页说明：用量与费用、流量、客户端接管、密钥、上游、路由、五项防护、MCP、设置、菜单栏与通知。",
+        },
+      },
       {
         slug: "install",
         label: { en: "Install and update", "zh-CN": "安装与更新" },
