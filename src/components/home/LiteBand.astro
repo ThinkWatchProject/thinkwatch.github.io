@@ -30,14 +30,19 @@ const zh = lang === "zh-CN";
         lang === "zh-CN" ? "text-[28px] leading-[1.35] sm:text-[34px] lg:text-[40px]" : "text-[32px] leading-[1.15] sm:text-[40px] lg:text-[46px]",
       ]}
     >{c.title}</h2>
-    <div class="mt-2 flex flex-col gap-4">
+    <div class="mt-2 grid gap-x-8 gap-y-5 sm:grid-cols-2">
       {c.points.map((p) => (
-        <p class="text-base leading-relaxed text-[#cbd5e1] sm:text-[17px]"><span class="font-semibold text-white">{p.t}</span> {p.b}</p>
+        <div class="flex flex-col gap-1.5">
+          <h3 class="m-0 text-[17px] font-semibold text-white">{p.t}</h3>
+          <p class="m-0 text-[15px] leading-relaxed text-[#cbd5e1]">{p.b}</p>
+        </div>
       ))}
     </div>
-    <div class="flex flex-wrap items-center gap-3">
-      {c.pills.map((pill) => (
-        <span class="rounded-full border border-[var(--color-border-strong)] px-3 py-1.5 text-[13px] text-[#cbd5e1]">{pill}</span>
+    {/* 第一项是状态，单独做成徽标；其余是平台与许可证 */}
+    <div class="flex flex-wrap items-center gap-2.5">
+      <span class="rounded-full bg-[var(--color-brand-1)] px-3 py-1 text-[13px] font-medium text-[var(--color-bg)]">{c.pills[0]}</span>
+      {c.pills.slice(1).map((pill) => (
+        <span class="rounded-full border border-[var(--color-border-strong)] px-3 py-1 text-[13px] text-[#cbd5e1]">{pill}</span>
       ))}
     </div>
     <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:gap-5">
