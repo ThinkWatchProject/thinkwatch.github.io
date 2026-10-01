@@ -37,8 +37,10 @@ export type Product = {
   id: ProductId;
   /** Brand name, not translated */
   name: string;
-  /** Docs home path without locale prefix, e.g. "/docs/lite" */
+  /** Docs path without locale prefix that the product's doc slugs sit under, e.g. "/docs/lite" */
   base: string;
+  /** The product's docs home, when it is not `base` itself */
+  home?: string;
   /** Where the markdown sources live ("Edit on GitHub") */
   editUrl: string;
   /** One-liner shown on the documentation home */
@@ -59,8 +61,12 @@ export const products: Product[] = [
   {
     id: "thinkwatch",
     name: "ThinkWatch Enterprise",
+    // Its guides keep their /docs/<slug> addresses; /docs itself is the
+    // documentation home for all three products, so its own home is an
+    // overview page beside the guides.
     base: "/docs",
-    editUrl: "https://github.com/ThinkWatchProject/ThinkWatch/tree/main/docs",
+    home: "/docs/overview",
+    editUrl: "https://github.com/ThinkWatchProject/thinkwatch.github.io/tree/main/src/content/docs",
     tagline: {
       en: "The gateway for teams and enterprises. Deploy, configure, and operate it in production.",
       "zh-CN": "面向团队与企业的网关。在生产环境中部署、配置与运维。",
@@ -289,7 +295,8 @@ export function getProduct(id: ProductId): Product {
 
 /** Docs home URL of a product, localized. */
 export function productHomeHref(lang: Lang, id: ProductId): string {
-  return localePath(lang, getProduct(id).base);
+  const p = getProduct(id);
+  return localePath(lang, p.home ?? p.base);
 }
 
 /**
@@ -297,8 +304,8 @@ export function productHomeHref(lang: Lang, id: ProductId): string {
  * how the sidebar has always handled missing translations.
  */
 export function docHref(lang: Lang, id: ProductId, doc: DocMeta): string {
-  const base = getProduct(id).base;
-  const path = doc.slug ? `${base}/${doc.slug}` : base;
+  const p = getProduct(id);
+  const path = doc.slug ? `${p.base}/${doc.slug}` : (p.home ?? p.base);
   return doc.locales.includes(lang) ? localePath(lang, path) : path;
 }
 

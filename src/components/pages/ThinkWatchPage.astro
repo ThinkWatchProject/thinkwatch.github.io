@@ -14,6 +14,7 @@ import QuickStart from "~/components/sections/QuickStart.astro";
 import LogExplorerMock from "~/components/mocks/LogExplorerMock.tsx";
 import NeonMotion from "~/components/NeonMotion.astro";
 import { getLang, localePath } from "~/i18n";
+import { productHomeHref } from "~/content/docs/_meta";
 import { getLatestRelease } from "~/lib/github";
 import { enterpriseLd } from "~/lib/structured-data";
 import { thinkwatchCopy } from "~/i18n/pages/thinkwatch";
@@ -53,7 +54,7 @@ const delay = (i: number) => `animation-delay: ${i * 90}ms;`;
           <p class="nx-lede nx-rise" style="--d:2">{c.hero.sub}</p>
           <div class="nx-actions nx-rise" style="--d:3">
             <a href="#quickstart" class="nx-pill">{c.hero.ctaPrimary}</a>
-            <a href={localePath(lang, "/docs")} class="nx-ghost">{c.hero.ctaSecondary}</a>
+            <a href={productHomeHref(lang, "thinkwatch")} class="nx-ghost">{c.hero.ctaSecondary}</a>
           </div>
           <ul class="hero-pills nx-rise" style="--d:4">
             {pills.map((p) => (

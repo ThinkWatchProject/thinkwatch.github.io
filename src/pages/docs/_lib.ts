@@ -12,14 +12,15 @@ export type DocsEntry =
 
 const collectionFor = { thinkwatch: "docs", lite: "docs_lite", core: "docs_core" } as const;
 
-/** Markdown file rendered as the docs home of Lite and Core. */
+/** Markdown file rendered as each product's docs home. */
 export const HOME_ENTRY = "overview";
 
 /**
- * Path segments under /docs owned by product routes. ThinkWatch guides are
- * served by docs/[...slug].astro, so these must never be generated there.
+ * Path segments under /docs owned by other routes (the Lite and Core docs, and
+ * ThinkWatch Enterprise's overview). ThinkWatch guides are served by
+ * docs/[...slug].astro, so these must never be generated there.
  */
-export const RESERVED_SLUGS = ["lite", "core"];
+export const RESERVED_SLUGS = ["lite", "core", HOME_ENTRY];
 
 export async function getProductEntries(product: ProductId, lang: Lang) {
   const all: DocsEntry[] = [
@@ -48,8 +49,8 @@ export async function getArticlePaths(product: ProductId, lang: Lang) {
     .map(({ entry, slug }) => ({ params: { slug }, props: { entry, slug } }));
 }
 
-/** The markdown entry rendered as a product's docs home (Lite and Core only). */
-export async function getHomeEntry(product: Exclude<ProductId, "thinkwatch">, lang: Lang): Promise<DocsEntry> {
+/** The markdown entry rendered as a product's docs home. */
+export async function getHomeEntry(product: ProductId, lang: Lang): Promise<DocsEntry> {
   const entries = await getProductEntries(product, lang);
   const home = entries.find(({ slug }) => slug === HOME_ENTRY);
   if (!home) throw new Error(`[docs] missing ${product} ${lang}/${HOME_ENTRY}.md`);

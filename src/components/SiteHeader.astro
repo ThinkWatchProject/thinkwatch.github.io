@@ -1,7 +1,7 @@
 ---
 import { getLang, t, localePath, type Lang } from "~/i18n";
 import { getStarCount, formatStars } from "~/lib/github";
-import { findDoc } from "~/content/docs/_meta";
+import { findDoc, getProduct } from "~/content/docs/_meta";
 import SearchModal from "./SearchModal.astro";
 import TwMark from "./TwMark.astro";
 
@@ -44,7 +44,8 @@ function targetPath(target: Lang): string {
   if (/^\/404(\.html)?\/?$/.test(cleanPath)) return "/";
   if (currentDocMeta && !currentDocMeta.locales.includes(target)) {
     // Untranslated doc: fall back to that product's docs home.
-    return docMatch?.[1] ? `/docs/${docMatch[1]}` : "/docs";
+    const product = getProduct((docMatch?.[1] as "lite" | "core" | undefined) ?? "thinkwatch");
+    return product.home ?? product.base;
   }
   return cleanPath;
 }
