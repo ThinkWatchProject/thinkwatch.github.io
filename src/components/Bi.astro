@@ -1,0 +1,20 @@
+---
+// A piece of text in the page's language. On a page that picks its language in
+// the browser (the 404 page: GitHub Pages serves one for every language), both
+// are rendered and the page's script shows the visitor's.
+import { getLang } from "~/i18n";
+
+interface Props {
+  en: string;
+  zh: string;
+  /** Render both languages for the page's script to choose from */
+  both?: boolean;
+}
+
+const { en, zh, both = false } = Astro.props;
+const lang = getLang(Astro);
+---
+
+{both ? (
+  <Fragment><span data-i18n="en">{en}</span><span data-i18n="zh-CN" hidden>{zh}</span></Fragment>
+) : lang === "zh-CN" ? zh : en}

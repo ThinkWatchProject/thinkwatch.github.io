@@ -5,7 +5,8 @@ import SiteFooter from "~/components/SiteFooter.astro";
 import { t } from "~/i18n";
 
 // GitHub Pages serves one static 404 for every language, so both copies are
-// rendered and the inline script below shows the one the visitor prefers.
+// rendered, the site header and footer included, and the inline script below
+// shows the one the visitor prefers.
 const en = t("en").notFound;
 const zh = t("zh-CN").notFound;
 
@@ -20,7 +21,7 @@ const links = [
 ---
 
 <Base title={en.title} description={en.description} noindex>
-  <SiteHeader />
+  <SiteHeader bilingual />
   <main id="main">
     <section class="nx-hero nf-hero">
       <div class="nx-aurora" aria-hidden="true"><i></i><i></i><i></i></div>
@@ -70,7 +71,7 @@ content-type: text/html; charset=utf-8</span>
       </div>
     </section>
   </main>
-  <SiteFooter />
+  <SiteFooter bilingual />
 </Base>
 
 <style>
@@ -164,13 +165,22 @@ content-type: text/html; charset=utf-8</span>
       document.documentElement.lang = pref;
       document.title = pref === "zh-CN" ? zhTitle : enTitle;
 
-      // Point every link at the Chinese site for Chinese visitors
+      // Point every link at the Chinese site for Chinese visitors, and swap
+      // in the Chinese attributes (labels, the search box's texts)
       if (pref === "zh-CN") {
         document.querySelectorAll("[data-localize]").forEach(function (a) {
           var path = a.getAttribute("data-localize") || "/";
           a.setAttribute("href", path === "/" ? "/zh-CN/" : "/zh-CN" + path);
         });
+        document.querySelectorAll("[data-zh-attrs]").forEach(function (el) {
+          var attrs = JSON.parse(el.getAttribute("data-zh-attrs") || "{}");
+          Object.keys(attrs).forEach(function (name) { el.setAttribute(name, attrs[name]); });
+        });
       }
+
+      // The language menu marks the visitor's language
+      var choice = document.querySelector('[data-lang-choice="' + pref + '"]');
+      if (choice) choice.setAttribute("aria-current", "true");
     } catch (e) {}
   })();
 </script>
