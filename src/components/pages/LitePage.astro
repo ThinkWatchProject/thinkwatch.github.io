@@ -83,7 +83,23 @@ const changelogHref = localePath(lang, "/changelog");
 const feat = Object.fromEntries(c.features.items.map((item) => [item.id, item])) as Record<string, (typeof c.features.items)[number]>;
 /** The four stops of the scroll story, in the order a request meets them */
 const storyIds = ["routing", "security", "traffic", "overview"] as const;
-const clients = ["Claude Code", "Codex", "Claude Desktop", "opencode", "Cursor", "Zed", "Aider", "DeepSeek Harness", "Continue", "Antigravity CLI"];
+const clients = [
+  "Claude Code",
+  "Codex",
+  "Claude Desktop",
+  "opencode",
+  "Pi",
+  "oh-my-pi",
+  "Grok Build",
+  "Qwen Code",
+  "Hermes Agent",
+  "Cursor",
+  "Zed",
+  "Aider",
+  "DeepSeek Harness",
+  "Continue",
+  "Antigravity CLI",
+];
 
 const delay = (i: number) => `animation-delay: ${i * 90}ms;`;
 const eyebrow = "font-mono text-[11px] uppercase tracking-[0.08em] text-[var(--color-muted)] sm:text-[13px]";

@@ -78,7 +78,7 @@ export const liteCopy = {
       bento: {
         titleA: "And the rest,",
         titleB: " all in one app.",
-        clientsCount: "7",
+        clientsCount: "12",
         clientsCountSub: "set up in one step · 3 more by instructions",
         noticesTitle: "System notifications",
         notices: [
@@ -116,25 +116,25 @@ export const liteCopy = {
         {
           id: "clients",
           title: "Connect once, switch freely",
-          body: "Claude Code, Codex, opencode and four other clients are pointed at the gateway in one step, with the change previewed, the original file backed up and a restore always available; on Windows, Claude Code and Codex inside WSL as well. From then on, switching upstreams happens in the gateway, with no client to reconfigure or restart.",
+          body: "Claude Code, Codex, opencode and nine other clients are pointed at the gateway in one step, with the change previewed, the original file backed up and a restore always available; on Windows, Claude Code and Codex inside WSL as well. From then on, switching upstreams happens in the gateway, with no client to reconfigure or restart.",
           alt: "The Clients page: Claude Code and Codex connected, each with its own key and its requests over the last 24 hours; opencode not connected; Cursor set up by hand and in use; Continue and Antigravity CLI not yet set up; Zed and Aider not detected",
         },
         {
           id: "security",
           title: "Protection against relays: keys replaced, malicious tool calls cut off",
-          body: "A relay sees every request in full and can rewrite every answer. Outbound redaction swaps API keys, private keys, JWTs and connection-string passwords for placeholders before a request leaves and restores them in the response, so the relay never holds the real values. When an answer carries a tool call that downloads and runs code, sends out environment variables or credential files, reads private keys or installs a startup item or scheduled job, tool-call inspection cuts the answer off before the client can run it; hidden characters and prompt injection can be refused as well. The five protections start in Observe, recording without changing anything, and each switches to Enforce on its own.",
+          body: "A relay sees every request in full and can rewrite every answer. Outbound redaction swaps API keys, private keys, JWTs, connection-string passwords, Chinese resident ID numbers and bank card numbers for placeholders before a request leaves and restores them in the response, so the relay never holds the real values. When an answer carries a tool call that downloads and runs code, sends out environment variables or credential files, reads private keys or installs a startup item or scheduled job, tool-call inspection cuts the answer off before the client can run it; hidden characters and prompt injection can be refused as well. The five protections start in Observe, recording without changing anything, and each switches to Enforce on its own.",
           alt: "The Security page log: credentials replaced before a request left, one of them matched by a custom rule; a download-and-run tool call cut off; and hidden characters, a delete command and an injected instruction recorded, each with the key, client, model and upstream of its request",
         },
         {
           id: "mcp",
           title: "MCP servers, skills and hooks, scanned",
-          body: "The MCP servers of eight clients appear side by side, with third-party remote servers and inconsistent configurations marked, and can be copied or removed between clients. Client configuration, skills, hooks and project instructions are scanned for hidden characters, prompt injection, dangerous commands and overly broad permissions, and a new finding raises a notification.",
+          body: "The MCP servers of thirteen clients appear side by side, with third-party remote servers and inconsistent configurations marked, and can be copied or removed between clients. Client configuration, skills, hooks and project instructions are scanned for hidden characters, prompt injection, dangerous commands and overly broad permissions, and a new finding raises a notification.",
           alt: "The MCP page: the MCP servers configured in Claude Code, Claude Desktop, Cursor, Codex, opencode, Antigravity CLI and Zed side by side, with remote third-party servers and a server configured differently in two clients marked; one high, one medium and one low finding in 11 scanned files",
         },
         {
           id: "traffic",
           title: "Every request, traceable",
-          body: "A request shows the rule it matched, each upstream it tried, any conversion between API formats and how its cost was calculated. A finished request can be replayed against another upstream and the two answers compared side by side.",
+          body: "A request shows the rule it matched, each upstream it tried, any conversion between API formats and how its cost was calculated. A finished request can be replayed against another upstream and the two answers compared side by side, and the whole history can be searched, including the text of requests and answers.",
           alt: "The Traffic page: each request with its key, model, upstream, time to first token, total time, tokens and cost, with marks for converted formats, redacted keys and a blocked request, and one request answered locally by the gateway",
         },
         {
@@ -322,7 +322,7 @@ export const liteCopy = {
       bento: {
         titleA: "还有这些，",
         titleB: "都在一个应用里。",
-        clientsCount: "7",
+        clientsCount: "12",
         clientsCountSub: "款一键接入 · 另有 3 款按说明配置",
         noticesTitle: "系统通知",
         notices: [
@@ -351,25 +351,25 @@ export const liteCopy = {
         {
           id: "clients",
           title: "一次接入，随时切换",
-          body: "一键接入 Claude Code、Codex、opencode 等七款客户端，写入前预览改动、备份原文件，随时可以还原；Windows 上 WSL 中的 Claude Code 与 Codex 同样支持。此后切换上游只在网关中完成，客户端无需改配置或重启。",
+          body: "一键接入 Claude Code、Codex、opencode 等十二款客户端，写入前预览改动、备份原文件，随时可以还原；Windows 上 WSL 中的 Claude Code 与 Codex 同样支持。此后切换上游只在网关中完成，客户端无需改配置或重启。",
           alt: "客户端页：Claude Code 与 Codex 已接管，各用一把密钥，并列出最近 24 小时的请求；opencode 尚未接管；Cursor 已手动配置并在使用；Continue 与 Antigravity CLI 尚未配置；Zed 与 Aider 未检测到",
         },
         {
           id: "security",
           title: "防范中转站：替换密钥，拦截恶意工具调用",
-          body: "中转站能看到请求的全部内容，也能改写每一次回答。出站脱敏在请求发出前把 API 密钥、私钥、JWT 与连接串口令换成占位符，并在响应中还原，中转站拿不到原值。回答中若出现下载即执行、外发环境变量或凭据文件、读取私钥、写入开机启动项或定时任务之类的工具调用，工具调用审查会在客户端执行之前切断回答；隐藏字符与提示注入也可以直接拒绝。五项防护出厂只记录、不改动请求，逐项切换到拦截即可生效。",
+          body: "中转站能看到请求的全部内容，也能改写每一次回答。出站脱敏在请求发出前把 API 密钥、私钥、JWT、连接串口令、身份证号与银行卡号换成占位符，并在响应中还原，中转站拿不到原值。回答中若出现下载即执行、外发环境变量或凭据文件、读取私钥、写入开机启动项或定时任务之类的工具调用，工具调用审查会在客户端执行之前切断回答；隐藏字符与提示注入也可以直接拒绝。五项防护出厂只记录、不改动请求，逐项切换到拦截即可生效。",
           alt: "安全页日志：请求发出前替换的凭据（其中一条由自定义规则命中）、被切断的下载即执行工具调用，以及记录在案的隐藏字符、删除命令与注入指令，每条都注明所属请求的密钥、客户端、模型与上游",
         },
         {
           id: "mcp",
           title: "扫描 MCP、技能与钩子",
-          body: "八款客户端的 MCP 服务器集中显示，标出第三方远程服务器与各客户端之间不一致的配置，可以在客户端之间复制或移除。客户端配置、技能、钩子与项目指令中的隐藏字符、提示注入、危险命令与过宽权限会被找出，出现新发现时发送通知。",
+          body: "十三款客户端的 MCP 服务器集中显示，标出第三方远程服务器与各客户端之间不一致的配置，可以在客户端之间复制或移除。客户端配置、技能、钩子与项目指令中的隐藏字符、提示注入、危险命令与过宽权限会被找出，出现新发现时发送通知。",
           alt: "MCP 页：Claude Code、Claude Desktop、Cursor、Codex、opencode、Antigravity CLI 与 Zed 中配置的 MCP 服务器并列显示，标出第三方远程服务器与两个客户端间配置不一致的服务器；共扫描 11 个文件，发现高、中、低风险各一项",
         },
         {
           id: "traffic",
           title: "每个请求都可追溯",
-          body: "请求详情给出命中的规则、尝试过的每个上游、API 格式转换，以及费用的计算依据。已结束的请求可以重放到另一个上游，并排对比两次回答。",
+          body: "请求详情给出命中的规则、尝试过的每个上游、API 格式转换，以及费用的计算依据。已结束的请求可以重放到另一个上游，并排对比两次回答；全部请求记录都可以搜索，包括请求与回答的内容。",
           alt: "流量页：逐条列出请求的密钥、模型、上游、首 token 时间、总耗时、token 与费用，标出格式转换、密钥脱敏与被拦截的请求，其中一条由网关在本地应答",
         },
         {
