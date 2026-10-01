@@ -1,7 +1,7 @@
 // The changelog: every published release of the three products, read from
-// GitHub at build time, with the release notes written for this site (the
-// Enterprise releases up to v0.4.0, in src/content/changelog) attached to
-// their version. Releases without notes here link to their page on GitHub.
+// GitHub at build time, each with its notes: the ones written for this site
+// (the Enterprise releases up to v0.4.0, in src/content/changelog) or else the
+// ones published with the release on GitHub (src/lib/release-notes.ts).
 import { getCollection, type CollectionEntry } from "astro:content";
 import { getProduct, productName } from "~/content/docs/_meta";
 import type { Lang } from "~/i18n";
@@ -24,6 +24,8 @@ export interface ChangelogEntry {
   url?: string;
   /** Release notes written for this site */
   notes?: CollectionEntry<"changelog"> | CollectionEntry<"changelog_zh">;
+  /** Otherwise the notes published with the release on GitHub, in the page's language when they exist in it */
+  releaseNotes?: CollectionEntry<"release_notes">;
 }
 
 /** "ThinkWatch Enterprise" / "ThinkWatch 企业版", "ThinkWatch Lite", "ThinkWatch Core" */
@@ -39,6 +41,12 @@ export async function getChangelog(lang: Lang): Promise<ChangelogEntry[]> {
     for (const entry of await getCollection("changelog_zh")) notes.set(entry.data.version, entry);
   }
 
+  const published = new Map<string, CollectionEntry<"release_notes">>();
+  for (const entry of await getCollection("release_notes")) {
+    const key = `${entry.data.product}-${entry.data.tag}`;
+    if (entry.data.lang === lang || !published.has(key)) published.set(key, entry);
+  }
+
   const releases = await getReleases();
   const entries: ChangelogEntry[] = releases.map((r) => {
     const enterprise = r.product === "enterprise";
@@ -51,6 +59,7 @@ export async function getChangelog(lang: Lang): Promise<ChangelogEntry[]> {
       date: new Date(r.date),
       url: r.url,
       notes: enterprise ? notes.get(version) : undefined,
+      releaseNotes: published.get(`${r.product}-${r.tag}`),
     };
   });
 
