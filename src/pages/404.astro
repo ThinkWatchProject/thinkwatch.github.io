@@ -12,8 +12,8 @@ const zh = t("zh-CN").notFound;
 // `path` is the English path; the script prefixes /zh-CN for Chinese visitors.
 const links = [
   { path: "/", en: en.home, zh: zh.home, primary: true },
-  { path: "/thinkwatch", en: en.thinkwatch, zh: zh.thinkwatch, primary: false },
   { path: "/lite", en: en.lite, zh: zh.lite, primary: false },
+  { path: "/thinkwatch", en: en.thinkwatch, zh: zh.thinkwatch, primary: false },
   { path: "/core", en: en.core, zh: zh.core, primary: false },
   { path: "/docs", en: en.docs, zh: zh.docs, primary: false },
 ];
@@ -21,58 +21,127 @@ const links = [
 
 <Base title={en.title} description={en.description} noindex>
   <SiteHeader />
-  <main id="main" class="container-page relative overflow-hidden py-20 text-center md:py-28">
-    <div
-      class="pointer-events-none absolute left-1/2 top-1/3 h-[24rem] w-[24rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand-gradient opacity-10 blur-[120px] md:h-[34rem] md:w-[34rem]"
-      aria-hidden="true"
-    ></div>
+  <main id="main">
+    <section class="nx-hero nf-hero">
+      <div class="nx-aurora" aria-hidden="true"><i></i><i></i><i></i></div>
+      <div class="nx-gridbg" aria-hidden="true"></div>
+      <div class="container-page nf-grid">
+        <div class="min-w-0">
+          <p class="nf-code nx-grad nx-rise" aria-hidden="true">404</p>
+          <h1 class="nx-h2 nf-h1 nx-rise" style="--d:1">
+            <span data-i18n="en">{en.headline}</span>
+            <span data-i18n="zh-CN" hidden>{zh.headline}</span>
+          </h1>
+          <p class="nx-sub nx-rise" style="--d:2">
+            <span data-i18n="en">{en.sub}</span>
+            <span data-i18n="zh-CN" hidden>{zh.sub}</span>
+          </p>
 
-    <div class="relative">
-      <div class="font-display text-gradient text-[8rem] leading-none sm:text-[10rem] md:text-[13rem] reveal" aria-hidden="true">
-        404
+          <nav class="nx-rise" style="--d:3">
+            <h2 class="sr-only">
+              <span data-i18n="en">{en.linksLabel}</span>
+              <span data-i18n="zh-CN" hidden>{zh.linksLabel}</span>
+            </h2>
+            <ul class="nf-links">
+              {links.map((l) => (
+                <li>
+                  <a href={l.path} data-localize={l.path} class={l.primary ? "nx-pill" : "nx-ghost"}>
+                    <span data-i18n="en">{l.en}</span>
+                    <span data-i18n="zh-CN" hidden>{l.zh}</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        </div>
+
+        <!-- A real request for the missing path; the script fills in the path the visitor asked for. -->
+        <figure class="nx-panel nf-term nx-rise" style="--d:3" aria-hidden="true">
+          <div class="nx-panel-top">
+            <span class="nx-lights"><i></i><i></i><i></i></span>
+            <span>zsh</span>
+          </div>
+          <pre><span class="nf-prompt">$</span> curl -I https://thinkwat.ch<span data-request-path>{Astro.url.pathname}</span>
+<span class="nf-status">HTTP/2 404</span>
+<span class="nf-dim">server: GitHub.com
+content-type: text/html; charset=utf-8</span>
+<span class="nf-prompt">$</span> <span class="nf-caret"></span></pre>
+        </figure>
       </div>
-      <h1 class="font-display mt-4 text-3xl md:text-5xl reveal" style="animation-delay: 80ms">
-        <span data-i18n="en">{en.headline}</span>
-        <span data-i18n="zh-CN" hidden>{zh.headline}</span>
-      </h1>
-      <p class="mx-auto mt-4 max-w-md text-[var(--color-muted)] reveal" style="animation-delay: 160ms">
-        <span data-i18n="en">{en.sub}</span>
-        <span data-i18n="zh-CN" hidden>{zh.sub}</span>
-      </p>
-
-      <nav class="mt-10 reveal" style="animation-delay: 240ms">
-        <h2 class="sr-only">
-          <span data-i18n="en">{en.linksLabel}</span>
-          <span data-i18n="zh-CN" hidden>{zh.linksLabel}</span>
-        </h2>
-        <ul class="mx-auto flex max-w-2xl flex-col items-stretch gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-center">
-          {links.map((l) => (
-            <li>
-              <a
-                href={l.path}
-                data-localize={l.path}
-                class:list={[
-                  "inline-flex min-h-11 w-full items-center justify-center rounded-lg px-5 font-medium transition sm:w-auto",
-                  l.primary
-                    ? "bg-brand-gradient text-black hover:brightness-110"
-                    : "border border-[var(--color-border-strong)] text-[var(--color-text)] hover:border-[var(--color-brand-1)] hover:text-[var(--color-brand-1)]",
-                ]}
-              >
-                <span data-i18n="en">{l.en}</span>
-                <span data-i18n="zh-CN" hidden>{l.zh}</span>
-              </a>
-            </li>
-          ))}
-        </ul>
-      </nav>
-
-      <!-- A real request for the missing path; the script fills in the path the visitor asked for. -->
-      <pre class="mt-12 inline-block max-w-full overflow-x-auto rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3 text-left font-mono text-xs text-[var(--color-dim)]"><span class="text-[var(--color-brand-1)]">$</span> curl -I https://thinkwat.ch<span data-request-path>{Astro.url.pathname}</span>
-HTTP/2 404</pre>
-    </div>
+    </section>
   </main>
   <SiteFooter />
 </Base>
+
+<style>
+  .nf-hero {
+    padding: 72px 0 104px;
+  }
+  .nf-grid {
+    display: grid;
+    gap: 48px;
+    align-items: center;
+  }
+  @media (min-width: 1024px) {
+    .nf-grid {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 0.95fr);
+      gap: 56px;
+    }
+  }
+  .nf-code {
+    margin: 0;
+    font-size: clamp(96px, 14vw, 176px);
+    font-weight: 600;
+    line-height: 0.9;
+    letter-spacing: -0.06em;
+    font-variant-numeric: tabular-nums;
+  }
+  .nf-h1 {
+    margin-top: 24px;
+  }
+  .nf-links {
+    margin: 32px 0 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .nf-term pre {
+    margin: 0;
+    overflow-x: auto;
+    padding: 22px 22px 26px;
+    font-family: var(--font-mono);
+    font-size: 13.5px;
+    line-height: 1.75;
+    color: var(--color-text);
+    white-space: pre;
+  }
+  .nf-prompt {
+    color: rgb(var(--a1));
+  }
+  .nf-status {
+    color: rgb(var(--a2));
+    font-weight: 600;
+  }
+  .nf-dim {
+    color: var(--color-dim);
+  }
+  .nf-caret {
+    display: inline-block;
+    width: 8px;
+    height: 1.1em;
+    vertical-align: -0.2em;
+    background: var(--color-text);
+    animation: nx-blink 1.1s step-end infinite;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .nf-caret {
+      animation: none;
+    }
+  }
+</style>
 
 <script is:inline define:vars={{ enTitle: en.title, zhTitle: zh.title }}>
   (function () {
