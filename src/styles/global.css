@@ -265,9 +265,13 @@
   scroll-margin-top: 5rem;
   position: relative;
 }
-.prose-tw h1 { font-size: 2.25rem; line-height: 1.15; margin-top: 0; margin-bottom: 0.5em; letter-spacing: -0.025em; }
-.prose-tw h2 { font-size: 1.6rem;  line-height: 1.25; margin-top: 2.4em; margin-bottom: 0.6em; padding-top: 1.4em; border-top: 1px solid rgba(255,255,255,0.06); }
-.prose-tw h3 { font-size: 1.2rem;  line-height: 1.35; margin-top: 1.9em; margin-bottom: 0.5em; }
+.prose-tw h1 { font-size: clamp(2rem, 3.4vw, 2.75rem); line-height: 1.1; margin-top: 0; margin-bottom: 0.45em; letter-spacing: -0.035em; text-wrap: balance; }
+:lang(zh-CN) .prose-tw h1 { line-height: 1.22; letter-spacing: -0.01em; }
+/* The paragraph under the title reads as the page's lede */
+.prose-tw > h1 + p { font-size: 1.1rem; line-height: 1.7; color: var(--color-muted); }
+.prose-tw h2 { font-size: 1.55rem; line-height: 1.25; margin-top: 2.6em; margin-bottom: 0.6em; letter-spacing: -0.025em; }
+:lang(zh-CN) .prose-tw h2 { letter-spacing: -0.005em; }
+.prose-tw h3 { font-size: 1.15rem; line-height: 1.35; margin-top: 2em; margin-bottom: 0.5em; }
 .prose-tw h4 { font-size: 1.0rem;  line-height: 1.4;  margin-top: 1.6em; margin-bottom: 0.4em; color: #e5e7eb; }
 
 .prose-tw p,
@@ -297,16 +301,17 @@
 .prose-tw ul { list-style: disc; }
 .prose-tw ol { list-style: decimal; }
 .prose-tw li { margin-top: 0.4em; }
-.prose-tw li::marker { color: var(--color-brand-2); }
+.prose-tw li::marker { color: var(--color-dim); }
 
+/* A note: the mark's cyan as a rule down its side */
 .prose-tw blockquote {
-  border-left: 2px solid var(--color-brand-2);
-  padding: 0.25em 0 0.25em 1em;
-  background: color-mix(in oklab, var(--color-brand-2) 5%, transparent);
-  border-radius: 0 8px 8px 0;
-  font-style: italic;
+  border-left: 2px solid rgb(var(--a1));
+  padding: 0.8em 1.1em;
+  background: rgb(var(--a1) / 0.05);
+  border-radius: 0 10px 10px 0;
 }
-.prose-tw blockquote p { color: #e5e7eb; }
+.prose-tw blockquote p { color: #d4d7dc; }
+.prose-tw blockquote > * + * { margin-top: 0.6em; }
 
 .prose-tw hr {
   border: 0;
@@ -318,18 +323,18 @@
 .prose-tw :not(pre) > code {
   font-family: var(--font-mono);
   font-size: 0.85em;
-  color: var(--color-brand-1);
-  background: rgba(34, 229, 242, 0.08);
-  border: 1px solid rgba(34, 229, 242, 0.2);
+  color: #e6e8eb;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   padding: 0.1em 0.4em;
-  border-radius: 4px;
+  border-radius: 5px;
 }
 
 /* Code blocks (Shiki output) */
 .prose-tw pre.shiki,
 .prose-tw pre.astro-code {
-  background: #0c0d0f !important;
-  border: 1px solid rgba(255,255,255,0.08);
+  background: #0b0c0e !important;
+  border: 1px solid rgba(255,255,255,0.1);
   border-radius: 12px;
   padding: 1.1rem 1.25rem;
   font-size: 0.81rem;
@@ -358,6 +363,8 @@
 .prose-tw .table-scroll {
   overflow-x: auto;
   margin: 1.5em 0;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
 }
 .prose-tw .table-scroll > table { margin: 0; }
 @media (max-width: 40rem) {
@@ -379,9 +386,10 @@
 }
 .prose-tw td {
   padding: 0.6em 1em;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
   color: #c3c7ce;
 }
+.prose-tw tbody tr:last-child td { border-bottom: 0; }
 .prose-tw tr:hover td { background: rgba(255,255,255,0.02); }
 
 /* Heading anchor link (rehype-autolink-headings) */
@@ -402,7 +410,7 @@
 /* Images */
 .prose-tw img {
   max-width: 100%;
-  border-radius: 10px;
+  border-radius: 12px;
   border: 1px solid rgba(255,255,255,0.08);
   margin: 1.5em 0;
 }

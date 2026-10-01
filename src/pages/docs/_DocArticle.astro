@@ -104,24 +104,59 @@ const homeCards = slug ? [] : p.docs.filter((d) => d.slug);
     {/* The "Import links" page ends with its link builder, which a markdown file cannot hold */}
     {product === "lite" && slug === "import-links" && <ImportLinkBuilder />}
     {synced && (
-      <p class="mt-12 border-t border-[var(--color-border)] pt-6 text-sm leading-relaxed text-[var(--color-muted)]" data-pagefind-ignore>
+      <p class="mt-12 text-sm leading-relaxed text-[var(--color-dim)]" data-pagefind-ignore>
         {zh ? "本页取自 ThinkWatch Core 仓库 " : "This page is published from "}
         <a href={sourceUrl} class="font-mono text-[var(--color-brand-1)] transition-colors hover:text-[var(--color-brand-2)]">{synced.source}</a>
         {zh ? `（${synced.ref}）。` : ` in the ThinkWatch Core repository, at ${synced.ref}.`}
       </p>
     )}
     {homeCards.length > 0 && (
-      <div class="mt-12 grid gap-4 sm:grid-cols-2" data-pagefind-ignore>
-      {homeCards.map((d) => (
-        <a
-          href={docHref(lang, product, d)}
-          class="block rounded-xl border border-[var(--color-border-strong)] bg-[var(--color-surface)]/60 p-5 transition-colors hover:border-[var(--color-brand-1)]/50 hover:bg-[var(--color-surface)]"
-        >
-          <div class="mb-1.5 font-semibold tracking-tight text-[var(--color-text)]">{d.label[lang]}</div>
-          <p class="text-sm leading-relaxed text-[var(--color-muted)]">{d.summary?.[lang]}</p>
-        </a>
-      ))}
-    </div>
+      <div class="home-cards" data-pagefind-ignore>
+        {homeCards.map((d, i) => (
+          <a href={docHref(lang, product, d)} class="nx-tile home-card">
+            <span class="nx-fig">{String(i + 1).padStart(2, "0")}</span>
+            <span class="home-card-title">{d.label[lang]}</span>
+            <span class="nx-body">{d.summary?.[lang]}</span>
+          </a>
+        ))}
+      </div>
     )}
   </div>
 </DocsLayout>
+
+<style>
+  .home-cards {
+    margin-top: 48px;
+    display: grid;
+    gap: 12px;
+  }
+  @media (min-width: 640px) {
+    .home-cards {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    /* an odd one out takes the whole last row */
+    .home-card:last-child:nth-child(odd) {
+      grid-column: 1 / -1;
+    }
+  }
+  .home-card {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 22px 22px 24px;
+  }
+  .home-card .nx-body {
+    margin: 0;
+  }
+  .home-card-title {
+    margin-top: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: #fff;
+    transition: color 150ms;
+  }
+  .home-card:hover .home-card-title {
+    color: var(--color-brand-2);
+  }
+</style>

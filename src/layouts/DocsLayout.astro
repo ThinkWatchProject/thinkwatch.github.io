@@ -3,6 +3,7 @@ import { productName } from "~/content/docs/_meta";
 import Base from "./Base.astro";
 import SiteHeader from "~/components/SiteHeader.astro";
 import SiteFooter from "~/components/SiteFooter.astro";
+import NeonMotion from "~/components/NeonMotion.astro";
 import {
   docHref,
   getProduct,
@@ -41,6 +42,8 @@ interface Props {
   modified?: string;
   /** Where the page's text is edited, when not with the product's other docs */
   editUrl?: string;
+  /** The documentation home: full width, no sidebar or table of contents, search across every product */
+  hub?: boolean;
 }
 
 const {
@@ -57,6 +60,7 @@ const {
   published,
   modified,
   editUrl,
+  hub = false,
 } = Astro.props;
 const lang = getLang(Astro);
 const zh = lang === "zh-CN";
@@ -81,9 +85,10 @@ const tocHeadings = headings
   .filter((h) => h.depth === 2 || h.depth === 3)
   .map((h) => ({ ...h, text: h.text.replace(/#+\s*$/, "").trim() }));
 
-const itemBase = "flex items-center justify-between gap-2 rounded-lg px-3 text-[15px] transition-colors";
-const itemActive = "text-[var(--color-brand-1)] font-medium";
-const itemIdle = "text-[var(--color-text)]/80 hover:text-[var(--color-text)]";
+const navLabel = zh ? `${productName(p, lang)} 文档导航` : `${productName(p, lang)} documentation`;
+const editLabel = zh ? "在 GitHub 上编辑" : "Edit on GitHub";
+const updated = modified?.slice(0, 10);
+const updatedLabel = zh ? `最后更新于 ${updated}` : `Last updated ${updated}`;
 ---
 
 <Base
@@ -97,309 +102,529 @@ const itemIdle = "text-[var(--color-text)]/80 hover:text-[var(--color-text)]";
 >
   <SiteHeader />
 
-  <!-- Product switcher bar. data-docs-product scopes the search modal to this product. -->
-  <div
-    class="docs-product-bar border-b border-[var(--color-border)] bg-[var(--color-surface)]"
-    data-docs-product={p.id}
-    data-docs-product-name={productName(p, lang)}
-  >
-    <div class="container-page flex items-center justify-between gap-6 py-2.5 md:py-3.5">
-      <div class="flex min-w-0 items-center gap-5">
-        <span class="hidden font-mono text-xs uppercase tracking-[0.08em] text-[var(--color-muted)] sm:inline">
-          {productLabel}
-        </span>
-        <nav aria-label={productLabel} class="product-switch min-w-0 max-w-full overflow-x-auto" data-product-switch>
-          <ul class="inline-flex rounded-[10px] border border-[var(--color-border-strong)] bg-[var(--color-bg)] p-1 text-[15px]">
-            {products.map((pr) => {
-              const active = pr.id === product;
-              return (
+  <div class="docs-shell">
+    <div class="nx-aurora docs-aurora" aria-hidden="true"><i></i><i></i><i></i></div>
+    <div class="nx-gridbg docs-grid" aria-hidden="true"></div>
+
+    <!-- Product switcher bar. data-docs-product scopes the search modal to this
+         product. The documentation home has neither: its tiles lead to each
+         product, and its search covers them all. -->
+    {!hub && (
+      <div class="docs-bar" data-docs-product={p.id} data-docs-product-name={productName(p, lang)}>
+        <div class="container-page docs-bar-inner">
+          <nav aria-label={productLabel} class="product-switch" data-product-switch>
+            <ul class="seg">
+              {products.map((pr) => (
                 <li>
-                  <a
-                    href={productHomeHref(lang, pr.id)}
-                    aria-current={active ? "page" : undefined}
-                    class:list={[
-                      "flex h-11 items-center whitespace-nowrap rounded-[7px] px-4 transition-colors sm:h-9",
-                      active
-                        ? "bg-[var(--color-border)] font-medium text-[var(--color-text)]"
-                        : "text-[var(--color-text)]/80 hover:text-[var(--color-text)]",
-                    ]}
-                  >
+                  <a href={productHomeHref(lang, pr.id)} aria-current={pr.id === product ? "page" : undefined} class="seg-item">
                     {productName(pr, lang)}
                   </a>
                 </li>
-              );
-            })}
-          </ul>
-        </nav>
-      </div>
-
-      <button
-        type="button"
-        data-search-trigger
-        class="hidden h-10 w-[22.5rem] max-w-[40vw] shrink-0 items-center justify-between rounded-[10px] border border-[var(--color-border-strong)] bg-[var(--color-bg)] px-3.5 text-sm text-[var(--color-muted)] transition-colors hover:border-[var(--color-brand-1)]/50 hover:text-[var(--color-text)] md:flex"
-      >
-        <span class="flex min-w-0 items-center gap-2.5">
-          <svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
-            <circle cx="11" cy="11" r="7" />
-            <line x1="16.5" y1="16.5" x2="21" y2="21" />
-          </svg>
-          <span class="truncate">{searchLabel}</span>
-        </span>
-        <kbd class="rounded-[5px] border border-[var(--color-border-strong)] px-1.5 py-0.5 font-mono text-xs">⌘K</kbd>
-      </button>
-    </div>
-  </div>
-
-  <main id="main" class="container-page py-8 lg:py-10">
-    <!-- Mobile docs drawer: a collapsible <details> shown only below lg -->
-    <details class="mobile-docs-nav mb-6 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)]/60 lg:hidden">
-      <summary class="flex min-h-11 cursor-pointer select-none list-none items-center justify-between gap-3 px-4 py-3 text-sm font-medium text-[var(--color-text)]">
-        <span class="flex min-w-0 items-center gap-2">
-          <svg class="h-4 w-4 shrink-0 text-[var(--color-brand-1)]" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
-            <line x1="3" y1="5" x2="13" y2="5" stroke-linecap="round"/>
-            <line x1="3" y1="8" x2="13" y2="8" stroke-linecap="round"/>
-            <line x1="3" y1="11" x2="13" y2="11" stroke-linecap="round"/>
-          </svg>
-          <span class="shrink-0">{productName(p, lang)}</span>
-          <span class="text-[var(--color-dim)]">·</span>
-          <span class="truncate font-normal text-[var(--color-muted)]">{pageLabel}</span>
-        </span>
-        <svg class="chevron h-4 w-4 shrink-0 text-[var(--color-muted)] transition-transform" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <polyline points="4,6 8,10 12,6"/>
-        </svg>
-      </summary>
-      <div class="border-t border-[var(--color-border)] p-3">
-        <nav aria-label={zh ? `${productName(p, lang)} 文档导航` : `${productName(p, lang)} documentation`} class="space-y-5">
-          {sidebar.map((g) => (
-            <div>
-              <div class="px-3 pb-1.5 font-mono text-xs uppercase tracking-[0.08em] text-[var(--color-muted)]">{g.label}</div>
-              <ul class="space-y-0.5">
-                {g.items.map((d) => (
-                  <li>
-                    <a
-                      href={d.href}
-                      aria-current={d.slug === current ? "page" : undefined}
-                      class:list={[itemBase, "min-h-11 py-2", d.slug === current ? `bg-[var(--color-surface-2)] ${itemActive}` : itemIdle]}
-                    >
-                      <span>{d.label[lang]}</span>
-                      {!d.availableHere && (
-                        <span class="rounded border border-cyan-500/30 bg-cyan-500/15 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider text-cyan-300">EN</span>
-                      )}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </nav>
-
-        {tocHeadings.length > 0 && (
-          <div class="mt-5 border-t border-[var(--color-border)] pt-4">
-            <div class="mb-2 px-3 font-mono text-xs uppercase tracking-[0.08em] text-[var(--color-muted)]">{tocLabel}</div>
-            <ul class="space-y-0.5 text-sm">
-              {tocHeadings.map((h) => (
-                <li>
-                  <a
-                    href={`#${h.slug}`}
-                    class:list={[
-                      "block rounded-md px-3 py-2 text-[var(--color-muted)] transition-colors hover:bg-white/[0.03] hover:text-white",
-                      h.depth === 3 ? "pl-7 text-[12.5px] text-[var(--color-dim)]" : "",
-                    ]}
-                  >
-                    {h.text}
-                  </a>
-                </li>
               ))}
             </ul>
-          </div>
-        )}
+          </nav>
 
-        <a
-          href={edit}
-          target="_blank"
-          rel="noopener"
-          class="mt-4 flex min-h-11 items-center gap-1.5 border-t border-[var(--color-border)] px-3 pt-3 text-xs text-[var(--color-muted)] hover:text-white"
-        >
-          {zh ? "在 GitHub 上编辑" : "Edit on GitHub"}
-        </a>
-      </div>
-    </details>
-
-    <div class="grid gap-8 lg:grid-cols-[15rem_minmax(0,1fr)_12rem] xl:grid-cols-[17.5rem_minmax(0,1fr)_15rem] xl:gap-14">
-      <!-- Desktop sidebar (hidden on mobile) -->
-      <aside class="hidden lg:sticky lg:top-20 lg:block lg:max-h-[calc(100vh-6rem)] lg:self-start lg:overflow-y-auto">
-        <nav aria-label={zh ? `${productName(p, lang)} 文档导航` : `${productName(p, lang)} documentation`} class="flex flex-col gap-7">
-          {sidebar.map((g) => (
-            <div class="flex flex-col gap-1">
-              <div class="px-3 pb-2 font-mono text-xs uppercase tracking-[0.08em] text-[var(--color-muted)]">{g.label}</div>
-              <ul class="flex flex-col gap-1">
-                {g.items.map((d) => (
-                  <li>
-                    <a
-                      href={d.href}
-                      aria-current={d.slug === current ? "page" : undefined}
-                      class:list={[itemBase, "py-2", d.slug === current ? `bg-[var(--color-surface)] ${itemActive}` : itemIdle]}
-                    >
-                      <span>{d.label[lang]}</span>
-                      {!d.availableHere && (
-                        <span class="rounded border border-cyan-500/30 bg-cyan-500/15 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider text-cyan-300">EN</span>
-                      )}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </nav>
-
-        <div class="mt-8 border-t border-[var(--color-border)] pt-6 text-xs text-[var(--color-muted)]">
-          <a
-            href={edit}
-            target="_blank"
-            rel="noopener"
-            class="inline-flex items-center gap-1.5 transition-colors hover:text-white"
-          >
-            <svg class="h-3 w-3" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-              <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
-            </svg>
-            {zh ? "在 GitHub 上编辑" : "Edit on GitHub"}
-          </a>
+          <button type="button" data-search-trigger class="docs-search">
+            <span class="flex min-w-0 items-center gap-2.5">
+              <svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                <circle cx="11" cy="11" r="7" />
+                <line x1="16.5" y1="16.5" x2="21" y2="21" />
+              </svg>
+              <span class="truncate">{searchLabel}</span>
+            </span>
+            <kbd>⌘K</kbd>
+          </button>
         </div>
-      </aside>
+      </div>
+    )}
 
-      <!-- Article. Only the markdown gets .prose-tw: those rules are unlayered and
-           would override the utilities on the breadcrumb, cards and prev/next links. -->
-      <article
-        class="min-w-0 max-w-[72ch] text-[0.95rem]"
-        data-pagefind-body
-        data-pagefind-meta={`title:${searchTitle}`}
-        data-pagefind-filter={`product:${p.id}`}
-      >
-        {current !== "" && currentDoc && (
-          <nav aria-label={zh ? "面包屑" : "Breadcrumb"} class="mb-5 flex flex-wrap items-center gap-2 text-sm text-[var(--color-muted)]" data-pagefind-ignore>
-            <a href={productHomeHref(lang, product)} class="transition-colors hover:text-[var(--color-text)]">{productName(p, lang)}</a>
-            <span aria-hidden="true">/</span>
-            <span>{groupLabels[currentDoc.group][lang]}</span>
-            <span aria-hidden="true">/</span>
-            <span aria-current="page" class="text-[var(--color-text)]/80">{currentDoc.label[lang]}</span>
-          </nav>
-        )}
-
-        <div class="prose-tw"><slot /></div>
+    {hub ? (
+      <main id="main" class="container-page" data-pagefind-body data-pagefind-meta={`title:${searchTitle}`} data-pagefind-filter={`product:${p.id}`}>
+        <slot />
         <slot name="after" />
-
-        {(prev || next) && (
-          <nav class="mt-16 grid gap-4 border-t border-[var(--color-border)] pt-8 sm:grid-cols-2" aria-label={zh ? "文档翻页" : "Document navigation"} data-pagefind-ignore>
-            {prev ? (
-              <a
-                href={docHref(lang, product, prev)}
-                class="group flex flex-col gap-1 rounded-xl border border-[var(--color-border-strong)] px-5 py-4 transition-colors hover:border-[var(--color-brand-1)]/50 hover:bg-[var(--color-surface)]/60"
-              >
-                <span class="text-[13px] text-[var(--color-muted)]">← {prevLabel}</span>
-                <span class="text-base text-[var(--color-text)] transition-colors group-hover:text-[var(--color-brand-1)]">
-                  {prev.label[lang] || prev.label.en}
-                </span>
-              </a>
-            ) : <span class="hidden sm:block" />}
-            {next ? (
-              <a
-                href={docHref(lang, product, next)}
-                class="group flex flex-col items-end gap-1 rounded-xl border border-[var(--color-border-strong)] px-5 py-4 text-right transition-colors hover:border-[var(--color-brand-1)]/50 hover:bg-[var(--color-surface)]/60"
-              >
-                <span class="text-[13px] text-[var(--color-muted)]">{nextLabel} →</span>
-                <span class="text-base text-[var(--color-text)] transition-colors group-hover:text-[var(--color-brand-1)]">
-                  {next.label[lang] || next.label.en}
-                </span>
-              </a>
-            ) : <span />}
-          </nav>
-        )}
-      </article>
-
-      <!-- TOC (right rail) -->
-      {tocHeadings.length > 0 ? (
-        <aside class="hidden lg:sticky lg:top-20 lg:block lg:max-h-[calc(100vh-6rem)] lg:self-start lg:overflow-y-auto">
-          <div class="mb-4 font-mono text-xs uppercase tracking-[0.08em] text-[var(--color-muted)]">
-            {tocLabel}
-          </div>
-          <nav aria-label={zh ? "本页目录" : "Table of contents"}>
-            <ul class="space-y-1.5 border-l border-[var(--color-border)] text-sm">
-              {tocHeadings.map((h) => (
-                <li>
-                  <a
-                    href={`#${h.slug}`}
-                    data-toc-link={h.slug}
-                    class:list={[
-                      "-ml-px block border-l-2 border-transparent py-1 transition-colors hover:border-white/30 hover:text-white",
-                      h.depth === 2 ? "pl-3 text-[var(--color-muted)]" : "pl-6 text-[12.5px] text-[var(--color-dim)]",
-                    ]}
-                  >
-                    {h.text}
-                  </a>
-                </li>
+      </main>
+    ) : (
+      <main id="main" class="container-page docs-main">
+        <!-- Mobile docs drawer: a collapsible <details> shown only below lg -->
+        <details class="mobile-docs-nav lg:hidden">
+          <summary>
+            <span class="flex min-w-0 items-center gap-2">
+              <svg class="h-4 w-4 shrink-0 text-[var(--color-muted)]" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+                <line x1="3" y1="5" x2="13" y2="5" stroke-linecap="round"/>
+                <line x1="3" y1="8" x2="13" y2="8" stroke-linecap="round"/>
+                <line x1="3" y1="11" x2="13" y2="11" stroke-linecap="round"/>
+              </svg>
+              <span class="shrink-0">{productName(p, lang)}</span>
+              <span class="text-[var(--color-dim)]">·</span>
+              <span class="truncate font-normal text-[var(--color-muted)]">{pageLabel}</span>
+            </span>
+            <svg class="chevron h-4 w-4 shrink-0 text-[var(--color-muted)] transition-transform" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="4,6 8,10 12,6"/>
+            </svg>
+          </summary>
+          <div class="border-t border-white/[0.08] p-3">
+            <nav aria-label={navLabel} class="flex flex-col gap-5">
+              {sidebar.map((g) => (
+                <div>
+                  <div class="nav-group">{g.label}</div>
+                  <ul class="flex flex-col gap-0.5">
+                    {g.items.map((d) => (
+                      <li>
+                        <a href={d.href} aria-current={d.slug === current ? "page" : undefined} class="nav-item min-h-11">
+                          <span>{d.label[lang]}</span>
+                          {!d.availableHere && <span class="en-badge">EN</span>}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               ))}
-            </ul>
-          </nav>
-        </aside>
-      ) : <span />}
-    </div>
-  </main>
+            </nav>
+
+            {tocHeadings.length > 0 && (
+              <div class="mt-5 border-t border-white/[0.08] pt-4">
+                <div class="nav-group">{tocLabel}</div>
+                <ul class="flex flex-col gap-0.5 text-sm">
+                  {tocHeadings.map((h) => (
+                    <li>
+                      <a href={`#${h.slug}`} class:list={["nav-item min-h-11", h.depth === 3 && "pl-7 text-[13px]"]}>
+                        {h.text}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            <a href={edit} target="_blank" rel="noopener" class="nav-item mt-4 min-h-11 border-t border-white/[0.08] pt-3 text-[13px]">
+              {editLabel}
+            </a>
+          </div>
+        </details>
+
+        <div class="grid gap-8 lg:grid-cols-[15rem_minmax(0,1fr)_12rem] xl:grid-cols-[16.5rem_minmax(0,1fr)_14.5rem] xl:gap-14">
+          <!-- Desktop sidebar (hidden on mobile) -->
+          <aside class="docs-rail hidden lg:block">
+            <nav aria-label={navLabel} class="flex flex-col gap-7">
+              {sidebar.map((g) => (
+                <div>
+                  <div class="nav-group">{g.label}</div>
+                  <ul class="flex flex-col gap-0.5">
+                    {g.items.map((d) => (
+                      <li>
+                        <a href={d.href} aria-current={d.slug === current ? "page" : undefined} class="nav-item">
+                          <span>{d.label[lang]}</span>
+                          {!d.availableHere && <span class="en-badge">EN</span>}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </nav>
+          </aside>
+
+          <!-- Article. Only the markdown gets .prose-tw: those rules are unlayered and
+               would override the utilities on the breadcrumb, cards and prev/next links. -->
+          <article
+            class="min-w-0 max-w-[72ch]"
+            data-pagefind-body
+            data-pagefind-meta={`title:${searchTitle}`}
+            data-pagefind-filter={`product:${p.id}`}
+          >
+            {current !== "" && currentDoc && (
+              <nav aria-label={zh ? "面包屑" : "Breadcrumb"} class="crumbs" data-pagefind-ignore>
+                <a href={productHomeHref(lang, product)}>{productName(p, lang)}</a>
+                <span aria-hidden="true">/</span>
+                <span>{groupLabels[currentDoc.group][lang]}</span>
+                <span aria-hidden="true">/</span>
+                <span aria-current="page" class="text-[var(--color-text)]">{currentDoc.label[lang]}</span>
+              </nav>
+            )}
+
+            <div class="prose-tw"><slot /></div>
+            <slot name="after" />
+
+            <div class="doc-meta" data-pagefind-ignore>
+              {updated && <span>{updatedLabel}</span>}
+              <a href={edit} target="_blank" rel="noopener">
+                <svg class="h-3.5 w-3.5" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+                  <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
+                </svg>
+                {editLabel}
+              </a>
+            </div>
+
+            {(prev || next) && (
+              <nav class="pager" aria-label={zh ? "文档翻页" : "Document navigation"} data-pagefind-ignore>
+                {prev ? (
+                  <a href={docHref(lang, product, prev)} class="nx-tile pager-card">
+                    <span class="nx-label">← {prevLabel}</span>
+                    <span class="pager-title">{prev.label[lang] || prev.label.en}</span>
+                  </a>
+                ) : <span class="hidden sm:block" />}
+                {next ? (
+                  <a href={docHref(lang, product, next)} class="nx-tile pager-card pager-next">
+                    <span class="nx-label">{nextLabel} →</span>
+                    <span class="pager-title">{next.label[lang] || next.label.en}</span>
+                  </a>
+                ) : <span />}
+              </nav>
+            )}
+          </article>
+
+          <!-- TOC (right rail) -->
+          {tocHeadings.length > 0 ? (
+            <aside class="docs-rail hidden lg:block">
+              <div class="nav-group !px-0">{tocLabel}</div>
+              <nav aria-label={zh ? "本页目录" : "Table of contents"}>
+                <ul class="toc">
+                  {tocHeadings.map((h) => (
+                    <li>
+                      <a href={`#${h.slug}`} data-toc-link={h.slug} class:list={["toc-link", h.depth === 3 && "toc-sub"]}>
+                        {h.text}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
+            </aside>
+          ) : <span />}
+        </div>
+      </main>
+    )}
+  </div>
   <SiteFooter />
+  <NeonMotion />
 </Base>
 
 <style is:global>
-  .mobile-docs-nav summary::-webkit-details-marker { display: none; }
-  .mobile-docs-nav[open] summary .chevron { transform: rotate(180deg); }
+  /* ---------- Docs shell: the neon ground, toned down for reading ---------- */
+  .docs-shell {
+    position: relative;
+    isolation: isolate;
+  }
+  .docs-aurora {
+    opacity: 0.55;
+    inset: -260px 0 auto;
+  }
+  .docs-grid {
+    height: 560px;
+    opacity: 0.7;
+  }
 
-  /* Product switcher scrolls sideways on narrow screens without a visible bar. */
+  .docs-bar {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .docs-bar-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    padding-block: 12px;
+  }
+  /* Product switcher: the site's segmented control */
   .product-switch {
+    min-width: 0;
+    max-width: 100%;
+    overflow-x: auto;
     scrollbar-width: none;
     -webkit-overflow-scrolling: touch;
   }
   .product-switch::-webkit-scrollbar { display: none; }
-
-  .toc-link-active {
-    color: var(--color-text) !important;
-    border-color: var(--color-brand-1) !important;
+  .seg {
+    display: inline-flex;
+    gap: 4px;
+    margin: 0;
+    padding: 4px;
+    list-style: none;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 12px;
+    background: rgba(15, 16, 18, 0.7);
+    backdrop-filter: blur(8px);
+  }
+  .seg-item {
+    display: flex;
+    align-items: center;
+    height: 36px;
+    padding: 0 14px;
+    border-radius: 9px;
+    white-space: nowrap;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-muted);
+    transition: color 150ms, background 150ms;
+  }
+  .seg-item:hover { color: #fff; }
+  .seg-item[aria-current="page"] {
+    color: #fff;
+    background: var(--color-surface-2);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14);
+  }
+  @media (max-width: 767px) {
+    .seg-item { height: 40px; }
+  }
+  .docs-search {
+    display: none;
+    flex-shrink: 0;
+    width: 22.5rem;
+    max-width: 40vw;
+    height: 40px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 12px;
+    background: rgba(15, 16, 18, 0.7);
+    backdrop-filter: blur(8px);
+    padding: 0 8px 0 14px;
+    font-size: 14px;
+    color: var(--color-muted);
+    transition: color 150ms, border-color 150ms;
+  }
+  .docs-search:hover {
+    color: var(--color-text);
+    border-color: rgba(255, 255, 255, 0.26);
+  }
+  .docs-search kbd {
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 6px;
+    padding: 2px 6px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+  }
+  @media (min-width: 768px) {
+    .docs-search { display: flex; }
   }
 
-  /* Code copy button (injected by client script) */
-  .code-block-wrap {
+  .docs-main {
+    padding-block: 40px 96px;
+  }
+  .docs-rail {
+    position: sticky;
+    top: 5rem;
+    align-self: start;
+    max-height: calc(100vh - 6rem);
+    overflow-y: auto;
+    scrollbar-width: thin;
+  }
+
+  /* Sidebar */
+  .nav-group {
+    padding: 0 12px 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-dim);
+  }
+  .nav-item {
     position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    border-radius: 8px;
+    padding: 7px 12px;
+    font-size: 14.5px;
+    color: var(--color-muted);
+    transition: color 150ms, background 150ms;
+  }
+  .nav-item:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.03);
+  }
+  .nav-item[aria-current="page"] {
+    color: #fff;
+    font-weight: 500;
+    background: rgba(255, 255, 255, 0.05);
+  }
+  /* the current page carries the mark's cyan→magenta as a bar */
+  .nav-item[aria-current="page"]::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 8px;
+    bottom: 8px;
+    width: 2px;
+    border-radius: 2px;
+    background: linear-gradient(180deg, rgb(var(--a1)), rgb(var(--a2)));
+    box-shadow: 0 0 10px rgb(var(--a1) / 0.6);
+  }
+  .en-badge {
+    flex-shrink: 0;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 4px;
+    padding: 1px 5px;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.06em;
+    color: var(--color-dim);
+  }
+
+  .mobile-docs-nav {
+    margin-bottom: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 14px;
+    background: rgba(15, 16, 18, 0.7);
+    backdrop-filter: blur(8px);
+  }
+  .mobile-docs-nav summary {
+    display: flex;
+    min-height: 44px;
+    cursor: pointer;
+    user-select: none;
+    list-style: none;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-text);
+  }
+  .mobile-docs-nav summary::-webkit-details-marker { display: none; }
+  .mobile-docs-nav[open] summary .chevron { transform: rotate(180deg); }
+
+  /* Article chrome */
+  .crumbs {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+    font-size: 13px;
+    color: var(--color-dim);
+  }
+  .crumbs a { transition: color 150ms; }
+  .crumbs a:hover { color: var(--color-text); }
+  .doc-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px 24px;
+    margin-top: 64px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding-top: 20px;
+    font-size: 13px;
+    color: var(--color-dim);
+  }
+  .doc-meta a {
+    display: inline-flex;
+    min-height: 32px;
+    align-items: center;
+    gap: 6px;
+    transition: color 150ms;
+  }
+  .doc-meta a:hover { color: #fff; }
+  .pager {
+    display: grid;
+    gap: 12px;
+    margin-top: 24px;
+  }
+  @media (min-width: 640px) {
+    .pager { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  .pager-card {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 18px 20px;
+  }
+  .pager-next {
+    align-items: flex-end;
+    text-align: right;
+  }
+  .pager-title {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--color-text);
+    transition: color 150ms;
+  }
+  .pager-card:hover .pager-title { color: #fff; }
+
+  /* Table of contents */
+  .toc {
+    margin: 4px 0 0;
+    padding: 0;
+    list-style: none;
+    border-left: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .toc-link {
+    position: relative;
+    display: block;
+    padding: 5px 0 5px 14px;
+    font-size: 13.5px;
+    line-height: 1.45;
+    color: var(--color-muted);
+    transition: color 150ms;
+  }
+  .toc-sub {
+    padding-left: 26px;
+    font-size: 12.5px;
+    color: var(--color-dim);
+  }
+  .toc-link:hover { color: #fff; }
+  .toc-link-active { color: #fff; }
+  .toc-link-active::before {
+    content: "";
+    position: absolute;
+    left: -1px;
+    top: 4px;
+    bottom: 4px;
+    width: 2px;
+    border-radius: 2px;
+    background: linear-gradient(180deg, rgb(var(--a1)), rgb(var(--a2)));
+    box-shadow: 0 0 10px rgb(var(--a1) / 0.6);
+  }
+
+  /* Code blocks: a window with the language on its title bar and a copy
+     button (both added by the script below; without it the block stands alone) */
+  .code-block-wrap {
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    background: #0b0c0e;
+  }
+  .code-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    padding: 5px 6px 5px 14px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    color: var(--color-dim);
+  }
+  .prose-tw .code-block-wrap pre.astro-code,
+  .prose-tw .code-block-wrap pre.shiki {
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent !important;
   }
   .code-copy-btn {
-    position: absolute;
-    top: 0.6rem;
-    right: 0.6rem;
-    padding: 0.35rem 0.55rem;
-    font-size: 0.7rem;
+    min-height: 26px;
+    padding: 0 9px;
+    font-size: 11px;
     font-family: var(--font-mono);
     color: var(--color-muted);
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: transparent;
+    border: 1px solid transparent;
     border-radius: 6px;
     cursor: pointer;
-    opacity: 0;
-    transition: opacity 200ms, color 150ms, border-color 150ms, background 150ms;
-  }
-  .code-block-wrap:hover .code-copy-btn,
-  .code-copy-btn:focus {
-    opacity: 1;
-  }
-  /* Touch screens have no hover: keep the button visible. */
-  @media (hover: none) {
-    .code-copy-btn { opacity: 1; }
+    transition: color 150ms, border-color 150ms, background 150ms;
   }
   .code-copy-btn:hover {
     color: #fff;
-    border-color: rgba(255, 255, 255, 0.25);
-    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.04);
   }
   .code-copy-btn[data-copied="true"] {
-    color: var(--color-brand-1);
-    border-color: color-mix(in oklab, var(--color-brand-1) 40%, transparent);
-    background: color-mix(in oklab, var(--color-brand-1) 10%, transparent);
-    opacity: 1;
+    color: rgb(var(--a1));
+    border-color: rgb(var(--a1) / 0.4);
+    background: rgb(var(--a1) / 0.08);
   }
 </style>
 
@@ -424,22 +649,28 @@ const itemIdle = "text-[var(--color-text)]/80 hover:text-[var(--color-text)]";
 </script>
 
 <script>
-  // Wrap every code block with a "Copy" button.
+  // Give every code block a title bar: its language and a "Copy" button.
   const copyLabel = document.documentElement.lang === "zh-CN" ? "复制" : "Copy";
   const copiedLabel = document.documentElement.lang === "zh-CN" ? "已复制" : "Copied";
+  const plain = new Set(["", "plaintext", "text", "txt", "plain"]);
 
   document.querySelectorAll<HTMLPreElement>("article pre.astro-code, article pre.shiki").forEach((pre) => {
     if (pre.parentElement?.classList.contains("code-block-wrap")) return;
     const wrap = document.createElement("div");
     wrap.className = "code-block-wrap";
     pre.parentElement?.insertBefore(wrap, pre);
-    wrap.appendChild(pre);
+
+    const head = document.createElement("div");
+    head.className = "code-head";
+    const lang = document.createElement("span");
+    const name = (pre.dataset.language || "").toLowerCase();
+    lang.textContent = plain.has(name) ? "" : name;
+    head.appendChild(lang);
 
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className = "code-copy-btn";
     btn.textContent = copyLabel;
-    btn.setAttribute("aria-label", copyLabel);
     btn.addEventListener("click", async () => {
       const text = pre.innerText;
       try {
@@ -454,7 +685,8 @@ const itemIdle = "text-[var(--color-text)]/80 hover:text-[var(--color-text)]";
         btn.textContent = "!";
       }
     });
-    wrap.appendChild(btn);
+    head.appendChild(btn);
+    wrap.append(head, pre);
   });
 </script>
 
