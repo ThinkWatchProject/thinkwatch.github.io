@@ -1,6 +1,7 @@
 import { defineCollection, z } from "astro:content";
 import { glob } from "astro/loaders";
 import { coreDocsLoader } from "./lib/core-docs-loader";
+import { releaseNotesLoader } from "./lib/release-notes";
 
 const changelogSchema = z.object({
   version: z.string(),
@@ -53,4 +54,16 @@ const docs_core_synced = defineCollection({
   }),
 });
 
-export const collections = { changelog, changelog_zh, docs, docs_lite, docs_core, docs_core_synced };
+// The notes published with each release on GitHub, shown on the changelog:
+// see src/lib/release-notes.ts. Ids are "<lang>/<product>-<tag>".
+const release_notes = defineCollection({
+  loader: releaseNotesLoader(),
+  schema: z.object({
+    product: z.enum(["enterprise", "lite", "core"]),
+    /** The git tag, e.g. "v0.47.0" */
+    tag: z.string(),
+    lang: z.enum(["en", "zh-CN"]),
+  }),
+});
+
+export const collections = { changelog, changelog_zh, docs, docs_lite, docs_core, docs_core_synced, release_notes };
