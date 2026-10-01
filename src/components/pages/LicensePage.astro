@@ -3,6 +3,7 @@
 import Base from "~/layouts/Base.astro";
 import SiteHeader from "~/components/SiteHeader.astro";
 import SiteFooter from "~/components/SiteFooter.astro";
+import NeonMotion from "~/components/NeonMotion.astro";
 import { getLang } from "~/i18n";
 import { licenseCopy } from "~/i18n/pages/license";
 import { breadcrumbs, webPage } from "~/lib/structured-data";
@@ -14,189 +15,369 @@ const jsonLd = [
   webPage(lang, "/license", c.meta.title, c.meta.description),
   breadcrumbs(lang, "/license", c.meta.breadcrumbHome, c.meta.breadcrumbPage),
 ];
-
-const eyebrow = "font-mono text-xs sm:text-[13px] uppercase tracking-[0.08em]";
 ---
 
 <Base title={c.meta.title} description={c.meta.description} jsonLd={jsonLd}>
   <SiteHeader />
   <main id="main">
-    <!-- Hero -->
-    <section class="container-page pt-16 pb-12 md:pt-24 md:pb-16">
-      <div class={`${eyebrow} text-[var(--color-brand-1)] reveal`}>{c.hero.eyebrow}</div>
-      <h1
-        class="font-display mt-5 text-[2.25rem] leading-[1.1] sm:text-5xl lg:text-[56px] lg:leading-[1.05] reveal"
-        style="animation-delay: 80ms"
-      >
-        {c.hero.title}
-      </h1>
-      <p
-        class="mt-5 max-w-[820px] text-lg md:text-xl leading-relaxed text-slate-300 reveal"
-        style="animation-delay: 160ms"
-      >
-        {c.hero.sub}
-      </p>
-    </section>
+    <section class="nx-hero lic-hero">
+      <div class="nx-aurora" aria-hidden="true"><i></i><i></i><i></i></div>
+      <div class="nx-gridbg" aria-hidden="true"></div>
+      <div class="container-page">
+        <p class="nx-label nx-rise">{c.hero.eyebrow}</p>
+        <h1 class="nx-h1 lic-h1 nx-rise" style="--d:1"><span class="nx-grad">{c.hero.title}</span></h1>
+        <p class="nx-sub nx-rise" style="--d:2">{c.hero.sub}</p>
 
-    <!-- The three products and their licenses -->
-    <section class="container-page pb-16 md:pb-24">
-      <div class="grid gap-4 md:grid-cols-3 md:gap-5">
-        {c.products.map((p, i) => (
-          <div
-            class:list={[
-              "flex flex-col gap-3 rounded-2xl border border-[var(--color-border-strong)] p-6 md:p-8 reveal",
-              p.tone === "amber" && "bg-[var(--color-surface)]",
-            ]}
-            style={`animation-delay: ${220 + i * 70}ms`}
-          >
-            <h2 class="text-xl md:text-[22px] font-semibold text-[var(--color-text)]">{p.name}</h2>
-            <span
-              class:list={[
-                "self-start rounded-full border px-2.5 py-1 font-mono text-[13px] leading-none",
-                p.tone === "amber"
-                  ? "border-[var(--color-accent)] text-[var(--color-accent)]"
-                  : "border-[var(--color-brand-1)] text-[var(--color-brand-1)]",
-              ]}
-            >
-              {p.badge}
-            </span>
-            <p class="text-base leading-relaxed text-[var(--color-muted)]">{p.body}</p>
-          </div>
-        ))}
+        <!-- The three products and their licenses -->
+        <div class="lic-products nx-rise" style="--d:3">
+          {c.products.map((p) => (
+            <div class="nx-tile lic-product">
+              <span class:list={["lic-badge", p.tone === "amber" && "lic-badge-bsl"]}>{p.badge}</span>
+              <h2 class="lic-name">{p.name}</h2>
+              <p class="nx-body">{p.body}</p>
+            </div>
+          ))}
+        </div>
       </div>
     </section>
 
-    <!-- ThinkWatch BSL rules and commercial tiers -->
-    <section class="bg-[var(--color-surface)] py-16 md:py-24">
+    <!-- ThinkWatch Enterprise: BSL rules and commercial tiers -->
+    <section class="nx-section nx-hairline">
       <div class="container-page">
-        <div class={`${eyebrow} text-[var(--color-muted)]`}>{c.rules.eyebrow}</div>
-        <h2 class="font-display mt-4 text-3xl md:text-[40px] md:leading-tight">{c.rules.title}</h2>
+        <p class="nx-label nx-in">{c.rules.eyebrow}</p>
+        <h2 class="nx-h2 lic-h2 nx-in">{c.rules.title}</h2>
 
-        <dl class="mt-8 md:mt-9 border-b border-[var(--color-border-strong)] text-base md:text-[17px]">
+        <dl class="lic-terms nx-in">
           {c.rules.rows.map((r) => (
-            <div class="grid gap-1.5 border-t border-[var(--color-border-strong)] py-5 md:grid-cols-[300px_minmax(0,1fr)] md:gap-0">
-              <dt class="font-semibold text-[var(--color-text)]">{r.term}</dt>
-              <dd class="leading-relaxed text-slate-300">{r.rule}</dd>
+            <div>
+              <dt>{r.term}</dt>
+              <dd>{r.rule}</dd>
             </div>
           ))}
         </dl>
 
-        <h3 class="mt-14 md:mt-[72px] text-2xl md:text-[26px] font-semibold text-[var(--color-text)]">{c.tiers.title}</h3>
-        <p class="mt-2.5 text-base md:text-[17px] text-[var(--color-muted)]">{c.tiers.sub}</p>
-        <p class="mt-2 text-sm text-[var(--color-dim)] md:hidden">{c.tiers.scrollHint}</p>
+        <h3 class="lic-h3 nx-in">{c.tiers.title}</h3>
+        <p class="nx-body nx-in">{c.tiers.sub}</p>
+        <p class="lic-hint md:hidden">{c.tiers.scrollHint}</p>
 
         <!-- The table keeps its column widths and scrolls inside this box on narrow screens. -->
-        <div
-          class="tier-scroll mt-6 -mx-5 overflow-x-auto px-5 md:mx-0 md:px-0"
-          role="region"
-          aria-label={c.tiers.tableLabel}
-          tabindex="0"
-        >
-          <table class="w-full min-w-[760px] border-collapse text-left text-base">
+        <div class="tier-scroll nx-in" role="region" aria-label={c.tiers.tableLabel} tabindex="0">
+          <table>
             <thead>
               <tr>
-                {c.tiers.headers.map((h) => (
-                  <th scope="col" class="whitespace-nowrap border-b border-[var(--color-border-strong)] py-3.5 pr-6 font-normal text-[var(--color-muted)]">
-                    {h}
-                  </th>
-                ))}
+                {c.tiers.headers.map((h) => <th scope="col">{h}</th>)}
               </tr>
             </thead>
             <tbody>
               {c.tiers.rows.map((row) => (
-                <tr>
-                  <th scope="row" class="whitespace-nowrap border-b border-[var(--color-border)] py-4 pr-6 font-semibold text-[var(--color-text)]">
-                    {row.name}
-                  </th>
-                  <td class="whitespace-nowrap border-b border-[var(--color-border)] py-4 pr-6 font-mono text-[15px] tabular-nums text-slate-300">
-                    {row.tokens}
-                  </td>
-                  <td class="whitespace-nowrap border-b border-[var(--color-border)] py-4 pr-6 font-mono text-[15px] tabular-nums text-slate-300">
-                    {row.calls}
-                  </td>
-                  <td
-                    class:list={[
-                      "border-b border-[var(--color-border)] py-4",
-                      row.free ? "text-[var(--color-brand-1)]" : "text-slate-300",
-                    ]}
-                  >
-                    {row.price}
-                  </td>
+                <tr class:list={[row.free && "tier-free"]}>
+                  <th scope="row">{row.name}</th>
+                  <td class="num">{row.tokens}</td>
+                  <td class="num">{row.calls}</td>
+                  <td class="price">{row.price}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
 
-        <div class="mt-5 max-w-[980px] space-y-2 text-base leading-relaxed text-[var(--color-muted)]">
+        <div class="lic-notes">
           {c.tiers.notes.map((n) => <p>{n}</p>)}
         </div>
       </div>
     </section>
 
     <!-- What counts toward the thresholds -->
-    <section class="container-page py-16 md:py-24">
-      <h2 class={`${eyebrow} text-[var(--color-muted)]`}>{c.counts.eyebrow}</h2>
-      <p class="mt-4 max-w-[820px] text-base md:text-[17px] leading-relaxed text-slate-300">{c.counts.volume}</p>
-      <div class="mt-7 grid gap-4 md:grid-cols-2 md:gap-6">
-        {c.counts.cards.map((card) => (
-          <div class="flex flex-col gap-[18px] rounded-2xl border border-[var(--color-border-strong)] p-6 md:p-8">
-            <h3 class="text-[22px] md:text-2xl font-semibold text-[var(--color-text)]">{card.title}</h3>
-            <div class="flex flex-col gap-1.5">
-              <span class={`${eyebrow} !text-xs text-[var(--color-brand-1)]`}>{c.counts.counted}</span>
-              <p class="text-base leading-relaxed text-slate-300">{card.counted}</p>
+    <section class="nx-section nx-hairline">
+      <div class="container-page">
+        <h2 class="nx-h2 lic-h2 nx-in">{c.counts.eyebrow}</h2>
+        <p class="nx-sub nx-in">{c.counts.volume}</p>
+        <div class="lic-counts">
+          {c.counts.cards.map((card) => (
+            <div class="nx-tile lic-count nx-in">
+              <h3 class="lic-name">{card.title}</h3>
+              <div class="lic-count-part">
+                <span class="lic-mark lic-mark-in">{c.counts.counted}</span>
+                <p>{card.counted}</p>
+              </div>
+              <div class="lic-count-part">
+                <span class="lic-mark">{c.counts.notCounted}</span>
+                <p>{card.notCounted}</p>
+              </div>
             </div>
-            <div class="flex flex-col gap-1.5">
-              <span class={`${eyebrow} !text-xs text-[var(--color-muted)]`}>{c.counts.notCounted}</span>
-              <p class="text-base leading-relaxed text-slate-300">{card.notCounted}</p>
-            </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </section>
 
     <!-- Full text and sales contact -->
-    <section class="container-page pb-16 md:pb-24">
-      <div class="grid gap-4 md:grid-cols-2 md:gap-6">
-        <div class="flex flex-col gap-2.5 rounded-2xl border border-[var(--color-border-strong)] p-6 md:p-8">
-          <h2 class="text-xl font-semibold text-[var(--color-text)]">{c.fullText.title}</h2>
-          <p class="text-base leading-relaxed text-[var(--color-muted)]">{c.fullText.body}</p>
-          <ul class="mt-1 flex flex-col gap-x-6 sm:flex-row sm:flex-wrap">
-            {c.fullText.links.map((l) => (
-              <li>
-                <a
-                  href={l.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="inline-flex min-h-11 items-center text-base text-[var(--color-brand-1)] underline-offset-4 transition-colors hover:text-[var(--color-brand-2)] hover:underline focus-visible:underline"
-                >
-                  {l.label}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div class="flex flex-col gap-2.5 rounded-2xl border border-[var(--color-border-strong)] bg-[var(--color-surface)] p-6 md:p-8">
-          <h2 class="text-xl font-semibold text-[var(--color-text)]">{c.contact.title}</h2>
-          <p class="text-base leading-relaxed text-[var(--color-muted)]">{c.contact.body}</p>
-          <a
-            href={c.contact.href}
-            class="mt-1 inline-flex min-h-11 items-center self-start text-base text-[var(--color-brand-1)] underline-offset-4 transition-colors hover:text-[var(--color-brand-2)] hover:underline focus-visible:underline"
-          >
-            {c.contact.label}
-          </a>
+    <section class="nx-section-tight nx-hairline lic-end">
+      <div class="container-page">
+        <div class="nx-cols" style="--cols:2">
+          <div class="lic-end-col">
+            <h2 class="nx-h3">{c.fullText.title}</h2>
+            <p class="nx-body">{c.fullText.body}</p>
+            <ul class="lic-links">
+              {c.fullText.links.map((l) => (
+                <li>
+                  <a href={l.href} target="_blank" rel="noopener noreferrer" class="nx-link">{l.label}</a>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div class="lic-end-col">
+            <h2 class="nx-h3">{c.contact.title}</h2>
+            <p class="nx-body">{c.contact.body}</p>
+            <a href={c.contact.href} class="nx-ghost lic-mail">{c.contact.label}</a>
+          </div>
         </div>
       </div>
     </section>
   </main>
   <SiteFooter />
+  <NeonMotion />
 </Base>
 
 <style>
-  /* Keyboard users can focus the scroll box; show where focus is. */
+  .lic-hero {
+    padding-bottom: 72px;
+  }
+  .lic-h1 {
+    margin-top: 16px;
+  }
+  .lic-products {
+    margin-top: 44px;
+    display: grid;
+    gap: 12px;
+  }
+  @media (min-width: 768px) {
+    .lic-products {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  .lic-product {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 26px 26px 28px;
+  }
+  .lic-product .nx-body {
+    margin: 0;
+  }
+  .lic-name {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: #fff;
+  }
+  /* MIT in the mark's cyan, the Business Source License in amber */
+  .lic-badge {
+    align-self: flex-start;
+    margin-bottom: 6px;
+    border: 1px solid rgb(var(--a1) / 0.5);
+    border-radius: 999px;
+    padding: 4px 10px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 1;
+    color: rgb(var(--a1));
+    background: rgb(var(--a1) / 0.08);
+  }
+  .lic-badge-bsl {
+    border-color: color-mix(in oklab, var(--color-accent) 55%, transparent);
+    color: var(--color-accent);
+    background: color-mix(in oklab, var(--color-accent) 10%, transparent);
+  }
+
+  .lic-h2 {
+    margin-top: 14px;
+  }
+  .lic-terms {
+    margin: 40px 0 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .lic-terms > div {
+    display: grid;
+    gap: 6px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 20px 0;
+  }
+  @media (min-width: 768px) {
+    .lic-terms > div {
+      grid-template-columns: 280px minmax(0, 1fr);
+      gap: 0 32px;
+    }
+  }
+  .lic-terms dt {
+    font-size: 16px;
+    font-weight: 600;
+    color: #fff;
+  }
+  .lic-terms dd {
+    margin: 0;
+    max-width: 760px;
+    font-size: 16px;
+    line-height: 1.65;
+    color: var(--color-muted);
+  }
+
+  .lic-h3 {
+    margin: 72px 0 0;
+    font-size: 26px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: #fff;
+  }
+  .lic-hint {
+    margin: 8px 0 0;
+    font-size: 13px;
+    color: var(--color-dim);
+  }
+  .tier-scroll {
+    margin-top: 24px;
+    overflow-x: auto;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    background: linear-gradient(180deg, #141518, #0f1012);
+  }
   .tier-scroll:focus-visible {
-    outline: 2px solid var(--color-brand-1);
+    outline: 2px solid rgb(var(--a1));
     outline-offset: 4px;
-    border-radius: 4px;
+  }
+  .tier-scroll table {
+    width: 100%;
+    min-width: 760px;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 15px;
+  }
+  .tier-scroll th,
+  .tier-scroll td {
+    padding: 16px 24px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    white-space: nowrap;
+  }
+  .tier-scroll thead th {
+    padding-block: 14px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-dim);
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+  }
+  .tier-scroll tbody tr:last-child > * {
+    border-bottom: 0;
+  }
+  .tier-scroll tbody th {
+    font-weight: 600;
+    color: #fff;
+  }
+  .tier-scroll .num {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-text);
+  }
+  .tier-scroll .price {
+    white-space: normal;
+    color: var(--color-muted);
+  }
+  /* The free tier, set off in the mark's cyan */
+  .tier-free > * {
+    background: rgb(var(--a1) / 0.05);
+  }
+  .tier-free th {
+    box-shadow: inset 2px 0 0 rgb(var(--a1));
+  }
+  .tier-free .price {
+    color: rgb(var(--a1));
+  }
+  .lic-notes {
+    margin-top: 20px;
+    max-width: 920px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 15px;
+    line-height: 1.65;
+    color: var(--color-muted);
+  }
+  .lic-notes p {
+    margin: 0;
+  }
+
+  .lic-counts {
+    margin-top: 40px;
+    display: grid;
+    gap: 12px;
+  }
+  @media (min-width: 768px) {
+    .lic-counts {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  .lic-count {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .lic-count-part {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .lic-count-part p {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.65;
+    color: var(--color-muted);
+  }
+  .lic-mark {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-dim);
+  }
+  .lic-mark::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 99px;
+    border: 1px solid var(--color-dim);
+  }
+  .lic-mark-in {
+    color: var(--color-text);
+  }
+  .lic-mark-in::before {
+    border: 0;
+    background: rgb(var(--a1));
+    box-shadow: 0 0 8px rgb(var(--a1));
+  }
+
+  .lic-end {
+    padding-bottom: 104px;
+  }
+  .lic-end-col {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .lic-links {
+    margin: 12px 0 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 24px;
+  }
+  .lic-links .nx-link {
+    font-size: 14.5px;
+  }
+  .lic-mail {
+    margin-top: 20px;
+    font-family: var(--font-mono);
+    font-size: 14px;
   }
 </style>

@@ -1,16 +1,18 @@
 ---
 // The /changelog page: the releases of ThinkWatch Enterprise, ThinkWatch Lite
-// and ThinkWatch Core, newest first, filterable by product. Each release shows
-// its version and date and links to its page on GitHub; the Enterprise releases
-// written up on this site also show their notes. Copy lives in
+// and ThinkWatch Core, newest first and grouped by month, filterable by
+// product, under the latest release of each. Each release shows its version
+// and date and links to its page on GitHub; the Enterprise releases written up
+// on this site also show their notes. Copy lives in
 // src/i18n/pages/changelog.ts, the list in src/lib/changelog.ts.
 import { render } from "astro:content";
 import Base from "~/layouts/Base.astro";
 import SiteHeader from "~/components/SiteHeader.astro";
 import SiteFooter from "~/components/SiteFooter.astro";
+import NeonMotion from "~/components/NeonMotion.astro";
 import { getLang } from "~/i18n";
 import { changelogCopy } from "~/i18n/pages/changelog";
-import { getChangelog, releaseProductName } from "~/lib/changelog";
+import { getChangelog, releaseProductName, type ChangelogEntry } from "~/lib/changelog";
 import { breadcrumbs, webPage } from "~/lib/structured-data";
 
 const lang = getLang(Astro);
@@ -22,170 +24,475 @@ const jsonLd = [
   breadcrumbs(lang, "/changelog", c.meta.breadcrumbHome, c.meta.breadcrumbPage),
 ];
 
-const typeStyles: Record<string, string> = {
-  release: "border-brand-1/40 bg-brand-1/10 text-brand-1",
-  feature: "border-white/15 bg-white/5 text-[var(--color-text)]",
-  fix: "border-emerald-500/30 bg-emerald-500/10 text-emerald-300",
-  security: "border-accent/40 bg-accent/10 text-accent",
-};
-
 // Release times are UTC; format them in UTC so the date does not depend on where the site is built.
 const fmt = new Intl.DateTimeFormat(c.dateLocale, { ...c.dateFormat, timeZone: "UTC" });
+const fmtFull = new Intl.DateTimeFormat(c.dateLocale, { ...c.fullDateFormat, timeZone: "UTC" });
+const fmtMonth = new Intl.DateTimeFormat(c.dateLocale, { ...c.monthFormat, timeZone: "UTC" });
 
-const filters = [
-  { id: "all", label: c.all },
-  ...(["enterprise", "lite", "core"] as const).map((id) => ({ id, label: c.filters[id] })),
-];
+const products = ["lite", "enterprise", "core"] as const;
+const count = (id: string) => (id === "all" ? entries.length : entries.filter((e) => e.product === id).length);
+const filters = [{ id: "all", label: c.all }, ...products.map((id) => ({ id, label: c.filters[id] }))];
+
+const latest = products
+  .map((id) => entries.find((e) => e.product === id))
+  .filter((e): e is ChangelogEntry => Boolean(e));
+
+// Newest month first; releases keep their newest-first order inside it.
+const months: { key: string; label: string; items: ChangelogEntry[] }[] = [];
+for (const e of entries) {
+  const key = `${e.date.getUTCFullYear()}-${e.date.getUTCMonth()}`;
+  if (months.at(-1)?.key !== key) months.push({ key, label: fmtMonth.format(e.date), items: [] });
+  months.at(-1)!.items.push(e);
+}
 ---
 
 <Base title={c.meta.title} description={c.meta.description} jsonLd={jsonLd}>
   <SiteHeader />
-  <main id="main" class="container-page py-16 md:py-24">
-    <header class="max-w-3xl">
-      <div class="font-mono text-xs sm:text-[13px] uppercase tracking-[0.08em] text-[var(--color-brand-1)] reveal">
-        {c.eyebrow}
-      </div>
-      <h1 class="font-display mt-5 text-4xl leading-[1.1] md:text-[56px] reveal" style="animation-delay: 80ms">
-        {c.titleA}<span class="text-gradient">{c.titleHighlight}</span>
-      </h1>
-      <p class="mt-5 text-lg leading-relaxed text-[var(--color-muted)] reveal" style="animation-delay: 160ms">
-        {c.intro}<a href="/changelog.xml" class="text-[var(--color-text)] underline underline-offset-4 hover:text-[var(--color-brand-1)]">{c.rss}</a>{c.introEnd}
-      </p>
-    </header>
+  <main id="main">
+    <section class="nx-hero cl-hero">
+      <div class="nx-aurora" aria-hidden="true"><i></i><i></i><i></i></div>
+      <div class="nx-gridbg" aria-hidden="true"></div>
+      <div class="container-page">
+        <p class="nx-label nx-rise">{c.eyebrow}</p>
+        <h1 class="nx-h1 cl-h1 nx-rise" style="--d:1">{c.titleA}<span class="nx-grad">{c.titleHighlight}</span></h1>
+        <p class="nx-sub nx-rise" style="--d:2">
+          {c.intro}<a href="/changelog.xml" class="cl-rss">{c.rss}</a>{c.introEnd}
+        </p>
 
-    <div class="mt-10 md:mt-12 flex flex-wrap gap-2" role="group" aria-label={c.filterLabel}>
-      {filters.map((f, i) => (
-        <button
-          type="button"
-          data-filter-btn={f.id}
-          aria-pressed={i === 0 ? "true" : "false"}
-          class="filter-btn inline-flex min-h-11 items-center rounded-full border border-white/15 px-4 text-sm font-medium text-[var(--color-muted)] transition-colors hover:border-white/30 hover:text-[var(--color-text)]"
-        >
-          {f.label}
-        </button>
-      ))}
-    </div>
-
-    <ol class="changelog-list mt-12 max-w-3xl" data-filter="all">
-      {entries.map(async (entry) => {
-        const name = releaseProductName(entry.product, lang);
-        const notes = entry.notes;
-        const Content = notes ? (await render(notes)).Content : null;
-        return (
-          <li
-            id={entry.id}
-            data-product={entry.product}
-            class:list={[
-              "changelog-item relative scroll-mt-24 border-l border-[var(--color-border-strong)] pl-6 sm:pl-8",
-              notes ? "pb-12" : "pb-6",
-            ]}
-          >
-            {/* The anchor the release had while the page listed Enterprise alone (#v0.4.0). */}
-            {entry.legacyId && <span id={entry.legacyId} class="absolute top-0 scroll-mt-24" aria-hidden="true"></span>}
-            <a
-              href={`#${entry.id}`}
-              class="timeline-dot absolute -left-[5px] top-2 size-2.5 rounded-full bg-[var(--color-brand-1)] ring-4 ring-[var(--color-bg)] transition-transform hover:scale-125"
-              aria-label={`${c.linkTo} ${name} ${entry.tag}`}
-            ></a>
-
-            <div class:list={["flex flex-wrap items-center gap-x-3 gap-y-2", notes && "mb-3"]}>
-              <span class="rounded-full border border-[var(--color-border-strong)] px-2 py-0.5 text-xs text-[var(--color-muted)]">
-                {name}
+        <h2 class="sr-only">{c.latest}</h2>
+        <div class="cl-latest nx-rise" style="--d:3">
+          {latest.map((e) => (
+            <a href={e.url ?? `#${e.id}`} target={e.url ? "_blank" : undefined} rel={e.url ? "noopener" : undefined} class="nx-tile cl-latest-tile">
+              <span class="cl-prod" data-product={e.product}>{releaseProductName(e.product, lang)}</span>
+              <span class="cl-latest-tag">{e.tag}</span>
+              <span class="cl-latest-foot">
+                <time datetime={e.date.toISOString()}>{fmtFull.format(e.date)}</time>
+                {e.url && <span class="cl-gh">{c.github} ↗</span>}
               </span>
-              <span class="font-mono text-sm text-[var(--color-text)]">{entry.tag}</span>
-              {notes && (
-                <span class={`rounded-full border px-2 py-0.5 text-[10px] uppercase tracking-wider ${typeStyles[notes.data.type]}`}>
-                  {notes.data.type}
-                </span>
-              )}
-              <time class="text-xs text-[var(--color-dim)]" datetime={entry.date.toISOString()}>
-                {fmt.format(entry.date)}
-              </time>
-              {entry.url && (
-                <a
-                  href={entry.url}
-                  target="_blank"
-                  rel="noopener"
-                  class="inline-flex items-center text-xs text-[var(--color-brand-1)] transition-colors hover:text-[var(--color-brand-2)]"
-                >
-                  {c.github}
-                  <svg class="ml-1 h-3 w-3" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                    <path d="M5 11L11 5M6 5h5v5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
-                  </svg>
-                </a>
-              )}
-            </div>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
 
-            {notes && (
-              <Fragment>
-                <h2 class="mb-3 text-2xl font-semibold tracking-tight text-[var(--color-text)]">{notes.data.title}</h2>
+    <section class="container-page cl-body">
+      <div class="cl-filter" role="group" aria-label={c.filterLabel}>
+        {filters.map((f, i) => (
+          <button type="button" data-filter-btn={f.id} aria-pressed={i === 0 ? "true" : "false"} class="cl-filter-btn">
+            {f.label}<span class="cl-count">{count(f.id)}</span>
+          </button>
+        ))}
+      </div>
 
-                {notes.data.highlights && (
-                  <ul class="mb-4 space-y-1.5 text-sm text-[var(--color-muted)]">
-                    {notes.data.highlights.map((h) => (
-                      <li class="flex gap-2">
-                        <span class="text-[var(--color-brand-1)]" aria-hidden="true">›</span>
-                        <span>{h}</span>
-                      </li>
-                    ))}
-                  </ul>
-                )}
+      <div class="changelog-list" data-filter="all">
+        {months.map((m) => (
+          <section class="cl-month">
+            <h2 class="cl-month-label">{m.label}</h2>
+            <ol class="cl-rows">
+              {m.items.map(async (entry) => {
+                const name = releaseProductName(entry.product, lang);
+                const notes = entry.notes;
+                const Content = notes ? (await render(notes)).Content : null;
+                return (
+                  <li id={entry.id} data-product={entry.product} class="changelog-item">
+                    {/* The anchor the release had while the page listed Enterprise alone (#v0.4.0). */}
+                    {entry.legacyId && <span id={entry.legacyId} class="cl-legacy" aria-hidden="true"></span>}
+                    <div class="cl-row">
+                      <time class="cl-date" datetime={entry.date.toISOString()}>{fmt.format(entry.date)}</time>
+                      <span class="cl-prod" data-product={entry.product}>{name}</span>
+                      <a href={`#${entry.id}`} class="cl-tag" aria-label={`${c.linkTo} ${name} ${entry.tag}`}>{entry.tag}</a>
+                      {entry.url ? (
+                        <a href={entry.url} target="_blank" rel="noopener" class="cl-gh-link" aria-label={`${c.githubFull}: ${name} ${entry.tag}`}>
+                          {c.github} ↗
+                        </a>
+                      ) : <span />}
+                    </div>
 
-                <div class="prose prose-invert prose-sm max-w-none text-[var(--color-muted)]">
-                  {Content && <Content />}
-                </div>
-              </Fragment>
-            )}
-          </li>
-        );
-      })}
-    </ol>
+                    {notes && (
+                      <div class="cl-notes">
+                        <h3 class="cl-notes-title">{notes.data.title}</h3>
+                        {notes.data.highlights && (
+                          <ul class="cl-highlights">
+                            {notes.data.highlights.map((h) => <li>{h}</li>)}
+                          </ul>
+                        )}
+                        {Content && (
+                          <details class="cl-more">
+                            <summary>{c.readNotes}</summary>
+                            <div class="prose-tw cl-prose"><Content /></div>
+                          </details>
+                        )}
+                      </div>
+                    )}
+                  </li>
+                );
+              })}
+            </ol>
+          </section>
+        ))}
+      </div>
+    </section>
   </main>
   <SiteFooter />
+  <NeonMotion />
 </Base>
 
 <style>
-  .changelog-list[data-filter="enterprise"] .changelog-item:not([data-product="enterprise"]),
-  .changelog-list[data-filter="lite"]       .changelog-item:not([data-product="lite"]),
-  .changelog-list[data-filter="core"]       .changelog-item:not([data-product="core"]) {
-    display: none;
+  .cl-hero {
+    padding-bottom: 56px;
+  }
+  .cl-h1 {
+    margin-top: 16px;
+  }
+  .cl-rss {
+    color: var(--color-text);
+    text-decoration: underline;
+    text-decoration-color: rgba(255, 255, 255, 0.3);
+    text-underline-offset: 4px;
+    transition: color 150ms, text-decoration-color 150ms;
+  }
+  .cl-rss:hover {
+    color: #fff;
+    text-decoration-color: rgb(var(--a1));
   }
 
-  /* Active filter pill: teal. Driven by aria-pressed so the script only flips that attribute. */
-  .filter-btn[aria-pressed="true"] {
-    border-color: var(--color-brand-1);
-    background: color-mix(in oklab, var(--color-brand-1) 14%, transparent);
-    color: var(--color-brand-1);
+  /* Each product keeps one colour wherever it appears on the page */
+  .cl-prod {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--color-muted);
+    white-space: nowrap;
   }
-  .filter-btn:focus-visible {
-    outline: 2px solid var(--color-brand-1);
+  .cl-prod::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 99px;
+    background: var(--dot);
+    box-shadow: 0 0 8px var(--dot);
+  }
+  .cl-prod[data-product="enterprise"] {
+    --dot: var(--color-accent);
+  }
+  .cl-prod[data-product="lite"] {
+    --dot: rgb(var(--a1));
+  }
+  .cl-prod[data-product="core"] {
+    --dot: rgb(var(--a2));
+  }
+
+  .cl-latest {
+    margin-top: 40px;
+    display: grid;
+    gap: 12px;
+  }
+  @media (min-width: 768px) {
+    .cl-latest {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  .cl-latest-tile {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 22px 24px;
+  }
+  .cl-latest-tag {
+    font-family: var(--font-mono);
+    font-size: clamp(22px, 2.2vw, 28px);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    color: #fff;
+    font-variant-numeric: tabular-nums;
+  }
+  .cl-latest-foot {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 13px;
+    color: var(--color-dim);
+  }
+  .cl-gh {
+    transition: color 150ms;
+  }
+  .cl-latest-tile:hover .cl-gh {
+    color: #fff;
+  }
+
+  .cl-body {
+    padding-bottom: 104px;
+  }
+  /* Filter: the site's segmented control */
+  .cl-filter {
+    display: inline-flex;
+    max-width: 100%;
+    overflow-x: auto;
+    gap: 4px;
+    padding: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 12px;
+    background: var(--color-surface);
+    scrollbar-width: none;
+  }
+  .cl-filter-btn {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 8px;
+    min-height: 36px;
+    padding: 0 14px;
+    border-radius: 9px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-muted);
+    transition: color 150ms, background 150ms;
+  }
+  .cl-filter-btn:hover {
+    color: #fff;
+  }
+  .cl-filter-btn[aria-pressed="true"] {
+    color: #fff;
+    background: var(--color-surface-2);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14);
+  }
+  .cl-filter-btn:focus-visible {
+    outline: 2px solid rgb(var(--a1));
     outline-offset: 2px;
   }
-
-  /* The dot is 10px; give its anchor a larger invisible hit area. */
-  .timeline-dot::before {
-    content: "";
-    position: absolute;
-    inset: -14px;
+  .cl-count {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--color-dim);
+    font-variant-numeric: tabular-nums;
   }
 
-  /* Section headings inside changelog body */
-  .changelog-item :global(.prose h2) {
-    font-size: 0.75rem;
+  /* Months down the side, releases as hairline rows */
+  .changelog-list {
+    margin-top: 40px;
+  }
+  .cl-month {
+    display: grid;
+    gap: 8px 40px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 24px 0 32px;
+  }
+  @media (min-width: 1024px) {
+    .cl-month {
+      grid-template-columns: 200px minmax(0, 1fr);
+    }
+    .cl-month-label {
+      position: sticky;
+      top: 88px;
+      align-self: start;
+    }
+  }
+  .cl-month-label {
+    margin: 0;
+    padding-top: 10px;
+    font-size: 15px;
     font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--color-brand-1);
-    margin-top: 1.25rem;
-    margin-bottom: 0.375rem;
+    letter-spacing: -0.01em;
+    color: #fff;
   }
-  .changelog-item :global(.prose h2:first-child) {
+  .cl-rows {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    max-width: 860px;
+  }
+  .changelog-item {
+    position: relative;
+    scroll-margin-top: 96px;
+  }
+  .changelog-item + .changelog-item {
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+  }
+  .cl-legacy {
+    position: absolute;
+    top: 0;
+    scroll-margin-top: 96px;
+  }
+  .cl-rows {
+    --date: 84px;
+    --prod: 168px;
+    --gap: 20px;
+  }
+  .cl-row {
+    display: grid;
+    grid-template-columns: var(--date) var(--prod) minmax(0, 1fr) 72px;
+    align-items: center;
+    gap: 4px var(--gap);
+    min-height: 44px;
+    padding: 6px 12px;
+    margin: 0 -12px;
+    border-radius: 10px;
+    transition: background 150ms;
+  }
+  .cl-row:hover,
+  .changelog-item:target .cl-row {
+    background: rgba(255, 255, 255, 0.03);
+  }
+  .changelog-item:target .cl-row {
+    box-shadow: inset 2px 0 0 rgb(var(--a1));
+  }
+  .cl-tag {
+    justify-self: start;
+    font-family: var(--font-mono);
+    font-size: 14.5px;
+    color: var(--color-text);
+    transition: color 150ms;
+  }
+  .cl-tag:hover {
+    color: rgb(var(--a1));
+  }
+  .cl-date {
+    font-size: 13px;
+    color: var(--color-dim);
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+  .cl-gh-link {
+    justify-self: end;
+    display: inline-flex;
+    min-height: 32px;
+    align-items: center;
+    font-size: 13px;
+    color: var(--color-dim);
+    transition: color 150ms;
+  }
+  .cl-gh-link:hover {
+    color: #fff;
+  }
+  @media (max-width: 639px) {
+    .cl-row {
+      grid-template-columns: minmax(0, 1fr) auto;
+      padding-block: 10px;
+    }
+    .cl-prod {
+      grid-column: 1;
+      grid-row: 1;
+    }
+    .cl-date {
+      grid-column: 2;
+      grid-row: 1;
+      justify-self: end;
+    }
+    .cl-tag {
+      grid-column: 1;
+      grid-row: 2;
+    }
+    .cl-gh-link {
+      grid-column: 2;
+      grid-row: 2;
+    }
+  }
+
+  .cl-notes {
+    padding: 8px 0 28px;
+  }
+  /* the notes line up under the version */
+  @media (min-width: 640px) {
+    .cl-notes {
+      padding-left: calc(var(--date) + var(--prod) + 2 * var(--gap));
+    }
+  }
+  .cl-notes-title {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: #fff;
+  }
+  .cl-highlights {
+    margin: 14px 0 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 14.5px;
+    line-height: 1.6;
+    color: var(--color-muted);
+  }
+  .cl-highlights li {
+    display: flex;
+    gap: 10px;
+  }
+  .cl-highlights li::before {
+    content: "";
+    flex-shrink: 0;
+    width: 5px;
+    height: 5px;
+    margin-top: 0.62em;
+    border-radius: 99px;
+    background: linear-gradient(135deg, rgb(var(--a1)), rgb(var(--a2)));
+  }
+  .cl-more {
+    margin-top: 16px;
+  }
+  .cl-more summary {
+    display: inline-flex;
+    min-height: 40px;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    list-style: none;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-text);
+    transition: color 150ms;
+  }
+  .cl-more summary::-webkit-details-marker {
+    display: none;
+  }
+  .cl-more summary::after {
+    content: "↓";
+    color: var(--color-dim);
+    transition: transform 150ms;
+  }
+  .cl-more[open] summary::after {
+    transform: rotate(180deg);
+  }
+  .cl-more summary:hover {
+    color: #fff;
+  }
+  .cl-prose {
+    margin-top: 12px;
+    font-size: 0.9rem;
+  }
+  .cl-prose :global(h2) {
+    margin-top: 1.8em;
+    font-size: 1.1rem;
+  }
+  .cl-prose :global(h2:first-child) {
     margin-top: 0;
   }
-
   /* Hide the # anchor link appended by rehypeAutolinkHeadings */
-  .changelog-item :global(.heading-anchor) {
+  .cl-prose :global(.heading-anchor) {
     display: none;
+  }
+
+  /* Filtering hides other products' releases, and a month left empty */
+  .changelog-list[data-filter="enterprise"] .changelog-item:not([data-product="enterprise"]),
+  .changelog-list[data-filter="lite"] .changelog-item:not([data-product="lite"]),
+  .changelog-list[data-filter="core"] .changelog-item:not([data-product="core"]),
+  .changelog-list[data-filter="enterprise"] .cl-month:not(:has([data-product="enterprise"])),
+  .changelog-list[data-filter="lite"] .cl-month:not(:has([data-product="lite"])),
+  .changelog-list[data-filter="core"] .cl-month:not(:has([data-product="core"])) {
+    display: none;
+  }
+  /* the first release shown in a month gets no rule above it */
+  .changelog-list[data-filter="enterprise"] .changelog-item[data-product="enterprise"],
+  .changelog-list[data-filter="lite"] .changelog-item[data-product="lite"],
+  .changelog-list[data-filter="core"] .changelog-item[data-product="core"] {
+    border-top: 0;
+  }
+  .changelog-list[data-filter="enterprise"] .changelog-item[data-product="enterprise"] ~ .changelog-item[data-product="enterprise"],
+  .changelog-list[data-filter="lite"] .changelog-item[data-product="lite"] ~ .changelog-item[data-product="lite"],
+  .changelog-list[data-filter="core"] .changelog-item[data-product="core"] ~ .changelog-item[data-product="core"] {
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
   }
 </style>
 

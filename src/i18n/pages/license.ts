@@ -24,14 +24,14 @@ export const licenseCopy = {
     meta: {
       title: "License · ThinkWatch",
       description:
-        "ThinkWatch Lite and ThinkWatch Core are MIT. ThinkWatch is source-available under the Business Source License 1.1: free for non-production use, and free in production up to 10,000,000 billable tokens and 10,000 MCP tool calls per month.",
+        "ThinkWatch Lite and ThinkWatch Core are MIT. ThinkWatch Enterprise is source-available under the Business Source License 1.1: free for non-production use, and free in production up to 10,000,000 billable tokens and 10,000 MCP tool calls per month.",
       breadcrumbHome: "Home",
       breadcrumbPage: "License",
     },
     hero: {
       eyebrow: "License terms",
       title: "Licensing",
-      sub: "ThinkWatch Lite and ThinkWatch Core are licensed under MIT. ThinkWatch is source-available under the Business Source License 1.1, with free production use up to monthly thresholds.",
+      sub: "ThinkWatch Lite and ThinkWatch Core are licensed under MIT. ThinkWatch Enterprise is source-available under the Business Source License 1.1, with free production use up to monthly thresholds.",
     },
     products: [
       {
@@ -75,7 +75,7 @@ export const licenseCopy = {
     tiers: {
       title: "Commercial tiers",
       sub: "Priced by monthly usage, not by seat.",
-      tableLabel: "ThinkWatch commercial tiers",
+      tableLabel: "ThinkWatch Enterprise commercial tiers",
       scrollHint: "Scroll sideways to see every column.",
       headers: ["Tier", "Billable tokens / month", "MCP tool calls / month", "List price"],
       rows: [
@@ -131,7 +131,7 @@ export const licenseCopy = {
     },
     contact: {
       title: "Commercial licensing",
-      body: "If either free threshold is exceeded, a commercial license must be obtained before continuing production use of ThinkWatch.",
+      body: "If either free threshold is exceeded, a commercial license must be obtained before continuing production use of ThinkWatch Enterprise.",
       label: links.salesLabel,
       href: links.sales,
     },
@@ -141,14 +141,14 @@ export const licenseCopy = {
     meta: {
       title: "许可证 · ThinkWatch",
       description:
-        "ThinkWatch Lite 与 ThinkWatch Core 采用 MIT 许可证。ThinkWatch 在 Business Source License 1.1 下源码开放：非生产环境免费；生产环境每月 10,000,000 计费 token 与 10,000 次 MCP 工具调用以内免费。",
+        "ThinkWatch Lite 与 ThinkWatch Core 采用 MIT 许可证。ThinkWatch 企业版在 Business Source License 1.1 下源码开放：非生产环境免费；生产环境每月 10,000,000 计费 token 与 10,000 次 MCP 工具调用以内免费。",
       breadcrumbHome: "首页",
       breadcrumbPage: "许可证",
     },
     hero: {
       eyebrow: "许可条款",
       title: "许可证",
-      sub: "ThinkWatch Lite 与 ThinkWatch Core 采用 MIT 许可证。ThinkWatch 在 Business Source License 1.1 下源码开放，生产环境用量在月度阈值以内可免费使用。",
+      sub: "ThinkWatch Lite 与 ThinkWatch Core 采用 MIT 许可证。ThinkWatch 企业版在 Business Source License 1.1 下源码开放，生产环境用量在月度阈值以内可免费使用。",
     },
     products: [
       {
@@ -192,7 +192,7 @@ export const licenseCopy = {
     tiers: {
       title: "商业授权档位",
       sub: "按月度用量计价，不按席位。",
-      tableLabel: "ThinkWatch 商业授权档位",
+      tableLabel: "ThinkWatch 企业版商业授权档位",
       scrollHint: "左右滑动查看全部列。",
       headers: ["档位", "计费 token / 月", "MCP 工具调用 / 月", "标价"],
       rows: [
@@ -245,7 +245,7 @@ export const licenseCopy = {
     },
     contact: {
       title: "商业授权",
-      body: "超出任一免费阈值后，继续在生产环境使用 ThinkWatch 之前须获取商业授权。",
+      body: "超出任一免费阈值后，继续在生产环境使用 ThinkWatch 企业版之前须获取商业授权。",
       label: links.salesLabel,
       href: links.sales,
     },
