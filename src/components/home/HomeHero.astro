@@ -27,17 +27,17 @@ const ent = (await getLatestRelease())?.replace(/^v/, "") ?? null;
       <p class="nx-lede nx-rise" style="--d:2">{c.sub}</p>
 
       <div class="doors nx-rise" style="--d:3">
-        <a href={localePath(lang, "/thinkwatch")} class="nx-tile door">
-          <span class="nx-label">{c.doors.teams.label}</span>
-          <span class="door-name">{c.doors.teams.name}</span>
-          <span class="nx-body">{c.doors.teams.text}</span>
-          <span class="door-cta">{c.doors.teams.cta}</span>
-        </a>
         <a href={localePath(lang, "/lite")} class="nx-tile door">
           <span class="nx-label">{c.doors.machine.label}</span>
           <span class="door-name">{c.doors.machine.name}</span>
           <span class="nx-body">{c.doors.machine.text}</span>
           <span class="door-cta">{c.doors.machine.cta}</span>
+        </a>
+        <a href={localePath(lang, "/thinkwatch")} class="nx-tile door">
+          <span class="nx-label">{c.doors.teams.label}</span>
+          <span class="door-name">{c.doors.teams.name}</span>
+          <span class="nx-body">{c.doors.teams.text}</span>
+          <span class="door-cta">{c.doors.teams.cta}</span>
         </a>
       </div>
     </div>
