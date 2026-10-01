@@ -22,4 +22,4 @@ ThinkWatch Enterprise is a self-hosted AI API and MCP gateway for organizations.
 3. [Configuration](/docs/configuration): environment variables and system settings.
 4. [Security](/docs/security): authentication, encryption, RBAC and the hardening checklist.
 
-ThinkWatch Enterprise is source-available under the Business Source License 1.1: free for non-production use, and free in production up to monthly thresholds. See [License](/license).
+ThinkWatch Enterprise is source-available under the Business Source License 1.1: free for non-production use, and free in production up to monthly thresholds. See [Pricing](/pricing).

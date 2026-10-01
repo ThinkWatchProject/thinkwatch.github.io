@@ -112,8 +112,8 @@ export function pageSources(pathname: string): string[] {
         // The sections below the hero still read their copy from the shared dictionary.
         "src/i18n/index.ts",
       ];
-    case "/license":
-      return ["src/components/pages/LicensePage.astro", "src/i18n/pages/license.ts"];
+    case "/pricing":
+      return ["src/components/pages/PricingPage.astro", "src/i18n/pages/pricing.ts"];
     case "/changelog":
       return ["src/components/pages/ChangelogPage.astro", "src/i18n/pages/changelog.ts", "src/content/changelog"];
     case "/docs":

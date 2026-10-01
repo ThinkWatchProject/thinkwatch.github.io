@@ -1,4 +1,4 @@
-// Copy for the /license page.
+// Copy for the /pricing page.
 // Every rule, tier, price and definition here mirrors LICENSING.md in the
 // ThinkWatch repository. If that file changes, update this one to match,
 // and keep the numbers identical across both languages.
@@ -19,7 +19,7 @@ const tierNumbers = [
   { name: "Enterprise", tokens: "1,000,000,001 – 10,000,000,000", calls: "1,000,001 – 10,000,000", free: false },
 ] as const;
 
-export const licenseCopy = {
+export const pricingCopy = {
   en: {
     meta: {
       title: "Pricing · ThinkWatch",
@@ -252,4 +252,4 @@ export const licenseCopy = {
   },
 } as const;
 
-export default licenseCopy;
+export default pricingCopy;

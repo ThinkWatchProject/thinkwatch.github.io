@@ -32,6 +32,12 @@ function rehypeScrollingTables() {
 // https://astro.build/config
 export default defineConfig({
   site: 'https://thinkwat.ch',
+  // Pages that moved. GitHub Pages cannot answer with a redirect, so each old
+  // address is built as a page that sends the browser on (and is not indexed).
+  redirects: {
+    '/license': '/pricing',
+    '/zh-CN/license': '/zh-CN/pricing',
+  },
   i18n: {
     defaultLocale: 'en',
     locales: ['en', 'zh-CN'],
@@ -58,7 +64,7 @@ export default defineConfig({
         // Product landing pages: ThinkWatch, ThinkWatch Lite, ThinkWatch Core.
         const productPaths = ['/thinkwatch', '/lite', '/core'];
         const isProduct = productPaths.some((p) => pathname === p || pathname === `/zh-CN${p}`);
-        const isLicense = pathname === '/license' || pathname === '/zh-CN/license';
+        const isPricing = pathname === '/pricing' || pathname === '/zh-CN/pricing';
 
         if (isHome) {
           item.priority = 1.0;
@@ -76,7 +82,7 @@ export default defineConfig({
         } else if (isChangelog) {
           item.priority = 0.7;
           item.changefreq = ChangeFreqEnum.WEEKLY;
-        } else if (isLicense) {
+        } else if (isPricing) {
           item.priority = 0.6;
           item.changefreq = ChangeFreqEnum.MONTHLY;
         } else {

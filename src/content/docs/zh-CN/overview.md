@@ -22,4 +22,4 @@ ThinkWatch 企业版是面向组织自托管的 AI API 与 MCP 网关。组织�
 3. [配置说明](/zh-CN/docs/configuration)：环境变量与系统设置。
 4. [安全模型](/zh-CN/docs/security)：认证、加密、RBAC 与加固清单。
 
-ThinkWatch 企业版在 Business Source License 1.1 下源码开放：非生产环境免费，生产环境在月度阈值以内免费，详见[许可证](/zh-CN/license)。
+ThinkWatch 企业版在 Business Source License 1.1 下源码开放：非生产环境免费，生产环境在月度阈值以内免费，详见[定价](/zh-CN/pricing)。
