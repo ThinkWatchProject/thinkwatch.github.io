@@ -4,9 +4,22 @@ import { getStarCount, formatStars } from "~/lib/github";
 import { findDoc, getProduct } from "~/content/docs/_meta";
 import SearchModal from "./SearchModal.astro";
 import TwMark from "./TwMark.astro";
+import Bi from "./Bi.astro";
 
+interface Props {
+  /**
+   * Render the text in both languages, with links that the page's script
+   * points at the visitor's (the 404 page; see Bi.astro).
+   */
+  bilingual?: boolean;
+}
+
+const { bilingual = false } = Astro.props;
 const lang = getLang(Astro);
-const s = t(lang);
+const sEn = t("en");
+const sZh = t("zh-CN");
+/** data-localize for a link on a bilingual page: the 404 page's script prefixes /zh-CN for Chinese visitors */
+const localize = (path: string) => (bilingual ? path : undefined);
 const stars = await getStarCount();
 const starLabel = formatStars(stars);
 
@@ -20,14 +33,9 @@ const isHome =
 const homeAnchor = (hash: string) => (isHome ? hash : `${homePath}${hash}`);
 
 const currentPath = Astro.url.pathname.replace(/^\/zh-CN/, "").replace(/\/$/, "") || "/";
-const links = [
-  { href: localePath(lang, "/lite"), label: s.nav.lite, match: "/lite" },
-  { href: localePath(lang, "/thinkwatch"), label: s.nav.thinkwatch, match: "/thinkwatch" },
-  { href: localePath(lang, "/core"), label: s.nav.core, match: "/core" },
-  { href: localePath(lang, "/docs"), label: s.nav.docs, match: "/docs" },
-  { href: localePath(lang, "/changelog"), label: s.nav.changelog, match: "/changelog" },
-  { href: localePath(lang, "/pricing"), label: s.nav.pricing, match: "/pricing" },
-].map((l) => ({ ...l, active: currentPath === l.match || currentPath.startsWith(l.match + "/") }));
+const links = (["lite", "thinkwatch", "core", "docs", "changelog", "pricing"] as const)
+  .map((key) => ({ path: `/${key}`, href: localePath(lang, `/${key}`), en: sEn.nav[key], zh: sZh.nav[key] }))
+  .map((l) => ({ ...l, active: currentPath === l.path || currentPath.startsWith(l.path + "/") }));
 
 const cleanPath = Astro.url.pathname.replace(/^\/zh-CN/, "") || "/";
 
@@ -54,15 +62,15 @@ const langOptions: { code: Lang; label: string; native: string }[] = [
   { code: "en", label: "English", native: "EN" },
   { code: "zh-CN", label: "简体中文", native: "中文" },
 ];
-const currentLangOption = langOptions.find((l) => l.code === lang)!;
 
 const menuLabel = lang === "zh-CN" ? "菜单" : "Menu";
-const closeLabel = lang === "zh-CN" ? "关闭" : "Close";
+/** On a bilingual page, attributes the page's script swaps in for Chinese visitors */
+const zhAttrs = (attrs: Record<string, string>) => (bilingual ? JSON.stringify(attrs) : undefined);
 ---
 
 <header class="sticky top-0 z-50 backdrop-blur-md backdrop-saturate-150 bg-[var(--color-bg)]/70 border-b border-white/[0.07]">
   <div class="container-page flex items-center justify-between h-16 gap-3">
-    <a href={localePath(lang, "/")} class="flex items-center gap-2 sm:gap-2.5 group shrink-0">
+    <a href={localePath(lang, "/")} data-localize={localize("/")} class="flex items-center gap-2 sm:gap-2.5 group shrink-0">
       <TwMark id="m-header" size={26} />
       <span class="text-base sm:text-lg tracking-tight text-white">
         <span class="font-medium">Think</span><span class="font-bold">Watch</span>
@@ -74,17 +82,18 @@ const closeLabel = lang === "zh-CN" ? "关闭" : "Close";
       {links.map((l) => (
         <a
           href={l.href}
+          data-localize={localize(l.path)}
           aria-current={l.active ? "page" : undefined}
           class:list={["transition-colors", l.active ? "text-white" : "hover:text-white"]}
         >
-          {l.label}
+          <Bi en={l.en} zh={l.zh} both={bilingual} />
         </a>
       ))}
     </nav>
 
     <!-- Right cluster: search + lang + GitHub (mobile compact) + CTA + burger -->
     <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
-      <SearchModal />
+      <SearchModal bilingual={bilingual} />
 
       <!-- Language dropdown — pure HTML <details>, no JS -->
       <details class="lang-menu relative">
@@ -96,7 +105,7 @@ const closeLabel = lang === "zh-CN" ? "关闭" : "Close";
             <circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.2"/>
             <path d="M1.5 8h13M8 1.5c2 2 2 11 0 13M8 1.5c-2 2-2 11 0 13" stroke="currentColor" stroke-width="1.2"/>
           </svg>
-          <span class="hidden xs:inline">{currentLangOption.native}</span>
+          <span class="hidden xs:inline"><Bi en="EN" zh="中文" both={bilingual} /></span>
           <svg class="w-3 h-3 transition-transform hidden sm:block" viewBox="0 0 12 12" fill="none" aria-hidden="true">
             <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
@@ -104,7 +113,8 @@ const closeLabel = lang === "zh-CN" ? "关闭" : "Close";
         <div class="absolute right-0 mt-2 w-44 rounded-lg border border-white/10 bg-[var(--color-surface)] shadow-2xl shadow-black/40 backdrop-blur-lg overflow-hidden z-50">
           {langOptions.map((opt) => {
             const href = localePath(opt.code, targetPath(opt.code));
-            const isActive = opt.code === lang;
+            // On a bilingual page the script marks the visitor's language instead
+            const isActive = !bilingual && opt.code === lang;
             return (
               <a
                 href={href}
@@ -145,9 +155,10 @@ const closeLabel = lang === "zh-CN" ? "关闭" : "Close";
       <!-- Desktop CTA -->
       <a
         href={localePath(lang, "/thinkwatch#quickstart")}
+        data-localize={localize("/thinkwatch#quickstart")}
         class="hidden sm:inline-flex items-center text-sm font-medium px-4 h-9 rounded-full bg-[#f7f8f8] text-[#08090a] hover:bg-white hover:shadow-[0_8px_30px_-8px_rgba(34,229,242,0.5)] transition"
       >
-        {s.common.getStarted}
+        <Bi en={sEn.common.getStarted} zh={sZh.common.getStarted} both={bilingual} />
       </a>
 
       <!-- Mobile burger -->
@@ -155,6 +166,7 @@ const closeLabel = lang === "zh-CN" ? "关闭" : "Close";
         type="button"
         data-mobile-nav-toggle
         aria-label={menuLabel}
+        data-zh-attrs={zhAttrs({ "aria-label": "菜单" })}
         aria-expanded="false"
         aria-controls="mobile-nav-panel"
         class="md:hidden flex items-center justify-center w-9 h-9 rounded-md border border-white/10 text-[var(--color-muted)] hover:text-white hover:border-white/25 transition-colors"
@@ -178,28 +190,30 @@ const closeLabel = lang === "zh-CN" ? "关闭" : "Close";
     hidden
     class="md:hidden border-t border-white/10 bg-[var(--color-bg)]/95 backdrop-blur-md"
   >
-    <nav aria-label={menuLabel}>
+    <nav aria-label={menuLabel} data-zh-attrs={zhAttrs({ "aria-label": "菜单" })}>
       <ul class="container-page py-3 flex flex-col">
         {links.map((l) => (
           <li>
             <a
               href={l.href}
+              data-localize={localize(l.path)}
               aria-current={l.active ? "page" : undefined}
               class:list={[
                 "block py-3 text-base transition-colors border-b border-white/5",
                 l.active ? "text-white" : "text-[var(--color-muted)] hover:text-white",
               ]}
             >
-              {l.label}
+              <Bi en={l.en} zh={l.zh} both={bilingual} />
             </a>
           </li>
         ))}
         <li>
           <a
             href={localePath(lang, "/thinkwatch#quickstart")}
+            data-localize={localize("/thinkwatch#quickstart")}
             class="mt-4 inline-flex items-center justify-center w-full px-4 py-3 rounded-full bg-[#f7f8f8] text-[#08090a] font-medium hover:bg-white transition"
           >
-            {s.common.getStarted}
+            <Bi en={sEn.common.getStarted} zh={sZh.common.getStarted} both={bilingual} />
           </a>
         </li>
       </ul>
@@ -211,6 +225,8 @@ const closeLabel = lang === "zh-CN" ? "关闭" : "Close";
   .lang-menu summary::-webkit-details-marker { display: none; }
   .lang-menu[open] summary svg:last-child { transform: rotate(180deg); }
   .lang-menu[open] summary { color: white; border-color: rgba(255, 255, 255, 0.25); }
+  /* The visitor's language, marked by the bilingual page's script */
+  .lang-menu [data-lang-choice][aria-current] { color: white; background: rgba(255, 255, 255, 0.06); }
 
   /* Extra-small breakpoint: 400px — hide the lang code text on very narrow phones */
   @media (min-width: 400px) {

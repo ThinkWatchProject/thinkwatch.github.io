@@ -2,11 +2,20 @@
 import { getLang, t, localePath } from "~/i18n";
 
 import TwMark from "./TwMark.astro";
+import Bi from "./Bi.astro";
 
+interface Props {
+  /** Render the text in both languages, with links the page's script localizes (the 404 page; see Bi.astro) */
+  bilingual?: boolean;
+}
+
+const { bilingual = false } = Astro.props;
 const lang = getLang(Astro);
-const s = t(lang);
+const en = t("en");
+const zh = t("zh-CN");
 const year = new Date().getFullYear();
-
+/** A link to a page of the site, and on a bilingual page the path its script localizes */
+const link = (path: string) => ({ href: localePath(lang, path), "data-localize": bilingual ? path : undefined });
 ---
 
 <footer class="border-t border-white/5 mt-20 sm:mt-32">
@@ -17,25 +26,25 @@ const year = new Date().getFullYear();
         <span class="text-white"><span class="font-medium">Think</span><span class="font-bold">Watch</span></span>
       </div>
       <p class="text-[var(--color-muted)] max-w-sm">
-        {s.footer.tagline}
+        <Bi en={en.footer.tagline} zh={zh.footer.tagline} both={bilingual} />
       </p>
     </div>
 
     <div>
-      <div class="text-white/80 font-medium mb-3">{s.footer.product}</div>
+      <div class="text-white/80 font-medium mb-3"><Bi en={en.footer.product} zh={zh.footer.product} both={bilingual} /></div>
       <ul class="space-y-1 sm:space-y-2 text-[var(--color-muted)]">
-        <li><a href={localePath(lang, "/thinkwatch")} class="inline-block py-1.5 hover:text-white">{lang === "zh-CN" ? "ThinkWatch 企业版" : "ThinkWatch Enterprise"}</a></li>
-        <li><a href={localePath(lang, "/lite")} class="inline-block py-1.5 hover:text-white">ThinkWatch Lite</a></li>
-        <li><a href={localePath(lang, "/core")} class="inline-block py-1.5 hover:text-white">ThinkWatch Core</a></li>
+        <li><a {...link("/thinkwatch")} class="inline-block py-1.5 hover:text-white"><Bi en="ThinkWatch Enterprise" zh="ThinkWatch 企业版" both={bilingual} /></a></li>
+        <li><a {...link("/lite")} class="inline-block py-1.5 hover:text-white">ThinkWatch Lite</a></li>
+        <li><a {...link("/core")} class="inline-block py-1.5 hover:text-white">ThinkWatch Core</a></li>
       </ul>
     </div>
 
     <div>
-      <div class="text-white/80 font-medium mb-3">{s.footer.resources}</div>
+      <div class="text-white/80 font-medium mb-3"><Bi en={en.footer.resources} zh={zh.footer.resources} both={bilingual} /></div>
       <ul class="space-y-1 sm:space-y-2 text-[var(--color-muted)]">
-        <li><a href={localePath(lang, "/docs")} class="inline-block py-1.5 hover:text-white">{s.nav.docs}</a></li>
-        <li><a href={localePath(lang, "/changelog")} class="inline-block py-1.5 hover:text-white">{s.nav.changelog}</a></li>
-        <li><a href={localePath(lang, "/pricing")} class="inline-block py-1.5 hover:text-white">{s.nav.pricing}</a></li>
+        <li><a {...link("/docs")} class="inline-block py-1.5 hover:text-white"><Bi en={en.nav.docs} zh={zh.nav.docs} both={bilingual} /></a></li>
+        <li><a {...link("/changelog")} class="inline-block py-1.5 hover:text-white"><Bi en={en.nav.changelog} zh={zh.nav.changelog} both={bilingual} /></a></li>
+        <li><a {...link("/pricing")} class="inline-block py-1.5 hover:text-white"><Bi en={en.nav.pricing} zh={zh.nav.pricing} both={bilingual} /></a></li>
         <li><a href="https://github.com/ThinkWatchProject" class="inline-block py-1.5 hover:text-white">GitHub</a></li>
         <li><a href="/changelog.xml" class="inline-block py-1.5 hover:text-white">RSS</a></li>
       </ul>
@@ -43,7 +52,7 @@ const year = new Date().getFullYear();
   </div>
 
   <div class="container-page py-6 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-[var(--color-dim)]">
-    <span>© {year} ThinkWatch. {s.footer.licensing}</span>
-    <span>{s.footer.builtWith}</span>
+    <span>© {year} ThinkWatch. <Bi en={en.footer.licensing} zh={zh.footer.licensing} both={bilingual} /></span>
+    <span><Bi en={en.footer.builtWith} zh={zh.footer.builtWith} both={bilingual} /></span>
   </div>
 </footer>
