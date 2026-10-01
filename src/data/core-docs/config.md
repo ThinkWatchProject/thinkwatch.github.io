@@ -152,6 +152,7 @@ means.
 | `client_probes` | object, [`client_probes`](#cfg-client_probes) | — | What happens to the helper requests clients send on their own (health checks, warm-ups, titles). |
 | `security` | object, [`security`](#cfg-security) | — | The five guards. All of them start in `observe` or `off`, so out of the box nothing is changed or blocked. |
 | `retention` | object, [`retention`](#cfg-retention) | — | How long request logs are kept. |
+| `failover` | object, [`failover`](#cfg-failover) | — | How long an upstream is set aside after it fails, and how long the start of a stream is awaited. |
 | `groups` | list of [`groups[]`](#cfg-groups) | `[]` | Strategy groups: several upstreams behind one name, with a way to pick among them. |
 | `routes` | list of [`routes[]`](#cfg-routes) | `[]` | Routes. Without any, requests fail over across all upstreams in the order they are declared. |
 | `default_route` | string | — | The route for keys that do not name one. Unset: the route named `default`, or the built-in failover when there is none. |
@@ -309,11 +310,13 @@ Upstreams: the APIs requests are forwarded to.
 | Field | Type | Default | Description |
 |---|---|---|---|
 | `name` | string | **required** | Name of the upstream; unique, and not the name of a group. Names starting with `__` are reserved. |
-| `base_url` | string | **required** | Endpoint, `http://` or `https://`, up to the version segment where the provider documents one (`https://api.anthropic.com`, `https://api.openai.com/v1`). |
-| `key` | string, `${VAR}` allowed | — | API key. It goes in the header the protocol expects: `x-api-key` (Anthropic), `Authorization: Bearer` (OpenAI), `x-goog-api-key` (Gemini). Leave it out for upstreams without a key, or when the credential is written in `headers`. Cannot be combined with `oauth`. |
+| `base_url` | string | **required** | Endpoint, `http://` or `https://`, up to the version segment where the provider documents one (`https://api.anthropic.com`, `https://api.openai.com/v1`). For Bedrock, the region's runtime endpoint: `https://bedrock-runtime.<region>.amazonaws.com`. |
+| `key` | string, `${VAR}` allowed | — | API key. It goes in the header the protocol expects: `x-api-key` (Anthropic), `Authorization: Bearer` (OpenAI, and a Bedrock API key), `x-goog-api-key` (Gemini). Leave it out for upstreams without a key, or when the credential is written in `headers`. Cannot be combined with `oauth` or `aws`. |
 | `headers` | map of header name → value | `{}` | Additional request headers, in the order written; values may use `${VAR}`, and `{{access_token}}` where `oauth` is set. At most 32. Headers HTTP or the gateway manages (`host`, `content-length`, `connection`, …) cannot be set. |
 | `oauth` | object, [`providers[].oauth`](#cfg-providers-oauth) | — | OAuth credential: an access token obtained from a refresh token. Instead of `key`. |
-| `protocol` | `anthropic` \| `openai-chat` \| `openai-responses` \| `gemini` \| `chatgpt` | — | API format of the upstream. Unset: recognized from `base_url` for the official endpoints, otherwise treated as `anthropic`. |
+| `aws` | object, [`providers[].aws`](#cfg-providers-aws) | — | AWS access keys of a Bedrock upstream, written there or read from an AWS profile: every request is signed with them (SigV4). Instead of `key`, which holds a Bedrock API key. |
+| `protocol` | `anthropic` \| `openai-chat` \| `openai-responses` \| `gemini` \| `chatgpt` \| `bedrock` | — | API format of the upstream. Unset: recognized from `base_url` for the official endpoints (a Bedrock runtime endpoint is `bedrock`), otherwise treated as `anthropic`. |
+| `forward_client_identity` | bool | `false` | Also send the client's own identity: its `User-Agent`, identity headers such as `x-app` and `originator`, and identity fields in the request body such as `metadata.user_id`. Values are the client's, never made up. Off: requests carry ThinkWatch's `User-Agent` and no client identity. For upstreams that admit only certain clients (Kimi For Coding, Bailian Coding Plan, relays restricted to official clients). Not available for `chatgpt`. |
 | `proxy` | string | `direct` | `direct`; `system`, the proxy in the core process's `HTTPS_PROXY`, `HTTP_PROXY` or `ALL_PROXY` environment variables; or the name of an entry in `proxies`. |
 | `on_proxy_fail` | `fail` \| `direct` | `fail` | When the proxy cannot be reached: `fail` the request, or go `direct`. |
 | `models` | list of strings | `[]` | Models to assume when the upstream does not answer `/v1/models`. |
@@ -323,11 +326,11 @@ Upstreams: the APIs requests are forwarded to.
 | `disabled` | bool | `false` | Take the upstream out of routing and out of the model list, and keep its configuration. |
 <!-- /generated -->
 
-A credential is one of three things: `key`, which goes in the header the
-protocol expects; `oauth`, a token obtained from a refresh token; or
-`headers`, when the upstream wants something of its own. `headers` can be
-combined with the other two, except for the header that already carries the
-credential.
+A credential is one of four things: `key`, which goes in the header the
+protocol expects; `oauth`, a token obtained from a refresh token; `aws`, the
+access keys a Bedrock upstream signs its requests with; or `headers`, when the
+upstream wants something of its own. `headers` can be combined with the
+others, except for the header that already carries the credential.
 
 ```yaml
 providers:
@@ -349,6 +352,15 @@ providers:
     protocol: openai-chat
     billing: free
 ```
+
+A request carries the request itself and the headers its upstream needs,
+and nothing else from the client: the credential and the headers written in
+`headers`; ThinkWatch's own `User-Agent`; and, from the client's request, only
+the headers the upstream's protocol uses (`anthropic-*` for Anthropic,
+`Idempotency-Key` and `X-Client-Request-Id` for OpenAI, none for Gemini).
+Identity fields that clients fill in themselves, such as Claude Code's
+`metadata.user_id`, are removed from the body. For an upstream that admits only
+certain clients, turn on `forward_client_identity`.
 
 A ChatGPT account upstream (`protocol: chatgpt`) takes only the credential
 the desktop app obtains by signing in; it cannot be written by hand. Claude
@@ -382,6 +394,60 @@ the token goes:
     headers:
       X-Access: Token {{access_token}}
 ```
+
+#### `providers[].aws`
+
+<!-- generated: table providers[].aws -->
+<a id="cfg-providers-aws"></a>
+
+| Field | Type | Default | Description |
+|---|---|---|---|
+| `access_key_id` | string, `${VAR}` allowed | — | Access key ID. Written together with `secret_access_key`; `profile` instead. |
+| `secret_access_key` | string, `${VAR}` allowed | — | Secret access key. |
+| `session_token` | string, `${VAR}` allowed | — | Session token of temporary credentials, such as those STS issues. When it expires, requests are refused until it is replaced. |
+| `profile` | string | — | Profile in the AWS credential files to read the access keys from, instead of writing them here: `~/.aws/credentials` and `~/.aws/config`, or the files `AWS_SHARED_CREDENTIALS_FILE` and `AWS_CONFIG_FILE` name, on the machine core runs on. The files are read again when they change. |
+| `region` | string | — | Region to sign for. Unset: the one in `base_url`, which must then be a standard runtime endpoint. Required when `base_url` is a VPC endpoint or a proxy. |
+<!-- /generated -->
+
+A Bedrock upstream authenticates in one of two ways. A Bedrock API key goes in
+`key` and is sent as `Authorization: Bearer`. AWS access keys go in `aws`,
+written there or read with `aws.profile` from a profile in the AWS credential
+files: every request is signed with them (SigV4) once its body is final, and the
+keys themselves are never sent. Keys written in the configuration can be read
+from the environment with `${VAR}`. A profile is read from the files on the
+machine core runs on, and read again when they change, so a tool that refreshes
+temporary keys in `~/.aws/credentials` needs no restart. Nothing runs a command
+to obtain a credential, so a profile that signs in through IAM Identity Center
+(`aws sso login`), runs a `credential_process` or assumes a role cannot be used;
+export the keys it produces instead.
+
+```yaml
+providers:
+  - name: bedrock
+    base_url: https://bedrock-runtime.us-east-1.amazonaws.com
+    key: ${AWS_BEARER_TOKEN_BEDROCK}
+
+  - name: bedrock-keys
+    base_url: https://bedrock-runtime.eu-west-1.amazonaws.com
+    aws:
+      access_key_id: ${AWS_ACCESS_KEY_ID}
+      secret_access_key: ${AWS_SECRET_ACCESS_KEY}
+      session_token: ${AWS_SESSION_TOKEN}
+
+  - name: bedrock-profile
+    base_url: https://bedrock-runtime.us-west-2.amazonaws.com
+    aws:
+      profile: dev
+```
+
+Requests are converted to Converse. The model list comes from the region's
+control plane: the foundation models that can be invoked on demand, the
+inference profiles AWS defines (`us.anthropic.claude-…`), and the account's
+application inference profiles, listed by the ARN they are invoked by. Listing
+needs `bedrock:ListFoundationModels` and `bedrock:ListInferenceProfiles`;
+without them requests are still forwarded, and `models` can list the models by
+hand. For a VPC endpoint or a proxy, write its address in `base_url` and the
+region in `aws.region`; the model list is asked of that address too.
 
 ### `proxies`
 
@@ -468,8 +534,8 @@ pages. Every field is written out; nothing is inferred when pricing.
 | `cache_read` | number | **required** | US dollars per million tokens read from the prompt cache. |
 | `cache_write_5m` | number | **required** | US dollars per million tokens written to a 5-minute cache. |
 | `cache_write_1h` | number | **required** | US dollars per million tokens written to a 1-hour cache. |
-| `input_above_200k` | number | — | Input price once a request's input exceeds 200K tokens. Written together with `output_above_200k`, or neither. |
-| `output_above_200k` | number | — | Output price once a request's input exceeds 200K tokens. |
+| `input_above_200k` | number | — | Input price once a request's input, cache reads and writes included, exceeds 200K tokens. Written together with `output_above_200k`, or neither. Cache prices stay the ones above. |
+| `output_above_200k` | number | — | Output price once a request's input, cache reads and writes included, exceeds 200K tokens. |
 <!-- /generated -->
 
 ```yaml
@@ -751,6 +817,32 @@ a few hundred bytes. The byte limit covers bursts.
 | `body_max_bytes` | integer | `2147483648` | Upper bound on the bytes bodies may take; beyond it the oldest days go first. The default is 2 GiB. |
 <!-- /generated -->
 
+### `failover`
+
+An upstream that fails is set aside for a while, so that the next requests
+go straight to the next candidate. How long depends on the reason the
+upstream gives: an insufficient balance waits for a top-up, a used-up quota
+waits until the moment the upstream says it resets, and a rate limit usually
+passes within seconds. A request with a single candidate is never affected.
+
+Before the first content of a streamed answer reaches the client, an error
+the upstream sends in the stream moves the request to the next candidate,
+the same as an error status would.
+
+<!-- generated: table failover -->
+<a id="cfg-failover"></a>
+
+| Field | Type | Default | Description |
+|---|---|---|---|
+| `failures_to_pause` | integer | `3` | Consecutive failures without a stated reason (5xx, connection errors) before the upstream is set aside. From 1 to 100. |
+| `pause_secs` | integer | `60` | Seconds the first such pause lasts. Each further pause doubles it, up to `max_pause_secs`; one success resets it. |
+| `max_pause_secs` | integer | `600` | Upper bound on the doubled pause, in seconds; not less than `pause_secs`. |
+| `no_balance_pause_secs` | integer | `1800` | Seconds to set aside an upstream that reports an insufficient balance. |
+| `quota_pause_secs` | integer | `3600` | Seconds to set aside an upstream whose quota is used up when it does not say when the quota resets. When it does, the upstream is set aside until then. |
+| `rate_limit_max_pause_secs` | integer | `3600` | A rate-limited upstream is set aside for the time its `Retry-After` gives, at most this many seconds. Without `Retry-After` it counts as a failure without a stated reason. |
+| `stream_start_wait_secs` | integer | `15` | Seconds to hold a streamed answer until its first content arrives. An error before then moves the request to the next upstream; after this long, what has arrived is passed on. From 1 to 120. |
+<!-- /generated -->
+
 ### `groups`
 
 A group puts several upstreams behind one name. Rules send requests to a
@@ -762,15 +854,25 @@ group with `to`.
 | Field | Type | Default | Description |
 |---|---|---|---|
 | `name` | string | **required** | Name of the group; unique, and not the name of an upstream. |
-| `type` | `fallback` \| `select` \| `load-balance` \| `url-test` \| `cheapest` | `fallback` | `fallback`: the first healthy member, in order. `select`: the member named in `selected`. `load-balance`: take turns. `url-test`: the fastest by measured time to first byte. `cheapest`: the lowest input price. |
+| `type` | `fallback` \| `select` \| `load-balance` \| `url-test` \| `cheapest` | `fallback` | `fallback`: the first healthy member, in order. `select`: the member named in `selected`. `load-balance`: take turns between new conversations. `url-test`: the fastest by measured time to first byte. `cheapest`: the lowest input price. |
 | `providers` | list of strings | **required** | Member upstreams, by name. |
-| `session_affinity` | bool | `true` | Keep a session on the same upstream so its prompt cache keeps hitting. Turning it off under `load-balance` spreads every turn and loses the cache. |
 | `selected` | string | — | For `select`: the chosen member. |
 <!-- /generated -->
 
-`fallback` is the default because spreading a session across upstreams
-loses the prompt cache, which is worth far more than any spread of load on
-a single user's machine.
+`fallback` is the default because a single user's machine has no load to
+spread.
+
+Whatever the type, a conversation stays on the upstream that last answered
+it, so that what the upstream holds of it in its prompt cache is read again
+rather than paid for in full elsewhere. Within a turn (while the client sends
+tool results back) it always stays; across turns it stays while the previous
+answer read or wrote at least 1024 tokens of prompt cache and came less than
+five minutes ago. An upstream that is cooling down after failures releases
+the conversation, and whichever upstream answered after a failover is the one
+it stays on. The rule a turn matched at its start also holds for the rest of
+that turn: rules keyed on input size or images do not move a turn halfway,
+unless its input no longer fits the context window of a model the rule sends
+it to. `load-balance` therefore takes turns between new conversations.
 
 ### `routes`
 

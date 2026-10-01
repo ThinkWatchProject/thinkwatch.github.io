@@ -101,6 +101,7 @@ twcore config set /listen/gateway/port 8790 --int
 | `client_probes` | 对象，见 [`client_probes`](#cfg-client_probes) | — | 客户端自行发出的辅助请求（连通性检查、预热、起标题）如何处理。 |
 | `security` | 对象，见 [`security`](#cfg-security) | — | 五项防护。出厂时都处在 `observe` 或 `off`，不改变、不拦截任何请求。 |
 | `retention` | 对象，见 [`retention`](#cfg-retention) | — | 请求日志保留多久。 |
+| `failover` | 对象，见 [`failover`](#cfg-failover) | — | 上游失败后停用多久，以及流式回答的开头最多等多久。 |
 | `groups` | 对象列表，见 [`groups[]`](#cfg-groups) | `[]` | 策略组：多个上游合用一个名字，并规定如何在其中选择。 |
 | `routes` | 对象列表，见 [`routes[]`](#cfg-routes) | `[]` | 路由。一条都不写时，请求按上游的声明顺序故障转移。 |
 | `default_route` | 字符串 | — | 未指定路由的密钥走哪条路由。不写：名为 `default` 的路由；没有这条路由时走内置的故障转移。 |
@@ -233,11 +234,13 @@ clients:
 | 字段 | 类型 | 默认值 | 说明 |
 |---|---|---|---|
 | `name` | 字符串 | **必填** | 上游的名字，不能重复，也不能和策略组同名。以 `__` 开头的名字保留给内置项。 |
-| `base_url` | 字符串 | **必填** | 接口地址，`http://` 或 `https://`，按服务商文档写到版本段为止（`https://api.anthropic.com`、`https://api.openai.com/v1`）。 |
-| `key` | 字符串，可写 `${VAR}` | — | API 密钥，放进协议规定的请求头：`x-api-key`（Anthropic）、`Authorization: Bearer`（OpenAI）、`x-goog-api-key`（Gemini）。上游不需要密钥、或凭据写在 `headers` 里时不写。不能和 `oauth` 同时写。 |
+| `base_url` | 字符串 | **必填** | 接口地址，`http://` 或 `https://`，按服务商文档写到版本段为止（`https://api.anthropic.com`、`https://api.openai.com/v1`）。Bedrock 写所在区域的推理地址：`https://bedrock-runtime.<区域>.amazonaws.com`。 |
+| `key` | 字符串，可写 `${VAR}` | — | API 密钥，放进协议规定的请求头：`x-api-key`（Anthropic）、`Authorization: Bearer`（OpenAI，以及 Bedrock API Key）、`x-goog-api-key`（Gemini）。上游不需要密钥、或凭据写在 `headers` 里时不写。不能和 `oauth`、`aws` 同时写。 |
 | `headers` | 请求头名 → 值的映射 | `{}` | 额外的请求头，按书写顺序发送；值可以用 `${VAR}`，配置了 `oauth` 时可以用 `{{access_token}}`。最多 32 个。HTTP 或网关管理的请求头（`host`、`content-length`、`connection` 等）不能设置。 |
 | `oauth` | 对象，见 [`providers[].oauth`](#cfg-providers-oauth) | — | OAuth 凭据：用 refresh token 换取 access token。与 `key` 二选一。 |
-| `protocol` | `anthropic` \| `openai-chat` \| `openai-responses` \| `gemini` \| `chatgpt` | — | 上游的接口格式。不写：官方地址按 `base_url` 识别，其余按 `anthropic` 处理。 |
+| `aws` | 对象，见 [`providers[].aws`](#cfg-providers-aws) | — | Bedrock 上游的 AWS 访问密钥，写在这里或者从 AWS 的 profile 读：每个请求用它们签名（SigV4）。与 `key`（Bedrock API Key）二选一。 |
+| `protocol` | `anthropic` \| `openai-chat` \| `openai-responses` \| `gemini` \| `chatgpt` \| `bedrock` | — | 上游的接口格式。不写：官方地址按 `base_url` 识别（Bedrock 的推理地址是 `bedrock`），其余按 `anthropic` 处理。 |
+| `forward_client_identity` | 布尔 | `false` | 同时发送客户端自己的身份：它的 `User-Agent`、`x-app` 和 `originator` 等身份请求头，以及请求体中的身份字段（如 `metadata.user_id`）。发送的都是客户端的原值，不做伪造。关闭时请求使用 ThinkWatch 的 `User-Agent`，不带客户端身份。用于只接受特定客户端的上游（Kimi For Coding、百炼 Coding Plan、只允许官方客户端的中转站）。`chatgpt` 不可用。 |
 | `proxy` | 字符串 | `direct` | `direct`；`system`，即 core 进程环境变量 `HTTPS_PROXY`、`HTTP_PROXY`、`ALL_PROXY` 中的代理；或 `proxies` 中某一项的名字。 |
 | `on_proxy_fail` | `fail` \| `direct` | `fail` | 代理不可用时：请求失败（`fail`），或改为直连（`direct`）。 |
 | `models` | 字符串列表 | `[]` | 上游不支持 `/v1/models` 时，按这份清单认定它提供的模型。 |
@@ -247,7 +250,7 @@ clients:
 | `disabled` | 布尔 | `false` | 不参与路由，模型也不出现在模型列表里；配置原样保留。 |
 <!-- /generated -->
 
-凭据有三种写法：`key`，放进协议规定的请求头；`oauth`，用 refresh token 换取 token；`headers`，用于上游自有的鉴权方式。`headers` 可以和前两者同时使用，但不能再设置已经承载凭据的那个请求头。
+凭据有四种写法：`key`，放进协议规定的请求头；`oauth`，用 refresh token 换取 token；`aws`，Bedrock 上游签名请求用的访问密钥；`headers`，用于上游自有的鉴权方式。`headers` 可以和其余几种同时使用，但不能再设置已经承载凭据的那个请求头。
 
 ```yaml
 providers:
@@ -269,6 +272,8 @@ providers:
     protocol: openai-chat
     billing: free
 ```
+
+每个请求只带请求本身和上游需要的请求头，客户端的其他信息一律不发：凭据和 `headers` 中写的请求头、ThinkWatch 自己的 `User-Agent`，以及客户端请求中该上游协议使用的请求头（Anthropic 为 `anthropic-*`，OpenAI 为 `Idempotency-Key` 和 `X-Client-Request-Id`，Gemini 没有）。客户端自动填写的身份字段（如 Claude Code 的 `metadata.user_id`）从请求体中去掉。只接受特定客户端的上游，打开 `forward_client_identity`。
 
 ChatGPT 账号上游（`protocol: chatgpt`）只接受桌面应用登录得到的凭据，不能手写。不支持 Claude 和 Google 的订阅登录，请使用 API 密钥。
 
@@ -298,6 +303,43 @@ access token 默认放进协议的鉴权请求头。要放在别处，在 `heade
     headers:
       X-Access: Token {{access_token}}
 ```
+
+#### `providers[].aws`
+
+<!-- generated: table providers[].aws -->
+<a id="cfg-providers-aws"></a>
+
+| 字段 | 类型 | 默认值 | 说明 |
+|---|---|---|---|
+| `access_key_id` | 字符串，可写 `${VAR}` | — | 访问密钥 ID。与 `secret_access_key` 一起写；也可以改写 `profile`。 |
+| `secret_access_key` | 字符串，可写 `${VAR}` | — | 私有访问密钥。 |
+| `session_token` | 字符串，可写 `${VAR}` | — | 临时凭证（如 STS 签发的）的会话令牌。过期之后请求会被拒绝，直到换上新的。 |
+| `profile` | 字符串 | — | 从 AWS 凭证文件读访问密钥时用的 profile，代替把密钥写在这里：`~/.aws/credentials` 和 `~/.aws/config`，或 `AWS_SHARED_CREDENTIALS_FILE`、`AWS_CONFIG_FILE` 指定的文件，读的是 core 所在机器上的。文件变了会重新读。 |
+| `region` | 字符串 | — | 签名用的区域。不写：取 `base_url` 里的区域，这时 `base_url` 必须是标准的推理地址。`base_url` 是 VPC 端点或代理时必须写。 |
+<!-- /generated -->
+
+Bedrock 上游有两种认证方式。Bedrock API Key 写在 `key` 中，以 `Authorization: Bearer` 发送。AWS 访问密钥写在 `aws` 中，或者用 `aws.profile` 从 AWS 凭证文件里的某个 profile 读取：每个请求在请求体定稿之后用它们签名（SigV4），密钥本身不会发送。写在配置中的密钥可以用 `${VAR}` 从环境变量读取。profile 读的是 core 所在机器上的文件，文件变了会重新读，因此把临时密钥刷新进 `~/.aws/credentials` 的工具不需要重启 core。获取凭证时不执行任何命令，因此经 IAM Identity Center 登录（`aws sso login`）、运行 `credential_process` 或扮演角色的 profile 无法使用，请改为导出它们生成的密钥。
+
+```yaml
+providers:
+  - name: bedrock
+    base_url: https://bedrock-runtime.us-east-1.amazonaws.com
+    key: ${AWS_BEARER_TOKEN_BEDROCK}
+
+  - name: bedrock-keys
+    base_url: https://bedrock-runtime.eu-west-1.amazonaws.com
+    aws:
+      access_key_id: ${AWS_ACCESS_KEY_ID}
+      secret_access_key: ${AWS_SECRET_ACCESS_KEY}
+      session_token: ${AWS_SESSION_TOKEN}
+
+  - name: bedrock-profile
+    base_url: https://bedrock-runtime.us-west-2.amazonaws.com
+    aws:
+      profile: dev
+```
+
+请求转换为 Converse 格式。模型清单取自所在区域的控制面：可按需调用的基础模型、AWS 预设的推理配置（`us.anthropic.claude-…`），以及账号自己创建的应用推理配置（按调用时使用的 ARN 列出）。列出清单需要 `bedrock:ListFoundationModels` 和 `bedrock:ListInferenceProfiles` 权限；没有这两项权限时请求照常转发，可以在 `models` 中手动列出模型。使用 VPC 端点或代理时，在 `base_url` 中写它的地址，在 `aws.region` 中写区域；模型清单也向该地址获取。
 
 ### `proxies`
 
@@ -376,8 +418,8 @@ proxies:
 | `cache_read` | 数字 | **必填** | 每百万缓存读取 token 的美元价格。 |
 | `cache_write_5m` | 数字 | **必填** | 每百万写入 5 分钟缓存 token 的美元价格。 |
 | `cache_write_1h` | 数字 | **必填** | 每百万写入 1 小时缓存 token 的美元价格。 |
-| `input_above_200k` | 数字 | — | 单次请求输入超过 200K token 后的输入单价。与 `output_above_200k` 同时写或都不写。 |
-| `output_above_200k` | 数字 | — | 单次请求输入超过 200K token 后的输出单价。 |
+| `input_above_200k` | 数字 | — | 单次请求的输入（连同缓存读写）超过 200K token 后的输入单价。与 `output_above_200k` 同时写或都不写；缓存单价仍按上面写的算。 |
+| `output_above_200k` | 数字 | — | 单次请求的输入（连同缓存读写）超过 200K token 后的输出单价。 |
 <!-- /generated -->
 
 ```yaml
@@ -645,6 +687,29 @@ security:
 | `body_max_bytes` | 整数 | `2147483648` | 正文最多占用的字节数，超出时从最早的日期开始删除。默认 2 GiB。 |
 <!-- /generated -->
 
+### `failover`
+
+上游失败后会停用一段时间，接下来的请求直接交给下一个候选。停用多久取决于上游
+给出的原因：余额不足要等充值，额度用完要等到上游说的重置时刻，限流通常几秒钟就
+过去。只有一个候选的请求不受影响。
+
+流式回答在第一段内容交给客户端之前，上游在流里报的错误和错误状态码一样，会把
+请求换到下一个候选。
+
+<!-- generated: table failover -->
+<a id="cfg-failover"></a>
+
+| 字段 | 类型 | 默认值 | 说明 |
+|---|---|---|---|
+| `failures_to_pause` | 整数 | `3` | 没有说明原因的失败（5xx、连接失败）连续几次后停用这家上游，取值 1 到 100。 |
+| `pause_secs` | 整数 | `60` | 这类失败第一次停用的秒数。之后每停用一次翻一倍，直到 `max_pause_secs`；成功一次后回到这个值。 |
+| `max_pause_secs` | 整数 | `600` | 翻倍后的停用上限，单位秒，不小于 `pause_secs`。 |
+| `no_balance_pause_secs` | 整数 | `1800` | 上游报告余额不足时停用的秒数。 |
+| `quota_pause_secs` | 整数 | `3600` | 上游报告额度用完、但没有给出重置时间时停用的秒数。给出了重置时间的，停用到那一刻。 |
+| `rate_limit_max_pause_secs` | 整数 | `3600` | 被限流的上游按它给的 `Retry-After` 停用，最多这么多秒。没有 `Retry-After` 的按没有说明原因的失败计。 |
+| `stream_start_wait_secs` | 整数 | `15` | 流式回答在第一段内容到达前最多暂存的秒数。在此之前上游报错，请求换到下一家；超过这个时间，已收到的部分照常交给客户端。取值 1 到 120。 |
+<!-- /generated -->
+
 ### `groups`
 
 策略组让多个上游合用一个名字。规则用 `to` 把请求交给策略组。
@@ -655,13 +720,14 @@ security:
 | 字段 | 类型 | 默认值 | 说明 |
 |---|---|---|---|
 | `name` | 字符串 | **必填** | 策略组的名字，不能重复，也不能和上游同名。 |
-| `type` | `fallback` \| `select` \| `load-balance` \| `url-test` \| `cheapest` | `fallback` | `fallback`：按顺序取第一个健康的。`select`：取 `selected` 指定的那个。`load-balance`：轮流。`url-test`：按实测首字节时间取最快的。`cheapest`：取输入单价最低的。 |
+| `type` | `fallback` \| `select` \| `load-balance` \| `url-test` \| `cheapest` | `fallback` | `fallback`：按顺序取第一个健康的。`select`：取 `selected` 指定的那个。`load-balance`：新对话轮流。`url-test`：按实测首字节时间取最快的。`cheapest`：取输入单价最低的。 |
 | `providers` | 字符串列表 | **必填** | 成员上游的名字。 |
-| `session_affinity` | 布尔 | `true` | 同一会话固定走同一家，使 prompt cache 持续命中。在 `load-balance` 下关闭会让每一轮都换一家，缓存随之失效。 |
 | `selected` | 字符串 | — | `select` 类型选中的成员。 |
 <!-- /generated -->
 
-默认类型为 `fallback`：把一个会话分散到多家上游会丢掉 prompt cache，而在单个使用者的机器上，分散负载换来的远不及缓存省下的。
+默认类型为 `fallback`：单个使用者的机器上没有需要分散的负载。
+
+无论哪种类型，一段对话都留在上次回答它的那一家上游，让上游缓存着的那部分被再次读取，而不是换一家全价重算。同一轮之内（客户端正在回传工具结果）一律不换；跨轮时，上一次回答读或写了至少 1024 个 token 的 prompt cache、且距今不到五分钟，才继续留下。上游因失败进入冷却时，对话随之放开；故障转移之后接下回答的那一家，就是之后留下的那一家。一轮开始时命中的规则也沿用到这一轮结束：按输入大小或图片分流的规则不会让一轮半路换家，除非输入已经超出规则所指模型的上下文窗口。因此 `load-balance` 轮流的是新对话。
 
 ### `routes`
 
