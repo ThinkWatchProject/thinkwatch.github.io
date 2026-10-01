@@ -1,19 +1,20 @@
 ---
-// Shared /license page. Copy lives in src/i18n/pages/license.ts.
+// Shared /pricing page: the licenses of the three products and the commercial
+// terms of ThinkWatch Enterprise. Copy lives in src/i18n/pages/pricing.ts.
 import Base from "~/layouts/Base.astro";
 import SiteHeader from "~/components/SiteHeader.astro";
 import SiteFooter from "~/components/SiteFooter.astro";
 import NeonMotion from "~/components/NeonMotion.astro";
 import { getLang } from "~/i18n";
-import { licenseCopy } from "~/i18n/pages/license";
+import { pricingCopy } from "~/i18n/pages/pricing";
 import { breadcrumbs, webPage } from "~/lib/structured-data";
 
 const lang = getLang(Astro);
-const c = licenseCopy[lang];
+const c = pricingCopy[lang];
 
 const jsonLd = [
-  webPage(lang, "/license", c.meta.title, c.meta.description),
-  breadcrumbs(lang, "/license", c.meta.breadcrumbHome, c.meta.breadcrumbPage),
+  webPage(lang, "/pricing", c.meta.title, c.meta.description),
+  breadcrumbs(lang, "/pricing", c.meta.breadcrumbHome, c.meta.breadcrumbPage),
 ];
 ---
 

@@ -26,7 +26,7 @@ const links = [
   { href: localePath(lang, "/core"), label: s.nav.core, match: "/core" },
   { href: localePath(lang, "/docs"), label: s.nav.docs, match: "/docs" },
   { href: localePath(lang, "/changelog"), label: s.nav.changelog, match: "/changelog" },
-  { href: localePath(lang, "/license"), label: s.nav.license, match: "/license" },
+  { href: localePath(lang, "/pricing"), label: s.nav.pricing, match: "/pricing" },
 ].map((l) => ({ ...l, active: currentPath === l.match || currentPath.startsWith(l.match + "/") }));
 
 const cleanPath = Astro.url.pathname.replace(/^\/zh-CN/, "") || "/";
