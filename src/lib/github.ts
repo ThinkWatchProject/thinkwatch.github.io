@@ -83,6 +83,8 @@ export interface ProductRelease {
   tag: string;
   /** Asset file name → its download URL */
   assets: Record<string, string>;
+  /** Asset file name → its size in bytes */
+  sizes: Record<string, number>;
 }
 
 const latestCache = new Map<string, Promise<ProductRelease | null>>();
@@ -94,13 +96,17 @@ function getLatestProductRelease(repo: string): Promise<ProductRelease | null> {
       try {
         const res = await fetch(`https://api.github.com/repos/${repo}/releases/latest`, { headers: githubHeaders() });
         if (!res.ok) return null;
-        const data: { tag_name?: string; assets?: { name?: string; browser_download_url?: string }[] } =
-          await res.json();
+        const data: {
+          tag_name?: string;
+          assets?: { name?: string; browser_download_url?: string; size?: number }[];
+        } = await res.json();
         const assets: Record<string, string> = {};
+        const sizes: Record<string, number> = {};
         for (const a of data.assets ?? []) {
           if (a.name && a.browser_download_url) assets[a.name] = a.browser_download_url;
+          if (a.name && typeof a.size === "number") sizes[a.name] = a.size;
         }
-        return data.tag_name ? { tag: data.tag_name, assets } : null;
+        return data.tag_name ? { tag: data.tag_name, assets, sizes } : null;
       } catch {
         return null;
       }
@@ -111,6 +117,17 @@ function getLatestProductRelease(repo: string): Promise<ProductRelease | null> {
 }
 
 export const getLatestLiteRelease = () => getLatestProductRelease(productRepos.lite);
+
+/**
+ * A download's size as shown next to it, in decimal megabytes ("17.2 MB"), the
+ * unit Finder and most download pages use. Null in, null out, so a release
+ * without the file simply shows no size.
+ */
+export function formatSize(bytes: number | null | undefined): string | null {
+  if (typeof bytes !== "number") return null;
+  const mb = bytes / 1_000_000;
+  return `${mb < 1 ? mb.toFixed(2) : mb < 100 ? mb.toFixed(1) : Math.round(mb)} MB`;
+}
 export const getLatestCoreRelease = () => getLatestProductRelease(productRepos.core);
 
 // Every published release of the three products, newest first, for the

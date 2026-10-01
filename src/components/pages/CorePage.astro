@@ -9,7 +9,7 @@ import CopyCommand from "~/components/CopyCommand.astro";
 import NeonMotion from "~/components/NeonMotion.astro";
 import { getLang, localePath } from "~/i18n";
 import { coreCopy } from "~/i18n/pages/core";
-import { getLatestCoreRelease, getReleases } from "~/lib/github";
+import { formatSize, getLatestCoreRelease, getReleases } from "~/lib/github";
 import { coreLd } from "~/lib/structured-data";
 
 const lang = getLang(Astro);
@@ -33,11 +33,12 @@ const asServiceUser = "sudo -u thinkwatch THINKWATCH_HOME=/var/lib/thinkwatch tw
 // (twcore upgrade and the install script depend on them as well). Links point
 // at the latest release read at build time, or at GitHub's redirect to the
 // latest release when GitHub could not be reached; the version then comes from
-// the committed list of releases (src/data/releases.json).
+// the committed list of releases (src/data/releases.json) and no sizes are shown.
 const release = await getLatestCoreRelease();
 const tag = release?.tag ?? (await getReleases()).find((r) => r.product === "core")?.tag;
 const version = tag?.replace(/^v/, "");
 const download = (file: string) => release?.assets[file] ?? `${repo}/releases/latest/download/${file}`;
+const size = (file: string) => formatSize(release?.sizes[file]);
 const binaries: { label: string; file: string; archive?: string }[] = [
   { label: c.install.platforms.mac, file: "twcore-aarch64-apple-darwin" },
   { label: c.install.platforms.winX64, file: "twcore-x86_64-pc-windows-msvc.exe" },
@@ -214,6 +215,7 @@ const fileLink = "break-all text-[var(--color-brand-1)] transition-colors hover:
                   <span class="shrink-0 text-[15px] font-medium">{b.label}</span>
                   <span class="flex min-w-0 flex-wrap items-baseline gap-x-3 gap-y-1 font-mono text-[13px] sm:justify-end">
                     <a href={download(b.file)} class={fileLink}>{b.file}</a>
+                    {size(b.file) && <span class="whitespace-nowrap text-[var(--color-muted)]">{size(b.file)}</span>}
                     <a href={download(`${b.file}.sha256`)} class={fileLink}>sha256</a>
                     {b.archive && <a href={download(b.archive)} class={fileLink}>tar.gz</a>}
                   </span>
