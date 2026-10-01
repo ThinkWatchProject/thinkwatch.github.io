@@ -97,8 +97,9 @@ for (const e of entries) {
                 const published = notes ? undefined : entry.releaseNotes;
                 const source = notes ?? published;
                 const Content = source ? (await render(source)).Content : null;
-                // Core and Enterprise publish their notes in English only
-                const english = lang === "zh-CN" && published?.data.lang === "en";
+                // Notes that exist only in the other language: Core's and Enterprise's are
+                // English only, and the first Lite releases have Chinese notes only
+                const otherLang = published && published.data.lang !== lang ? published.data.lang : undefined;
                 // A release with notes opens in place to show them
                 const Wrap = Content ? "details" : "div";
                 const Row = Content ? "summary" : "div";
@@ -112,7 +113,7 @@ for (const e of entries) {
                         <span class="cl-prod" data-product={entry.product}>{name}</span>
                         <span class="cl-tagcell">
                           <a href={`#${entry.id}`} class="cl-tag" aria-label={`${c.linkTo} ${name} ${entry.tag}`}>{entry.tag}</a>
-                          {english && <span class="cl-en" title={c.englishOnly}>EN</span>}
+                          {otherLang && <span class="cl-en" title={c.otherLanguageOnly}>{otherLang === "en" ? "EN" : "中文"}</span>}
                         </span>
                         {entry.url ? (
                           <a href={entry.url} target="_blank" rel="noopener" class="cl-gh-link" aria-label={`${c.githubFull}: ${name} ${entry.tag}`}>

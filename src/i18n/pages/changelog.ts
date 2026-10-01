@@ -24,7 +24,7 @@ export const changelogCopy = {
     linkTo: "Link to",
     latest: "Latest releases",
     readNotes: "Read the notes",
-    englishOnly: "These notes are in English only",
+    otherLanguageOnly: "These notes are in Chinese only",
     dateLocale: "en-US",
     /** A release's date under its month */
     dateFormat: { month: "short", day: "numeric" },
@@ -52,7 +52,7 @@ export const changelogCopy = {
     linkTo: "链接到",
     latest: "最新版本",
     readNotes: "查看说明",
-    englishOnly: "此版本的说明仅有英文",
+    otherLanguageOnly: "此版本的说明仅有英文",
     dateLocale: "zh-CN",
     dateFormat: { month: "long", day: "numeric" },
     fullDateFormat: { year: "numeric", month: "long", day: "numeric" },
