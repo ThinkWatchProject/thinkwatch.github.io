@@ -76,7 +76,7 @@ const productLabel = zh ? "产品" : "Product";
 const searchLabel = zh ? `搜索 ${productName(p, lang)} 文档` : `Search ${productName(p, lang)} docs`;
 const pageLabel = currentDoc?.label[lang] ?? title.split(" · ")[0];
 // Title stored in the search index: on a product home "Overview" alone would be ambiguous.
-const searchTitle = current === "" ? (product === "thinkwatch" ? title.split(" · ")[0] : productName(p, lang)) : pageLabel;
+const searchTitle = hub ? title.split(" · ")[0] : current === "" ? productName(p, lang) : pageLabel;
 
 // Only show H2/H3 in the TOC; hide if there's only the (auto-generated) doc title.
 // rehype-autolink-headings appends a literal "#" text node to each heading,
@@ -139,7 +139,7 @@ const updatedLabel = zh ? `最后更新于 ${updated}` : `Last updated ${updated
     )}
 
     {hub ? (
-      <main id="main" class="container-page" data-pagefind-body data-pagefind-meta={`title:${searchTitle}`} data-pagefind-filter={`product:${p.id}`}>
+      <main id="main" class="container-page" data-pagefind-body data-pagefind-meta={`title:${searchTitle}`}>
         <slot />
         <slot name="after" />
       </main>
