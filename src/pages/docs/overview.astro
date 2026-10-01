@@ -1,0 +1,10 @@
+---
+// ThinkWatch Enterprise's docs home. Its guides are /docs/<slug>; /docs is the
+// documentation home for all three products.
+import DocArticle from "~/pages/docs/_DocArticle.astro";
+import { getHomeEntry } from "~/pages/docs/_lib";
+
+const entry = await getHomeEntry("thinkwatch", "en");
+---
+
+<DocArticle lang="en" product="thinkwatch" slug="" entry={entry} />
