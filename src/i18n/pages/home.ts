@@ -88,7 +88,7 @@ export const homeCopy = {
         { t: "Every request traceable", b: "The matched rule, each upstream attempt and the cost of every request, with replay against another upstream." },
         { t: "Costs stated as they are", b: "Estimated amounts are marked, and requests without a price are counted separately rather than as zero." },
       ],
-      pills: ["Available", "macOS (Apple silicon)", "Windows (x64, ARM64)", "Linux (x86_64, aarch64)", "MIT open source"],
+      pills: ["Available", "macOS (Apple silicon)", "Windows (x64, ARM64)", "Linux (x86_64, aarch64)"],
       shotAlt:
         "The Overview page for the last 7 days: 83.1M tokens, $68.11 in cost including $0.441 estimated and 13 unpriced requests, and 1,339 requests of which 11 failed, each compared with the prior 7 days; a token trend stacked by model with the periods that had failures marked; and the models ranked by tokens",
       cta: "Explore ThinkWatch Lite",
@@ -215,7 +215,7 @@ export const homeCopy = {
         { t: "每个请求都可追溯", b: "每个请求命中的规则、尝试过的上游与费用都有记录，也可以重放到另一个上游对比。" },
         { t: "费用如实计算", b: "估算的金额单独标注，无法计价的请求单独计数，不按零计入。" },
       ],
-      pills: ["已发布", "macOS（Apple silicon）", "Windows（x64、ARM64）", "Linux（x86_64、aarch64）", "MIT 开源"],
+      pills: ["已发布", "macOS（Apple silicon）", "Windows（x64、ARM64）", "Linux（x86_64、aarch64）"],
       shotAlt:
         "概览页（最近 7 天）：token 83.1M、费用 $68.11（含估算 $0.441，13 条无法计价）、请求 1,339 次（失败 11 次），均与上一个 7 天对比；按模型分层的 token 趋势，并标出存在失败的时段；以及按 token 排序的模型列表",
       cta: "了解 ThinkWatch Lite",
