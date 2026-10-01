@@ -81,6 +81,21 @@ export const liteCopy = {
         clientsCount: "7",
         clientsCountSub: "set up in one step · 3 more by instructions",
         noticesTitle: "System notifications",
+        notices: [
+          {
+            title: "Blocked Bash Call from “relay”",
+            body: "It matched the rule “Download and run”, so the response was cut off.",
+          },
+          {
+            title: "“chatgpt” Subscription Quota Used Up",
+            body: "The 5-hour usage limit has been reached and resets in about 2 hours. Requests through this upstream will be rejected.",
+          },
+          {
+            title: "Disconnected from “homelab”",
+            body: "Reconnecting. Until the connection is restored, the app shows the state at the time of the disconnect.",
+          },
+        ],
+        now: "now",
       },
     },
     status: {
@@ -310,6 +325,12 @@ export const liteCopy = {
         clientsCount: "7",
         clientsCountSub: "款一键接入 · 另有 3 款按说明配置",
         noticesTitle: "系统通知",
+        notices: [
+          { title: "已拦截 relay 返回的 Bash 调用", body: "命中规则「下载即执行」，响应已切断。" },
+          { title: "chatgpt 的订阅额度已用完", body: "5 小时额度已用完，约 2 小时后重置。经此上游的请求会被拒绝。" },
+          { title: "与 homelab 的连接已断开", body: "正在重新连接。连接恢复前，应用中的内容停留在断开时的状态。" },
+        ],
+        now: "现在",
       },
     },
     status: {

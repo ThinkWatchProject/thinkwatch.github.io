@@ -79,7 +79,8 @@ const fileLink = "break-all text-[var(--color-brand-1)] transition-colors hover:
             <a class="nx-announce nx-rise" style="--d:0" href={`${repo}/releases/tag/v${version}`}><span class="dot"></span>{c.motion.announce(version)}<span class="chev">→</span></a>
           )}
           <h1 class="nx-h1 nx-rise" style="--d:1">
-            {zh ? <span class="whitespace-nowrap">{c.hero.titleA}</span> : c.hero.titleA}<span class:list={["nx-grad", zh && "whitespace-nowrap"]}>{c.hero.titleHighlight}</span>
+            {/* Chinese: the break goes after 的, so neither half runs under the terminal */}
+            {zh ? <Fragment><span class="whitespace-nowrap">{c.hero.titleA.trim()}</span><br /></Fragment> : c.hero.titleA}<span class:list={["nx-grad", zh && "whitespace-nowrap"]}>{c.hero.titleHighlight}</span>
           </h1>
           <p class="nx-lede nx-rise" style="--d:2">{c.hero.sub}</p>
           <div class="nx-actions nx-rise" style="--d:3">
