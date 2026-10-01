@@ -22,15 +22,15 @@ const tierNumbers = [
 export const licenseCopy = {
   en: {
     meta: {
-      title: "License · ThinkWatch",
+      title: "Pricing · ThinkWatch",
       description:
         "ThinkWatch Lite and ThinkWatch Core are MIT. ThinkWatch Enterprise is source-available under the Business Source License 1.1: free for non-production use, and free in production up to 10,000,000 billable tokens and 10,000 MCP tool calls per month.",
       breadcrumbHome: "Home",
-      breadcrumbPage: "License",
+      breadcrumbPage: "Pricing",
     },
     hero: {
-      eyebrow: "License terms",
-      title: "Licensing",
+      eyebrow: "Licenses and commercial terms",
+      title: "Pricing",
       sub: "ThinkWatch Lite and ThinkWatch Core are licensed under MIT. ThinkWatch Enterprise is source-available under the Business Source License 1.1, with free production use up to monthly thresholds.",
     },
     products: [
@@ -38,13 +38,13 @@ export const licenseCopy = {
         name: "ThinkWatch Lite",
         badge: "MIT",
         tone: "teal",
-        body: "Use, modify, and redistribute it, commercially or not. Keep the copyright and license notice.",
+        body: "Free to use, modify, and redistribute, commercially or not. Keep the copyright and license notice.",
       },
       {
         name: "ThinkWatch Core",
         badge: "MIT",
         tone: "teal",
-        body: "Use, modify, and redistribute it, commercially or not. Keep the copyright and license notice.",
+        body: "Free to use, modify, and redistribute, commercially or not. Keep the copyright and license notice.",
       },
       {
         name: "ThinkWatch Enterprise",
@@ -139,15 +139,15 @@ export const licenseCopy = {
 
   "zh-CN": {
     meta: {
-      title: "许可证 · ThinkWatch",
+      title: "定价 · ThinkWatch",
       description:
         "ThinkWatch Lite 与 ThinkWatch Core 采用 MIT 许可证。ThinkWatch 企业版在 Business Source License 1.1 下源码开放：非生产环境免费；生产环境每月 10,000,000 计费 token 与 10,000 次 MCP 工具调用以内免费。",
       breadcrumbHome: "首页",
-      breadcrumbPage: "许可证",
+      breadcrumbPage: "定价",
     },
     hero: {
-      eyebrow: "许可条款",
-      title: "许可证",
+      eyebrow: "许可证与商业授权",
+      title: "定价",
       sub: "ThinkWatch Lite 与 ThinkWatch Core 采用 MIT 许可证。ThinkWatch 企业版在 Business Source License 1.1 下源码开放，生产环境用量在月度阈值以内可免费使用。",
     },
     products: [
@@ -155,13 +155,13 @@ export const licenseCopy = {
         name: "ThinkWatch Lite",
         badge: "MIT",
         tone: "teal",
-        body: "可自由使用、修改和再分发，商业或非商业用途均可。需保留版权声明与许可声明。",
+        body: "可免费使用、修改和再分发，商业或非商业用途均可。需保留版权声明与许可声明。",
       },
       {
         name: "ThinkWatch Core",
         badge: "MIT",
         tone: "teal",
-        body: "可自由使用、修改和再分发，商业或非商业用途均可。需保留版权声明与许可声明。",
+        body: "可免费使用、修改和再分发，商业或非商业用途均可。需保留版权声明与许可声明。",
       },
       {
         name: "ThinkWatch 企业版",
