@@ -1,7 +1,8 @@
 ---
 import { productName } from "~/content/docs/_meta";
-// Documentation home (/docs, /zh-CN/docs): intro, one card per product listing
-// its docs. It is also ThinkWatch's docs home, so the sidebar shows ThinkWatch.
+// Documentation home (/docs, /zh-CN/docs): a short hero with search across
+// every product, one tile per product listing its docs, then other resources.
+// It is also ThinkWatch Enterprise's docs home ("Overview" in its sidebar).
 import DocsLayout from "~/layouts/DocsLayout.astro";
 import { docHref, products, productHomeHref } from "~/content/docs/_meta";
 import { localePath, type Lang } from "~/i18n";
@@ -18,84 +19,210 @@ const copy = zh
       title: "文档 · ThinkWatch",
       description:
         "ThinkWatch 企业版、ThinkWatch Lite 与 ThinkWatch Core 的文档，涵盖架构、部署、配置、API 参考、安全模型、桌面应用与共享核心。",
-      h1: "文档",
+      label: "文档",
+      h1a: "ThinkWatch ",
+      h1b: "文档",
       intro:
-        "三个产品分别提供文档：面向组织的 ThinkWatch 企业版；桌面应用 ThinkWatch Lite，在本机运行网关，也可以连接服务器上的 ThinkWatch Core；以及 ThinkWatch Core，即 ThinkWatch Lite 所基于的网关引擎与 Rust crate，ThinkWatch 企业版也使用其中的四个 crate。可通过上方的切换器选择产品，或从下方卡片进入。",
+        "三个产品分别提供文档：面向组织的 ThinkWatch 企业版；桌面应用 ThinkWatch Lite，在本机运行网关，也可以连接服务器上的 ThinkWatch Core；以及 ThinkWatch Core，即 ThinkWatch Lite 所基于的网关引擎与 Rust crate，ThinkWatch 企业版也使用其中的四个 crate。",
+      search: "搜索全部文档",
       open: (name: string) => `进入 ${name} 文档`,
       more: "其他资源",
+      resources: [
+        { href: "https://github.com/ThinkWatchProject", title: "GitHub", text: "三个产品的源码、Issues 与 Release。" },
+        { href: localePath(lang, "/changelog"), title: "更新日志", text: "各发布版本的变更记录。" },
+        {
+          href: "https://github.com/ThinkWatchProject/ThinkWatch/blob/main/LICENSING.md",
+          title: "LICENSING.md",
+          text: "ThinkWatch 企业版的生产环境阈值与商业授权。",
+        },
+      ],
     }
   : {
       title: "Documentation · ThinkWatch",
       description:
         "Documentation for ThinkWatch Enterprise, ThinkWatch Lite, and ThinkWatch Core, covering architecture, deployment, configuration, API reference, the security model, the desktop application, and the shared core.",
-      h1: "Documentation",
+      label: "Documentation",
+      h1a: "ThinkWatch ",
+      h1b: "documentation",
       intro:
-        "Documentation is provided for three products: ThinkWatch Enterprise, for organizations; ThinkWatch Lite, a desktop application that runs the gateway locally or connects to ThinkWatch Core on a server; and ThinkWatch Core, the gateway engine and Rust crates that ThinkWatch Lite is built on, three of which ThinkWatch Enterprise also uses. Select a product with the switcher above or from the cards below.",
+        "Documentation is provided for three products: ThinkWatch Enterprise, for organizations; ThinkWatch Lite, a desktop application that runs the gateway locally or connects to ThinkWatch Core on a server; and ThinkWatch Core, the gateway engine and Rust crates that ThinkWatch Lite is built on, four of which ThinkWatch Enterprise also uses.",
+      search: "Search all docs",
       open: (name: string) => `Open ${name} docs`,
       more: "Additional resources",
+      resources: [
+        { href: "https://github.com/ThinkWatchProject", title: "GitHub", text: "Source, issues and releases for all three products." },
+        { href: localePath(lang, "/changelog"), title: "Changelog", text: "Release notes for each version." },
+        {
+          href: "https://github.com/ThinkWatchProject/ThinkWatch/blob/main/LICENSING.md",
+          title: "LICENSING.md",
+          text: "Production thresholds and commercial tiers for ThinkWatch Enterprise.",
+        },
+      ],
     };
 ---
 
-<DocsLayout title={copy.title} description={copy.description} product="thinkwatch" current="" ogType="website" ogCard="home">
-  <h1>{copy.h1}</h1>
-  <p>{copy.intro}</p>
+<DocsLayout title={copy.title} description={copy.description} product="thinkwatch" current="" ogType="website" ogCard="home" hub>
+  <section class="hub-hero">
+    <p class="nx-label nx-rise">{copy.label}</p>
+    <h1 class="nx-h1 hub-h1 nx-rise" style="--d:1">{copy.h1a}<span class="nx-grad">{copy.h1b}</span></h1>
+    <p class="nx-sub nx-rise" style="--d:2">{copy.intro}</p>
+    <button type="button" data-search-trigger class="hub-search nx-rise" style="--d:3" data-pagefind-ignore>
+      <span class="flex min-w-0 items-center gap-3">
+        <svg class="h-[18px] w-[18px] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+          <circle cx="11" cy="11" r="7" />
+          <line x1="16.5" y1="16.5" x2="21" y2="21" />
+        </svg>
+        <span class="truncate">{copy.search}</span>
+      </span>
+      <kbd>⌘K</kbd>
+    </button>
+  </section>
 
-  <!-- Outside .prose-tw (see DocsLayout): cards, then a prose block of links. -->
-  <div slot="after">
-  <div class="mt-10 grid gap-4">
-    {products.map((p) => {
+  <div class="hub-products" data-pagefind-ignore>
+    {products.map((p, i) => {
       const docs = p.docs.filter((d) => d.slug);
       return (
-        <section class="rounded-xl border border-[var(--color-border-strong)] bg-[var(--color-surface)]/60 p-5 sm:p-6">
-          <h2 class="text-lg font-semibold tracking-tight text-[var(--color-text)]">
-            <a href={productHomeHref(lang, p.id)} class="hover:text-[var(--color-brand-1)] transition-colors">{productName(p, lang)}</a>
+        <section class="nx-tile hub-product nx-in" style={`transition-delay:${i * 80}ms`}>
+          <h2 class="hub-name">
+            <a href={productHomeHref(lang, p.id)}>{productName(p, lang)}</a>
           </h2>
-          <p class="mt-1.5 text-sm leading-relaxed text-[var(--color-muted)]">{p.tagline[lang]}</p>
-          <ul class="mt-4 grid gap-x-4 sm:grid-cols-2">
+          <p class="nx-body">{p.tagline[lang]}</p>
+          <ul class="hub-docs">
             {docs.map((d) => (
               <li>
-                <a
-                  href={docHref(lang, p.id, d)}
-                  class="flex min-h-11 items-center justify-between gap-2 border-t border-[var(--color-border)] py-2 text-sm text-[var(--color-text)]/85 transition-colors hover:text-[var(--color-brand-1)]"
-                >
+                <a href={docHref(lang, p.id, d)}>
                   <span>{d.label[lang]}</span>
-                  {!d.locales.includes(lang) && (
-                    <span class="rounded border border-cyan-500/30 bg-cyan-500/15 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider text-cyan-300">EN</span>
-                  )}
+                  {!d.locales.includes(lang) && <span class="en-badge">EN</span>}
                 </a>
               </li>
             ))}
           </ul>
-          <a
-            href={productHomeHref(lang, p.id)}
-            class="mt-4 inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-[var(--color-brand-1)] transition-colors hover:text-[var(--color-brand-2)]"
-          >
-            {copy.open(productName(p, lang))}
-            <svg class="h-3.5 w-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <line x1="3" y1="8" x2="13" y2="8" />
-              <polyline points="9,4 13,8 9,12" />
-            </svg>
-          </a>
+          <a href={productHomeHref(lang, p.id)} class="nx-link hub-open">{copy.open(productName(p, lang))}</a>
         </section>
       );
     })}
   </div>
 
-  <div class="prose-tw">
-  <h2>{copy.more}</h2>
-  {zh ? (
-    <ul>
-      <li><a href="https://github.com/ThinkWatchProject/ThinkWatch">GitHub 仓库</a> —— 源码、Issues、Release</li>
-      <li><a href={localePath(lang, "/changelog")}>更新日志</a> —— 各发布版本的变更记录</li>
-      <li><a href="https://github.com/ThinkWatchProject/ThinkWatch/blob/main/LICENSING.md">LICENSING.md</a> —— 生产环境阈值与商业授权</li>
-    </ul>
-  ) : (
-    <ul>
-      <li><a href="https://github.com/ThinkWatchProject/ThinkWatch">GitHub repository</a> — source, issues, releases</li>
-      <li><a href={localePath(lang, "/changelog")}>Changelog</a> — release notes for each version</li>
-      <li><a href="https://github.com/ThinkWatchProject/ThinkWatch/blob/main/LICENSING.md">LICENSING.md</a> — production thresholds and commercial tiers</li>
-    </ul>
-  )}
-  </div>
-  </div>
+  <section class="hub-more" aria-labelledby="hub-more">
+    <h2 id="hub-more" class="nx-label">{copy.more}</h2>
+    <div class="nx-cols" style="--cols:3">
+      {copy.resources.map((r) => (
+        <a href={r.href} class="hub-res">
+          <span class="nx-h3">{r.title}</span>
+          <span class="nx-body">{r.text}</span>
+        </a>
+      ))}
+    </div>
+  </section>
 </DocsLayout>
+
+<style>
+  .hub-hero {
+    padding: 72px 0 56px;
+    max-width: 760px;
+  }
+  .hub-h1 {
+    margin-top: 16px;
+  }
+  .hub-search {
+    margin-top: 32px;
+    display: flex;
+    width: min(100%, 560px);
+    height: 52px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 14px;
+    background: rgba(15, 16, 18, 0.75);
+    backdrop-filter: blur(8px);
+    padding: 0 10px 0 18px;
+    font-size: 15px;
+    color: var(--color-muted);
+    box-shadow: 0 20px 60px -30px rgb(var(--a1) / 0.5);
+    transition: color 150ms, border-color 150ms, box-shadow 200ms;
+  }
+  .hub-search:hover {
+    color: var(--color-text);
+    border-color: rgb(var(--a1) / 0.45);
+    box-shadow: 0 20px 60px -24px rgb(var(--a1) / 0.65);
+  }
+  .hub-search kbd {
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 6px;
+    padding: 3px 7px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+  }
+
+  .hub-products {
+    display: grid;
+    gap: 12px;
+  }
+  @media (min-width: 1024px) {
+    .hub-products {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  .hub-product {
+    display: flex;
+    flex-direction: column;
+    padding: 28px 28px 18px;
+  }
+  .hub-name {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: #fff;
+  }
+  .hub-name a {
+    transition: color 150ms;
+  }
+  .hub-name a:hover {
+    color: var(--color-brand-2);
+  }
+  .hub-docs {
+    flex: 1;
+    margin: 20px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .hub-docs a {
+    display: flex;
+    min-height: 40px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+    font-size: 14.5px;
+    color: var(--color-muted);
+    transition: color 150ms;
+  }
+  .hub-docs a:hover {
+    color: #fff;
+  }
+  .hub-open {
+    margin-top: 8px;
+    font-size: 14px;
+  }
+
+  .hub-more {
+    padding: 72px 0 104px;
+  }
+  .hub-more h2 {
+    margin: 0 0 16px;
+    font-weight: 500;
+  }
+  .hub-res {
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 28px;
+  }
+  .hub-res .nx-h3 {
+    transition: color 150ms;
+  }
+  .hub-res:hover .nx-h3 {
+    color: var(--color-brand-2);
+  }
+</style>
