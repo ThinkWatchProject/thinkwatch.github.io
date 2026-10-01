@@ -1,16 +1,34 @@
 ---
 import { getLang } from "~/i18n";
+import Bi from "./Bi.astro";
 
+interface Props {
+  /** Render the text in both languages for the page's script to choose from (the 404 page; see Bi.astro) */
+  bilingual?: boolean;
+}
+
+const { bilingual = false } = Astro.props;
 const lang = getLang(Astro);
-const placeholder = lang === "zh-CN" ? "搜索文档…" : "Search docs…";
-const buttonLabel = lang === "zh-CN" ? "搜索" : "Search";
-const emptyHint = lang === "zh-CN" ? "开始输入以搜索文档。" : "Start typing to search the docs.";
-const noResults = lang === "zh-CN" ? "未找到结果" : "No results";
-// Used when the page is a product's docs page (DocsLayout sets data-docs-product).
-const scopedPlaceholder = lang === "zh-CN" ? "搜索 {product} 文档…" : "Search {product} docs…";
-const scopeLabel = lang === "zh-CN" ? "范围" : "Scope";
-const scopeAll = lang === "zh-CN" ? "全部文档" : "All docs";
-const scopeProduct = lang === "zh-CN" ? "{product} 文档" : "{product} docs";
+const text = {
+  placeholder: { en: "Search docs…", zh: "搜索文档…" },
+  button: { en: "Search", zh: "搜索" },
+  emptyHint: { en: "Start typing to search the docs.", zh: "开始输入以搜索文档。" },
+  noResults: { en: "No results", zh: "未找到结果" },
+  // Used when the page is a product's docs page (DocsLayout sets data-docs-product).
+  scopedPlaceholder: { en: "Search {product} docs…", zh: "搜索 {product} 文档…" },
+  scopeLabel: { en: "Scope", zh: "范围" },
+  scopeAll: { en: "All docs", zh: "全部文档" },
+  scopeProduct: { en: "{product} docs", zh: "{product} 文档" },
+};
+const pick = (k: keyof typeof text) => (lang === "zh-CN" ? text[k].zh : text[k].en);
+const placeholder = pick("placeholder");
+const buttonLabel = pick("button");
+const emptyHint = pick("emptyHint");
+const noResults = pick("noResults");
+const scopedPlaceholder = pick("scopedPlaceholder");
+const scopeProduct = pick("scopeProduct");
+/** On a bilingual page, attributes the page's script swaps in for Chinese visitors */
+const zhAttrs = (attrs: Record<string, string>) => (bilingual ? JSON.stringify(attrs) : undefined);
 ---
 
 <!--
@@ -27,13 +45,14 @@ const scopeProduct = lang === "zh-CN" ? "{product} 文档" : "{product} docs";
   type="button"
   data-search-trigger
   aria-label={buttonLabel}
+  data-zh-attrs={zhAttrs({ "aria-label": text.button.zh })}
   class="flex items-center justify-center gap-2 text-xs text-[var(--color-muted)] hover:text-white border border-white/10 hover:border-white/25 rounded-md w-9 h-9 md:w-auto md:h-9 md:px-2.5 transition-colors"
 >
   <svg class="w-4 h-4 md:w-3.5 md:h-3.5" viewBox="0 0 16 16" fill="none" aria-hidden="true">
     <circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.4"/>
     <line x1="11" y1="11" x2="14" y2="14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
   </svg>
-  <span class="hidden md:inline">{buttonLabel}</span>
+  <span class="hidden md:inline"><Bi {...text.button} both={bilingual} /></span>
   <kbd class="hidden lg:inline ml-1 px-1.5 py-0.5 text-[9px] font-mono rounded border border-white/10 bg-white/[0.04] text-[var(--color-dim)]">⌘K</kbd>
 </button>
 
@@ -44,6 +63,13 @@ const scopeProduct = lang === "zh-CN" ? "{product} 文档" : "{product} docs";
   data-placeholder={placeholder}
   data-scoped-placeholder={scopedPlaceholder}
   data-scope-product={scopeProduct}
+  data-zh-attrs={zhAttrs({
+    "data-empty-hint": text.emptyHint.zh,
+    "data-no-results": text.noResults.zh,
+    "data-placeholder": text.placeholder.zh,
+    "data-scoped-placeholder": text.scopedPlaceholder.zh,
+    "data-scope-product": text.scopeProduct.zh,
+  })}
   class="search-modal fixed top-4 sm:top-[15vh] left-1/2 -translate-x-1/2 m-0 w-[calc(100vw-1rem)] sm:w-full max-w-2xl rounded-2xl border border-white/10 bg-[var(--color-surface)]/95 backdrop-blur-xl shadow-2xl shadow-black/60 text-[var(--color-text)] p-0 outline-none"
 >
   <form method="dialog">
@@ -56,6 +82,7 @@ const scopeProduct = lang === "zh-CN" ? "{product} 文档" : "{product} docs";
         id="search-input"
         type="search"
         placeholder={placeholder}
+        data-zh-attrs={zhAttrs({ placeholder: text.placeholder.zh })}
         autocomplete="off"
         spellcheck="false"
         class="flex-1 bg-transparent border-0 outline-none text-base text-white placeholder:text-[var(--color-dim)]"
@@ -66,13 +93,13 @@ const scopeProduct = lang === "zh-CN" ? "{product} 文档" : "{product} docs";
     </div>
 
     <div id="search-scope" hidden class="flex items-center gap-2 overflow-x-auto px-5 py-2.5 border-b border-white/10 text-xs">
-      <span class="text-[var(--color-dim)] mr-1 shrink-0">{scopeLabel}</span>
+      <span class="text-[var(--color-dim)] mr-1 shrink-0"><Bi {...text.scopeLabel} both={bilingual} /></span>
       <button type="button" data-scope="product" aria-pressed="true" class="search-scope-btn"></button>
-      <button type="button" data-scope="all" aria-pressed="false" class="search-scope-btn">{scopeAll}</button>
+      <button type="button" data-scope="all" aria-pressed="false" class="search-scope-btn"><Bi {...text.scopeAll} both={bilingual} /></button>
     </div>
 
     <div id="search-results" class="max-h-[70vh] sm:max-h-[50vh] overflow-y-auto px-2 py-2 text-sm">
-      <div class="px-3 py-6 text-center text-[var(--color-dim)]">{emptyHint}</div>
+      <div class="px-3 py-6 text-center text-[var(--color-dim)]"><Bi {...text.emptyHint} both={bilingual} /></div>
     </div>
   </form>
 </dialog>
