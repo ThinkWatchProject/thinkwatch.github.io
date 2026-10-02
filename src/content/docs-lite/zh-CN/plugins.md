@@ -86,7 +86,7 @@ export function onRequest(req, ctx) {
 | `onReplyTextEnd(ctx)` | `reply.text` | 逐段模式下，每段文字结束时调用。可选。 |
 | `onToolCall(call, ctx)` | `reply.tool_calls` | 回答中的每个工具调用完整之后调用。 |
 
-**`onRequest`** 接收[请求视图](#请求视图)，返回改过的视图；不返回则请求保持原样。调用 `reject("原因")` 拒绝这次请求，客户端收到注明插件名称的错误；`reject` 通过抛出异常结束钩子，即使插件自己接住这个异常，拒绝依然成立。每个请求只调用一次：上游出错、请求转到下一个上游时沿用第一次的结果，不再重新调用。
+**`onRequest`** 接收[请求视图](#请求视图)，返回改过的视图；不返回则请求保持原样。调用 `reject("原因")` 拒绝这次请求，客户端收到注明插件名称的错误；`reject` 通过抛出异常结束钩子，即使插件自己接住这个异常，拒绝依然成立。每个请求只调用一次：上游出错、请求转到下一个上游时沿用第一次的结果，不再重新调用。只有生成回答的请求才调用它；计算 token 数的请求（`/v1/messages/count_tokens` 与 Gemini 的 `countTokens`）不经过它，原样转发。
 
 **`onReplyText`** 在整段模式（默认）下，每段文字到齐后调用一次，参数是整段文字，调用结束后文字才交给客户端。逐段模式下随流式输出逐段调用，返回值是此刻要发出的文字；返回 `""` 表示先扣住，这段文字结束时 `onReplyTextEnd` 的返回值把扣住的内容放出。非流式的回答一次传入全部文字，逐段模式下随后再调用 `onReplyTextEnd`。不返回表示文字不变。
 
@@ -147,7 +147,7 @@ type Ctx = {
 
 ### 可用的 JavaScript
 
-插件可以使用 JavaScript 标准内置对象，例如 `JSON`、`RegExp`、`Map`、`Date` 与 `Math`；`console.log`、`console.info`、`console.warn` 与 `console.error` 写入插件日志；`reject` 只在 `onRequest` 中有效。没有 `fetch`、`require`、`import()` 和定时器，也无法访问文件、网络、环境变量和进程。插件存进变量的内容，不会留到它所处理的这次请求或这个回答之后。
+插件可以使用 JavaScript 标准内置对象，例如 `JSON`、`RegExp`、`Map`、`Date` 与 `Math`；`console.log`、`console.info`、`console.warn` 与 `console.error` 写入插件日志；`reject` 只在 `onRequest` 中有效。没有 `fetch`、`require` 和定时器，`import` 与 `import()` 加载不了任何模块，也无法访问文件、网络、环境变量和进程。插件存进变量的内容，不会留到它所处理的这次请求或这个回答之后。
 
 ## 权限
 

@@ -86,7 +86,7 @@ The file is checked when it is added and whenever core loads it. It must export 
 | `onReplyTextEnd(ctx)` | `reply.text` | In stream mode, at the end of each text block. Optional. |
 | `onToolCall(call, ctx)` | `reply.tool_calls` | For each tool call in the answer, once it is complete. |
 
-**`onRequest`** receives the [request view](#the-request-view) and returns it changed, or returns nothing to leave the request as it is. Calling `reject("reason")` refuses the request, and the client receives an error that names the plugin; `reject` ends the hook by throwing, and the refusal stands even if the plugin catches what it throws. The hook runs once for each request: when the request moves to another upstream after a failure, the result is reused and the hook does not run again.
+**`onRequest`** receives the [request view](#the-request-view) and returns it changed, or returns nothing to leave the request as it is. Calling `reject("reason")` refuses the request, and the client receives an error that names the plugin; `reject` ends the hook by throwing, and the refusal stands even if the plugin catches what it throws. The hook runs once for each request: when the request moves to another upstream after a failure, the result is reused and the hook does not run again. It runs for requests that generate an answer; token-count requests (`/v1/messages/count_tokens` and Gemini's `countTokens`) are forwarded without it.
 
 **`onReplyText`** in block mode, the default, is called once for each text block with the whole text of the block, and the text reaches the client after the call. In stream mode it is called for each piece of streamed text and returns what to send now; returning `""` holds the text back, and `onReplyTextEnd` returns whatever is still held when the block ends. An answer that is not streamed is passed in one call, followed by `onReplyTextEnd` in stream mode. Returning nothing leaves the text unchanged.
 
@@ -147,7 +147,7 @@ type Ctx = {
 
 ### Available JavaScript
 
-Plugins have the standard JavaScript built-ins, such as `JSON`, `RegExp`, `Map`, `Date` and `Math`; `console.log`, `console.info`, `console.warn` and `console.error`, which write to the plugin's log; and `reject`, which is valid only in `onRequest`. There is no `fetch`, `require`, `import()` or timer, and no access to files, the network, environment variables or processes. Nothing a plugin stores in a variable outlives the request or answer it runs for.
+Plugins have the standard JavaScript built-ins, such as `JSON`, `RegExp`, `Map`, `Date` and `Math`; `console.log`, `console.info`, `console.warn` and `console.error`, which write to the plugin's log; and `reject`, which is valid only in `onRequest`. There is no `fetch`, `require` or timer, `import` and `import()` load nothing, and there is no access to files, the network, environment variables or processes. Nothing a plugin stores in a variable outlives the request or answer it runs for.
 
 ## Permissions
 
