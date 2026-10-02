@@ -2,7 +2,7 @@
 
 A page-by-page reference to what ThinkWatch Lite shows and does. The [Lite page](/lite) gives the short version.
 
-The main window has nine pages: Overview, Traffic, Clients, Keys, Upstreams, Routing, Security, MCP and Settings.
+The main window has ten pages: Overview, Traffic, Clients, Keys, Upstreams, Routing, Security, MCP, Plugins and Settings.
 
 ## Usage and cost
 
@@ -72,6 +72,10 @@ The MCP page covers what clients load from their own configuration files, which 
 - **Findings:** client configuration, skills, hooks, slash commands, subagents and project instruction files are scanned for hidden characters, prompt injection, dangerous commands and overly broad permissions, and each finding is graded high, medium or low. The scan only reports; it never changes a file.
 
 The app watches these files while it runs, and a new finding raises a system notification.
+
+## Plugins
+
+Plugins are short JavaScript files that change requests before they go to an upstream and answers before they reach the client, such as adding today's date to the system prompt or unifying terms in answers. They run in a sandbox inside core with no network, files or memory between requests, see placeholders instead of the keys in a request, and pass through the same protections afterwards. A plugin is added from a file or pasted code, reviewed with its permissions and confirmed in a system dialog; it stops running when its file changes until the new version is approved. The page lists each plugin with its status, permissions, scope and statistics, and offers its settings, a trial run on a recent request and its log; requests changed by plugins are marked in Traffic. The API, permissions, limits and security model are described in [Plugins](/docs/lite/plugins).
 
 ## Settings
 
