@@ -202,8 +202,8 @@ export const products: Product[] = [
         locales: both,
         group: "reference",
         summary: {
-          en: "JavaScript plugins that change requests and answers: adding one, the API, permissions, limits, the sandbox and what it cannot prevent, and five examples.",
-          "zh-CN": "改写请求与回答的 JavaScript 插件：添加方法、接口、权限、限额、沙箱及其无法防范的情况，以及五个示例。",
+          en: "JavaScript plugins that change requests and answers: where they run, adding one, the API, permissions, limits, the sandbox and what it cannot prevent, and the six that ship with the app.",
+          "zh-CN": "改写请求与回答的 JavaScript 插件：运行位置、添加方法、接口、权限、限额、沙箱及其无法防范的情况，以及应用自带的六个插件。",
         },
       },
       {

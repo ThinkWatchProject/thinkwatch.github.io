@@ -1,8 +1,8 @@
 # Plugins
 
-Plugins adapt requests and answers to a particular setup: adding today's date to the system prompt, unifying terms in answers, removing a parameter that a relay rejects, masking internal host names, or rewriting file paths in tool calls between WSL and Windows. A plugin is a short JavaScript file. It runs in a sandbox inside core, sees placeholders instead of the keys it would otherwise find, and every change it makes is recorded on the request and checked by the same protections as anything a client sends.
+Plugins adapt requests and answers to a particular setup: adding today's date to the system prompt, asking for answers in one language, unifying terms, masking internal names, rewriting file paths in tool calls between WSL and Windows, or keeping a DeepSeek session usable after its history picked up content the API refuses. A plugin is a short JavaScript file. It runs in a sandbox inside core, sees placeholders instead of the keys it would otherwise find, and every change it makes is recorded on the request and checked by the same protections as anything a client sends.
 
-This page covers what plugins can do, how one is added, the API for writing one, permissions, limits and the security model. Five example plugins are listed at the end.
+This page covers what plugins can do, where they run, how one is added, the API for writing one, permissions, limits and the security model. Six plugins ship with the app, all off by default; they are described at the end.
 
 ## What a plugin can change
 
@@ -15,13 +15,26 @@ A plugin sees the same structure whatever API format the client uses (Anthropic 
 
 Request headers, upstream addresses and credentials are not available to plugins. Images are passed as their media type only, without their data, and thinking blocks can be read but not changed.
 
+## Where plugins run
+
+A request is routed first, on what the client sent: the routing rules, a rule's model rename, failover groups and the key's model list all see the client's original request, and plugins cannot change where it goes. Then, for each attempt to send it to an upstream:
+
+1. Keys are replaced with placeholders.
+2. The request hooks in scope for this attempt run, in list order.
+3. The content filter and the hidden-character check look at the request as the plugins left it.
+4. The request is converted to the upstream's format if needed, outbound redaction applies, and it is sent.
+
+When an attempt fails and the request moves to another upstream, the hooks run again from the request as the client sent it, so changes made for one upstream never reach another. A retry to the same upstream reuses what the hooks produced.
+
+On the answer side, the hooks run after the answer is converted to the client's format and before the tool-call inspection and the output limit.
+
 ## Adding a plugin
 
 1. On the **Plugins** page, choose **Add plugin**, then choose a `.js` file or paste the code.
 2. The **Review plugin** dialog shows the full code, each requested permission with what it allows, the scope, the settings, the plugin's id and the behavior on errors.
 3. Choosing **Install** raises a system dialog with the plugin's name, its permissions in plain words and the beginning of the file's SHA-256 hash. The plugin is installed only after it is confirmed there.
 
-The system dialog is raised by the app itself, outside the page, and the endpoints that install a plugin, replace its code or approve a changed file are not available to the page. A script injected into the page cannot install a plugin on its own.
+The system dialog is raised by the app itself, outside the page, and the endpoints that install a plugin, replace its code or approve a changed file are not available to the page. A script injected into the page cannot install a plugin on its own. For a plugin that may change tool calls, turning it on and changing its settings or scope are confirmed in a system dialog as well.
 
 Plugins are installed only from a local file or from pasted code. There is no installation from a link, no plugin marketplace and no automatic update.
 
@@ -31,11 +44,11 @@ On the Plugins page:
 
 - **Order.** Plugins run in the order of the list. Each plugin sees the result of the one before it and is checked against its own permissions.
 - **Settings.** Values for the settings a plugin declares, the scope, and the behavior on errors.
-- **Trial run.** Runs the plugin on a recent request from the history and shows the request or answer before and after, with the plugin's log. Nothing is sent to an upstream.
+- **Trial run.** Runs the plugin on a recent request from the history, as it was sent to the upstream that answered, and shows the request or answer before and after, with the plugin's log. Nothing is sent to an upstream.
 - **Logs.** The latest 500 lines the plugin wrote with `console`.
 - **Statistics** since core started: calls, changes, refusals, errors and the average CPU time per call.
 
-On the Traffic page, requests changed by a plugin carry a mark. A request's detail lists every plugin that ran with its outcome (unchanged, changed, refused, error or skipped) and its CPU time, and shows the request as the client sent it and as it was after the plugins. A failing plugin raises a notification.
+On the Traffic page, requests changed by a plugin carry a mark. A request's detail lists every plugin run, for each attempt, with its outcome (unchanged, changed, refused, error or skipped) and its CPU time, and shows the request as the client sent it and as it was sent to the upstream that answered. A failing plugin raises a notification.
 
 When the app is connected to a [remote core](/docs/lite/remote-core), plugins are installed on the server and run there.
 
@@ -71,22 +84,32 @@ export function onRequest(req, ctx) {
 | `api` | Yes | `1`, the only version supported. |
 | `description` | No | Up to 500 characters. |
 | `permissions` | Yes | One or more of `system`, `messages`, `tools`, `params`, `reply.text` and `reply.tool_calls`; see [Permissions](#permissions). |
-| `match` | No | The initial scope: `clients`, `models` and `upstreams`, each a list of patterns where `*` matches any run of characters. A missing or empty list matches everything. `upstreams` applies only to answer hooks, because the upstream is not known before routing. The scope can be changed on the Plugins page. |
+| `match` | No | The initial [scope](#scope): `clients`, `models` and `upstreams`, each a list of patterns where `*` matches any run of characters. A missing or empty list matches everything. The scope can be changed on the Plugins page. |
 | `reply` | No | `"block"` (the default) or `"stream"`: how `onReplyText` receives text. |
-| `settings` | No | Up to 20 entries, each with `type` (`string`, `number` or `boolean`), `label` and `default`. Values are edited on the Plugins page and passed in `ctx.settings`. |
+| `settings` | No | Up to 20 entries, each with `type` (`string`, `number` or `boolean`), `label` and `default`. Values are edited on the Plugins page and passed in `ctx.settings`. A string value may span several lines. |
 
 The file is checked when it is added and whenever core loads it. It must export a valid manifest and at least one hook; each exported hook needs its permission, and each permission must be used by an exported hook, so that a plugin requests nothing it does not use. A file that fails any check is not installed, and the error names the line and column where it can.
+
+### Scope
+
+| List | Matches |
+|---|---|
+| `clients` | The client the request came from, as recorded on the request, such as `claude-code`. |
+| `models` | The model sent to the upstream, after a routing rule renamed it. |
+| `upstreams` | The upstream of the attempt, for request hooks and answer hooks alike. |
+
+A request hook is in scope per attempt: after a failover, a plugin limited to one upstream runs only for the attempts that go there.
 
 ### Hooks
 
 | Hook | Permission | Called |
 |---|---|---|
-| `onRequest(req, ctx)` | `system`, `messages`, `tools` or `params` | Once for each request, before it goes to an upstream. |
+| `onRequest(req, ctx)` | `system`, `messages`, `tools` or `params` | Before each attempt to send the request to an upstream, after routing. |
 | `onReplyText(text, ctx)` | `reply.text` | For the text of the answer. |
 | `onReplyTextEnd(ctx)` | `reply.text` | In stream mode, at the end of each text block. Optional. |
 | `onToolCall(call, ctx)` | `reply.tool_calls` | For each tool call in the answer, once it is complete. |
 
-**`onRequest`** receives the [request view](#the-request-view) and returns it changed, or returns nothing to leave the request as it is. Calling `reject("reason")` refuses the request, and the client receives an error that names the plugin; `reject` ends the hook by throwing, and the refusal stands even if the plugin catches what it throws. The hook runs once for each request: when the request moves to another upstream after a failure, the result is reused and the hook does not run again. It runs for requests that generate an answer; token-count requests (`/v1/messages/count_tokens` and Gemini's `countTokens`) are forwarded without it.
+**`onRequest`** receives the [request view](#the-request-view) and returns it changed, or returns nothing to leave the request as it is. Calling `reject("reason")` refuses the request, and the client receives an error that names the plugin; `reject` ends the hook by throwing, and the refusal stands even if the plugin catches what it throws. The hook runs once for each attempt to send the request to an upstream, as described in [Where plugins run](#where-plugins-run). It runs for requests that generate an answer; token-count requests (`/v1/messages/count_tokens` and Gemini's `countTokens`) are forwarded without it.
 
 **`onReplyText`** in block mode, the default, is called once for each text block with the whole text of the block, and the text reaches the client after the call. In stream mode it is called for each piece of streamed text and returns what to send now; returning `""` holds the text back, and `onReplyTextEnd` returns whatever is still held when the block ends. An answer that is not streamed is passed in one call, followed by `onReplyTextEnd` in stream mode. Returning nothing leaves the text unchanged.
 
@@ -127,7 +150,7 @@ Core assigns a `key` to every message, part and tool. The rules for changes:
 - Messages can be removed, changed or added. Added messages have the role `user`, `assistant` or `system` and contain text parts only. Messages that are kept keep their order and their role.
 - Within a kept message, parts can be removed, their editable fields changed, and text parts added. `type`, `id`, `name` and `call_id` cannot be changed, and neither can thinking, image and other parts.
 - Tools can be removed or added, and their `description` and `input_schema` changed. Tool names stay unique.
-- Values in `params` can be changed; a changed `params.model` is the model that routing uses.
+- Values in `params` can be changed. A changed `params.model` renames the model sent to the upstream of this attempt, as a routing rule's rename does; it does not change where the request goes.
 
 A result that breaks a rule, or that contains a section the plugin was not granted, counts as an error.
 
@@ -135,10 +158,11 @@ A result that breaks a rule, or that contains a section the plugin was not grant
 
 ```ts
 type Ctx = {
-  client: string | null;   // the client, as recorded on the request, e.g. "claude-code"
-  model: string;           // the model the client asked for
+  client: string | null;    // the client, as recorded on the request, e.g. "claude-code"
+  model: string;            // the model sent to the upstream, after a routing rule renamed it
+  requested_model: string;  // the model the client asked for
   format: "anthropic" | "openai_chat" | "openai_responses" | "gemini"; // the client's format
-  upstream: string | null; // answer hooks only: the upstream that served the answer
+  upstream: string;         // the upstream of this attempt, or the one that served the answer
   settings: Record<string, string | number | boolean>;
 };
 ```
@@ -147,7 +171,7 @@ type Ctx = {
 
 ### Available JavaScript
 
-Plugins have the standard JavaScript built-ins, such as `JSON`, `RegExp`, `Map`, `Date` and `Math`; `console.log`, `console.info`, `console.warn` and `console.error`, which write to the plugin's log; and `reject`, which is valid only in `onRequest`. There is no `fetch`, `require` or timer, `import` and `import()` load nothing, and there is no access to files, the network, environment variables or processes. Nothing a plugin stores in a variable outlives the request or answer it runs for.
+Plugins have the standard JavaScript built-ins, such as `JSON`, `RegExp`, `Map`, `Date` and `Math`; `console.log`, `console.info`, `console.warn` and `console.error`, which write to the plugin's log; and `reject`, which is valid only in `onRequest`. There is no `fetch`, `require` or timer, `import` and `import()` load nothing, and there is no access to files, the network, environment variables or processes. The sandbox's clock is UTC. Nothing a plugin stores in a variable outlives the request attempt or answer it runs for.
 
 ## Permissions
 
@@ -158,7 +182,7 @@ A permission decides both what a plugin sees and what it may change. Sections th
 | `system` | The system prompt | |
 | `messages` | Messages: text, tool results and the arguments of earlier tool calls; thinking is read-only and images are passed as their type only | Can add instructions to the conversation |
 | `tools` | Tool definitions | Changes which tools the model can use |
-| `params` | Model, `max_tokens`, `temperature`, `top_p`, `stop` | Can change which upstream the request goes to and what it costs |
+| `params` | Model, `max_tokens`, `temperature`, `top_p`, `stop` | Can change the model sent to the upstream, and so what the request costs |
 | `reply.text` | The text of answers | |
 | `reply.tool_calls` | The tool calls in answers: change, remove, add | High risk, shown in red: a plugin can change what the client runs. The tool-call inspection still checks the result. |
 
@@ -166,10 +190,10 @@ A permission decides both what a plugin sees and what it may change. Sections th
 
 A plugin fails when it throws an error, exceeds a [limit](#limits), returns something that is not valid, or changes a section it was not granted. Each plugin sets what happens then:
 
-- **Reject the request** (the default): the request is refused, or the answer ends, with an error that names the plugin.
+- **Reject the request** (the default): the request is refused, or the answer ends, with an error that names the plugin. A refused request is not tried on another upstream.
 - **Skip this plugin**: the plugin is left out for this request, and the request continues as if it were not installed.
 
-The same choice applies to requests in a plugin's scope while it cannot run: when its file has changed and has not been approved, or when it fails to load. The upstream is not known at that point, so such a plugin is matched by client and model only, and with Reject it refuses those requests even if its scope names particular upstreams. Every failure is recorded on the request.
+The same choice applies while a plugin cannot run: when its file has changed and has not been approved, or when it fails to load. Such a plugin is matched against each attempt by client, model and upstream, like a working one, so it refuses only attempts within its scope. Every failure is recorded on the request.
 
 ## Limits
 
@@ -183,11 +207,11 @@ Each call can write 100 lines to the log, and a line longer than 4 KiB is cut sh
 ## Security model
 
 - **A sandbox with nothing in it.** Plugins run in QuickJS compiled to WebAssembly and executed by Wasmtime inside core. Plugin code never runs in the app's window and never runs as native code. The sandbox has no network, files, environment variables or processes; even a flaw in the JavaScript engine reaches only the sandbox's own memory, not the keys and tokens in core's memory.
-- **Nothing is kept.** Each request runs its hook in a new instance. Each answer gets one instance, shared by that answer's hooks and discarded when the answer ends. Plugins share nothing with each other.
+- **Nothing is kept.** Each attempt runs its request hooks in a new instance. Each answer gets one instance, shared by that answer's hooks and discarded when the answer ends. Plugins share nothing with each other.
 - **Placeholders instead of keys.** Keys that the outbound redaction rules recognize are replaced with placeholders before a plugin sees them and restored after it, on the request and on the answer, whatever mode the protection is in. The answer side matters as much as the request: answers become part of the conversation and are sent upstream again with the next request, so a plugin that could see a real key could hide it, encoded, in an answer.
-- **The protections still apply.** Request hooks run before the content filter, the hidden-character check, outbound redaction and routing; answer hooks run before the tool-call inspection and the output limit. Whatever a plugin writes is checked like anything else.
+- **The protections still apply.** Request hooks run after routing and before the content filter, the hidden-character check and outbound redaction; answer hooks run before the tool-call inspection and the output limit. Whatever a plugin writes is checked like anything else, and plugins cannot change where a request is routed.
 - **Approved code only.** A plugin runs only while its file matches the SHA-256 hash approved at installation. Installing, replacing code and approving a changed file are confirmed in a system dialog.
-- **Every change is visible.** Each run is recorded on the request, a changed request is stored as it was after the plugins (with keys replaced, like every stored request), and requests changed by plugins are marked on the Traffic page.
+- **Every change is visible.** Each run is recorded on the request, a changed request is stored as it was sent to the upstream that answered (with keys replaced, like every stored request), and requests changed by plugins are marked on the Traffic page.
 - **Bounded.** Every call has limits on CPU time, memory, output and log volume. Plugins run in a separate thread pool, so a slow plugin does not hold up the gateway's own work.
 - **Plain text.** The app shows a plugin's name, description, setting labels, logs and errors as plain text.
 
@@ -197,39 +221,18 @@ A plugin is allowed to change content, and the sandbox cannot judge whether a ch
 
 These risks are limited by granting a plugin only the permissions it needs, by reading its code before installing it, and by comparing the request before and after the plugins in the request's detail.
 
-## Examples
+## Plugins that ship with the app
 
-The ThinkWatch Core repository has five example plugins in [`examples/plugins`](https://github.com/ThinkWatchProject/ThinkWatch-Core/tree/main/examples/plugins).
+Six plugins come with the app. They appear in the plugin list like any other, all off, and are turned on and configured the same way. A plugin that is turned off does nothing. Their code is in the ThinkWatch Core repository, in [`crates/tw-gateway/src/plugin/defaults`](https://github.com/ThinkWatchProject/ThinkWatch-Core/tree/main/crates/tw-gateway/src/plugin/defaults).
 
-| File | Permission | What it does |
-|---|---|---|
-| `add-date.js` | `system` | Appends today's date, in a configurable time zone, to the system prompt. |
-| `unify-terms.js` | `reply.text` | Replaces terms in answers according to a list in its settings. Stream mode: the answer keeps streaming, and only a few characters that may start a term are held back until the next piece arrives. |
-| `strip-params.js` | `params` | Removes `temperature`, `top_p` or `stop` before the request goes out, for relays and models that reject them. |
-| `mask-pattern.js` | `reply.text` | Replaces text in answers that matches a regular expression in its settings, such as internal host names. |
-| `wsl-paths.js` | `reply.tool_calls` | Rewrites paths in tool-call arguments between WSL (`/mnt/c/…`) and Windows (`C:\…`). |
-
-The stream-mode replacement in `unify-terms.js`, in outline:
-
-```js
-export const manifest = {
-  name: "Unify terms",
-  api: 1,
-  permissions: ["reply.text"],
-  reply: "stream",
-  settings: { terms: { type: "string", label: "Terms (from=to, comma-separated)", default: "e-mail=email" } },
-};
-
-let held = ""; // the answer's hooks share one instance, so this lasts for the whole answer
-
-export function onReplyText(text, ctx) {
-  return convert(held + text, ctx, false); // sends what is settled, keeps a possible start of a term in `held`
-}
-
-export function onReplyTextEnd(ctx) {
-  return convert(held, ctx, true); // the block has ended: send everything that is left
-}
-```
+| Plugin | Permission | What it does | Settings |
+|---|---|---|---|
+| Answer language (`reply-language`) | `system` | Appends a fixed instruction to answer in the chosen language, unless the user asks for another. | Language, default 简体中文. Only a language name is accepted. |
+| Current date (`current-date`) | `system` | Appends today's date to the system prompt. | Time zone in hours from UTC, default 8. |
+| Unify terms (`term-unify`) | `reply.text` | Replaces terms in answers. The answer keeps streaming; a few characters that may start a term wait for the next piece, and a longer term wins over a shorter one. | Pairs, one `wrong=right` per line. |
+| Mask answer content (`reply-redact`) | `reply.text` | Replaces text in answers that matches a pattern, such as internal host names or ticket numbers. Each text block is shown once it is complete. Does nothing until patterns are set. | Regular expressions, one per line; the replacement text; whether case matters. |
+| WSL paths (`wsl-paths`) | `messages`, `reply.tool_calls` | Rewrites drive paths in tool-call arguments between WSL (`/mnt/c/…`) and Windows (`C:\…`), in answers and in earlier calls in the conversation, to the side the client runs on. Command lines, text and tool results are left as they are. | Whether the client runs on Windows. |
+| DeepSeek flag emoji (`deepseek-flags`) | `system`, `messages`, `reply.text`, `reply.tool_calls` | The DeepSeek API refuses requests that contain a certain regional flag emoji, so a conversation that once picked one up, for example from a fetched page, cannot continue. The plugin replaces the emoji with an ASCII placeholder before the request goes out and restores it in answers and tool calls. | None. Scope: models starting with `deepseek`. |
 
 ## Next steps
 
