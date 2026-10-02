@@ -11,7 +11,7 @@ This page covers what plugins can do, how one is added, the API for writing one,
 | Request, before it goes to an upstream | The system prompt; the messages, including tool results and the arguments of earlier tool calls; the tool definitions; the model, `max_tokens`, `temperature`, `top_p` and `stop`. A plugin can also refuse the request. |
 | Answer, before it reaches the client | The text of the answer, as a whole block or as it streams; the tool calls in the answer, which can be changed, removed or added. |
 
-A plugin sees the same structure whatever API format the client uses (Anthropic Messages, OpenAI Chat Completions, OpenAI Responses or Gemini). Core writes the changes back in the client's own format and touches only the items that changed; cache markers, signatures, images and fields it does not know are kept. A request that no plugin changes is forwarded byte for byte, so the upstream's prompt cache is unaffected.
+A plugin sees the same structure whatever API format the client uses (Anthropic Messages, OpenAI Chat Completions, OpenAI Responses or Gemini). Plugins also run on the WebSocket connection Codex uses for the Responses API: each `response.create` goes through the request hooks, and each answer through the answer hooks. Core writes the changes back in the client's own format and touches only the items that changed; cache markers, signatures, images and fields it does not know are kept. A request that no plugin changes is forwarded byte for byte, so the upstream's prompt cache is unaffected.
 
 Request headers, upstream addresses and credentials are not available to plugins. Images are passed as their media type only, without their data, and thinking blocks can be read but not changed.
 
@@ -169,7 +169,7 @@ A plugin fails when it throws an error, exceeds a [limit](#limits), returns some
 - **Reject the request** (the default): the request is refused, or the answer ends, with an error that names the plugin.
 - **Skip this plugin**: the plugin is left out for this request, and the request continues as if it were not installed.
 
-The same choice applies to requests in a plugin's scope while it cannot run: when its file has changed and has not been approved, or when it fails to load. Every failure is recorded on the request.
+The same choice applies to requests in a plugin's scope while it cannot run: when its file has changed and has not been approved, or when it fails to load. The upstream is not known at that point, so such a plugin is matched by client and model only, and with Reject it refuses those requests even if its scope names particular upstreams. Every failure is recorded on the request.
 
 ## Limits
 
