@@ -17,15 +17,15 @@ Request headers, upstream addresses and credentials are not available to plugins
 
 ## Adding a plugin
 
-1. On the **Plugins** page, choose **Add**, then select a `.js` file or paste the code.
-2. The review dialog shows the full code, each requested permission with what it allows, the scope, the settings, the plugin's id and the behavior on errors.
+1. On the **Plugins** page, choose **Add plugin**, then choose a `.js` file or paste the code.
+2. The **Review plugin** dialog shows the full code, each requested permission with what it allows, the scope, the settings, the plugin's id and the behavior on errors.
 3. Choosing **Install** raises a system dialog with the plugin's name, its permissions in plain words and the beginning of the file's SHA-256 hash. The plugin is installed only after it is confirmed there.
 
 The system dialog is raised by the app itself, outside the page, and the endpoints that install a plugin, replace its code or approve a changed file are not available to the page. A script injected into the page cannot install a plugin on its own.
 
 Plugins are installed only from a local file or from pasted code. There is no installation from a link, no plugin marketplace and no automatic update.
 
-Core keeps the approved copy of each plugin together with its SHA-256 hash. When the file on disk changes, the plugin stops running and its status shows **Changed**; its review dialog shows the differences from the approved copy, and the plugin runs again once the new version is approved in the system dialog. Replacing a plugin's code from the app goes through the same review and confirmation.
+Core keeps the approved copy of each plugin together with its SHA-256 hash. When the file on disk changes, the plugin stops running and its status shows **File changed**; its review dialog shows the differences from the approved copy, and the plugin runs again once the new version is approved in the system dialog. **Replace code** goes through the same review and system dialog.
 
 On the Plugins page:
 
@@ -86,7 +86,7 @@ The file is checked when it is added and whenever core loads it. It must export 
 | `onReplyTextEnd(ctx)` | `reply.text` | In stream mode, at the end of each text block. Optional. |
 | `onToolCall(call, ctx)` | `reply.tool_calls` | For each tool call in the answer, once it is complete. |
 
-**`onRequest`** receives the [request view](#the-request-view) and returns it changed, or returns nothing to leave the request as it is. Calling `reject("reason")` refuses the request, and the client receives an error that names the plugin. The hook runs once for each request: when the request moves to another upstream after a failure, the result is reused and the hook does not run again.
+**`onRequest`** receives the [request view](#the-request-view) and returns it changed, or returns nothing to leave the request as it is. Calling `reject("reason")` refuses the request, and the client receives an error that names the plugin; `reject` ends the hook by throwing, and the refusal stands even if the plugin catches what it throws. The hook runs once for each request: when the request moves to another upstream after a failure, the result is reused and the hook does not run again.
 
 **`onReplyText`** in block mode, the default, is called once for each text block with the whole text of the block, and the text reaches the client after the call. In stream mode it is called for each piece of streamed text and returns what to send now; returning `""` holds the text back, and `onReplyTextEnd` returns whatever is still held when the block ends. An answer that is not streamed is passed in one call, followed by `onReplyTextEnd` in stream mode. Returning nothing leaves the text unchanged.
 
@@ -94,7 +94,7 @@ The file is checked when it is added and whenever core loads it. It must export 
 
 Thinking blocks are not passed to plugins and reach the client unchanged.
 
-Hooks are synchronous. An `async` function, or a hook that returns a promise, counts as an error.
+A hook may be an `async` function or return a promise; it is settled within the same call and the same limits, and a promise that never settles counts as an error.
 
 ### The request view
 
@@ -166,7 +166,7 @@ A permission decides both what a plugin sees and what it may change. Sections th
 
 A plugin fails when it throws an error, exceeds a [limit](#limits), returns something that is not valid, or changes a section it was not granted. Each plugin sets what happens then:
 
-- **Reject this request** (the default): the request is refused, or the answer ends, with an error that names the plugin.
+- **Reject the request** (the default): the request is refused, or the answer ends, with an error that names the plugin.
 - **Skip this plugin**: the plugin is left out for this request, and the request continues as if it were not installed.
 
 The same choice applies to requests in a plugin's scope while it cannot run: when its file has changed and has not been approved, or when it fails to load. Every failure is recorded on the request.
@@ -175,10 +175,10 @@ The same choice applies to requests in a plugin's scope while it cannot run: whe
 
 | Hook | CPU time | Memory | Output |
 |---|---|---|---|
-| Request | 200 ms per call | 128 MB | Twice the size of the request, plus 1 MB |
-| Answer | 20 ms per call, 2 s for the whole answer | 64 MB | Text held back in stream mode: 1 MB |
+| Request | 200 ms per call, including the module's top-level code | 128 MiB | Twice the size of the request view, plus 1 MiB |
+| Answer | 20 ms per call; 2 s for the whole answer | 64 MiB | Twice the size of the text or tool call passed in, plus 1 MiB; text released by `onReplyTextEnd`: 1 MiB |
 
-Each call can write 100 lines to the log, of up to 4 KB each. The plugin file can be up to 1 MiB. A call that exceeds a limit is stopped and counts as an error.
+Each call can write 100 lines to the log, and a line longer than 4 KiB is cut short. The plugin file can be up to 1 MiB. A call that exceeds a limit, including a 101st log line, is stopped and counts as an error.
 
 ## Security model
 
