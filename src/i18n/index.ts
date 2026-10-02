@@ -3,6 +3,9 @@
 
 export type Lang = "en" | "zh-CN";
 
+/** Where the sponsor line on the Lite page and in the footer leads; the Lite README links to the same address */
+export const sponsorHref = "mailto:fylorn@outlook.com?subject=ThinkWatch%20Lite%20Sponsorship";
+
 const dict = {
   en: {
     common: {
@@ -11,6 +14,8 @@ const dict = {
       copy: "Copy",
       copied: "Copied ✓",
       skipToContent: "Skip to content",
+      sponsors: "Sponsors: ",
+      sponsorsCta: "Want to appear here?",
     },
 
     nav: {
@@ -241,6 +246,8 @@ const dict = {
       copy: "复制",
       copied: "已复制 ✓",
       skipToContent: "跳转到正文",
+      sponsors: "赞助商：",
+      sponsorsCta: "想出现在这里吗？",
     },
 
     nav: {
