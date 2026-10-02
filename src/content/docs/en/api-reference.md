@@ -2034,8 +2034,9 @@ Retrieve all settings grouped by category.
   "security": {
     "signature_drift_seconds": 300,
     "nonce_ttl_seconds": 300,
-    "content_filter_patterns": [],
-    "pii_patterns": []
+    "redact": {},
+    "inspect_tools": {},
+    "content": {}
   },
   "budget": {
     "budget_warning_threshold": 0.8,

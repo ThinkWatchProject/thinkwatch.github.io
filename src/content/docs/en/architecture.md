@@ -324,7 +324,7 @@ Authentication and authorization library. Contains:
 Shared infrastructure used by all other crates. Contains:
 
 - **`config.rs`** -- `AppConfig` struct loaded from environment variables.
-- **`dynamic_config.rs`** -- `DynamicConfig` system that loads settings from the `system_settings` database table. Supports multi-instance sync via Redis Pub/Sub and in-memory caching. Covers JWT TTLs, cache TTL, content filter patterns, PII patterns, budget thresholds, API key policies, and data retention settings.
+- **`dynamic_config.rs`** -- `DynamicConfig` system that loads settings from the `system_settings` database table. Supports multi-instance sync via Redis Pub/Sub and in-memory caching. Covers JWT TTLs, cache TTL, the policies of the request guards (outbound redaction, tool-call inspection and the content filter), budget thresholds, API key policies, and data retention settings.
 - **`db.rs`** -- PostgreSQL connection pool setup using `sqlx`.
 - **`models/`** -- Database model structs (one per domain entity): `user.rs`, `team.rs`, `api_key.rs`, `provider.rs`, `mcp_server.rs`, `usage.rs`, `audit_log.rs`.
 - **`dto/`** -- Data transfer objects for API request/response serialization.
@@ -393,7 +393,7 @@ The database schema is defined across twelve migration files applied in order on
 | Table               | Purpose |
 |---------------------|---------|
 | `providers`         | Upstream AI provider configuration: name, type (openai/anthropic/google/azure/bedrock/custom), base URL, AES-encrypted API key, and optional `config_json` (e.g. `api_version` for Azure). |
-| `models`            | AI models registered under a provider, with input/output token pricing. |
+| `models`            | AI models registered under a provider, with input/output token pricing and an optional maximum number of output tokens a request may ask for. |
 | `model_permissions` | Access control rules for models, grantable by role, team, or individual user. |
 
 ### 006_init_mcp_servers -- MCP Server Registry

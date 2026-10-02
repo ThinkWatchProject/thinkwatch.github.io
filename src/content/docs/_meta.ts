@@ -152,8 +152,8 @@ export const products: Product[] = [
         locales: both,
         group: "getStarted",
         summary: {
-          en: "Page by page: usage and cost, traffic, client setup, keys, upstreams, routing, the five protections, MCP, settings, the menu bar and notifications.",
-          "zh-CN": "逐页说明：用量与费用、流量、客户端接管、密钥、上游、路由、五项防护、MCP、设置、菜单栏与通知。",
+          en: "Page by page: usage and cost, traffic, client setup, keys, upstreams, routing, the three protections, MCP, settings, the menu bar and notifications.",
+          "zh-CN": "逐页说明：用量与费用、流量、客户端接管、密钥、上游、路由、三项防护、MCP、设置、菜单栏与通知。",
         },
       },
       {

@@ -15,7 +15,7 @@ No crate depends on a group below its own.
 | Group | Crate | Role |
 | --- | --- | --- |
 | Shared with ThinkWatch Enterprise | `tw-dialect` | Conversion of requests, responses and streams between Anthropic Messages, OpenAI Chat Completions, OpenAI Responses and Gemini; usage parsing |
-| | `tw-guard` | Outbound redaction and restoration, inspection of the tool calls an upstream returns, hidden characters, content filtering and the output length limit |
+| | `tw-guard` | Outbound redaction and restoration, inspection of the tool calls an upstream returns, and the content filter, with the settings, built-in rules, validation, rule listings and trials of all three |
 | | `tw-breaker` | The circuit-breaker state machine |
 | | `tw-bedrock` | Amazon Bedrock on the wire: SigV4 signing, event-stream framing, addresses and the model catalog |
 | Domain logic | `tw-types` | Messages for people: a stable code, its arguments and the English sentence |
@@ -34,7 +34,7 @@ No crate depends on a group below its own.
 
 ## Shared with ThinkWatch Enterprise
 
-ThinkWatch Enterprise depends on the first group and nothing else: format conversion and usage parsing (`tw-dialect`), the guards (`tw-guard`), the circuit breaker (`tw-breaker`) and Amazon Bedrock's wire protocol (`tw-bedrock`). These four depend only on each other, which a test in `tw-dialect` enforces, and CI builds ThinkWatch Enterprise against every change to them. A component that only one product uses lives in that product's repository rather than in Core.
+ThinkWatch Enterprise depends on the first group and nothing else: format conversion and usage parsing (`tw-dialect`), the guards and their rules (`tw-guard`), the circuit breaker (`tw-breaker`) and Amazon Bedrock's wire protocol (`tw-bedrock`). These four depend only on each other, which a test in `tw-dialect` enforces, and CI builds ThinkWatch Enterprise against every change to them. A component that only one product uses lives in that product's repository rather than in Core.
 
 ## Used by ThinkWatch Lite
 
