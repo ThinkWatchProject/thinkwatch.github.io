@@ -1,5 +1,5 @@
 ---
-import { getLang, t, localePath } from "~/i18n";
+import { getLang, t, localePath, sponsorHref } from "~/i18n";
 
 import TwMark from "./TwMark.astro";
 import Bi from "./Bi.astro";
@@ -27,6 +27,9 @@ const link = (path: string) => ({ href: localePath(lang, path), "data-localize":
       </div>
       <p class="text-[var(--color-muted)] max-w-sm">
         <Bi en={en.footer.tagline} zh={zh.footer.tagline} both={bilingual} />
+      </p>
+      <p class="mt-3 text-[var(--color-muted)]">
+        <Bi en={en.common.sponsors} zh={zh.common.sponsors} both={bilingual} /><a href={sponsorHref} class="underline decoration-white/20 underline-offset-[3px] hover:text-white"><Bi en={en.common.sponsorsCta} zh={zh.common.sponsorsCta} both={bilingual} /></a>
       </p>
     </div>
 

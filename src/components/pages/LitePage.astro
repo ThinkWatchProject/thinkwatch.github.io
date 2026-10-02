@@ -13,7 +13,7 @@ import TwMark from "~/components/TwMark.astro";
 import Base from "~/layouts/Base.astro";
 import SiteHeader from "~/components/SiteHeader.astro";
 import SiteFooter from "~/components/SiteFooter.astro";
-import { getLang, localePath, t } from "~/i18n";
+import { getLang, localePath, sponsorHref, t } from "~/i18n";
 import { liteCopy } from "~/i18n/pages/lite";
 import { formatSize, getLatestLiteRelease } from "~/lib/github";
 import { liteLd } from "~/lib/structured-data";
@@ -133,6 +133,7 @@ const archLabel = { x64: "x64", arm64: "ARM64" } as const;
             <LiteDownload />
             <a href="#install" class="ghost">{c.hero.ctaSecondary}</a>
           </div>
+          <p class="sponsor rise" style="--d:3">{ui.sponsors}<a href={sponsorHref}>{ui.sponsorsCta}</a></p>
         </div>
         <div class="hero-mark" aria-hidden="true">
           <div class="mark-halo"></div>
@@ -944,6 +945,27 @@ const archLabel = { x64: "x64", arm64: "ARM64" } as const;
   .ghost:hover {
     background: rgba(255, 255, 255, 0.04);
     border-color: rgba(255, 255, 255, 0.26);
+  }
+  .sponsor {
+    margin: 20px 0 0;
+    font-size: 14px;
+    color: var(--color-dim);
+  }
+  /* From sm up the download button's version line hangs below the buttons (LiteDownload) */
+  @media (min-width: 640px) {
+    .sponsor {
+      margin-top: 48px;
+    }
+  }
+  .sponsor a {
+    color: var(--color-muted);
+    text-decoration: underline;
+    text-decoration-color: rgba(255, 255, 255, 0.2);
+    text-underline-offset: 3px;
+    transition: color 160ms;
+  }
+  .sponsor a:hover {
+    color: var(--color-text);
   }
   @media (max-width: 1023px) {
     .hero-grid {
