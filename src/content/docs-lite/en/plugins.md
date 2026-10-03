@@ -2,7 +2,7 @@
 
 Plugins adapt requests and answers to a particular setup: adding instructions to the system prompt, removing a parameter that one upstream rejects, asking for answers in a chosen language, or rewriting file paths in tool calls between WSL and Windows. A plugin is a short JavaScript file. It runs in a sandbox inside core, sees placeholders instead of the keys it would otherwise find, and every change it makes is recorded on the request and checked by the same protections as anything a client sends.
 
-This page covers what plugins can do, where they run, how one is added, the API for writing one, permissions, limits and the security model. Two plugins ship with the app, both off by default; they are described at the end.
+This page covers what plugins can do, where they run, how one is added and edited, the API for writing one, permissions, limits and the security model. Two plugins ship with the app, both off by default; they are described at the end.
 
 ## What a plugin can change
 
@@ -34,22 +34,22 @@ A plugin that changes the model renames only what is sent to the upstream of thi
 
 On the answer side, the hooks run after the answer is converted to the client's format and before the tool-call inspection and the output limit.
 
-## Adding a plugin
+## Adding and editing a plugin
 
-1. On the **Plugins** page, choose **Add plugin**, then choose a `.js` file or paste the code.
-2. The **Review plugin** dialog shows the full code, each requested permission with what it allows, the kinds of request it handles unless it handles conversations only, the scope, the settings, the plugin's id and the behavior on errors.
-3. Choosing **Install** raises a system dialog with the plugin's name, its permissions in plain words and the beginning of the file's SHA-256 hash. The plugin is installed only after it is confirmed there.
+Each plugin is a single file that holds everything about it: the code, the requests it handles, what happens when it fails and the value of each setting. The file alone describes the plugin, so a copy of it carries the settings too. Only whether the plugin is on is kept outside the file, as a switch in the app.
 
-The system dialog is raised by the app itself, outside the page, and the endpoints that install a plugin, replace its code or approve a changed file are not available to the page. A script injected into the page cannot install a plugin on its own. The same holds for a plugin that may change tool calls: turning it on and changing its settings or scope are confirmed in a system dialog that names the plugin, what it can do and what is changing, and so is turning on a plugin whose permissions cannot be read. Turning such a plugin off, changing its behavior on errors, reordering and deleting need no confirmation.
+**Settings** on a plugin's row opens its editor, which has two tabs and a single **Save**:
 
-Plugins are installed only from a local file or from pasted code. There is no installation from a link, no plugin marketplace and no automatic update.
+- **Settings** holds the **Enabled** switch, the scope (**Applies to**), the behavior on errors (**On error**) and the plugin's own settings. Apart from **Enabled**, changes made here are written into the manifest in the code: the app rewrites only the manifest and leaves every other byte of the file as it is.
+- **Code** holds the whole file. When typing pauses, core reads the code again and the Settings tab follows it. Code that cannot be loaded is marked at the line and column of the error, and the Settings tab waits until it loads again.
 
-Core keeps the approved copy of each plugin together with its SHA-256 hash. When the file on disk changes, the plugin stops running and its status shows **File changed**; its review dialog shows the differences from the approved copy, and the plugin runs again once the new version is approved in the system dialog. **Replace code** goes through the same review and system dialog.
+Changes on both tabs are kept while switching between them and saved together.
+
+**Add plugin** opens the same editor on the **Code** tab. The code is pasted there or loaded with **Import from file…** at the top right, and **Save** installs the plugin. Plugins are installed only from a local file or pasted code; there is no installation from a link, no plugin marketplace and no automatic update.
 
 On the Plugins page:
 
-- **Order.** Plugins run in the order of the list. Each plugin sees the result of the one before it and is checked against its own permissions.
-- **Settings.** Values for the settings a plugin declares, the scope, and the behavior on errors.
+- **Order.** Plugins run in the order of the list, which **Reorder** changes. Each plugin sees the result of the one before it and is checked against its own permissions.
 - **Trial run.** Runs the plugin on a recent request from the history, with the routing that request had: the upstream that answered and the model sent to it. It shows the request or answer before and after, with the plugin's log. Nothing is sent to an upstream, and a trial run does not count in the statistics.
 - **Logs.** The latest 500 lines the plugin wrote with `console`.
 - **Statistics** since the gateway started: runs, changes, rejections, errors and the average CPU time.
@@ -58,9 +58,21 @@ On the Traffic page, requests changed by a plugin carry a mark. A request's deta
 
 When the app is connected to a [remote core](/docs/lite/remote-core), plugins are installed on the server and run there.
 
+### Confirmation in a system dialog
+
+Routine changes are saved directly. A system dialog is needed only for four steps, and only for a plugin that can change tool calls (one with the `reply.tool_calls` permission): installing it, turning it on, saving a change to its code, and approving a change made to its file outside the app. A change to the code counts when the permission is there before or after it, so adding `reply.tool_calls` is confirmed as well, and a plugin whose permissions cannot be read is treated as one that has it.
+
+The dialog is raised by the app itself, outside the page. It names the plugin, what the plugin can do and what is changing, and for new code the beginning of its SHA-256 hash, to compare with the one shown in the app. Core accepts these four steps only through the dialog, so a script injected into the page cannot take them on its own.
+
+No system dialog is needed for the settings, scope and behavior on errors of any plugin, for turning a plugin off, reordering or deleting, or for installing, turning on and editing a plugin that cannot change tool calls. Editing the config file in the app or restoring a version from its version history cannot install a plugin that can change tool calls, turn it on or change its code; such a change is refused there and made on the Plugins page.
+
+### When the file changes outside the app
+
+A plugin runs only as it was approved. Core keeps an approved copy of each plugin together with its SHA-256 hash, and a save in the app updates the file, the copy and the hash at once. When the file is changed or removed outside the app, the plugin stops running within seconds and its status shows **File changed**. **Review changes** shows the differences from the approved copy, and **Approve changes** lets the plugin run again; saving the plugin in its editor instead writes the editor's code back to the file.
+
 ## Writing a plugin
 
-A plugin is a single ES module file in UTF-8, at most 1 MiB. It exports a `manifest` and one or more hooks.
+A plugin is a single ES module file in UTF-8, at most 1 MiB. It exports a `manifest`, which describes the plugin and holds its configuration, and one or more hooks.
 
 ```js
 export const manifest = {
@@ -68,9 +80,10 @@ export const manifest = {
   api: 1,
   description: "Appends the notes set here to the system prompt.",
   permissions: ["system"],
-  match: { clients: ["claude-code"] },
+  match: { clients: ["claude-code"], models: [], upstreams: [] },
+  on_error: "reject",
   settings: {
-    notes: { type: "string", label: "Notes", default: "" },
+    notes: { type: "string", label: "Notes", value: "Use pnpm, not npm." },
   },
 };
 
@@ -91,13 +104,22 @@ export function onRequest(req, ctx) {
 | `description` | No | Up to 500 characters. |
 | `permissions` | Yes | One or more of `system`, `messages`, `tools`, `params`, `reply.text` and `reply.tool_calls`; see [Permissions](#permissions). |
 | `requests` | No | The kinds of request the plugin handles: one or more of `conversation`, `embeddings` and `completions`. Without it, conversations only; see [Embeddings and legacy completions](#embeddings-and-legacy-completions). |
-| `match` | No | The initial [scope](#scope): `clients`, `models` and `upstreams`, each a list of patterns where `*` matches any run of characters. A missing or empty list matches everything. The scope can be changed on the Plugins page. |
+| `match` | No | The [scope](#scope): `clients`, `models` and `upstreams`, each a list of up to 100 patterns in which `*` matches any run of characters. A missing or empty list matches everything. Shown as **Applies to** on the Settings tab. |
+| `on_error` | No | `"reject"` (the default) or `"skip"`: what happens when the plugin fails, described in [When a plugin fails](#when-a-plugin-fails). Shown as **On error** on the Settings tab. |
 | `reply` | No | `"block"` (the default) or `"stream"`: how `onReplyText` receives text. |
-| `settings` | No | Up to 20 entries, each named with letters, digits and `_`, with `type` (`string`, `number` or `boolean`), `label` (plain text, up to 100 characters) and `default`. Values are edited on the Plugins page and passed in `ctx.settings`. A string value may span several lines. |
+| `settings` | No | Up to 20 entries, each named with letters, digits and `_` and not starting with a digit, with `type` (`string`, `number` or `boolean`), `label` (plain text, up to 100 characters) and `value`, the current value (`""`, `0` or `false` when left out). Values are edited on the Settings tab and passed in `ctx.settings`. A string value may span several lines, up to 10,000 characters. |
+
+Whether the plugin is on is not part of the manifest; it is the **Enabled** switch in the app.
+
+The manifest is plain data, which lets core read it straight from the source and the app rewrite it without running the code. It is an object literal whose values are strings, numbers, `true`, `false`, `null`, lists and nested objects; keys are names or quoted strings, and trailing commas are allowed. Expressions, variables, function calls, spreads, computed keys, getters and template literals with `${}` are not data: a file that uses them in the manifest does not load, and neither does one whose code changes the manifest after declaring it.
+
+A rewrite replaces only the manifest literal, and every byte outside it stays as it is. The literal is written back in one fixed style, the one used in the examples on this page, and comments inside it are not kept, so notes about the settings belong above the manifest.
 
 The file is checked when it is added and whenever core loads it. It must export a valid manifest, with no fields other than these, and at least one hook. Each exported hook needs its permission, and each permission must be used by an exported hook, so that a plugin requests nothing it does not use; `onReplyTextEnd` also needs `onReplyText` and stream mode. A file that fails any check is not installed, and the error names the line and column where it can.
 
 ### Scope
+
+The scope is the manifest's `match`. It is edited under **Applies to** on the Settings tab, which suggests the clients, models and upstreams the gateway knows.
 
 | List | Matches |
 |---|---|
@@ -209,23 +231,23 @@ Plugins have the standard JavaScript built-ins, such as `JSON`, `RegExp`, `Map`,
 
 A permission decides both what a plugin sees and what it may change. Sections that are not granted are not passed to the plugin, and a result that changes them counts as an error.
 
-| Permission | Sees and may change | Shown at installation |
+| Permission | Sees and may change | Note in the app |
 |---|---|---|
 | `system` | The system prompt | |
 | `messages` | Messages: text, tool results and the arguments of earlier tool calls; thinking is read-only and images are passed as their type only. For embeddings and legacy completions, the text of each input | Can add instructions to the conversation |
 | `tools` | Tool definitions | Changes which tools the model can use |
 | `params` | Model, `max_tokens`, `temperature`, `top_p`, `stop`; for embeddings, the model only | Can change the model sent to the upstream, and so what the request costs |
 | `reply.text` | The text of answers | |
-| `reply.tool_calls` | The tool calls in answers: change, remove, add | High risk, shown in red: a plugin can change what the client runs. The tool-call inspection still checks the result, and turning such a plugin on, or changing its settings or scope, is confirmed in a system dialog. |
+| `reply.tool_calls` | The tool calls in answers: change, remove, add | High risk, shown in red: a plugin can change what the client runs. The tool-call inspection still checks the result, and installing such a plugin, turning it on, changing its code and approving a change to its file are confirmed in a system dialog. |
 
 ## When a plugin fails
 
-A plugin fails when it throws an error, exceeds a [limit](#limits), returns something that is not valid, or changes a section it was not granted. A request of a kind the plugin handles whose body cannot be read counts as a failure as well. Each plugin sets what happens then:
+A plugin fails when it throws an error, exceeds a [limit](#limits), returns something that is not valid, or changes a section it was not granted. A request of a kind the plugin handles whose body cannot be read counts as a failure as well. The manifest's `on_error`, shown as **On error** on the Settings tab, sets what happens then:
 
 - **Reject the request** (the default): the request is refused, or the answer ends, with an error that names the plugin. A refused request is not tried on another upstream.
 - **Skip this plugin**: the plugin is left out of this request, or of the rest of the answer, and the request continues as if it were not installed.
 
-The same choice applies while a plugin cannot run: when its file has changed and has not been approved, or when it fails to load. Such a plugin is matched against each attempt by request kind, client, model and upstream, like a working one, so it refuses only attempts within its scope; one whose manifest cannot be read at all counts as handling conversations only. Every failure is recorded on the request.
+The same choice applies while a plugin cannot run: when its file has changed and has not been approved, or when it fails to load. Its behavior on errors and its scope then come from the approved file, which core reads as data even when the code cannot run, so such a plugin refuses only the attempts within its scope, matched by request kind, client, model and upstream like a working one. A plugin that fails to load counts as handling conversations only, and one whose manifest cannot be read at all rejects every conversation. Every failure is recorded on the request.
 
 ## Limits
 
@@ -244,7 +266,7 @@ Across the gateway, at most 32 answer-hook instances run at the same time. Each 
 - **Nothing is kept.** Every request-hook call runs in a new instance. For each answer, a plugin gets one instance, shared by its hooks for that answer and discarded when the answer ends. Plugins share nothing with each other.
 - **Placeholders instead of keys.** Keys that the outbound redaction rules recognize are replaced with placeholders before a plugin sees them and restored after it, on the request and on the answer, whatever mode the protection is in. The answer side matters as much as the request: answers become part of the conversation and are sent upstream again with the next request, so a plugin that could see a real key could hide it, encoded, in an answer.
 - **The protections still apply.** Request hooks run after routing, and a request they change is checked again by the content filter and the hidden-character check before outbound redaction; answer hooks run before the tool-call inspection and the output limit. Whatever a plugin writes is checked like anything else, and plugins cannot change where a request is routed or switch to a model the key may not use.
-- **Approved code only.** A plugin runs only while its file matches the SHA-256 hash approved at installation. Installing, replacing code and approving a changed file are confirmed in a system dialog, and so are turning on a plugin that may change tool calls and changing its settings or scope.
+- **Approved code only.** A plugin runs only while its file matches the approved SHA-256 hash, and a save in the app updates the file and the hash together. Installing a plugin that may change tool calls, turning it on, changing its code and approving a change to its file are confirmed in a system dialog outside the page, as described in [Confirmation in a system dialog](#confirmation-in-a-system-dialog).
 - **Every change is visible.** Each run is recorded on the request, a changed request is stored as it was sent to the upstream that answered (with keys replaced, like every stored request), and requests changed by plugins are marked on the Traffic page.
 - **Bounded.** Every call has limits on CPU time, memory, output and log volume, and the number of answer instances alive at once is capped. Plugins run in a separate thread pool, so a slow plugin does not hold up the gateway's own work.
 - **Plain text.** The app shows a plugin's name, description, setting labels, logs and errors as plain text.
@@ -257,23 +279,57 @@ These risks are limited by granting a plugin only the permissions it needs, by r
 
 ## Plugins that ship with the app
 
-Two plugins come with the app. They appear in the plugin list like any other, both off, and are turned on and configured the same way. One of them, `wsl-paths`, may change tool calls, so turning it on, or changing its settings or scope, is confirmed in a system dialog. While no plugin is on, core does not start the sandbox, so plugins that stay off take no memory. The plugins ship with core, so a remote core has them too. Both handle conversations only, and their code is in the ThinkWatch Core repository, in [`crates/tw-gateway/src/plugin/defaults`](https://github.com/ThinkWatchProject/ThinkWatch-Core/tree/main/crates/tw-gateway/src/plugin/defaults).
+Two plugins come with the app. They appear in the plugin list like any other, both off, and are turned on and configured the same way; the app shows their names and setting labels in the interface language. One of them, `wsl-paths`, may change tool calls, so turning it on is confirmed in a system dialog, while its setting, scope and behavior on errors change without one. While no plugin is on, core does not start the sandbox, so plugins that stay off take no memory. The plugins ship with core, so a remote core has them too. Both handle conversations only, and their code is in the ThinkWatch Core repository, in [`crates/tw-gateway/src/plugin/defaults`](https://github.com/ThinkWatchProject/ThinkWatch-Core/tree/main/crates/tw-gateway/src/plugin/defaults).
 
 ### Answer in a chosen language (`reply-language`)
 
 Adds a fixed line to the end of the system prompt that asks the model to answer in the chosen language, unless the user explicitly asks for another. The line is the same on every request, so the upstream's prompt cache keeps hitting.
 
 - Permission: `system`.
-- Setting: the answer language, `简体中文` (Simplified Chinese) by default. Only a language name is accepted (letters, spaces, parentheses and hyphens, up to 40 characters), so the setting cannot add other instructions; with any other value the plugin fails on every request.
+- Setting: `language`, the answer language, shipped as `简体中文` (Simplified Chinese). Only a language name is accepted (letters, spaces, parentheses and hyphens, up to 40 characters), so the setting cannot add other instructions; with any other value the plugin fails on every request.
+
+The manifest as shipped:
+
+```js
+export const manifest = {
+  name: "Answer in a chosen language",
+  api: 1,
+  description: "Adds a fixed line to the end of the system prompt that asks the model to answer in the language set here.",
+  permissions: ["system"],
+  on_error: "reject",
+  settings: {
+    language: { type: "string", label: "Answer language", value: "简体中文" },
+  },
+};
+```
 
 ### Convert WSL and Windows paths (`wsl-paths`)
 
 A client running in WSL cannot open `C:\Users\…`, and a client running on Windows cannot open `/mnt/c/Users/…`. The plugin rewrites every tool-call argument whose whole value is a drive path into the form the client can open, in the tool calls of answers and in earlier tool calls in the conversation, so the model keeps seeing one form. Paths inside command lines, the text of the conversation and tool results are left as they are.
 
 - Permissions: `messages`, `reply.tool_calls`.
-- Setting: whether the client runs on Windows; off by default, for a client in WSL. The conversion is fixed in the code, and the setting cannot express any other rewrite.
+- Setting: `windows_client`, whether the client runs on Windows; shipped as `false`, for a client in WSL. The conversion is fixed in the code, and the setting cannot express any other rewrite.
 
-A built-in plugin that is deleted is not added again, and one whose code was replaced or edited is left as it is. Otherwise, when an update ships a newer version of a built-in plugin, the plugin is updated and keeps its on/off state, behavior on errors, scope and settings; a new version that asks for more permissions or more kinds of request is turned off.
+The manifest as shipped:
+
+```js
+export const manifest = {
+  name: "Convert WSL and Windows paths",
+  api: 1,
+  description: "Rewrites drive paths in tool-call arguments to the form the client can open (WSL /mnt/c/… or Windows C:\\…), in answers and in the conversation history.",
+  permissions: ["messages", "reply.tool_calls"],
+  on_error: "reject",
+  settings: {
+    windows_client: {
+      type: "boolean",
+      label: "The client runs on Windows (otherwise WSL)",
+      value: false,
+    },
+  },
+};
+```
+
+A built-in plugin that is deleted is not added again, and one whose code was edited is left as it is; changes made on its Settings tab do not count as editing the code. Otherwise, when an update ships a newer version of a built-in plugin, the plugin is updated and keeps its on/off state, its behavior on errors, its scope and the value of each setting the new version still declares with the same type; a new version that asks for more permissions or more kinds of request is turned off.
 
 ## Upgrading
 
