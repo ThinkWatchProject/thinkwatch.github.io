@@ -96,6 +96,8 @@ export const liteCopy = {
           },
         ],
         now: "now",
+        // The short plugin on the plugins tile: the example in the plugins doc, cut down
+        plugin: { name: "Project notes", note: "Use pnpm." },
       },
     },
     status: {
@@ -166,6 +168,12 @@ export const liteCopy = {
           title: "A key for each client",
           body: "Connecting a client gives it a key of its own, so traffic and cost are counted per client. Each key has its own route, visible models and concurrency limit, and a rotated key is written into its client's configuration.",
           alt: "The Keys page: the default key and one key each for Claude Code, Codex and Cursor, with the route each key uses, the models it may use, and its requests and cost over the last 24 hours",
+        },
+        // No screenshot: the bento shows a short plugin instead, so there is no alt.
+        {
+          id: "plugins",
+          title: "Plugins that adapt requests and answers",
+          body: "Short JavaScript plugins adapt requests and answers to a particular setup; the app includes two, one for answers in a chosen language and one for converting file paths between WSL and Windows. Each plugin runs in a sandbox without network or file access, reads and changes only the parts its permissions declare, and receives placeholders instead of keys; every change is recorded on the request and checked by the same protections as anything a client sends.",
         },
       ],
     },
@@ -335,6 +343,7 @@ export const liteCopy = {
           { title: "与 homelab 的连接已断开", body: "正在重新连接。连接恢复前，应用中的内容停留在断开时的状态。" },
         ],
         now: "现在",
+        plugin: { name: "附加项目说明", note: "使用 pnpm。" },
       },
     },
     status: {
@@ -405,6 +414,11 @@ export const liteCopy = {
           title: "每个客户端一把密钥",
           body: "接入客户端时为它生成专用密钥，流量与费用按客户端分开统计。每把密钥可单独设置路由、可见模型与并发上限，更换后的新密钥自动写入客户端配置。",
           alt: "密钥页：默认密钥与 Claude Code、Codex、Cursor 各自的密钥，列出各自使用的路由、可用模型，以及最近 24 小时的请求数与费用",
+        },
+        {
+          id: "plugins",
+          title: "插件改写请求与回答",
+          body: "简短的 JavaScript 插件让请求与回答适应具体的使用场景；应用自带两个插件，分别用于指定回答语言、在 WSL 与 Windows 之间转换路径。插件在没有网络与文件访问的沙箱中运行，只能读取和改动权限中声明的部分，看到的是占位符而不是密钥；每一处改动都记录在请求上，并与客户端发来的内容一样经过各项防护的检查。",
         },
       ],
     },

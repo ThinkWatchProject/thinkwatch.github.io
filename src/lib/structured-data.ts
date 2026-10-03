@@ -131,11 +131,18 @@ export async function liteLd(lang: Lang): Promise<JsonLd[]> {
     .filter(([name]) => /(\.dmg|-setup\.exe|-portable\.zip|\.AppImage)$/.test(name))
     .map(([, href]) => href);
   // Screenshots in the page's language; the English ones carry "-en", as on LitePage.astro.
-  const screenshot = c.features.items.map((item) => ({
-    "@type": "ImageObject",
-    url: abs(`/lite/${item.id}${lang === "zh-CN" ? "" : "-en"}.webp`),
-    caption: item.alt,
-  }));
+  // A feature without alt text (plugins) has no screenshot.
+  const screenshot = c.features.items.flatMap((item) =>
+    "alt" in item
+      ? [
+          {
+            "@type": "ImageObject",
+            url: abs(`/lite/${item.id}${lang === "zh-CN" ? "" : "-en"}.webp`),
+            caption: item.alt,
+          },
+        ]
+      : [],
+  );
   return [
     {
       "@context": CONTEXT,
