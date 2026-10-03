@@ -40,7 +40,7 @@ Uninstalling through the system first closes ThinkWatch Lite, restores the conne
 
 ## Windows: portable
 
-The portable copy runs straight from its folder, with no installation and no administrator rights. Download `ThinkWatch-Lite-<version>-windows-x64-portable.zip` (or `ThinkWatch-Lite-<version>-windows-arm64-portable.zip` for a PC with an ARM processor) from the [latest release](https://github.com/ThinkWatchProject/ThinkWatch-Lite/releases/latest), check it against the sha256 published beside it, extract it to any folder the user can write to and run `thinkwatch-lite.exe`. The zip holds two files: `thinkwatch-lite.exe` and the gateway, `twcore.exe`.
+The portable copy runs straight from its folder, with no installation and no administrator rights. Download `ThinkWatch-Lite-<version>-windows-x64-portable.zip` (or `ThinkWatch-Lite-<version>-windows-arm64-portable.zip` for a PC with an ARM processor) from the [latest release](https://github.com/ThinkWatchProject/ThinkWatch-Lite/releases/latest), check it against the sha256 published beside it, extract it to any folder the user can write to and run `ThinkWatch Lite.exe`. The zip holds two files: `ThinkWatch Lite.exe` and the gateway, `twcore.exe`.
 
 Configuration, keys and request history stay in the `data\` folder next to the program, apart from the installed copy's `%APPDATA%\ThinkWatch`, so the two keep separate settings. In a folder that cannot be written to, the app says so and quits.
 
