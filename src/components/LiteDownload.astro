@@ -3,7 +3,10 @@
 // takes one click instead of home → Lite page → install section → button.
 //
 // The download URLs and sizes come from the latest release's asset list at
-// build time (the file names carry the version). Without script, or for a machine there is
+// build time (the file names carry the version). Files are matched by the end of
+// their names (ThinkWatch-Lite-<version>-windows-x64-setup.exe ends in
+// -x64-setup.exe), which releases from before the <os>-<arch> names share. The
+// Windows button stays on the installer; the portable zip is on the Lite page. Without script, or for a machine there is
 // no build for (a phone, an Intel Mac), the button leads to the install
 // section instead, which lists every option. So does a Linux machine while the
 // latest release has no AppImage for it.

@@ -251,7 +251,8 @@ export const liteCopy = {
         body: "Installs the app for all users and keeps it up to date.",
         download: { x64: "Download for Windows (x64)", arm64: "Download for Windows (ARM64)" },
         otherLink: { x64: "x64 installer", arm64: "ARM64 installer" },
-        note: "The installer is not code-signed. When SmartScreen shows “Windows protected your PC”, choose More info, then Run anyway. Installing needs administrator permission, and WebView2 is downloaded if it is missing.",
+        portable: "Portable build (ZIP, no installation): ",
+        note: "Neither the installer nor the portable build is code-signed. When SmartScreen shows “Windows protected your PC”, choose More info, then Run anyway. Installing needs administrator permission, and the installer downloads WebView2 if it is missing; the portable build offers its download page instead.",
       },
       linux: {
         req: "Requires Ubuntu 22.04, Debian 12, Fedora 36 or a later distribution, on x86_64 or aarch64.",
@@ -492,7 +493,8 @@ export const liteCopy = {
         body: "为所有用户安装，之后应用自动更新。",
         download: { x64: "下载 Windows 版（x64）", arm64: "下载 Windows 版（ARM64）" },
         otherLink: { x64: "x64 安装程序", arm64: "ARM64 安装程序" },
-        note: "安装程序未经代码签名。SmartScreen 显示「Windows 已保护你的电脑」时，依次点「更多信息」「仍要运行」。安装需要管理员权限；缺少 WebView2 时会自动下载。",
+        portable: "绿色版（ZIP，免安装）：",
+        note: "安装程序与绿色版均未经代码签名。SmartScreen 显示「Windows 已保护你的电脑」时，依次点「更多信息」「仍要运行」。安装需要管理员权限；缺少 WebView2 时安装程序会自动下载，绿色版则给出下载页面。",
       },
       linux: {
         req: "需要 Ubuntu 22.04、Debian 12、Fedora 36 或更新的发行版，x86_64 或 aarch64。",

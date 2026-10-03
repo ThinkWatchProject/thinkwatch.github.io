@@ -2,7 +2,7 @@
 
 ThinkWatch Lite is a local gateway for Claude Code, Codex and other AI clients, on macOS, Windows and Linux. Each client is connected once; after that, upstreams and models change in the gateway without touching the client. Every request is recorded with its cost and route, and the API keys in it can be replaced before it leaves the machine.
 
-> It runs on macOS 12 or later on Apple silicon, on Windows 10 21H2 or later on x64 or ARM64 and on Linux on x86_64 or aarch64, is [installed](/docs/lite/install) with Homebrew, a disk image, the Windows installer or an AppImage, and updates itself.
+> It runs on macOS 12 or later on Apple silicon, on Windows 10 21H2 or later on x64 or ARM64 and on Linux on x86_64 or aarch64, is [installed](/docs/lite/install) with Homebrew, a disk image, the Windows installer or portable zip, or an AppImage, and updates itself.
 
 ## Highlights
 

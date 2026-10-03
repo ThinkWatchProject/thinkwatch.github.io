@@ -162,8 +162,8 @@ export const products: Product[] = [
         locales: both,
         group: "getStarted",
         summary: {
-          en: "Homebrew, a disk image, the Windows installer or the Linux AppImage, the quarantine attribute and SmartScreen, and how updates reach each kind of install.",
-          "zh-CN": "通过 Homebrew、磁盘映像、Windows 安装程序或 Linux AppImage 安装，隔离属性与 SmartScreen 的处理，以及各种安装方式如何更新。",
+          en: "Homebrew, a disk image, the Windows installer or portable zip, or the Linux AppImage, the quarantine attribute and SmartScreen, uninstalling, and how updates reach each kind of install.",
+          "zh-CN": "通过 Homebrew、磁盘映像、Windows 安装程序、Windows 绿色版或 Linux AppImage 安装，隔离属性与 SmartScreen 的处理，卸载，以及各种安装方式如何更新。",
         },
       },
       {
