@@ -1,5 +1,5 @@
 ---
-// The Lite band on the home page: the local gateway, its four points, where it
+// The Lite band on the home page: the local gateway, its main points, where it
 // runs, and a download, beside its overview screen. Each page shows the
 // interface in its own language; see LitePage.astro.
 import { getLang, localePath } from "~/i18n";
@@ -71,6 +71,10 @@ const zh = lang === "zh-CN";
   @media (min-width: 640px) {
     .points {
       grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    /* an odd point out takes the whole last row, so no cell stays empty */
+    .points > :last-child:nth-child(odd) {
+      grid-column: 1 / -1;
     }
   }
   .pills {
