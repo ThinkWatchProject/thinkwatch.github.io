@@ -1,8 +1,8 @@
 # Plugins
 
-Plugins adapt requests and answers to a particular setup: adding instructions to the system prompt, removing a parameter that one upstream rejects, asking for answers in a chosen language, rewriting file paths in tool calls between WSL and Windows, or keeping a DeepSeek session usable after its history picked up content the API refuses. A plugin is a short JavaScript file. It runs in a sandbox inside core, sees placeholders instead of the keys it would otherwise find, and every change it makes is recorded on the request and checked by the same protections as anything a client sends.
+Plugins adapt requests and answers to a particular setup: adding instructions to the system prompt, removing a parameter that one upstream rejects, asking for answers in a chosen language, or rewriting file paths in tool calls between WSL and Windows. A plugin is a short JavaScript file. It runs in a sandbox inside core, sees placeholders instead of the keys it would otherwise find, and every change it makes is recorded on the request and checked by the same protections as anything a client sends.
 
-This page covers what plugins can do, where they run, how one is added, the API for writing one, permissions, limits and the security model. Three plugins ship with the app, all off by default; they are described at the end.
+This page covers what plugins can do, where they run, how one is added, the API for writing one, permissions, limits and the security model. Two plugins ship with the app, both off by default; they are described at the end.
 
 ## What a plugin can change
 
@@ -257,7 +257,7 @@ These risks are limited by granting a plugin only the permissions it needs, by r
 
 ## Plugins that ship with the app
 
-Three plugins come with the app. They appear in the plugin list like any other, all off, and are turned on and configured the same way. Two of them may change tool calls, so turning them on, or changing their settings or scope, is confirmed in a system dialog. While no plugin is on, core does not start the sandbox, so plugins that stay off take no memory. The plugins ship with core, so a remote core has them too. All three handle conversations only, and their code is in the ThinkWatch Core repository, in [`crates/tw-gateway/src/plugin/defaults`](https://github.com/ThinkWatchProject/ThinkWatch-Core/tree/main/crates/tw-gateway/src/plugin/defaults).
+Two plugins come with the app. They appear in the plugin list like any other, both off, and are turned on and configured the same way. One of them, `wsl-paths`, may change tool calls, so turning it on, or changing its settings or scope, is confirmed in a system dialog. While no plugin is on, core does not start the sandbox, so plugins that stay off take no memory. The plugins ship with core, so a remote core has them too. Both handle conversations only, and their code is in the ThinkWatch Core repository, in [`crates/tw-gateway/src/plugin/defaults`](https://github.com/ThinkWatchProject/ThinkWatch-Core/tree/main/crates/tw-gateway/src/plugin/defaults).
 
 ### Answer in a chosen language (`reply-language`)
 
@@ -273,19 +273,11 @@ A client running in WSL cannot open `C:\Users\…`, and a client running on Wind
 - Permissions: `messages`, `reply.tool_calls`.
 - Setting: whether the client runs on Windows; off by default, for a client in WSL. The conversion is fixed in the code, and the setting cannot express any other rewrite.
 
-### Avoid DeepSeek request rejections (`deepseek-flags`)
-
-The DeepSeek API rejects any request that contains a certain regional flag emoji with `400 Content Exists Risk`, before the model runs. Once the emoji is in a conversation's history, for example from a fetched web page or a file a tool read, every later request in that session is rejected and the session cannot continue. Before a request is sent, the plugin replaces the emoji with placeholder text in the system prompt and the messages, tool results and earlier tool-call arguments included; in the answer it restores the emoji in the text and in tool calls, so files the client writes keep the original characters. A request without the emoji is sent unchanged, byte for byte, and the replacement is the same every time, so prompt caching is unaffected. Plugins cannot change thinking blocks, so the emoji stays wherever it appears in one.
-
-- Permissions: `system`, `messages`, `reply.text`, `reply.tool_calls`.
-- Settings: none. The characters and their placeholder are fixed in the code.
-- Scope: models whose name, as sent to the upstream, starts with `deepseek`. This includes requests that a routing rule renamed to a DeepSeek model.
-
 A built-in plugin that is deleted is not added again, and one whose code was replaced or edited is left as it is. Otherwise, when an update ships a newer version of a built-in plugin, the plugin is updated and keeps its on/off state, behavior on errors, scope and settings; a new version that asks for more permissions or more kinds of request is turned off.
 
 ## Upgrading
 
-The first launch after updating to the version that introduces plugins clears the request history, including stored requests and answers. The configuration, keys and upstreams are kept, and the three built-in plugins are added to the list, turned off.
+The first launch after updating to the version that introduces plugins clears the request history, including stored requests and answers. The configuration, keys and upstreams are kept, and the two built-in plugins are added to the list, turned off.
 
 ## Next steps
 
