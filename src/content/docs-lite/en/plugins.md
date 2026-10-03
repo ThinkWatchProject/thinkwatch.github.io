@@ -45,11 +45,11 @@ Each plugin is a single file that holds everything about it: the code, the reque
 
 Changes on both tabs are kept while switching between them and saved together.
 
-**Add plugin** opens the same editor on the **Code** tab. The code is pasted there or loaded with **Import from file…** at the top right, and **Save** installs the plugin. Plugins are installed only from a local file or pasted code; there is no installation from a link, no plugin marketplace and no automatic update.
+**Add plugin** opens the same editor on the **Code** tab, with a small working plugin to start from. The code is edited or pasted there, or loaded with **Import from file…** at the top right, and **Install** installs the plugin. For a new plugin the Settings tab also has the **Plugin ID**: lowercase letters, digits and hyphens, up to 40, suggested from the file name or the plugin's name. The ID cannot be changed after installing. A new plugin is installed turned off unless **Enabled** is switched on first. Plugins are installed only from a local file or pasted code; there is no installation from a link, no plugin marketplace and no automatic update.
 
 On the Plugins page:
 
-- **Order.** Plugins run in the order of the list, which **Reorder** changes. Each plugin sees the result of the one before it and is checked against its own permissions.
+- **Order.** Plugins run in the order of the list, which **Reorder** changes by dragging or with the arrows. Each plugin sees the result of the one before it and is checked against its own permissions.
 - **Trial run.** Runs the plugin on a recent request from the history, with the routing that request had: the upstream that answered and the model sent to it. It shows the request or answer before and after, with the plugin's log. Nothing is sent to an upstream, and a trial run does not count in the statistics.
 - **Logs.** The latest 500 lines the plugin wrote with `console`.
 - **Statistics** since the gateway started: runs, changes, rejections, errors and the average CPU time.
