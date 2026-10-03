@@ -9,6 +9,7 @@ ThinkWatch Lite is a local gateway for Claude Code, Codex and other AI clients, 
 - **Connect once, switch freely.** Twelve clients are pointed at the gateway in one step, with the change previewed and the original backed up; Cursor, Continue and Antigravity CLI come with instructions.
 - **Protection against relays.** A relay sees every request and can rewrite every answer. Outbound redaction can replace credentials, ID numbers and bank card numbers before a request leaves, and tool-call inspection can cut off an answer that carries a dangerous tool call, such as download-and-run or sending out credential files, before the client runs it. Hidden-character detection, a content filter and an output limit complete the five protections, each in Off, Observe or Enforce.
 - **MCP servers, skills and hooks, scanned.** The MCP servers of thirteen clients side by side, and a scan of client configuration for hidden characters, prompt injection, dangerous commands and overly broad permissions.
+- **Plugins.** Short JavaScript plugins adjust requests and answers, such as asking for answers in a chosen language or converting file paths between WSL and Windows. They run in a sandbox, see placeholders instead of keys, and every change they make is recorded.
 - **Every request traceable.** The matched rule, each attempt, any format conversion and the cost, with replay against another upstream; the whole history can be searched, including the text of requests and answers.
 - **Routing and failover.** Rules by model, tools, images and more; groups that fail over before the answer begins and keep each session on one upstream.
 - **Any upstream.** API keys, Amazon Bedrock, ChatGPT and Z.ai accounts, relays and local models, with conversion between the Anthropic, OpenAI and Gemini APIs.
@@ -26,6 +27,7 @@ ThinkWatch Lite is a local gateway for Claude Code, Codex and other AI clients, 
 | Routing | Routes, rules and groups, auxiliary requests, and the dry run |
 | Security | The security log and the five protections with their rules |
 | MCP | MCP servers, skills and hooks in each client, and the configuration scan |
+| Plugins | JavaScript plugins that change requests and answers, with their permissions, trial runs and logs |
 | Settings | Connection, language, appearance, menu bar, notifications, listening, retention, updates and uninstall |
 
 Each page is described in [Features](/docs/lite/features).
@@ -34,6 +36,7 @@ Each page is described in [Features](/docs/lite/features).
 
 - [Install and update](/docs/lite/install)
 - [Connecting to a remote core](/docs/lite/remote-core): the gateway is [ThinkWatch Core](/docs/core), which runs beside the app or on a Linux server.
+- [Plugins](/docs/lite/plugins): writing a plugin, its permissions and the sandbox it runs in.
 - [Architecture](/docs/lite/architecture): Lite holds no routing, forwarding or accounting logic; it controls Core over an encrypted control channel.
 - [Build from source](/docs/lite/run-from-source)
 

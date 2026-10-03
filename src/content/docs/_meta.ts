@@ -197,6 +197,16 @@ export const products: Product[] = [
         },
       },
       {
+        slug: "plugins",
+        label: { en: "Plugins", "zh-CN": "插件" },
+        locales: both,
+        group: "reference",
+        summary: {
+          en: "JavaScript plugins that change requests and answers: where they run, adding and editing one, the API and the kinds of request, permissions, limits, the sandbox and what it cannot prevent, and the two that ship with the app.",
+          "zh-CN": "改写请求与回答的 JavaScript 插件：运行位置、添加与编辑、接口与请求种类、权限、限额、沙箱及其无法防范的情况，以及应用自带的两个插件。",
+        },
+      },
+      {
         slug: "import-links",
         label: { en: "Import links", "zh-CN": "导入链接" },
         locales: both,
