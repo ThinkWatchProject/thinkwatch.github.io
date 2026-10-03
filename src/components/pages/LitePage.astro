@@ -79,8 +79,27 @@ const remoteDocsHref = localePath(lang, "/docs/lite/remote-core");
 const serverDocsHref = localePath(lang, "/docs/core/server-deployment");
 const jsonLd = await liteLd(lang);
 const changelogHref = localePath(lang, "/changelog");
-/** Feature copy by id: the story and the bento pick their text from it */
-const feat = Object.fromEntries(c.features.items.map((item) => [item.id, item])) as Record<string, (typeof c.features.items)[number]>;
+/** Feature copy by id: the story and the bento pick their text from it. Plugins have no screenshot, so no alt. */
+const feat = Object.fromEntries(c.features.items.map((item) => [item.id, item])) as Record<
+  string,
+  { id: string; title: string; body: string; alt?: string }
+>;
+/** Permissions a plugin declares, as named in the plugins doc */
+const pluginPermissions = ["system", "messages", "tools", "params", "reply.text", "reply.tool_calls"];
+/** The short plugin on the plugins tile, as highlighted lines: the doc's example, cut down */
+const escHtml = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+const pluginCode = [
+  `<span class="k">export const</span> manifest = {`,
+  `  name: <span class="s">"${escHtml(c.motion.bento.plugin.name)}"</span>,`,
+  `  api: <span class="n">1</span>,`,
+  `<span class="hl">  permissions: [<span class="s">"system"</span>],</span>`,
+  `};`,
+  ``,
+  `<span class="k">export function</span> onRequest(req) {`,
+  `  req.system += <span class="s">"\\n\\n${escHtml(c.motion.bento.plugin.note)}"</span>;`,
+  `  <span class="k">return</span> req;`,
+  `}`,
+].join("\n");
 /** The four stops of the scroll story, in the order a request meets them */
 const storyIds = ["routing", "security", "traffic", "overview"] as const;
 const clients = [
@@ -307,6 +326,19 @@ const archLabel = { x64: "x64", arm64: "ARM64" } as const;
             </div>
             <h3>{c.motion.bento.noticesTitle}</h3>
             <p>{c.menubar.notices}</p>
+          </article>
+          <article class="tile t-plugins lp-in">
+            <div class="tile-text">
+              <div class="chips perms" aria-hidden="true">
+                {pluginPermissions.map((p) => <span>{p}</span>)}
+              </div>
+              <h3>{feat.plugins.title}</h3>
+              <p>{feat.plugins.body}</p>
+            </div>
+            <div class="code-win" aria-hidden="true">
+              <div class="code-top"><span class="lights"><i></i><i></i><i></i></span><span>project-notes.js</span></div>
+              <pre><code set:html={pluginCode} /></pre>
+            </div>
           </article>
         </div>
       </div>
@@ -1687,6 +1719,69 @@ const archLabel = { x64: "x64", arm64: "ARM64" } as const;
   .chips span:nth-child(4) {
     animation-delay: 3s;
   }
+  /* The plugins tile: the whole last row, the copy beside a short plugin */
+  .t-plugins {
+    grid-column: span 6;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 40px;
+    align-items: center;
+  }
+  .perms span {
+    font-family: var(--font-mono);
+    animation-duration: 6s;
+  }
+  .perms span:nth-child(5) {
+    animation-delay: 4s;
+  }
+  .perms span:nth-child(6) {
+    animation-delay: 5s;
+  }
+  .code-win {
+    min-width: 0;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    background: #0b0c0e;
+    box-shadow: 0 30px 80px -30px rgba(0, 0, 0, 0.8);
+    overflow: hidden;
+  }
+  .code-top {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 9px 14px;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    color: var(--color-dim);
+  }
+  .code-win pre {
+    margin: 0;
+    padding: 14px 18px 16px;
+    overflow-x: auto;
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    line-height: 1.75;
+    color: #c3c7ce;
+  }
+  .code-win :global(.k) {
+    color: rgb(var(--a2));
+  }
+  .code-win :global(.s) {
+    color: rgb(var(--a1));
+  }
+  .code-win :global(.n) {
+    color: #8fb8ff;
+  }
+  /* the line that declares what the plugin may read and change */
+  .code-win :global(.hl) {
+    display: inline-block;
+    min-width: calc(100% + 36px);
+    margin: 0 -18px;
+    padding: 0 18px;
+    background: rgb(var(--a1) / 0.07);
+    box-shadow: inset 2px 0 rgb(var(--a1) / 0.7);
+  }
   .keyrows {
     margin: 0;
     padding: 0;
@@ -1841,7 +1936,8 @@ const archLabel = { x64: "x64", arm64: "ARM64" } as const;
     }
     .t-menubar,
     .t-mcp,
-    .t-notices {
+    .t-notices,
+    .t-plugins {
       grid-column: span 2;
     }
     .t-clients,
@@ -1861,9 +1957,23 @@ const archLabel = { x64: "x64", arm64: "ARM64" } as const;
     .t-formats,
     .t-keys,
     .t-dry,
-    .t-notices {
+    .t-notices,
+    .t-plugins {
       grid-column: auto;
       grid-row: auto;
+    }
+    .t-plugins {
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+    .code-win pre {
+      padding: 12px 14px 14px;
+      font-size: 12px;
+    }
+    .code-win :global(.hl) {
+      min-width: calc(100% + 28px);
+      margin: 0 -14px;
+      padding: 0 14px;
     }
     .t-menubar {
       grid-template-columns: 1fr;
