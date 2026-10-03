@@ -56,17 +56,10 @@ const win = Object.fromEntries(
     },
   ]),
 ) as Record<(typeof winArchs)[number], { url: string; sha: string | null; size: string | null }>;
-/** The Windows portable zips: unzip and run, data beside the program */
+/** The Windows portable zips, linked from one line under the installer; the release page until a release has them */
 const winZip = Object.fromEntries(
-  winArchs.map((arch) => [
-    arch,
-    {
-      url: assetUrl(`-windows-${arch}-portable.zip`) ?? latestPage,
-      sha: assetUrl(`-windows-${arch}-portable.zip.sha256`),
-      size: assetSize(`-windows-${arch}-portable.zip`),
-    },
-  ]),
-) as Record<(typeof winArchs)[number], { url: string; sha: string | null; size: string | null }>;
+  winArchs.map((arch) => [arch, assetUrl(`-windows-${arch}-portable.zip`) ?? latestPage]),
+) as Record<(typeof winArchs)[number], string>;
 const linuxArchs = ["x86_64", "aarch64"] as const;
 const linux = Object.fromEntries(
   linuxArchs.map((arch) => [
@@ -517,57 +510,38 @@ const archLabel = { x64: "x64", arm64: "ARM64" } as const;
 
           <div id="install-windows" role="tabpanel" aria-labelledby="install-tab-windows" class="install-panel" data-panel="windows">
             <p class="install-req">{c.install.windows.req}</p>
-            <div class="grid gap-4 lg:grid-cols-[3fr_2fr]">
-              <div class="install-card">
-                <h3 class="install-card-title">{c.install.windows.title}</h3>
-                <p class="install-card-body">{c.install.windows.body}</p>
-                <div class="flex flex-wrap items-center gap-x-5 gap-y-2">
-                  {winArchs.map((arch) => (
-                    <a href={win[arch].url} class="dl-button dl-primary" data-win-arch={arch} hidden={arch !== "x64"}>
-                      {c.install.windows.download[arch]}
-                    </a>
-                  ))}
-                  {winArchs.map((arch) => (
-                    <p class="install-meta" data-win-other={arch} hidden={arch === "x64"}>
-                      {c.install.other}<a href={win[arch].url}>{c.install.windows.otherLink[arch]}</a>
-                    </p>
-                  ))}
-                </div>
-                {liteVersion && (
-                  <p class="install-meta">
-                    <span>{c.install.version} {liteVersion}</span>
-                    {winArchs.map((arch) => win[arch].size && <Fragment>{" · "}<span>{archLabel[arch]} {win[arch].size}</span></Fragment>)}
-                    {winArchs.map((arch) =>
-                      win[arch].sha && <Fragment>{" · "}<a href={win[arch].sha}>{c.install.sha} ({archLabel[arch]})</a></Fragment>,
-                    )}
+            <div class="install-card">
+              <h3 class="install-card-title">{c.install.windows.title}</h3>
+              <p class="install-card-body">{c.install.windows.body}</p>
+              <div class="flex flex-wrap items-center gap-x-5 gap-y-2">
+                {winArchs.map((arch) => (
+                  <a href={win[arch].url} class="dl-button dl-primary" data-win-arch={arch} hidden={arch !== "x64"}>
+                    {c.install.windows.download[arch]}
+                  </a>
+                ))}
+                {winArchs.map((arch) => (
+                  <p class="install-meta" data-win-other={arch} hidden={arch === "x64"}>
+                    {c.install.other}<a href={win[arch].url}>{c.install.windows.otherLink[arch]}</a>
                   </p>
-                )}
+                ))}
               </div>
-              <div class="install-card">
-                <h3 class="install-card-title">{c.install.windows.portableTitle}</h3>
-                <p class="install-card-body">{c.install.windows.portableBody}</p>
-                <div class="mt-auto flex flex-wrap items-center gap-x-5 gap-y-2">
-                  {winArchs.map((arch) => (
-                    <a href={winZip[arch].url} class="dl-button" data-winzip-arch={arch} hidden={arch !== "x64"}>
-                      {c.install.windows.portableDownload[arch]}
-                    </a>
-                  ))}
-                  {winArchs.map((arch) => (
-                    <p class="install-meta" data-winzip-other={arch} hidden={arch === "x64"}>
-                      {c.install.other}<a href={winZip[arch].url}>{c.install.windows.portableOtherLink[arch]}</a>
-                    </p>
-                  ))}
-                </div>
-                {liteVersion && winArchs.some((arch) => winZip[arch].sha) && (
-                  <p class="install-meta">
-                    <span>{c.install.version} {liteVersion}</span>
-                    {winArchs.map((arch) => winZip[arch].size && <Fragment>{" · "}<span>{archLabel[arch]} {winZip[arch].size}</span></Fragment>)}
-                    {winArchs.map((arch) =>
-                      winZip[arch].sha && <Fragment>{" · "}<a href={winZip[arch].sha}>{c.install.sha} ({archLabel[arch]})</a></Fragment>,
-                    )}
-                  </p>
-                )}
-              </div>
+              {liteVersion && (
+                <p class="install-meta">
+                  <span>{c.install.version} {liteVersion}</span>
+                  {winArchs.map((arch) => win[arch].size && <Fragment>{" · "}<span>{archLabel[arch]} {win[arch].size}</span></Fragment>)}
+                  {winArchs.map((arch) =>
+                    win[arch].sha && <Fragment>{" · "}<a href={win[arch].sha}>{c.install.sha} ({archLabel[arch]})</a></Fragment>,
+                  )}
+                </p>
+              )}
+              {/* The portable zips as one line under the installer, this machine's architecture first */}
+              {winArchs.map((arch) => (
+                <p class="install-meta" data-winzip-arch={arch} hidden={arch !== "x64"}>
+                  {c.install.windows.portable}<span>{[arch, ...winArchs.filter((a) => a !== arch)].map((a, i) => (
+                    <Fragment>{i > 0 && " · "}<a href={winZip[a]}>{archLabel[a]}</a></Fragment>
+                  ))}</span>
+                </p>
+              ))}
             </div>
             <p class="install-note">{c.install.windows.note}</p>
           </div>

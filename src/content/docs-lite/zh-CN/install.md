@@ -40,7 +40,7 @@ Get-FileHash .\ThinkWatch-Lite-<版本>-windows-x64-setup.exe
 
 ## Windows：绿色版
 
-绿色版解压即用，无需安装，也不需要管理员权限。从 [最新版本的 release 页面](https://github.com/ThinkWatchProject/ThinkWatch-Lite/releases/latest)下载 `ThinkWatch-Lite-<版本>-windows-x64-portable.zip`（ARM 处理器的电脑用 `ThinkWatch-Lite-<版本>-windows-arm64-portable.zip`），与同页发布的 sha256 校验值核对后解压到任意可写入的文件夹，运行其中的 `ThinkWatch Lite.exe`。压缩包里只有 `ThinkWatch Lite.exe` 与网关 `twcore.exe` 两个文件。
+绿色版无需安装，也不需要管理员权限。从 [最新版本的 release 页面](https://github.com/ThinkWatchProject/ThinkWatch-Lite/releases/latest)下载 `ThinkWatch-Lite-<版本>-windows-x64-portable.zip`（ARM 处理器的电脑用 `ThinkWatch-Lite-<版本>-windows-arm64-portable.zip`），与同页发布的 sha256 校验值核对后解压到任意可写入的文件夹，运行其中的 `ThinkWatch Lite.exe`。压缩包里只有 `ThinkWatch Lite.exe` 与网关 `twcore.exe` 两个文件。
 
 配置、密钥与请求记录保存在程序旁边的 `data\` 文件夹中，与安装版的 `%APPDATA%\ThinkWatch` 互不相干，两者是两套独立的设置。文件夹不可写入时，应用会提示并退出。
 
