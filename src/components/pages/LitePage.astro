@@ -32,7 +32,9 @@ const latestPage = `${releases}/latest`;
 // The installers of the latest release. The file names carry the version, so
 // they come from the release's asset list, looked up at build time, along with
 // their sizes; without it, the buttons lead to the latest release page instead
-// and no size is shown.
+// and no size is shown. Names are ThinkWatch-Lite-<version>-<os>-<arch>…
+// (darwin, windows, linux); the installers, disk image and AppImages are matched
+// by the end of the name, which releases before the rename share.
 const liteRelease = await getLatestLiteRelease();
 const assetName = (suffix: string) => Object.keys(liteRelease?.assets ?? {}).find((n) => n.endsWith(suffix));
 const assetUrl = (suffix: string) => {
@@ -51,6 +53,17 @@ const win = Object.fromEntries(
       url: assetUrl(`-${arch}-setup.exe`) ?? latestPage,
       sha: assetUrl(`-${arch}-setup.exe.sha256`),
       size: assetSize(`-${arch}-setup.exe`),
+    },
+  ]),
+) as Record<(typeof winArchs)[number], { url: string; sha: string | null; size: string | null }>;
+/** The Windows portable zips: unzip and run, data beside the program */
+const winZip = Object.fromEntries(
+  winArchs.map((arch) => [
+    arch,
+    {
+      url: assetUrl(`-windows-${arch}-portable.zip`) ?? latestPage,
+      sha: assetUrl(`-windows-${arch}-portable.zip.sha256`),
+      size: assetSize(`-windows-${arch}-portable.zip`),
     },
   ]),
 ) as Record<(typeof winArchs)[number], { url: string; sha: string | null; size: string | null }>;
@@ -472,30 +485,57 @@ const archLabel = { x64: "x64", arm64: "ARM64" } as const;
 
           <div id="install-windows" role="tabpanel" aria-labelledby="install-tab-windows" class="install-panel" data-panel="windows">
             <p class="install-req">{c.install.windows.req}</p>
-            <div class="install-card">
-              <h3 class="install-card-title">{c.install.windows.title}</h3>
-              <p class="install-card-body">{c.install.windows.body}</p>
-              <div class="flex flex-wrap items-center gap-x-5 gap-y-2">
-                {winArchs.map((arch) => (
-                  <a href={win[arch].url} class="dl-button dl-primary" data-win-arch={arch} hidden={arch !== "x64"}>
-                    {c.install.windows.download[arch]}
-                  </a>
-                ))}
-                {winArchs.map((arch) => (
-                  <p class="install-meta" data-win-other={arch} hidden={arch === "x64"}>
-                    {c.install.other}<a href={win[arch].url}>{c.install.windows.otherLink[arch]}</a>
+            <div class="grid gap-4 lg:grid-cols-[3fr_2fr]">
+              <div class="install-card">
+                <h3 class="install-card-title">{c.install.windows.title}</h3>
+                <p class="install-card-body">{c.install.windows.body}</p>
+                <div class="flex flex-wrap items-center gap-x-5 gap-y-2">
+                  {winArchs.map((arch) => (
+                    <a href={win[arch].url} class="dl-button dl-primary" data-win-arch={arch} hidden={arch !== "x64"}>
+                      {c.install.windows.download[arch]}
+                    </a>
+                  ))}
+                  {winArchs.map((arch) => (
+                    <p class="install-meta" data-win-other={arch} hidden={arch === "x64"}>
+                      {c.install.other}<a href={win[arch].url}>{c.install.windows.otherLink[arch]}</a>
+                    </p>
+                  ))}
+                </div>
+                {liteVersion && (
+                  <p class="install-meta">
+                    <span>{c.install.version} {liteVersion}</span>
+                    {winArchs.map((arch) => win[arch].size && <Fragment>{" · "}<span>{archLabel[arch]} {win[arch].size}</span></Fragment>)}
+                    {winArchs.map((arch) =>
+                      win[arch].sha && <Fragment>{" · "}<a href={win[arch].sha}>{c.install.sha} ({archLabel[arch]})</a></Fragment>,
+                    )}
                   </p>
-                ))}
+                )}
               </div>
-              {liteVersion && (
-                <p class="install-meta">
-                  <span>{c.install.version} {liteVersion}</span>
-                  {winArchs.map((arch) => win[arch].size && <Fragment>{" · "}<span>{archLabel[arch]} {win[arch].size}</span></Fragment>)}
-                  {winArchs.map((arch) =>
-                    win[arch].sha && <Fragment>{" · "}<a href={win[arch].sha}>{c.install.sha} ({archLabel[arch]})</a></Fragment>,
-                  )}
-                </p>
-              )}
+              <div class="install-card">
+                <h3 class="install-card-title">{c.install.windows.portableTitle}</h3>
+                <p class="install-card-body">{c.install.windows.portableBody}</p>
+                <div class="mt-auto flex flex-wrap items-center gap-x-5 gap-y-2">
+                  {winArchs.map((arch) => (
+                    <a href={winZip[arch].url} class="dl-button" data-winzip-arch={arch} hidden={arch !== "x64"}>
+                      {c.install.windows.portableDownload[arch]}
+                    </a>
+                  ))}
+                  {winArchs.map((arch) => (
+                    <p class="install-meta" data-winzip-other={arch} hidden={arch === "x64"}>
+                      {c.install.other}<a href={winZip[arch].url}>{c.install.windows.portableOtherLink[arch]}</a>
+                    </p>
+                  ))}
+                </div>
+                {liteVersion && winArchs.some((arch) => winZip[arch].sha) && (
+                  <p class="install-meta">
+                    <span>{c.install.version} {liteVersion}</span>
+                    {winArchs.map((arch) => winZip[arch].size && <Fragment>{" · "}<span>{archLabel[arch]} {winZip[arch].size}</span></Fragment>)}
+                    {winArchs.map((arch) =>
+                      winZip[arch].sha && <Fragment>{" · "}<a href={winZip[arch].sha}>{c.install.sha} ({archLabel[arch]})</a></Fragment>,
+                    )}
+                  </p>
+                )}
+              </div>
             </div>
             <p class="install-note">{c.install.windows.note}</p>
           </div>
@@ -754,6 +794,7 @@ const archLabel = { x64: "x64", arm64: "ARM64" } as const;
     };
     const apply = (arm) => {
       show("win", arm && windows ? "arm64" : "x64");
+      show("winzip", arm && windows ? "arm64" : "x64");
       show("linux", arm && linux ? "aarch64" : "x86_64");
     };
     const guess = linux && /aarch64|arm64/.test(s);

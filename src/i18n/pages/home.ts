@@ -117,7 +117,7 @@ export const homeCopy = {
       lite: {
         runsAs: "Desktop app in the macOS menu bar, the Windows notification area or the Linux system tray",
         builtFor: "Individual developers",
-        status: "Available for macOS on Apple silicon (Homebrew or disk image), Windows on x64 or ARM64 (installer) and Linux on x86_64 or aarch64 (AppImage)",
+        status: "Available for macOS on Apple silicon (Homebrew or disk image), Windows on x64 or ARM64 (installer or portable zip) and Linux on x86_64 or aarch64 (AppImage)",
         license: "MIT",
       },
       core: {
@@ -244,7 +244,7 @@ export const homeCopy = {
       lite: {
         runsAs: "桌面应用，常驻 macOS 菜单栏、Windows 通知区域或 Linux 系统托盘",
         builtFor: "个人开发者",
-        status: "已发布：macOS（Apple silicon）用 Homebrew 或磁盘映像安装，Windows（x64、ARM64）用安装程序，Linux（x86_64、aarch64）用 AppImage",
+        status: "已发布：macOS（Apple silicon）用 Homebrew 或磁盘映像安装，Windows（x64、ARM64）用安装程序或绿色版，Linux（x86_64、aarch64）用 AppImage",
         license: "MIT",
       },
       core: {

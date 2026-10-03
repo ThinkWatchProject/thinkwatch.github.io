@@ -126,9 +126,9 @@ export async function liteLd(lang: Lang): Promise<JsonLd[]> {
   const release = await getLatestLiteRelease();
   const url = pageUrl(lang, "/lite");
   const repo = `${GITHUB}/ThinkWatch-Lite`;
-  // The installers of the latest release: disk image, Windows setup, AppImage.
+  // The installers of the latest release: disk image, Windows setup and portable zip, AppImage.
   const installers = Object.entries(release?.assets ?? {})
-    .filter(([name]) => /(\.dmg|-setup\.exe|\.AppImage)$/.test(name))
+    .filter(([name]) => /(\.dmg|-setup\.exe|-portable\.zip|\.AppImage)$/.test(name))
     .map(([, href]) => href);
   // Screenshots in the page's language; the English ones carry "-en", as on LitePage.astro.
   const screenshot = c.features.items.map((item) => ({

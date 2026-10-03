@@ -2,7 +2,7 @@
 
 ThinkWatch Lite 是 Claude Code、Codex 等 AI 客户端的本地网关，支持 macOS、Windows 与 Linux。客户端只需接入一次，此后在网关中更换上游与模型，无需改动客户端。每个请求的费用与去向都有记录，发出前可替换其中的 API 密钥。
 
-> 支持 macOS 12 及以上（Apple silicon）、Windows 10 21H2 及以上（x64、ARM64）和 Linux（x86_64、aarch64），可用 Homebrew、磁盘映像、Windows 安装程序或 AppImage [安装](/zh-CN/docs/lite/install)，安装后自动更新。
+> 支持 macOS 12 及以上（Apple silicon）、Windows 10 21H2 及以上（x64、ARM64）和 Linux（x86_64、aarch64），可用 Homebrew、磁盘映像、Windows 安装程序、Windows 绿色版或 AppImage [安装](/zh-CN/docs/lite/install)，安装后自动更新。
 
 ## 要点
 
