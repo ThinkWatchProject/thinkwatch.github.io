@@ -2,7 +2,7 @@
 
 A page-by-page reference to what ThinkWatch Lite shows and does. The [Lite page](/lite) gives the short version.
 
-The main window has nine pages: Overview, Traffic, Clients, Keys, Upstreams, Routing, Security, MCP and Settings.
+The main window has ten pages: Overview, Traffic, Clients, Keys, Upstreams, Routing, Security, MCP, Plugins and Settings.
 
 ## Usage and cost
 
@@ -14,7 +14,7 @@ Until the first request has gone to an upstream, the Overview page shows a get-s
 
 ## Traffic and sessions
 
-The Traffic page lists requests as they arrive: status, key, model, upstream, time to first token and total time (with the generation speed on hover), tokens and cost, with marks for a converted API format, redacted keys, text deleted by the content filter and a blocked or suspicious tool call. The list can be searched (path, key, upstream, model and error message), filtered by key, upstream and model, or narrowed to failed or unpriced requests. It holds the latest 2,000 requests, and a search or filter also runs over the stored history, further back on request. With content search on, it also covers what each request newly sent (the last user turn, tool results included) and its answer (tool calls included), for as long as payloads are kept; a match shows its excerpt under the request. The Sessions view groups the requests of one conversation into turns, with the input tokens and the cost of each turn.
+The Traffic page lists requests as they arrive: status, key, model, upstream, time to first token and total time (with the generation speed on hover), tokens and cost, with marks for a converted API format, redacted keys, text deleted by the content filter and a blocked or suspicious tool call. The list can be searched (path, key, upstream, model and error message), filtered by key, upstream and model, or narrowed to failed or unpriced requests. It holds the latest 2,000 requests, and a search or filter also runs over the stored history, further back on request. With content search on, it also covers what each request newly sent (the last user turn, tool results included) and its answer (tool calls included), for as long as payloads are kept; a match shows its excerpt under the request. The Sessions view groups the requests of one conversation into turns, with the input tokens and the cost of each turn. A session's Conversation tab replays it turn by turn: the messages each turn added and its answer, with text, folded thinking, tool calls beside their results, and images by type and size. Changes to the system prompt and restarts after compaction are marked, and a turn whose bodies are past retention, were too large to keep whole or cannot be read says so. Each turn opens its request.
 
 A request opens into its timeline, its routing (the rule it matched, the group it went through and each attempt with its status and duration), the request and response bodies, and its usage and cost. A request from DeepSeek Harness also shows the size of the session log it carried, the whole conversation the client attaches to every request; the gateway removes it before a request goes to an upstream other than DeepSeek. A finished request can be sent again, unchanged, to another upstream after an estimate of its cost, and the two responses are shown side by side.
 
@@ -70,6 +70,10 @@ The MCP page covers what clients load from their own configuration files, which 
 - **Findings:** client configuration, skills, hooks, slash commands, subagents and project instruction files are scanned for hidden characters, prompt injection, dangerous commands and overly broad permissions, and each finding is graded high, medium or low. The scan only reports; it never changes a file.
 
 The app watches these files while it runs, and a new finding raises a system notification.
+
+## Plugins
+
+Plugins are short JavaScript files that change requests before they go to an upstream and answers before they reach the client, such as asking for answers in a chosen language or converting file paths in tool calls between WSL and Windows. They run after routing, in a sandbox inside core with no network, files or memory between requests, see placeholders instead of the keys in a request, and pass through the same protections afterwards. Two plugins ship with the app, both off until turned on. Each plugin is one file that also holds its scope, its behavior on errors and its settings. It is edited in one editor with a Settings tab, whose changes are written into the file, and a Code tab; adding a plugin opens the same editor. Routine changes are saved directly; for a plugin that may change tool calls, installing it, turning it on, changing its code and approving a changed file are confirmed in a system dialog. A plugin whose file changes outside the app stops running until the new version is approved. The page lists each plugin with its status, permissions, scope and statistics, and offers a trial run on a recent request and its log; requests changed by plugins are marked in Traffic. The API, permissions, limits and security model are described in [Plugins](/docs/lite/plugins).
 
 ## Settings
 
