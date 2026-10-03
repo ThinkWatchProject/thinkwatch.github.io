@@ -1,9 +1,9 @@
 {
   "repository": "ThinkWatchProject/ThinkWatch-Core",
-  "ref": "feat/guard-unify",
+  "ref": "v0.59.0",
   "files": {
-    "docs/config.md": "f343bdf9fec3cf362b09d7b3e913d84658a5e5f34e3f951b0f687f608563006c",
-    "docs/config.zh-CN.md": "af3ff02a6fde186fa4961e87b0d1386dab395ec254ce2e0f43dcc905529dbc4a",
+    "docs/config.md": "0122d660347a3f0e398f42dc9942901996a70e4531ba77a741248e6f97f932fc",
+    "docs/config.zh-CN.md": "61c6668435399af55e8d385ce80e3e116c1420feff97440b898ec265f65174af",
     "docs/server.md": "5e1e9b901bef2b46d417aea057a1db24c78457d3c1938b8540ecb4766515b68f",
     "docs/server.zh-CN.md": "1f508e7c39b8ded28653773ca4d8701e6bdc2247bcd359c3a8fd00fd1401a6ff"
   }

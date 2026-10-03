@@ -157,6 +157,7 @@ means.
 | `routes` | list of [`routes[]`](#cfg-routes) | `[]` | Routes. Without any, requests fail over across all upstreams in the order they are declared. |
 | `default_route` | string | — | The route for keys that do not name one. Unset: the route named `default`, or the built-in failover when there is none. |
 | `default_key` | string | — | The gateway key for clients that were not given a key of their own. Unset: the key named `default`, or the first key. It cannot be disabled. |
+| `plugins` | list of [`plugins[]`](#cfg-plugins) | `[]` | Script plugins, in the order they run. The app installs them; each one's code and settings are a file next to this one. |
 <!-- /generated -->
 
 ### `listen`
@@ -1002,6 +1003,93 @@ routes:
       - name: everything else
         to: fast
 default_route: default
+```
+
+### `plugins`
+
+Script plugins change requests before they reach an upstream and answers
+before they reach the client. They run in a sandbox inside core, without
+access to files, the network or the real values of secrets. The app installs
+them: each plugin's code goes to `plugins/<id>.js` next to this file, a copy
+of the approved code to `plugins/.approved/<id>.js`, and the code's SHA-256
+to `sha256`.
+
+A plugin's file holds its settings too. The `manifest` at the top of the file
+says what to do when the plugin fails (`on_error`), which requests it handles
+(`match`) and the value of each setting (`settings.<name>.value`). When the
+app changes one of these, it rewrites only the manifest in the file and
+updates `sha256` along with it. This list keeps just the plugin, its approved
+hash and whether it is on. Entries written by core 0.58 also have `on_error`,
+`scope` and `settings`: they are ignored, and removed the next time the app
+changes a plugin.
+
+A plugin runs only while its file has exactly the approved hash. When the
+file changes on disk or disappears, the plugin stops within seconds and the
+app shows the change for review. Until the change is approved, the requests
+the plugin covers are refused (`on_error: "reject"`, the default) or pass
+without it (`on_error: "skip"`), as the approved file says. A plugin that does
+not load is handled the same way. Neither keeps the rest of the configuration
+from taking effect.
+
+Plugins run in the order of this list.
+
+In `match`, `clients`, `models` and `upstreams` are lists of names or
+patterns with `*` anywhere in them, matched regardless of case; a list that
+is empty or left out matches everything. `clients` names the client app
+(`claude-code`, `codex`, …), and a request whose app is not recognised
+matches only an empty list. `models` matches the model sent to the upstream:
+when a routing rule renames the model, the new name is the one that matches.
+`upstreams` applies to requests and answers alike.
+
+A plugin changes a request after routing, each time the request is sent to an
+upstream. A request that fails over to another upstream starts again from what
+the client sent, and the plugin sees which upstream and which model name the
+request goes to. Routing, model checks and session grouping use what the
+client sent. A plugin that changes the model name only renames what is sent to
+that upstream: the request is not routed again, and the new name must still be
+one of the models the key may use ([`clients[].allow`](#cfg-clients)), or the
+request is not sent.
+
+A plugin handles the kinds of request its code declares: conversations
+(Anthropic Messages, OpenAI Chat Completions and Responses, and Gemini,
+including their token counts and compaction), embeddings (`/v1/embeddings`,
+Gemini `:embedContent` and `:batchEmbedContents`) and legacy completions
+(`/v1/completions`). A plugin that declares none handles conversations only.
+Requests of a kind a plugin does not handle pass without it, whatever its
+`on_error`. Other endpoints, such as images and audio, pass without any plugin.
+
+<!-- generated: table plugins[] -->
+<a id="cfg-plugins"></a>
+
+| Field | Type | Default | Description |
+|---|---|---|---|
+| `id` | string | **required** | Lowercase letters, digits and hyphens, 1 to 40 characters; unique. `order`, `inspect`, `rewrite` and `confirmed` are taken by the control plane. |
+| `file` | string | **required** | The plugin's code, relative to this file's directory. It is always `plugins/<id>.js`; the app writes it. |
+| `sha256` | string | **required** | SHA-256 of the approved code, 64 lowercase hexadecimal characters. When the file no longer has this hash, the plugin stops running until the change is approved in the app. The approved code is kept in `plugins/.approved/<id>.js`. |
+| `enabled` | bool | `true` | Run the plugin. `false` keeps it installed and out of every request. |
+<!-- /generated -->
+
+```yaml
+plugins:
+  - id: add-date
+    file: plugins/add-date.js
+    sha256: 9f2b6c0e4a1d8f3b7c5e2a9d6f1b4c8e3a7d0f5b2c9e6a1d4f8b3c7e0a5d2f9b
+    enabled: true
+```
+
+The start of `plugins/add-date.js`:
+
+```js
+export const manifest = {
+  name: "Add date",
+  api: 1,
+  permissions: ["system"],
+  match: { clients: ["claude-code"], models: ["claude-*"], upstreams: [] },
+  on_error: "reject",
+  settings: {
+    note: { type: "string", label: "Note", value: "Answer in English." },
+  },
+};
 ```
 
 ## Environment variables
