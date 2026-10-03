@@ -324,7 +324,7 @@ MCP 代理引擎。包含：
 所有其他 crate 使用的共享基础设施。包含：
 
 - **`config.rs`** —— 从环境变量加载的 `AppConfig` 结构体。
-- **`dynamic_config.rs`** —— `DynamicConfig` 系统，从 `system_settings` 数据库表加载配置。支持通过 Redis Pub/Sub 的多实例同步和内存缓存。涵盖 JWT TTL、缓存 TTL、内容过滤规则、PII 模式、预算阈值、API Key 策略和数据保留设置。
+- **`dynamic_config.rs`** —— `DynamicConfig` 系统，从 `system_settings` 数据库表加载配置。支持通过 Redis Pub/Sub 的多实例同步和内存缓存。涵盖 JWT TTL、缓存 TTL、请求防护（出站脱敏、工具调用审查、内容过滤）的策略、预算阈值、API Key 策略和数据保留设置。
 - **`db.rs`** —— 使用 `sqlx` 设置 PostgreSQL 连接池。
 - **`models/`** —— 数据库模型结构体（每个领域实体一个）：`user.rs`、`team.rs`、`api_key.rs`、`provider.rs`、`mcp_server.rs`、`usage.rs`、`audit_log.rs`。
 - **`dto/`** —— 用于 API 请求/响应序列化的数据传输对象。
@@ -389,7 +389,7 @@ ThinkWatch 在 ClickHouse 中存储六种类型的日志，每种使用独立的
 | 表                  | 用途 |
 |---------------------|------|
 | `providers`         | 上游 AI 提供商配置：名称、类型（openai/anthropic/google/azure/bedrock/custom）、基础 URL、AES 加密的 API 密钥以及可选的 `config_json`（如 Azure 的 `api_version`）。|
-| `models`            | 注册在提供商下的 AI 模型，包含输入/输出 Token 定价。|
+| `models`            | 注册在提供商下的 AI 模型，包含输入/输出 Token 定价，以及可选的最大输出 token（单个请求可要求的输出 token 上限）。|
 | `model_permissions` | 模型的访问控制规则，可按角色、团队或个人用户授权。|
 
 ### 006_init_mcp_servers —— MCP 服务器注册

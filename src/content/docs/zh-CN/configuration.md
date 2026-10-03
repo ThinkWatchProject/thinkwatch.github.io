@@ -493,8 +493,26 @@ openssl rand -base64 32
 | ---------------------------- | ------- | -------------------------------------------- |
 | `signature_drift_seconds`    | `300`   | 签名请求允许的最大时钟偏差                   |
 | `nonce_ttl_seconds`          | `300`   | 用于重放保护的 nonce 值 TTL                  |
-| `content_filter_patterns`    | `[]`    | 内容过滤模式（最多 500 个；严重级别枚举：`low`、`medium`、`high`、`critical`） |
-| `pii_patterns`               | `[]`    | PII 检测正则表达式模式（最多 100 个；每个最长 1000 字符；保存时验证） |
+| `security.redact`            | `{}`    | 出站脱敏的策略，见[请求防护](#请求防护) |
+| `security.inspect_tools`     | `{}`    | 工具调用审查的策略，见[请求防护](#请求防护) |
+| `security.content`           | `{}`    | 内容过滤的策略，见[请求防护](#请求防护) |
+
+#### 请求防护
+
+出站脱敏、工具调用审查和内容过滤各以一个 JSON 对象保存完整的策略，分别位于 `security.redact`、`security.inspect_tools` 和 `security.content`。对象的结构与 ThinkWatch Core 的 `config.yaml` 中 `security` 一节相同，各字段与全部内置规则见 [Core 配置手册](/zh-CN/docs/core/configuration#cfg-security)；`{}` 即出厂设置。
+
+- `mode` 为 `off`、`observe` 或 `enforce`。出厂为 `observe`：命中的内容记入审计日志，不做任何改动；`enforce` 在控制台中按作用命名，出站脱敏为「替换」，工具调用审查为「切断」，内容过滤为「处置」。
+- `enable` 和 `disable` 按 id 启用或停用内置规则，`actions` 改变内置规则在 `enforce` 下的处置，`custom` 保存部署自己的规则。
+
+```json
+{
+  "mode": "enforce",
+  "enable": ["email"],
+  "custom": [{ "name": "员工编号", "pattern": "EMP-\\d{6}", "label": "EMPLOYEE" }]
+}
+```
+
+控制台的「内容安全」页编辑这些对象。经 `PATCH /api/admin/settings` 写入时，一个键整体写入，写入前先校验：字段名拼错、内置规则 id 不存在、正则无法编译或码位写法有误时返回 `400`。写入 `security.redact` 需要 `pii_redactor:write` 权限，另外两个键需要 `content_filter:write`。`GET /api/admin/security` 列出每项防护的档位与全部规则，`POST /api/admin/security/{guard}/test` 用一段样本测试这些规则。从仍使用 `security.content_filter_patterns`、`security.pii_redactor_patterns`、`security.hidden_text` 和 `security.tool_inspection` 的版本升级时，这些设置在首次启动时转换为上述三个键。
 
 ### 预算
 

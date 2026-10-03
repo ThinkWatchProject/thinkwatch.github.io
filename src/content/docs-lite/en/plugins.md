@@ -25,14 +25,14 @@ A request is routed first, on what the client sent: the routing rules, a rule's 
 
 1. Keys in the request are replaced with placeholders.
 2. The request hooks in scope for this attempt run in list order, starting from the request as the client sent it. The placeholders are restored after them.
-3. If a plugin changed the request, the content filter and the hidden-character check look at it again and report only what the plugins added. A block refuses the whole request; it is not tried on another upstream.
+3. If a plugin changed the request, the content filter checks it again, hidden-character rules included, and reports only what the plugins added. A block refuses the whole request; it is not tried on another upstream.
 4. The request is converted to the upstream's format if needed, outbound redaction applies, and it is sent.
 
 When an attempt fails and the request moves to another upstream, the hooks run again from the request as the client sent it, so changes made for one upstream never reach another. A retry to the same upstream, such as the one after a sign-in token is refreshed, reuses what the hooks produced.
 
 A plugin that changes the model renames only what is sent to the upstream of this attempt, like a routing rule's rename, and replaces any name a rule set. The request is not routed again and the upstream's model list is not checked again, but the models the key may use still apply: a model outside them refuses the request.
 
-On the answer side, the hooks run after the answer is converted to the client's format and before the tool-call inspection and the output limit.
+On the answer side, the hooks run after the answer is converted to the client's format and before the tool-call inspection.
 
 ## Adding and editing a plugin
 
@@ -201,7 +201,7 @@ type InputsView = {
 - Messages and parts cannot be added, removed or reordered, because the answer comes back input by input.
 - `params` holds the model, and for completions also `max_tokens`, `temperature`, `top_p` and `stop`. Other fields, such as `suffix` and `dimensions`, are not shown and stay as they are.
 
-Everything else works as for conversations: the placeholders, a run for each attempt after routing, a changed model renaming what is sent to this upstream, recording and trial runs. A changed request is checked again by the content filter and the hidden-character check, on the text of its inputs. Answer hooks do not run on these requests: an embeddings answer carries no text, and a legacy completions answer is passed through as it is.
+Everything else works as for conversations: the placeholders, a run for each attempt after routing, a changed model renaming what is sent to this upstream, recording and trial runs. A changed request is checked again by the content filter, on the text of its inputs. Answer hooks do not run on these requests: an embeddings answer carries no text, and a legacy completions answer is passed through as it is.
 
 `messages` and `params` apply to all three kinds; `system`, `tools`, `reply.text` and `reply.tool_calls` apply to conversations only. A plugin does not load when `requests` is empty, names an unknown kind or names one twice, when a kind it declares is reached by none of its permissions (embeddings and completions need `messages` or `params`), or when it holds a permission that applies to none of its kinds, such as `system` without `conversation`.
 
@@ -265,7 +265,7 @@ Across the gateway, at most 32 answer-hook instances run at the same time. Each 
 - **A sandbox with nothing in it.** Plugins run in QuickJS compiled to WebAssembly and executed by Wasmtime inside core. Plugin code never runs in the app's window and never runs as native code. The sandbox has no network, files, environment variables or processes; even a flaw in the JavaScript engine reaches only the sandbox's own memory, not the keys and tokens in core's memory.
 - **Nothing is kept.** Every request-hook call runs in a new instance. For each answer, a plugin gets one instance, shared by its hooks for that answer and discarded when the answer ends. Plugins share nothing with each other.
 - **Placeholders instead of keys.** Keys that the outbound redaction rules recognize are replaced with placeholders before a plugin sees them and restored after it, on the request and on the answer, whatever mode the protection is in. The answer side matters as much as the request: answers become part of the conversation and are sent upstream again with the next request, so a plugin that could see a real key could hide it, encoded, in an answer.
-- **The protections still apply.** Request hooks run after routing, and a request they change is checked again by the content filter and the hidden-character check before outbound redaction; answer hooks run before the tool-call inspection and the output limit. Whatever a plugin writes is checked like anything else, and plugins cannot change where a request is routed or switch to a model the key may not use.
+- **The protections still apply.** Request hooks run after routing, and a request they change is checked again by the content filter before outbound redaction; answer hooks run before the tool-call inspection. Whatever a plugin writes is checked like anything else, and plugins cannot change where a request is routed or switch to a model the key may not use.
 - **Approved code only.** A plugin runs only while its file matches the approved SHA-256 hash, and a save in the app updates the file and the hash together. Installing a plugin that may change tool calls, turning it on, changing its code and approving a change to its file are confirmed in a system dialog outside the page, as described in [Confirmation in a system dialog](#confirmation-in-a-system-dialog).
 - **Every change is visible.** Each run is recorded on the request, a changed request is stored as it was sent to the upstream that answered (with keys replaced, like every stored request), and requests changed by plugins are marked on the Traffic page.
 - **Bounded.** Every call has limits on CPU time, memory, output and log volume, and the number of answer instances alive at once is capped. Plugins run in a separate thread pool, so a slow plugin does not hold up the gateway's own work.

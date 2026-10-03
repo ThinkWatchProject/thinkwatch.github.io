@@ -150,13 +150,14 @@ means.
 | `proxies` | list of [`proxies[]`](#cfg-proxies) | `[]` | Outbound proxies, declared once and referred to by name from `providers[].proxy`. |
 | `pricing` | object, [`pricing`](#cfg-pricing) | — | Refreshing the default price table, and price sheets of your own. |
 | `client_probes` | object, [`client_probes`](#cfg-client_probes) | — | What happens to the helper requests clients send on their own (health checks, warm-ups, titles). |
-| `security` | object, [`security`](#cfg-security) | — | The five guards. All of them start in `observe` or `off`, so out of the box nothing is changed or blocked. |
+| `security` | object, [`security`](#cfg-security) | — | The three guards. All of them start in `observe`, so out of the box nothing is changed or refused. |
 | `retention` | object, [`retention`](#cfg-retention) | — | How long request logs are kept. |
 | `failover` | object, [`failover`](#cfg-failover) | — | How long an upstream is set aside after it fails, and how long the start of a stream is awaited. |
 | `groups` | list of [`groups[]`](#cfg-groups) | `[]` | Strategy groups: several upstreams behind one name, with a way to pick among them. |
 | `routes` | list of [`routes[]`](#cfg-routes) | `[]` | Routes. Without any, requests fail over across all upstreams in the order they are declared. |
 | `default_route` | string | — | The route for keys that do not name one. Unset: the route named `default`, or the built-in failover when there is none. |
 | `default_key` | string | — | The gateway key for clients that were not given a key of their own. Unset: the key named `default`, or the first key. It cannot be disabled. |
+| `plugins` | list of [`plugins[]`](#cfg-plugins) | `[]` | Script plugins, in the order they run. The app installs them; each one's code and settings are a file next to this one. |
 <!-- /generated -->
 
 ### `listen`
@@ -574,27 +575,29 @@ answered locally (`intercept`, nothing is sent upstream), passed through
 
 ### `security`
 
-Five guards, applied to every upstream alike. Each has a `mode`: `off`,
-`observe` (detect and record, change nothing) or `enforce` (act). They start
-in `observe`, except the output limit, which starts `off`. What `enforce`
-does differs per guard, and each says so below.
+Three guards, applied to every upstream alike. Each has a `mode`: `off`,
+`observe` (detect and record, change nothing) or `enforce` (act). All three
+start in `observe`. What `enforce` does differs per guard: redaction replaces,
+tool-call inspection cuts the response off, and the content filter does what
+each rule says (refuse, delete or record).
 
 <!-- generated: table security -->
 <a id="cfg-security"></a>
 
 | Field | Type | Default | Description |
 |---|---|---|---|
-| `redact` | object, [`security.redact`](#cfg-security-redact) | — | Outbound redaction: credentials found in a request are replaced before it leaves. |
+| `redact` | object, [`security.redact`](#cfg-security-redact) | — | Outbound redaction: credentials and personal information anywhere in a request are replaced before it leaves. |
 | `inspect_tools` | object, [`security.inspect_tools`](#cfg-security-inspect_tools) | — | Tool-call inspection: dangerous commands in the tool calls a model returns cut the response off. |
-| `hidden_text` | object, [`security.hidden_text`](#cfg-security-hidden_text) | — | Hidden characters that people cannot see and models can read refuse the request. |
-| `content` | object, [`security.content`](#cfg-security-content) | — | Content filter: words or patterns in what the caller sends refuse the request. |
-| `output_limit` | object, [`security.output_limit`](#cfg-security-output_limit) | — | Output length: a response longer than the limit is cut off. |
+| `content` | object, [`security.content`](#cfg-security-content) | — | Content filter: words, patterns or characters (hidden ones among them) in what the caller sends; each rule refuses the request, deletes what it matched, or only records it. |
 <!-- /generated -->
 
 #### `security.redact`
 
-Before a request leaves, credentials in it are looked for. Under `enforce`
-they are replaced.
+Before a request leaves, the whole request (system prompt, earlier answers
+and tool calls included) is searched for credentials and personal
+information. Under `enforce` what is found is replaced with placeholders, and
+put back where the answer repeats them. Images, files and other base64
+payloads are not searched.
 
 <!-- generated: table security.redact -->
 <a id="cfg-security-redact"></a>
@@ -604,7 +607,7 @@ they are replaced.
 | `mode` | `off` \| `observe` \| `enforce` | `observe` | `off` does nothing; `observe` detects and records only, and changes nothing; `enforce` detects and acts. |
 | `enable` | list of strings | `[]` | Built-in rules to switch on that are off out of the box, by id. |
 | `disable` | list of strings | `[]` | Built-in rules to switch off, by id. |
-| `custom` | list of [`security.redact.custom[]`](#cfg-security-redact-custom) | `[]` | Rules of your own: whatever a pattern matches is treated as a credential. |
+| `custom` | list of [`security.redact.custom[]`](#cfg-security-redact-custom) | `[]` | Rules of your own: whatever a pattern matches is replaced like a credential. |
 <!-- /generated -->
 
 <!-- generated: table security.redact.custom[] -->
@@ -614,6 +617,7 @@ they are replaced.
 |---|---|---|---|
 | `name` | string | **required** | Name shown in logs and in the app; it identifies the rule and has to be unique within this guard. |
 | `pattern` | string | **required** | Regular expression. |
+| `label` | string | `SECRET` | Placeholder name: what the pattern matches is replaced with `<<TW_label_1>>`, numbered per name. Capital letters, digits and underscores, starting with a letter, at most 24 characters. |
 | `disabled` | bool | `false` | Switches the rule off and keeps it in the file. |
 <!-- /generated -->
 
@@ -646,9 +650,49 @@ Built-in rules:
 | `private-key` | Private key | on |
 | `jwt` | JWT | on |
 | `conn-string-password` | Connection string password | on |
+| `cn-resident-id` | Chinese resident ID number | on |
+| `bank-card` | Bank card number | on |
+| `email` | Email address | off |
+| `cn-mobile-phone` | Chinese mainland mobile number | off |
 | `internal-ip` | Internal IP address | off |
 | `internal-domain` | Internal domain | off |
 <!-- /generated -->
+
+`cn-resident-id`, `bank-card`, `email` and `cn-mobile-phone` look for
+personal information rather than credentials. The first two are on out of the
+box and match only what checks out by structure:
+
+- `cn-resident-id`: an 18-character resident ID number of the People's
+  Republic of China whose first two digits are a province-level code, whose
+  date of birth is a real date between 1900-01-01 and today, and whose last
+  character is the right check character (ISO 7064 MOD 11-2). The old
+  15-digit numbers are not matched.
+- `bank-card`: a card number whose prefix and length belong to UnionPay,
+  Visa, Mastercard, American Express, JCB, Discover or Diners Club and which
+  passes the Luhn check, written as one run of digits or in groups of four
+  separated by single spaces or single hyphens (American Express also 4-6-5,
+  Diners Club also 4-6-4). The test card numbers published by Stripe,
+  Braintree and Adyen are not matched.
+
+`email` and `cn-mobile-phone` are off out of the box: they have no structure
+to check, and code and documents are full of things that look like them.
+
+- `email`: an address whose domain has at least two parts, the last of them
+  two or more letters. User names in URLs (`https://user@host`) and file
+  names such as `icon@2x.png` are not matched.
+- `cn-mobile-phone`: a Chinese mainland mobile number, 11 digits starting
+  with `1` and a second digit from `3` to `9`, not part of a longer run of
+  digits.
+
+A number that is part of a longer run of letters or digits is not matched,
+and neither is one written as a JSON number in the request body (in a tool
+call's arguments, for instance), since replacing it would leave the body
+invalid JSON. The placeholders of these rules say what was there
+(`<<TW_ID_NUMBER_1>>`, `<<TW_CARD_NUMBER_1>>`, `<<TW_EMAIL_1>>`,
+`<<TW_PHONE_1>>`), and the security log shows only the last four characters
+of a number, and the first character and the domain of an email address. A
+custom rule replaces with `<<TW_SECRET_1>>` unless it names its own
+placeholder (`label`).
 
 #### `security.inspect_tools`
 
@@ -690,37 +734,23 @@ Built-in rules:
 | `exfil-credentials` | Send out a credential file | `cut` |
 | `exfil-credentials-reversed` | Send out a credential file (verb first) | `cut` |
 | `ssh-key-read` | Read a private key or cloud credential | `cut` |
+| `secret-to-unknown-host` | Send a credential to an unknown host | `cut` |
 | `write-startup-item` | Write a startup item | `cut` |
 | `crontab-install` | Install a scheduled job | `cut` |
 | `rm-rf-root` | Delete home or root | `record` |
 | `chmod-777` | World-writable permissions | `record` |
-<!-- /generated -->
-
-#### `security.hidden_text`
-
-Characters people cannot see and models can read, in what the caller sends
-(tool results included). Under `enforce`, the request is refused.
-
-<!-- generated: table security.hidden_text -->
-<a id="cfg-security-hidden_text"></a>
-
-| Field | Type | Default | Description |
-|---|---|---|---|
-| `mode` | `off` \| `observe` \| `enforce` | `observe` | `off` does nothing; `observe` detects and records only, and changes nothing; `enforce` detects and acts. |
-| `disable` | list of strings | `[]` | Kinds not to look for: `tag`, `bidi`. |
-<!-- /generated -->
-
-<!-- generated: rules hidden_text -->
-| Kind | What it is |
-|---|---|
-| `tag` | Unicode tag characters (U+E0000 to U+E007F): invisible everywhere, read by the model, able to carry a whole instruction. |
-| `bidi` | Bidirectional control characters: make the order shown differ from the order the model reads. |
+| `upload-file-to-host` | Upload a local file to an external host | `record` |
 <!-- /generated -->
 
 #### `security.content`
 
-Words or patterns in what the caller sends. Under `enforce`, a match with
-rules set to `block` refuses the request.
+Words, patterns or characters in what the caller sends: user messages and
+the tool results in them, not the system prompt or the model's own turns.
+Each rule matches a keyword (`contains`), a regular expression (`regex`) or
+code points (`codepoints`), and says what happens under `enforce`: `block`
+refuses the request, `strip` deletes every match from the caller's text and
+sends the rest, `record` only records it. After deleting, the text is checked
+again, so a keyword split by hidden characters is caught once they are gone.
 
 <!-- generated: table security.content -->
 <a id="cfg-security-content"></a>
@@ -730,7 +760,7 @@ rules set to `block` refuses the request.
 | `mode` | `off` \| `observe` \| `enforce` | `observe` | `off` does nothing; `observe` detects and records only, and changes nothing; `enforce` detects and acts. |
 | `enable` | list of strings | `[]` | Built-in rules to switch on that are off out of the box, by id. |
 | `disable` | list of strings | `[]` | Built-in rules to switch off, by id. |
-| `actions` | map of built-in rule id → `block` \| `record` | `{}` | What a built-in rule does under `enforce`, written only where it differs from the factory setting. |
+| `actions` | map of built-in rule id → `block` \| `strip` \| `record` | `{}` | What a built-in rule does under `enforce`, written only where it differs from the factory setting. |
 | `custom` | list of [`security.content.custom[]`](#cfg-security-content-custom) | `[]` | Rules of your own. |
 <!-- /generated -->
 
@@ -740,9 +770,9 @@ rules set to `block` refuses the request.
 | Field | Type | Default | Description |
 |---|---|---|---|
 | `name` | string | **required** | Name shown in logs and in the app; it identifies the rule and has to be unique within this guard. |
-| `pattern` | string | **required** | A keyword, or a regular expression with `match: regex`. Case-insensitive either way. |
-| `match` | `contains` \| `regex` | `contains` | `contains`: the text contains `pattern`. `regex`: `pattern` is a regular expression. |
-| `action` | `block` \| `record` | `record` | Under `enforce`: `block` the request, or only `record` the match. |
+| `pattern` | string | **required** | A keyword; a regular expression with `match: regex`; code points with `match: codepoints` (`U+200B, U+E0000–U+E007F`). Keywords and regular expressions are case-insensitive. |
+| `match` | `contains` \| `regex` \| `codepoints` | `contains` | `contains`: the text contains `pattern`. `regex`: `pattern` is a regular expression. `codepoints`: the text has a character among the code points or ranges listed in `pattern`, separated by commas. |
+| `action` | `block` \| `strip` \| `record` | `record` | Under `enforce`: `block` the request, `strip` what matched and send the rest, or only `record` the match. |
 | `disabled` | bool | `false` | Switches the rule off and keeps it in the file. |
 <!-- /generated -->
 
@@ -751,6 +781,10 @@ Built-in rules:
 <!-- generated: rules content -->
 | id | Name | Group | Out of the box | Under `enforce`, out of the box |
 |---|---|---|---|---|
+| `unicode-tags` | Unicode tag characters | invisible | on | `strip` |
+| `bidi-controls` | Bidirectional controls | invisible | on | `strip` |
+| `zero-width` | Zero-width characters | invisible | off | `strip` |
+| `private-use` | Private-use characters | invisible | off | `strip` |
 | `ignore-previous-instructions` | Ignore previous instructions | injection | on | `block` |
 | `ignore-all-previous` | Ignore all previous | injection | on | `block` |
 | `disregard-your-instructions` | Disregard your instructions | injection | on | `block` |
@@ -775,16 +809,12 @@ Built-in rules:
 | `zh-jailbreak` | Jailbreak (Chinese) | chinese | off | `block` |
 <!-- /generated -->
 
-#### `security.output_limit`
-
-<!-- generated: table security.output_limit -->
-<a id="cfg-security-output_limit"></a>
-
-| Field | Type | Default | Description |
-|---|---|---|---|
-| `mode` | `off` \| `observe` \| `enforce` | `off` | Off out of the box: no single limit suits every use. `observe` records long responses; `enforce` stops the stream at the limit. |
-| `max_chars` | integer | `100000` | Limit in characters (Unicode scalar values), from 1 to 1000000. |
-<!-- /generated -->
+The `invisible` group matches characters people cannot see and models can
+read. Unicode tag characters (U+E0000–U+E007F) and bidirectional controls
+(U+202A–U+202E, U+2066–U+2069) are on out of the box; zero-width characters
+(U+200B–U+200D, U+2060, U+FEFF) and private-use characters (U+E000–U+F8FF,
+U+F0000–U+FFFFD, U+100000–U+10FFFD) are off, since emoji, Persian and icon
+fonts use them too. All four delete what they match under `enforce`.
 
 ```yaml
 security:
@@ -794,11 +824,16 @@ security:
     custom:
       - name: employee-id
         pattern: 'EMP-\d{6}'
+        label: EMPLOYEE
   inspect_tools:
     mode: enforce
-  output_limit:
+  content:
     mode: enforce
-    max_chars: 200000
+    enable: [zero-width]
+    custom:
+      - name: project-x
+        pattern: project-x
+        action: strip
 ```
 
 ### `retention`
@@ -807,6 +842,13 @@ Two limits, because the two kinds of data differ in size by three orders
 of magnitude: request bodies are tens of kilobytes each, a request's record
 a few hundred bytes. The byte limit covers bursts.
 
+Each request and response body is kept up to 4 MiB; of a longer one, the
+beginning is kept. Bodies are written with credentials and personal numbers
+already taken out. A request stored under `enforce` carries the placeholders
+the upstream received; anything else the redaction rules
+([`security.redact`](#cfg-security-redact)) recognize is masked, in every
+mode, `off` included.
+
 <!-- generated: table retention -->
 <a id="cfg-retention"></a>
 
@@ -814,7 +856,7 @@ a few hundred bytes. The byte limit covers bursts.
 |---|---|---|---|
 | `body_days` | integer | `7` | Days to keep request and response bodies. |
 | `row_days` | integer | `90` | Days to keep the record of each request (time, model, usage, cost). |
-| `body_max_bytes` | integer | `2147483648` | Upper bound on the bytes bodies may take; beyond it the oldest days go first. The default is 2 GiB. |
+| `body_max_bytes` | integer | `5368709120` | Upper bound on the bytes bodies may take; beyond it the oldest days go first. The default is 5 GiB. |
 <!-- /generated -->
 
 ### `failover`
@@ -961,6 +1003,93 @@ routes:
       - name: everything else
         to: fast
 default_route: default
+```
+
+### `plugins`
+
+Script plugins change requests before they reach an upstream and answers
+before they reach the client. They run in a sandbox inside core, without
+access to files, the network or the real values of secrets. The app installs
+them: each plugin's code goes to `plugins/<id>.js` next to this file, a copy
+of the approved code to `plugins/.approved/<id>.js`, and the code's SHA-256
+to `sha256`.
+
+A plugin's file holds its settings too. The `manifest` at the top of the file
+says what to do when the plugin fails (`on_error`), which requests it handles
+(`match`) and the value of each setting (`settings.<name>.value`). When the
+app changes one of these, it rewrites only the manifest in the file and
+updates `sha256` along with it. This list keeps just the plugin, its approved
+hash and whether it is on. Entries written by core 0.58 also have `on_error`,
+`scope` and `settings`: they are ignored, and removed the next time the app
+changes a plugin.
+
+A plugin runs only while its file has exactly the approved hash. When the
+file changes on disk or disappears, the plugin stops within seconds and the
+app shows the change for review. Until the change is approved, the requests
+the plugin covers are refused (`on_error: "reject"`, the default) or pass
+without it (`on_error: "skip"`), as the approved file says. A plugin that does
+not load is handled the same way. Neither keeps the rest of the configuration
+from taking effect.
+
+Plugins run in the order of this list.
+
+In `match`, `clients`, `models` and `upstreams` are lists of names or
+patterns with `*` anywhere in them, matched regardless of case; a list that
+is empty or left out matches everything. `clients` names the client app
+(`claude-code`, `codex`, …), and a request whose app is not recognised
+matches only an empty list. `models` matches the model sent to the upstream:
+when a routing rule renames the model, the new name is the one that matches.
+`upstreams` applies to requests and answers alike.
+
+A plugin changes a request after routing, each time the request is sent to an
+upstream. A request that fails over to another upstream starts again from what
+the client sent, and the plugin sees which upstream and which model name the
+request goes to. Routing, model checks and session grouping use what the
+client sent. A plugin that changes the model name only renames what is sent to
+that upstream: the request is not routed again, and the new name must still be
+one of the models the key may use ([`clients[].allow`](#cfg-clients)), or the
+request is not sent.
+
+A plugin handles the kinds of request its code declares: conversations
+(Anthropic Messages, OpenAI Chat Completions and Responses, and Gemini,
+including their token counts and compaction), embeddings (`/v1/embeddings`,
+Gemini `:embedContent` and `:batchEmbedContents`) and legacy completions
+(`/v1/completions`). A plugin that declares none handles conversations only.
+Requests of a kind a plugin does not handle pass without it, whatever its
+`on_error`. Other endpoints, such as images and audio, pass without any plugin.
+
+<!-- generated: table plugins[] -->
+<a id="cfg-plugins"></a>
+
+| Field | Type | Default | Description |
+|---|---|---|---|
+| `id` | string | **required** | Lowercase letters, digits and hyphens, 1 to 40 characters; unique. `order`, `inspect`, `rewrite` and `confirmed` are taken by the control plane. |
+| `file` | string | **required** | The plugin's code, relative to this file's directory. It is always `plugins/<id>.js`; the app writes it. |
+| `sha256` | string | **required** | SHA-256 of the approved code, 64 lowercase hexadecimal characters. When the file no longer has this hash, the plugin stops running until the change is approved in the app. The approved code is kept in `plugins/.approved/<id>.js`. |
+| `enabled` | bool | `true` | Run the plugin. `false` keeps it installed and out of every request. |
+<!-- /generated -->
+
+```yaml
+plugins:
+  - id: add-date
+    file: plugins/add-date.js
+    sha256: 9f2b6c0e4a1d8f3b7c5e2a9d6f1b4c8e3a7d0f5b2c9e6a1d4f8b3c7e0a5d2f9b
+    enabled: true
+```
+
+The start of `plugins/add-date.js`:
+
+```js
+export const manifest = {
+  name: "Add date",
+  api: 1,
+  permissions: ["system"],
+  match: { clients: ["claude-code"], models: ["claude-*"], upstreams: [] },
+  on_error: "reject",
+  settings: {
+    note: { type: "string", label: "Note", value: "Answer in English." },
+  },
+};
 ```
 
 ## Environment variables
