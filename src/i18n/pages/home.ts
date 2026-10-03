@@ -87,6 +87,7 @@ export const homeCopy = {
         { t: "Protection against relays", b: "Credentials can be replaced before a request leaves, so a relay never holds them, and dangerous tool calls a relay slips into an answer can be cut off before the client runs them. MCP servers, skills and hooks are scanned as well." },
         { t: "Every request traceable", b: "The matched rule, each upstream attempt and the cost of every request, with replay against another upstream." },
         { t: "Costs stated as they are", b: "Estimated amounts are marked, and requests without a price are counted separately rather than as zero." },
+        { t: "Plugins that adapt requests and answers", b: "Short JavaScript plugins adjust requests and answers, such as asking for answers in a chosen language. They run in a sandbox, see placeholders instead of keys, and every change they make is recorded." },
       ],
       pills: ["Available", "macOS (Apple silicon)", "Windows (x64, ARM64)", "Linux (x86_64, aarch64)"],
       shotAlt:
@@ -214,6 +215,7 @@ export const homeCopy = {
         { t: "防范中转站", b: "请求发出前可替换其中的凭据，中转站拿不到原值；中转站在回答中塞入的危险工具调用，可在客户端执行前切断。MCP 服务器、技能与钩子也会被扫描。" },
         { t: "每个请求都可追溯", b: "每个请求命中的规则、尝试过的上游与费用都有记录，也可以重放到另一个上游对比。" },
         { t: "费用如实计算", b: "估算的金额单独标注，无法计价的请求单独计数，不按零计入。" },
+        { t: "插件改写请求与回答", b: "简短的 JavaScript 插件可以调整请求与回答，例如要求用指定的语言回答。插件在沙箱中运行，看到的是占位符而不是密钥，每一处改动都有记录。" },
       ],
       pills: ["已发布", "macOS（Apple silicon）", "Windows（x64、ARM64）", "Linux（x86_64、aarch64）"],
       shotAlt:
