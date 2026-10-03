@@ -7,7 +7,7 @@ ThinkWatch Enterprise is a self-hosted AI API and MCP gateway for organizations.
 ## Highlights
 
 - **MCP tool calls run as the real user.** Each user connects their own GitHub, Notion, Linear, Slack or Atlassian account, so the upstream's own audit log shows who acted. Each tool can be granted per role and per API key.
-- **Security guards on every request.** Personal information is replaced with placeholders before a request goes upstream and restored in the answer. Tool calls in model responses are checked against rules for dangerous commands, and hidden Unicode characters and prompt-injection phrases in requests are logged or refused.
+- **Security guards on every request.** Credentials and personal information can be replaced with placeholders before a request goes upstream and restored in the answer, and a dangerous tool call in a model response can be cut off before the client runs it. A content filter can refuse prompt injection or delete hidden characters from what the caller sends; every guard ships in observe mode, which only records.
 - **Identity from the organization's directory.** Sign-in works through any OIDC provider, with optional TOTP. Five built-in roles and custom roles decide who may use which models, tools and admin pages.
 - **One key for AI and MCP.** `tw-` virtual keys can be scoped to the AI gateway, the MCP gateway or both. Keys are stored only as hashes and rotate with a grace period.
 - **Rate limits and budgets.** Sliding windows from one minute to one week limit requests or tokens, and daily, weekly or monthly budgets cap spending. Both attach to users, API keys or roles.

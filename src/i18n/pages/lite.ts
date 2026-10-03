@@ -1,8 +1,8 @@
 // Copy for the /lite product page.
 //
 // Product claims are checked against the code, not against other copy: the
-// five protections and their initial modes against ThinkWatch Core
-// (crates/tw-config/src/security.rs), which notices become system
+// three protections and their initial modes against ThinkWatch Core
+// (crates/tw-guard/src/policy.rs), which notices become system
 // notifications against the app (src-tauri/src/notices/rules.rs), and what
 // changes while the app is connected to a remote core against src/connection.
 //
@@ -122,7 +122,7 @@ export const liteCopy = {
         {
           id: "security",
           title: "Protection against relays: keys replaced, malicious tool calls cut off",
-          body: "A relay sees every request in full and can rewrite every answer. Outbound redaction swaps API keys, private keys, JWTs, connection-string passwords, Chinese resident ID numbers and bank card numbers for placeholders before a request leaves and restores them in the response, so the relay never holds the real values. When an answer carries a tool call that downloads and runs code, sends out environment variables or credential files, reads private keys or installs a startup item or scheduled job, tool-call inspection cuts the answer off before the client can run it; hidden characters and prompt injection can be refused as well. The five protections start in Observe, recording without changing anything, and each switches to Enforce on its own.",
+          body: "API keys, private keys, connection-string passwords, ID numbers and bank card numbers can be replaced with placeholders before a request leaves, so a relay never holds the real values, and an answer whose tool call downloads and runs code or sends out credentials can be cut off before the client runs it. Hidden characters that smuggle in instructions can be deleted and prompt injection refused; the three protections start in Observe, recording without changing anything, and each switches to Replace, Cut off or Enforce on its own.",
           alt: "The Security page log: credentials replaced before a request left, one of them matched by a custom rule; a download-and-run tool call cut off; and hidden characters, a delete command and an injected instruction recorded, each with the key, client, model and upstream of its request",
         },
         {
@@ -209,7 +209,7 @@ export const liteCopy = {
       intro: "Lite holds no routing, forwarding or accounting logic. All of it is in ThinkWatch Core, which runs beside the app or on a Linux server.",
       nodes: [
         { role: "Desktop app", title: "ThinkWatch Lite", items: ["Main window, menu bar and tray", "Starts and supervises the local core", "Or connects to a core on a server"] },
-        { role: "Gateway", title: "ThinkWatch Core", items: ["Routing, failover and format conversion", "Cost accounting and request records", "The five security protections"] },
+        { role: "Gateway", title: "ThinkWatch Core", items: ["Routing, failover and format conversion", "Cost accounting and request records", "The three security protections"] },
         { role: "Upstreams", title: "Model services", items: ["Anthropic, OpenAI and Gemini APIs", "Amazon Bedrock and signed-in accounts", "Relays and local models"] },
       ],
       links: ["Encrypted control channel", "Forwards requests"],
@@ -356,8 +356,8 @@ export const liteCopy = {
         },
         {
           id: "security",
-          title: "防范中转站：替换密钥，拦截恶意工具调用",
-          body: "中转站能看到请求的全部内容，也能改写每一次回答。出站脱敏在请求发出前把 API 密钥、私钥、JWT、连接串口令、身份证号与银行卡号换成占位符，并在响应中还原，中转站拿不到原值。回答中若出现下载即执行、外发环境变量或凭据文件、读取私钥、写入开机启动项或定时任务之类的工具调用，工具调用审查会在客户端执行之前切断回答；隐藏字符与提示注入也可以直接拒绝。五项防护出厂只记录、不改动请求，逐项切换到拦截即可生效。",
+          title: "防范中转站：替换密钥，切断恶意工具调用",
+          body: "API 密钥、私钥、连接串口令、身份证号与银行卡号可在请求发出前换成占位符，中转站拿不到原值；回答中的工具调用若是下载即执行或外发凭据，可在客户端执行之前切断。夹带指令的隐藏字符可以删除，提示注入可以拒绝；三项防护出厂只记录、不改动请求，可逐项切换到「替换」「切断」或「处置」。",
           alt: "安全页日志：请求发出前替换的凭据（其中一条由自定义规则命中）、被切断的下载即执行工具调用，以及记录在案的隐藏字符、删除命令与注入指令，每条都注明所属请求的密钥、客户端、模型与上游",
         },
         {
@@ -444,7 +444,7 @@ export const liteCopy = {
       intro: "Lite 不含路由、转发与计费逻辑，这些都在 ThinkWatch Core 中；core 随应用在本机运行，也可以部署在 Linux 服务器上。",
       nodes: [
         { role: "桌面应用", title: "ThinkWatch Lite", items: ["主窗口、菜单栏与托盘", "启动并守护本机的 core", "或连接服务器上的 core"] },
-        { role: "网关", title: "ThinkWatch Core", items: ["路由、故障转移与格式转换", "费用核算与请求记录", "五项安全防护"] },
+        { role: "网关", title: "ThinkWatch Core", items: ["路由、故障转移与格式转换", "费用核算与请求记录", "三项安全防护"] },
         { role: "上游", title: "模型服务", items: ["Anthropic、OpenAI、Gemini API", "Amazon Bedrock 与登录的账号", "中转服务与本机模型"] },
       ],
       links: ["加密控制通道", "转发请求"],

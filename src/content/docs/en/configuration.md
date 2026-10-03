@@ -493,8 +493,26 @@ Changes to dynamic settings take effect immediately without requiring a server r
 | ---------------------------- | ------- | ---------------------------------------------------- |
 | `signature_drift_seconds`    | `300`   | Maximum allowed clock drift for signed requests      |
 | `nonce_ttl_seconds`          | `300`   | TTL for nonce values used in replay protection       |
-| `content_filter_patterns`    | `[]`    | Content filter patterns (max 500; severity enum: `low`, `medium`, `high`, `critical`) |
-| `pii_patterns`               | `[]`    | PII detection regex patterns (max 100; max 1000 chars each; validated at save time) |
+| `security.redact`            | `{}`    | Outbound redaction policy, see [Request guards](#request-guards) |
+| `security.inspect_tools`     | `{}`    | Tool-call inspection policy, see [Request guards](#request-guards) |
+| `security.content`           | `{}`    | Content filter policy, see [Request guards](#request-guards) |
+
+#### Request guards
+
+Outbound redaction, tool-call inspection and the content filter each keep their whole policy as one JSON object under `security.redact`, `security.inspect_tools` and `security.content`. The object has the shape of the `security` section of ThinkWatch Core's `config.yaml`, which the [Core configuration reference](/docs/core/configuration#cfg-security) describes field by field, built-in rules included; `{}` is the factory setting.
+
+- `mode` is `off`, `observe` or `enforce`. `observe`, the factory mode, records matches in the audit log and changes nothing; the console calls `enforce` Replace for outbound redaction, Cut off for tool-call inspection and Enforce for the content filter.
+- `enable` and `disable` switch built-in rules on and off by id, `actions` changes what a built-in rule does under `enforce`, and `custom` holds rules of the deployment's own.
+
+```json
+{
+  "mode": "enforce",
+  "enable": ["email"],
+  "custom": [{ "name": "Employee ID", "pattern": "EMP-\\d{6}", "label": "EMPLOYEE" }]
+}
+```
+
+The Content Security page of the console edits these objects. Through `PATCH /api/admin/settings` a key is written whole and checked first: a misspelt field, an unknown built-in rule, a pattern that does not compile or a malformed code point is refused with `400`. Writing `security.redact` takes the `pii_redactor:write` permission, and the other two keys take `content_filter:write`. `GET /api/admin/security` lists each guard's mode and every rule, and `POST /api/admin/security/{guard}/test` tries a sample against them. A deployment upgraded from a version that kept `security.content_filter_patterns`, `security.pii_redactor_patterns`, `security.hidden_text` and `security.tool_inspection` has them converted into these keys at its first start.
 
 ### Budget
 

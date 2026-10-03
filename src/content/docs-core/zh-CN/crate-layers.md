@@ -15,7 +15,7 @@ tw-gateway · tw-control                                              ← 数据
 | 分组 | crate | 作用 |
 | --- | --- | --- |
 | 与 ThinkWatch 企业版共用 | `tw-dialect` | 请求、响应与流在 Anthropic Messages、OpenAI Chat Completions、OpenAI Responses 与 Gemini 之间的转换；用量解析 |
-| | `tw-guard` | 出站脱敏与还原、上游返回的工具调用审查、隐藏字符、内容过滤与输出长度限制 |
+| | `tw-guard` | 出站脱敏与还原、上游返回的工具调用审查与内容过滤，以及这三项防护的设置、内置规则、校验、规则列表与测试 |
 | | `tw-breaker` | 熔断器状态机 |
 | | `tw-bedrock` | Amazon Bedrock 的线上协议：SigV4 签名、事件流拆帧、接口地址与模型目录 |
 | 领域逻辑 | `tw-types` | 面向用户的消息：稳定的消息码、参数与英文句子 |
@@ -34,7 +34,7 @@ tw-gateway · tw-control                                              ← 数据
 
 ## 与 ThinkWatch 企业版共用
 
-ThinkWatch 企业版只依赖第一组：格式转换与用量解析（`tw-dialect`）、各项防护（`tw-guard`）、熔断器（`tw-breaker`）与 Amazon Bedrock 的线上协议（`tw-bedrock`）。这四个 crate 只依赖彼此，`tw-dialect` 中的一项测试保证这一点；每次改动它们，CI 都会用 ThinkWatch 企业版编译一遍。只有一个产品使用的组件放在该产品自己的仓库中，不留在 Core。
+ThinkWatch 企业版只依赖第一组：格式转换与用量解析（`tw-dialect`）、各项防护及其规则（`tw-guard`）、熔断器（`tw-breaker`）与 Amazon Bedrock 的线上协议（`tw-bedrock`）。这四个 crate 只依赖彼此，`tw-dialect` 中的一项测试保证这一点；每次改动它们，CI 都会用 ThinkWatch 企业版编译一遍。只有一个产品使用的组件放在该产品自己的仓库中，不留在 Core。
 
 ## ThinkWatch Lite 使用的部分
 
