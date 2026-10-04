@@ -12,7 +12,7 @@ export const coreCopy = {
     meta: {
       title: "ThinkWatch Core — AI API gateway engine in Rust",
       description:
-        "Rust crates and the twcore binary for an AI API gateway: rule-based routing, failover before the first byte, cost accounting, outbound secret redaction and tool-call inspection. Runs inside ThinkWatch Lite or as a standalone gateway on a Linux server. MIT License.",
+        "Rust crates and the twcore binary for an AI API gateway: routing rules, failover, cost accounting and key redaction, in ThinkWatch Lite or on a server.",
       twcoreDescription:
         "Self-contained AI API gateway binary: the local engine of ThinkWatch Lite, or a standalone gateway run by systemd on a Linux server.",
     },
@@ -137,7 +137,7 @@ export const coreCopy = {
     meta: {
       title: "ThinkWatch Core — 以 Rust 编写的 AI API 网关引擎",
       description:
-        "一组 Rust crate 与 twcore 二进制，提供 AI API 网关的规则路由、首字节前的故障转移、费用核算、出站密钥脱敏与工具调用审查；随 ThinkWatch Lite 运行，也可作为独立网关部署在 Linux 服务器上。采用 MIT 许可证。",
+        "AI API 网关的 Rust crate 与 twcore：规则路由、故障转移、费用核算与密钥脱敏，用于 ThinkWatch Lite 或服务器。",
       twcoreDescription: "独立运行的 AI API 网关二进制：ThinkWatch Lite 的本地引擎，也可由 systemd 在 Linux 服务器上作为独立网关运行。",
     },
     hero: {
