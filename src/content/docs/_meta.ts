@@ -10,10 +10,11 @@ import { localePath, type Lang } from "~/i18n";
 
 export type ProductId = "thinkwatch" | "lite" | "core";
 
-export type GroupId = "getStarted" | "concepts" | "reference" | "operations" | "contributing";
+export type GroupId = "getStarted" | "guides" | "concepts" | "reference" | "operations" | "contributing";
 
 export const groupLabels: Record<GroupId, Record<Lang, string>> = {
   getStarted: { en: "Get started", "zh-CN": "入门" },
+  guides: { en: "Guides", "zh-CN": "教程" },
   concepts: { en: "Concepts", "zh-CN": "概念" },
   reference: { en: "Reference", "zh-CN": "参考" },
   operations: { en: "Operations", "zh-CN": "运维" },
@@ -31,6 +32,12 @@ export type DocMeta = {
   group: GroupId;
   /** Optional one-liner shown on docs home pages */
   summary?: Record<Lang, string>;
+  /**
+   * The page's own title, for the browser tab and search results, when the
+   * sidebar label is a shortened form of it (the guides: their titles are the
+   * questions people search for, too long for the sidebar)
+   */
+  title?: Record<Lang, string>;
 };
 
 export type Product = {
@@ -184,6 +191,105 @@ export const products: Product[] = [
         summary: {
           en: "Run a development build with pnpm tauri dev, or build a macOS bundle, a Windows installer or a Linux AppImage.",
           "zh-CN": "用 pnpm tauri dev 运行开发版本，或打包 macOS 应用、Windows 安装程序与 Linux AppImage。",
+        },
+      },
+      {
+        slug: "claude-code-other-models",
+        label: { en: "Claude Code with other models", "zh-CN": "Claude Code 接国产模型" },
+        title: { en: "Use Claude Code with GLM, DeepSeek or Kimi", "zh-CN": "让 Claude Code 使用 GLM、DeepSeek 或 Kimi" },
+        locales: both,
+        group: "guides",
+        summary: {
+          en: "Point Claude Code at GLM, DeepSeek or Kimi through ThinkWatch Lite: name the model directly, or rewrite Claude model names with a routing rule.",
+          "zh-CN": "让 Claude Code 使用 GLM、DeepSeek 或 Kimi：直接用模型名，或用路由规则改写 Claude 模型名。",
+        },
+      },
+      {
+        slug: "codex-other-models",
+        label: { en: "Codex with other models", "zh-CN": "Codex 接其他模型" },
+        title: { en: "Use Codex with Claude, Gemini or a Chat Completions-only relay", "zh-CN": "让 Codex 使用 Claude、Gemini 或只提供 Chat Completions 的中转" },
+        locales: both,
+        group: "guides",
+        summary: {
+          en: "Run Codex on Claude, Gemini or a Chat Completions-only relay: ThinkWatch Lite converts the Responses API; the model is set in config.toml or a rule.",
+          "zh-CN": "让 Codex 使用 Claude、Gemini 或 Chat Completions 中转：网关转换格式，模型在配置或规则中指定。",
+        },
+      },
+      {
+        slug: "claude-desktop-third-party-models",
+        label: { en: "Claude Desktop with third-party models", "zh-CN": "Claude Desktop 用第三方模型" },
+        title: { en: "Use Claude Desktop with third-party models", "zh-CN": "让 Claude Desktop 使用第三方模型" },
+        locales: both,
+        group: "guides",
+        summary: {
+          en: "Connect Claude Desktop's official third-party inference mode to ThinkWatch Lite and rewrite its Claude model names to GLM, DeepSeek, Kimi or others.",
+          "zh-CN": "经官方第三方推理模式接入 Claude Desktop，用路由规则把 Claude 模型名改写为其他上游的模型。",
+        },
+      },
+      {
+        slug: "switch-upstreams-without-restart",
+        label: { en: "Switch upstreams without restarting", "zh-CN": "切换上游无需重启" },
+        title: { en: "Switch relays, upstreams or models without restarting Claude Code or Codex", "zh-CN": "切换中转站、上游或模型，无需重启 Claude Code 与 Codex" },
+        locales: both,
+        group: "guides",
+        summary: {
+          en: "Connect Claude Code or Codex once, then switch relays, upstreams or models in the gateway, with no client restart or config edit.",
+          "zh-CN": "Claude Code、Codex 接管一次，之后在网关中切换中转站、上游或模型，无需重启客户端或修改其配置。",
+        },
+      },
+      {
+        slug: "failover-and-load-balancing",
+        label: { en: "Failover and load balancing", "zh-CN": "故障转移与负载均衡" },
+        title: { en: "Fail over and balance load across relays and API keys", "zh-CN": "在多个中转站和多把密钥之间自动故障转移与负载均衡" },
+        locales: both,
+        group: "guides",
+        summary: {
+          en: "One upstream per relay key, grouped by strategy: in order, round robin, lowest latency, lowest cost or manual, with failover.",
+          "zh-CN": "每把密钥建一个上游，放进策略组按顺序、轮询、延迟最低、费用最低或手动选择，失败时自动换下一个。",
+        },
+      },
+      {
+        slug: "keep-api-keys-from-relays",
+        label: { en: "Keep API keys from relays", "zh-CN": "不让中转站拿到密钥" },
+        title: { en: "Keep the API keys in requests away from relays, and block dangerous tool calls", "zh-CN": "防止中转站拿到请求中的 API 密钥，并拦截危险的工具调用" },
+        locales: both,
+        group: "guides",
+        summary: {
+          en: "Outbound redaction swaps keys in requests for placeholders before a relay sees them; tool-call inspection cuts off dangerous calls.",
+          "zh-CN": "出站脱敏在中转站看到请求之前把其中的密钥换成占位符，工具调用审查切断危险的工具调用。",
+        },
+      },
+      {
+        slug: "wsl-claude-code-codex",
+        label: { en: "Claude Code and Codex in WSL", "zh-CN": "在 WSL 中使用" },
+        title: { en: "Use Claude Code and Codex in WSL", "zh-CN": "在 WSL 中使用 Claude Code 和 Codex" },
+        locales: both,
+        group: "guides",
+        summary: {
+          en: "Connect Claude Code and Codex inside WSL to ThinkWatch Lite on Windows, with WSL 1 or WSL 2 in mirrored networking.",
+          "zh-CN": "WSL 中的 Claude Code、Codex 接入 Windows 上的网关：支持 WSL 1 和 mirrored 网络。",
+        },
+      },
+      {
+        slug: "compare-cc-switch",
+        label: { en: "Compared with CC Switch", "zh-CN": "与 CC Switch 对比" },
+        title: { en: "ThinkWatch Lite vs CC Switch", "zh-CN": "ThinkWatch Lite 与 CC Switch 对比" },
+        locales: both,
+        group: "guides",
+        summary: {
+          en: "CC Switch rewrites client configs to switch providers; ThinkWatch Lite routes every request through a local gateway. Feature table and using both.",
+          "zh-CN": "CC Switch 改写客户端配置切换供应商，ThinkWatch Lite 经本机网关路由每个请求：功能对照、如何选择与同时使用。",
+        },
+      },
+      {
+        slug: "faq",
+        label: { en: "FAQ", "zh-CN": "常见问题" },
+        title: { en: "ThinkWatch Lite FAQ", "zh-CN": "ThinkWatch Lite 常见问题" },
+        locales: both,
+        group: "guides",
+        summary: {
+          en: "Answers about ThinkWatch Lite: cost, clients, platforms, Claude subscriptions, relays, data, signing, Codex sessions, servers and updates.",
+          "zh-CN": "Lite 常见问题：是否免费、支持的客户端与平台、Claude 订阅、中转站、数据与联网、签名、Codex 会话、服务器与更新。",
         },
       },
       {

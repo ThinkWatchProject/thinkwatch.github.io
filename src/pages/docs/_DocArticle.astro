@@ -11,6 +11,7 @@ import { CORE_REPO } from "~/lib/core-docs.mjs";
 import { firstPublished, lastModified } from "~/lib/lastmod";
 import { docsOgCard, ogImagePath } from "~/lib/og";
 import { organizationRef } from "~/lib/structured-data";
+import { faqPage } from "~/lib/faq";
 import type { DocsEntry } from "./_lib";
 
 interface Props {
@@ -29,7 +30,14 @@ const { Content, headings } = await render(entry);
 const { prev, next } = getNeighbours(product, slug, lang);
 
 const docLabel = meta?.label[lang] ?? slug;
-const title = `${docLabel} · ${productName(p, lang)} ${zh ? "文档" : "Docs"}`;
+// A guide's own title is the question people search for: it names the product
+// itself or is followed by it, in place of the shorter sidebar label.
+const ownTitle = meta?.title?.[lang];
+const title = ownTitle
+  ? ownTitle.includes(p.name)
+    ? ownTitle
+    : `${ownTitle} · ${p.name}`
+  : `${docLabel} · ${productName(p, lang)} ${zh ? "文档" : "Docs"}`;
 const description = meta?.summary?.[lang] ?? p.tagline[lang];
 
 // A document published from the Core repository: edited there, and credited
@@ -65,7 +73,7 @@ const jsonLd: Record<string, unknown>[] = [
   {
     "@context": "https://schema.org",
     "@type": "TechArticle",
-    headline: slug ? docLabel : `${productName(p, lang)} ${zh ? "文档" : "documentation"}`,
+    headline: slug ? (ownTitle ?? docLabel) : `${productName(p, lang)} ${zh ? "文档" : "documentation"}`,
     description,
     inLanguage: lang,
     url: pageUrl,
@@ -79,8 +87,13 @@ const jsonLd: Record<string, unknown>[] = [
   },
 ];
 
-// On a product's docs home, list the rest of its docs below the overview.
-const homeCards = slug ? [] : p.docs.filter((d) => d.slug);
+// The FAQ also carries FAQPage structured data, built from its own headings.
+const faq = slug === "faq" && entry.body ? faqPage(entry.body, lang) : null;
+if (faq) jsonLd.push(faq);
+
+// On a product's docs home, list the rest of its docs below the overview. The
+// guides are in the sidebar only, so the home keeps its few cards.
+const homeCards = slug ? [] : p.docs.filter((d) => d.slug && d.group !== "guides");
 ---
 
 <DocsLayout
