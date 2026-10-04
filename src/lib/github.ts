@@ -9,23 +9,25 @@ export type { Product, Release };
 
 const REPO = productRepos.enterprise;
 
-let cached: number | null | undefined;
+const starCache = new Map<string, Promise<number | null>>();
 
-export async function getStarCount(): Promise<number | null> {
-  if (cached !== undefined) return cached;
-  try {
-    const res = await fetch(`https://api.github.com/repos/${REPO}`, { headers: githubHeaders() });
-    if (!res.ok) {
-      cached = null;
-      return null;
-    }
-    const data: { stargazers_count?: number } = await res.json();
-    cached = typeof data.stargazers_count === "number" ? data.stargazers_count : null;
-    return cached;
-  } catch {
-    cached = null;
-    return null;
+/** A repository's star count, fetched once per build and repository. */
+export function getStarCount(repo: string): Promise<number | null> {
+  let cached = starCache.get(repo);
+  if (!cached) {
+    cached = (async () => {
+      try {
+        const res = await fetch(`https://api.github.com/repos/${repo}`, { headers: githubHeaders() });
+        if (!res.ok) return null;
+        const data: { stargazers_count?: number } = await res.json();
+        return typeof data.stargazers_count === "number" ? data.stargazers_count : null;
+      } catch {
+        return null;
+      }
+    })();
+    starCache.set(repo, cached);
   }
+  return cached;
 }
 
 export function formatStars(n: number | null): string {

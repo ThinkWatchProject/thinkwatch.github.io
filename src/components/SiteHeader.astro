@@ -1,6 +1,7 @@
 ---
 import { getLang, t, localePath, type Lang } from "~/i18n";
 import { getStarCount, formatStars } from "~/lib/github";
+import { productRepos } from "~/lib/releases.mjs";
 import { findDoc, getProduct } from "~/content/docs/_meta";
 import SearchModal from "./SearchModal.astro";
 import TwMark from "./TwMark.astro";
@@ -20,8 +21,6 @@ const sEn = t("en");
 const sZh = t("zh-CN");
 /** data-localize for a link on a bilingual page: the 404 page's script prefixes /zh-CN for Chinese visitors */
 const localize = (path: string) => (bilingual ? path : undefined);
-const stars = await getStarCount();
-const starLabel = formatStars(stars);
 
 // On the home page anchor links work as in-page jumps; on /docs/* and
 // /changelog they need to navigate back to the home first.
@@ -45,6 +44,15 @@ const currentDocSlug = docMatch ? docMatch[2] : null;
 const currentDocMeta = currentDocSlug
   ? findDoc(currentDocSlug, (docMatch?.[1] as "lite" | "core" | undefined) ?? "thinkwatch")
   : undefined;
+
+// The GitHub pill shows ThinkWatch Lite's repository, except on the enterprise
+// edition's page and its guides (/docs/<slug>), which show the enterprise one.
+const enterprise =
+  /^\/thinkwatch(\/|$)/.test(cleanPath) ||
+  (docMatch !== null && !docMatch[1] && docMatch[2] !== "lite" && docMatch[2] !== "core");
+const starRepo = enterprise ? productRepos.enterprise : productRepos.lite;
+const stars = await getStarCount(starRepo);
+const starLabel = formatStars(stars);
 
 function targetPath(target: Lang): string {
   // The 404 page stands in for every missing path, and /404 itself does not
@@ -137,9 +145,10 @@ const zhAttrs = (attrs: Record<string, string>) => (bilingual ? JSON.stringify(a
 
       <!-- GitHub icon + star pill (star count hidden on narrow phones) -->
       <a
-        href="https://github.com/ThinkWatchProject/ThinkWatch"
+        href={`https://github.com/${starRepo}`}
         target="_blank"
         rel="noopener"
+        data-star-repo={starRepo}
         aria-label={`GitHub repository — ${stars ?? 0} stars`}
         class="group flex items-center gap-1.5 text-xs font-medium text-[var(--color-muted)] hover:text-white border border-white/10 hover:border-white/25 rounded-md px-2 sm:pl-2 sm:pr-2.5 h-9 transition-colors"
       >
@@ -311,8 +320,9 @@ const zhAttrs = (attrs: Record<string, string>) => (bilingual ? JSON.stringify(a
   // Fetch live GitHub star count and update the pill
   {
     const el = document.querySelector<HTMLSpanElement>("[data-star-count]");
-    if (el) {
-      fetch("https://api.github.com/repos/ThinkWatchProject/ThinkWatch", {
+    const repo = el?.closest<HTMLAnchorElement>("[data-star-repo]")?.dataset.starRepo;
+    if (el && repo) {
+      fetch(`https://api.github.com/repos/${repo}`, {
         headers: { Accept: "application/vnd.github+json" },
       })
         .then((r) => r.ok ? r.json() : null)
