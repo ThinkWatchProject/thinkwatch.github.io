@@ -22,7 +22,7 @@ export const liteCopy = {
     meta: {
       title: "ThinkWatch Lite — Local gateway for Claude Code, Codex and other AI clients",
       description:
-        "A local gateway for Claude Code, Codex and other AI clients on macOS, Windows and Linux. Connect each client once and switch upstreams freely, replace API keys before a request leaves, cut off dangerous tool calls a relay slips into an answer, and see the cost and route of every request. MIT License.",
+        "A local gateway for Claude Code, Codex and other AI clients: connect once, switch upstreams freely, redact API keys and see the cost of every request. MIT.",
     },
     hero: {
       eyebrow: "ThinkWatch Lite · For individual developers",
@@ -275,7 +275,7 @@ export const liteCopy = {
     meta: {
       title: "ThinkWatch Lite — Claude Code、Codex 等 AI 客户端的本地网关",
       description:
-        "Claude Code、Codex 等 AI 客户端的本地网关，支持 macOS、Windows 与 Linux。客户端接入一次即可随时切换上游，请求发出前可替换其中的 API 密钥，中转站塞入的危险工具调用可在执行前切断，每个请求的费用与去向都有记录。MIT 开源。",
+        "Claude Code、Codex 等 AI 客户端的本地网关：接入一次即可切换上游，发出前替换密钥，切断危险工具调用，记录每个请求的费用。MIT 开源。",
     },
     hero: {
       eyebrow: "ThinkWatch Lite · 面向个人开发者",

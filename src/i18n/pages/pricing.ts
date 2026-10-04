@@ -24,7 +24,7 @@ export const pricingCopy = {
     meta: {
       title: "Pricing · ThinkWatch",
       description:
-        "ThinkWatch Lite and ThinkWatch Core are MIT. ThinkWatch Enterprise is source-available under the Business Source License 1.1: free for non-production use, and free in production up to 10,000,000 billable tokens and 10,000 MCP tool calls per month.",
+        "ThinkWatch Lite and Core are MIT-licensed. ThinkWatch Enterprise is under BSL 1.1: free outside production and in production within a monthly allowance.",
       breadcrumbHome: "Home",
       breadcrumbPage: "Pricing",
     },
@@ -141,7 +141,7 @@ export const pricingCopy = {
     meta: {
       title: "定价 · ThinkWatch",
       description:
-        "ThinkWatch Lite 与 ThinkWatch Core 采用 MIT 许可证。ThinkWatch 企业版在 Business Source License 1.1 下源码开放：非生产环境免费；生产环境每月 10,000,000 计费 token 与 10,000 次 MCP 工具调用以内免费。",
+        "ThinkWatch Lite 与 Core 采用 MIT 许可证；企业版采用 BSL 1.1，非生产环境免费，生产环境在每月额度以内免费。",
       breadcrumbHome: "首页",
       breadcrumbPage: "定价",
     },

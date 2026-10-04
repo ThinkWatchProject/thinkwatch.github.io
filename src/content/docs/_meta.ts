@@ -141,8 +141,8 @@ export const products: Product[] = [
     base: "/docs/lite",
     editUrl: "https://github.com/ThinkWatchProject/thinkwatch.github.io/tree/main/src/content/docs-lite",
     tagline: {
-      en: "The local gateway for Claude Code, Codex and other AI clients on macOS, Windows and Linux: what it does, how to install it, how to connect it to a core on a server, and how it is built.",
-      "zh-CN": "Claude Code、Codex 等 AI 客户端的本地网关，支持 macOS、Windows 与 Linux：功能、安装方法、连接服务器上的 core 的方法，以及构建方式。",
+      en: "The local gateway for Claude Code, Codex and other AI clients: what it does, installing it, connecting it to a server, and how it is built.",
+      "zh-CN": "Claude Code、Codex 等 AI 客户端的本地网关：功能、安装、连接服务器上的 core，以及构建方式。",
     },
     docs: [
       overview(),
@@ -162,8 +162,8 @@ export const products: Product[] = [
         locales: both,
         group: "getStarted",
         summary: {
-          en: "Homebrew, a disk image, the Windows installer or portable zip, or the Linux AppImage, the quarantine attribute and SmartScreen, uninstalling, and how updates reach each kind of install.",
-          "zh-CN": "通过 Homebrew、磁盘映像、Windows 安装程序、Windows 绿色版或 Linux AppImage 安装，隔离属性与 SmartScreen 的处理，卸载，以及各种安装方式如何更新。",
+          en: "Installing with Homebrew, a disk image, the Windows installer or portable zip, or the Linux AppImage; uninstalling; and how each kind of install updates.",
+          "zh-CN": "通过 Homebrew、磁盘映像、Windows 安装程序或绿色版、Linux AppImage 安装与卸载，以及各种安装方式如何更新。",
         },
       },
       {
@@ -192,8 +192,8 @@ export const products: Product[] = [
         locales: both,
         group: "concepts",
         summary: {
-          en: "A Tauri 2 shell and a React 19 frontend that supervise Core and control it over a unix socket on macOS and Linux, a loopback port on Windows or a TCP port on a server, each with an encrypted handshake.",
-          "zh-CN": "Tauri 2 外壳与 React 19 前端，负责托管 Core，在 macOS 与 Linux 上通过 unix socket、在 Windows 上通过回环端口、连接服务器时通过 TCP 端口控制它，每种通道都经过加密握手。",
+          en: "A Tauri 2 shell and a React 19 frontend that supervise Core and control it over a local socket or a TCP port, each with an encrypted handshake.",
+          "zh-CN": "Tauri 2 外壳与 React 19 前端托管 Core，经本机套接字或 TCP 端口控制它，每种通道都经过加密握手。",
         },
       },
       {
@@ -202,7 +202,7 @@ export const products: Product[] = [
         locales: both,
         group: "reference",
         summary: {
-          en: "JavaScript plugins that change requests and answers: where they run, adding and editing one, the API and the kinds of request, permissions, limits, the sandbox and what it cannot prevent, and the two that ship with the app.",
+          en: "JavaScript plugins that change requests and answers: where they run, the API, permissions, limits, the sandbox, and the two that ship with the app.",
           "zh-CN": "改写请求与回答的 JavaScript 插件：运行位置、添加与编辑、接口与请求种类、权限、限额、沙箱及其无法防范的情况，以及应用自带的两个插件。",
         },
       },
@@ -234,8 +234,8 @@ export const products: Product[] = [
     base: "/docs/core",
     editUrl: "https://github.com/ThinkWatchProject/thinkwatch.github.io/tree/main/src/content/docs-core",
     tagline: {
-      en: "The gateway engine shared by ThinkWatch Lite and ThinkWatch Enterprise: MIT-licensed Rust crates and the twcore binary, which also runs on its own on a Linux server.",
-      "zh-CN": "ThinkWatch Lite 与 ThinkWatch 企业版共用的网关引擎：采用 MIT 许可证的 Rust crate 与 twcore 二进制，后者也可独立运行在 Linux 服务器上。",
+      en: "The gateway engine of ThinkWatch Lite and Enterprise: MIT-licensed Rust crates and the twcore binary, which also runs alone on a Linux server.",
+      "zh-CN": "ThinkWatch Lite 与企业版共用的网关引擎：MIT 许可证的 Rust crate 与 twcore 二进制，也可独立运行在 Linux 服务器上。",
     },
     docs: [
       overview(),
