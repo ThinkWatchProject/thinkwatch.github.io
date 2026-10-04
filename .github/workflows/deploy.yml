@@ -71,3 +71,30 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+      # Tells the search engines that take IndexNow (Bing, which ChatGPT search
+      # and Copilot also use, Yandex and others) every address in the sitemap,
+      # so new and changed pages are crawled soon after a deploy. The key file
+      # in public/ shows the site is ours. Only for a push or a manual run:
+      # the scheduled rebuild every three hours would resubmit unchanged pages.
+      # A failed notification does not fail the deploy.
+      - name: Notify IndexNow
+        if: github.event_name != 'schedule'
+        continue-on-error: true
+        env:
+          INDEXNOW_KEY: f7c3fcca3acfc15fb46eca5e1fbde518
+        run: |
+          set -euo pipefail
+          curl -fsSL https://thinkwat.ch/sitemap-0.xml \
+            | grep -o '<loc>[^<]*</loc>' | sed -e 's/<loc>//' -e 's|</loc>||' > urls.txt
+          echo "$(wc -l < urls.txt) addresses"
+          python3 - <<'PY'
+          import json, os
+          urls = [u.strip() for u in open("urls.txt") if u.strip()]
+          key = os.environ["INDEXNOW_KEY"]
+          json.dump({"host": "thinkwat.ch", "key": key,
+                     "keyLocation": f"https://thinkwat.ch/{key}.txt", "urlList": urls},
+                    open("indexnow.json", "w"))
+          PY
+          curl -fsS -o /dev/null -w "IndexNow answered %{http_code}\n" -X POST https://api.indexnow.org/indexnow \
+            -H "Content-Type: application/json; charset=utf-8" --data @indexnow.json
