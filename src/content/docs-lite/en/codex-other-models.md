@@ -10,7 +10,7 @@ ThinkWatch Lite connects Codex to a gateway on the same computer that accepts th
 
 ## Steps
 
-1. On the Upstreams page, choose **New upstream** and pick a **Service**: **Anthropic** for Claude, or **Google Gemini**; each fills in the address and protocol. For a relay, choose **Custom**, enter its **Base URL** without an endpoint path such as `/chat/completions`, and set **Protocol** to **OpenAI Chat Completions**. Enter the **API key**, choose **Check connection**, then **Next**. If the relay does not list its models, enter them one per line under **Manual list**. Choose **Next**, then **Create**.
+1. On the Upstreams page, choose **New upstream** and pick a **Service**: **Anthropic** for Claude, or **Google Gemini**; each fills in the address and protocol. For a relay, choose **Custom**, enter its **Base URL** without an endpoint path such as `/chat/completions`, and set **Protocol** to **OpenAI Chat Completions**; for GLM, for example, `https://api.z.ai/api/paas/v4`, or `…/api/coding/paas/v4` on a GLM Coding Plan. A base URL that ends with its own version, such as `/v4` or Volcengine Ark's `/api/v3`, is used as written from ThinkWatch Lite 2026.10.5. Enter the **API key**, choose **Check connection**, then **Next**. If the relay does not list its models, enter them one per line under **Manual list**. Choose **Next**, then **Create**.
 2. On the Clients page, choose **Connect…** on the Codex row. The dialog shows the change to `~/.codex/config.toml`:
 
    | Field | Value |
