@@ -363,10 +363,10 @@ No authentication is needed — the packages are public.
 helm install think-watch deploy/helm/think-watch \
   --set secrets.jwtSecret=$(openssl rand -hex 32) \
   --set secrets.encryptionKey=$(openssl rand -hex 32) \
-  --set secrets.databaseUrl="postgres://thinkwatch:password@postgres:5432/think_watch" \
-  --set secrets.redisUrl="redis://:password@redis:6379" \
   --set config.corsOrigins="https://console.internal.example.com"
 ```
+
+The chart runs PostgreSQL, Redis and ClickHouse alongside the server. Secrets left empty are generated on the first install and kept across upgrades. To use managed databases instead, see [4.6 External PostgreSQL and Redis](#46-external-postgresql-and-redis).
 
 To deploy a specific image tag:
 
@@ -410,10 +410,10 @@ ingress:
 
 ### 4.4 External Secrets
 
-For production, use the External Secrets Operator instead of passing secrets via `--set`:
+For production, use the External Secrets Operator instead of passing secrets via `--set`. The chart always creates its own Secret, `<release>-secrets` (`think-watch-secrets` for the release above), and the server reads its variables from it, so the ExternalSecret merges values into that Secret instead of creating one: install the chart first, then apply:
 
 ```yaml
-apiVersion: external-secrets.io/v1beta1
+apiVersion: external-secrets.io/v1
 kind: ExternalSecret
 metadata:
   name: think-watch
@@ -423,21 +423,18 @@ spec:
     name: vault-backend  # or aws-secrets-manager, etc.
     kind: SecretStore
   target:
-    name: think-watch-secrets
+    name: think-watch-secrets  # <release>-secrets, created by the chart
+    creationPolicy: Merge
   data:
-    - secretKey: jwt-secret
+    - secretKey: JWT_SECRET
       remoteRef:
         key: think-watch/jwt-secret
-    - secretKey: encryption-key
+    - secretKey: ENCRYPTION_KEY
       remoteRef:
         key: think-watch/encryption-key
-    - secretKey: database-url
-      remoteRef:
-        key: think-watch/database-url
-    - secretKey: redis-url
-      remoteRef:
-        key: think-watch/redis-url
 ```
+
+On later upgrades the chart reads `JWT_SECRET` and `ENCRYPTION_KEY` back from the Secret, so the values from the store are kept; leave `secrets.jwtSecret` and `secrets.encryptionKey` unset, since values set there take precedence over the Secret. The server reads the Secret only at start, so restart it once after the first sync: `kubectl rollout restart deployment/think-watch-server`. `DATABASE_URL` and `REDIS_URL` cannot come from the store, because the chart writes them from `postgres.externalUrl` and `redis.externalUrl` on every upgrade (see [4.6](#46-external-postgresql-and-redis)).
 
 ### 4.5 Horizontal Pod Autoscaling
 
@@ -452,6 +449,48 @@ autoscaling:
 ```
 
 The server is stateless (all state is in PostgreSQL and Redis), so it scales horizontally without issue.
+
+### 4.6 External PostgreSQL and Redis
+
+A managed PostgreSQL or Redis can replace the bundled one. In the Helm chart, set `bundled: false` and `externalUrl` for that service; outside the chart, the URLs go in `DATABASE_URL` and `REDIS_URL`.
+
+```yaml
+postgres:
+  bundled: false
+  externalUrl: postgres://user:pass@pg.example.com:5432/think_watch?sslmode=require
+redis:
+  bundled: false
+  externalUrl: rediss://:pass@my-cache.example.com:6379
+```
+
+**PostgreSQL behind a connection pooler.** Each server instance sets up the schema when it starts, holding a session-level advisory lock so that instances starting together take turns. The URL must therefore reach PostgreSQL directly or through a pooler in session mode, never one in transaction mode (PgBouncer `pool_mode = transaction`, or the transaction-mode port of a managed pooler): there the lock can stay held on a server connection the pooler keeps, and every later start waits for it indefinitely. Schema setup uses the connections of `DATABASE_URL`; there is no separate URL for it.
+
+**Redis Cluster.** Give the URL the `redis-cluster://` scheme and name one node or more; the server finds the rest of the cluster from them:
+
+```text
+redis-cluster://:pass@redis-0.redis:6379?node=redis-1.redis:6379&node=redis-2.redis:6379
+```
+
+Every node must be reachable from the server at the address it announces to the cluster (`cluster-announce-ip` / `-port`). A cluster has only database 0, so the URL names no `/<db>`.
+
+**Redis over TLS.** Managed Redis services usually require TLS, for example ElastiCache with in-transit encryption, Upstash, Azure Cache for Redis and Redis Cloud. Use the `rediss://` scheme, or `rediss-cluster://` for a cluster, with the host name the service gives and the port it uses for TLS (a URL without a port means `6379`; Azure Cache for Redis uses `6380`). The certificate is checked against the public CAs and the host name in the URL; in a cluster, each node's certificate must name the address that node announces.
+
+A Redis whose certificate a private CA signed needs that CA: set `REDIS_CA_CERT` to the path of its PEM certificate, and the server then trusts only the certificates in that file for Redis. With the Helm chart, put the certificate in a Secret and name it under `redis.caSecret`; the chart mounts it and sets `REDIS_CA_CERT`:
+
+```bash
+kubectl -n thinkwatch create secret generic redis-ca --from-file=ca.crt=./ca.crt
+```
+
+```yaml
+redis:
+  bundled: false
+  externalUrl: rediss://:pass@redis.internal:6379
+  caSecret:
+    name: redis-ca
+    key: ca.crt
+```
+
+The file is read at start, so restart the server after changing it. Client certificates (mutual TLS) are not supported: such a Redis needs `tls-auth-clients no` and password authentication. With `networkPolicy.enabled`, ports that no URL names, such as cluster nodes announcing other ports, go in `networkPolicy.extraEgress`.
 
 ---
 

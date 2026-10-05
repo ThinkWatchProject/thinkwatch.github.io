@@ -166,7 +166,7 @@ export const liteCopy = {
         {
           id: "keys",
           title: "A key for each client",
-          body: "Connecting a client gives it a key of its own, so traffic and cost are counted per client. Each key has its own route, visible models and concurrency limit, and a rotated key is written into its client's configuration.",
+          body: "Connecting a client gives it a key of its own, so traffic and cost are counted per client. Each key has its own route, visible models, concurrency limit and usage limits on requests, tokens or cost, and a rotated key is written into its client's configuration.",
           alt: "The Keys page: the default key and one key each for Claude Code, Codex and Cursor, with the route each key uses, the models it may use, and its requests and cost over the last 24 hours",
         },
         // No screenshot: the bento shows a short plugin instead, so there is no alt.
@@ -409,7 +409,7 @@ export const liteCopy = {
         {
           id: "keys",
           title: "每个客户端一把密钥",
-          body: "接入客户端时为它生成专用密钥，流量与费用按客户端分开统计。每把密钥可单独设置路由、可见模型与并发上限，更换后的新密钥自动写入客户端配置。",
+          body: "接入客户端时为它生成专用密钥，流量与费用按客户端分开统计。每把密钥可单独设置路由、可见模型、并发上限，以及按请求次数、token 或费用计的用量上限，更换后的新密钥自动写入客户端配置。",
           alt: "密钥页：默认密钥与 Claude Code、Codex、Cursor 各自的密钥，列出各自使用的路由、可用模型，以及最近 24 小时的请求数与费用",
         },
         {
