@@ -410,10 +410,10 @@ ingress:
 
 ### 4.4 External Secrets
 
-For production, use the External Secrets Operator instead of passing secrets via `--set`:
+For production, use the External Secrets Operator instead of passing secrets via `--set`. The chart always creates its own Secret, `<release>-secrets` (`think-watch-secrets` for the release above), and the server reads its variables from it, so the ExternalSecret merges values into that Secret instead of creating one: install the chart first, then apply:
 
 ```yaml
-apiVersion: external-secrets.io/v1beta1
+apiVersion: external-secrets.io/v1
 kind: ExternalSecret
 metadata:
   name: think-watch
@@ -423,21 +423,18 @@ spec:
     name: vault-backend  # or aws-secrets-manager, etc.
     kind: SecretStore
   target:
-    name: think-watch-secrets
+    name: think-watch-secrets  # <release>-secrets, created by the chart
+    creationPolicy: Merge
   data:
-    - secretKey: jwt-secret
+    - secretKey: JWT_SECRET
       remoteRef:
         key: think-watch/jwt-secret
-    - secretKey: encryption-key
+    - secretKey: ENCRYPTION_KEY
       remoteRef:
         key: think-watch/encryption-key
-    - secretKey: database-url
-      remoteRef:
-        key: think-watch/database-url
-    - secretKey: redis-url
-      remoteRef:
-        key: think-watch/redis-url
 ```
+
+On later upgrades the chart reads `JWT_SECRET` and `ENCRYPTION_KEY` back from the Secret, so the values from the store are kept; leave `secrets.jwtSecret` and `secrets.encryptionKey` unset, since values set there take precedence over the Secret. The server reads the Secret only at start, so restart it once after the first sync: `kubectl rollout restart deployment/think-watch-server`. `DATABASE_URL` and `REDIS_URL` cannot come from the store, because the chart writes them from `postgres.externalUrl` and `redis.externalUrl` on every upgrade (see [4.6](#46-external-postgresql-and-redis)).
 
 ### 4.5 Horizontal Pod Autoscaling
 

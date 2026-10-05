@@ -410,10 +410,10 @@ ingress:
 
 ### 4.4 外部密钥管理
 
-在生产环境中，使用 External Secrets Operator 而非通过 `--set` 传递密钥：
+在生产环境中，使用 External Secrets Operator 而非通过 `--set` 传递密钥。Chart 总会创建自己的 Secret，即 `<release>-secrets`（上文的 release 对应 `think-watch-secrets`），服务器从中读取环境变量，因此 ExternalSecret 应把值合并进这个 Secret，而不是另建一个：先安装 Chart，再应用：
 
 ```yaml
-apiVersion: external-secrets.io/v1beta1
+apiVersion: external-secrets.io/v1
 kind: ExternalSecret
 metadata:
   name: think-watch
@@ -423,21 +423,18 @@ spec:
     name: vault-backend  # or aws-secrets-manager, etc.
     kind: SecretStore
   target:
-    name: think-watch-secrets
+    name: think-watch-secrets  # <release>-secrets, created by the chart
+    creationPolicy: Merge
   data:
-    - secretKey: jwt-secret
+    - secretKey: JWT_SECRET
       remoteRef:
         key: think-watch/jwt-secret
-    - secretKey: encryption-key
+    - secretKey: ENCRYPTION_KEY
       remoteRef:
         key: think-watch/encryption-key
-    - secretKey: database-url
-      remoteRef:
-        key: think-watch/database-url
-    - secretKey: redis-url
-      remoteRef:
-        key: think-watch/redis-url
 ```
+
+此后升级时，Chart 会从该 Secret 读回 `JWT_SECRET` 和 `ENCRYPTION_KEY`，密钥库中的值得以保留；`secrets.jwtSecret` 与 `secrets.encryptionKey` 须留空，因为在其中设置的值优先于 Secret。服务器只在启动时读取 Secret，因此首次同步后需要重启一次：`kubectl rollout restart deployment/think-watch-server`。`DATABASE_URL` 和 `REDIS_URL` 不能来自密钥库：每次升级时 Chart 都按 `postgres.externalUrl` 和 `redis.externalUrl` 重新写入（见 [4.6](#46-外部-postgresql-与-redis)）。
 
 ### 4.5 水平 Pod 自动伸缩
 
