@@ -363,10 +363,10 @@ ghcr.io/thinkwatch/think-watch-web:<git-sha>
 helm install think-watch deploy/helm/think-watch \
   --set secrets.jwtSecret=$(openssl rand -hex 32) \
   --set secrets.encryptionKey=$(openssl rand -hex 32) \
-  --set secrets.databaseUrl="postgres://thinkwatch:password@postgres:5432/think_watch" \
-  --set secrets.redisUrl="redis://:password@redis:6379" \
   --set config.corsOrigins="https://console.internal.example.com"
 ```
+
+Chart 会在服务器旁一并运行 PostgreSQL、Redis 和 ClickHouse。留空的密钥在首次安装时自动生成，升级时保留。改用托管数据库见 [4.6 外部 PostgreSQL 与 Redis](#46-外部-postgresql-与-redis)。
 
 如需部署特定版本：
 
@@ -452,6 +452,48 @@ autoscaling:
 ```
 
 服务器是无状态的（所有状态存储在 PostgreSQL 和 Redis 中），因此可以无障碍地水平扩展。
+
+### 4.6 外部 PostgreSQL 与 Redis
+
+托管的 PostgreSQL 或 Redis 可以代替 Chart 自带的实例。使用 Helm Chart 时，为该服务设置 `bundled: false` 和 `externalUrl`；不使用 Chart 时，地址写在 `DATABASE_URL` 和 `REDIS_URL` 中。
+
+```yaml
+postgres:
+  bundled: false
+  externalUrl: postgres://user:pass@pg.example.com:5432/think_watch?sslmode=require
+redis:
+  bundled: false
+  externalUrl: rediss://:pass@my-cache.example.com:6379
+```
+
+**经连接池访问 PostgreSQL。**每个服务器实例启动时都会建立数据库结构，期间持有一把会话级 advisory lock，使同时启动的实例依次进行。因此地址必须直连 PostgreSQL，或经由会话模式的连接池，不能使用事务模式的连接池（PgBouncer 的 `pool_mode = transaction`，或托管连接池的事务模式端口）：在事务模式下，这把锁可能留在连接池保留的服务端连接上，此后每次启动都会一直等待。建立数据库结构使用的就是 `DATABASE_URL` 的连接，没有单独的地址。
+
+**Redis Cluster。**地址使用 `redis-cluster://` 协议，列出一个或多个节点，服务器由此找到集群的其余节点：
+
+```text
+redis-cluster://:pass@redis-0.redis:6379?node=redis-1.redis:6379&node=redis-2.redis:6379
+```
+
+每个节点都必须能从服务器按它向集群公布的地址（`cluster-announce-ip` / `-port`）访问。集群只有 0 号数据库，因此地址中不写 `/<db>`。
+
+**经 TLS 访问 Redis。**托管 Redis 服务通常要求 TLS，例如开启传输加密的 ElastiCache、Upstash、Azure Cache for Redis 和 Redis Cloud。地址使用 `rediss://` 协议，集群使用 `rediss-cluster://`，主机名写服务给出的名称，端口写它的 TLS 端口（地址中不写端口即为 `6379`；Azure Cache for Redis 为 `6380`）。证书按公共 CA 和地址中的主机名校验；集群中每个节点的证书都必须包含该节点公布的地址。
+
+证书由私有 CA 签发的 Redis 需要提供该 CA：把 `REDIS_CA_CERT` 设为它的 PEM 证书路径，服务器连接 Redis 时便只信任该文件中的证书。使用 Helm Chart 时，把证书放进 Secret，并在 `redis.caSecret` 中指定；Chart 会挂载它并设置 `REDIS_CA_CERT`：
+
+```bash
+kubectl -n thinkwatch create secret generic redis-ca --from-file=ca.crt=./ca.crt
+```
+
+```yaml
+redis:
+  bundled: false
+  externalUrl: rediss://:pass@redis.internal:6379
+  caSecret:
+    name: redis-ca
+    key: ca.crt
+```
+
+该文件在启动时读取，修改后需要重启服务器。不支持客户端证书（双向 TLS）：这类 Redis 需设置 `tls-auth-clients no`，并使用密码认证。启用 `networkPolicy.enabled` 时，地址中没有写到的端口（例如集群节点公布的其他端口）写在 `networkPolicy.extraEgress` 中。
 
 ---
 

@@ -22,6 +22,7 @@ PostgreSQL 连接字符串。ThinkWatch 需要 PostgreSQL 15 或更高版本。
 - 在生产环境中，使用 `sslmode=require` 强制加密连接：`postgres://user:pass@host:5432/db?sslmode=require`
 - 避免在提交到版本控制的 URL 中嵌入密码。请使用密钥管理器。
 - 数据库用户需要创建表的权限（用于迁移），或者应单独应用迁移。
+- 直连数据库，或经由会话模式的连接池，不能使用事务模式：启动时建立数据库结构需要持有会话级 advisory lock。详见[外部 PostgreSQL 与 Redis](/zh-CN/docs/deployment-guide#46-外部-postgresql-与-redis)。
 
 ---
 
@@ -38,6 +39,7 @@ Redis 连接字符串。用于速率限制、OIDC 状态/nonce 存储和会话�
 **安全说明：**
 - 在生产环境中，启用 Redis 认证：`redis://:yourpassword@host:6379`
 - 对于启用了 TLS 的 Redis，使用 `rediss://` 协议：`rediss://:password@host:6380`
+- Redis Cluster 使用 `redis-cluster://` 协议（TLS 为 `rediss-cluster://`）。证书由私有 CA 签发时，把 `REDIS_CA_CERT` 设为该 CA 的 PEM 文件路径。详见[外部 PostgreSQL 与 Redis](/zh-CN/docs/deployment-guide#46-外部-postgresql-与-redis)。
 
 ---
 
