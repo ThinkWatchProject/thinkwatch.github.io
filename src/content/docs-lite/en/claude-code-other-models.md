@@ -12,7 +12,7 @@ ThinkWatch Lite connects Claude Code to a gateway on the same computer, which fo
 
 1. On the Upstreams page, choose **New upstream** and pick a **Service**:
    - **DeepSeek** fills in `https://api.deepseek.com/anthropic` and the protocol. Enter the **API key**.
-   - GLM with a key: **Custom**, with `https://open.bigmodel.cn/api/anthropic` or `https://api.z.ai/api/anthropic` as the **Base URL**, **Protocol** set to **Anthropic Messages**, and the **API key**.
+   - GLM with a key: **Custom**, with `https://open.bigmodel.cn/api/anthropic` or `https://api.z.ai/api/anthropic` as the **Base URL**, **Protocol** set to **Anthropic Messages**, and the **API key**. GLM's OpenAI-compatible address also works from ThinkWatch Lite 2026.10.5, with **Protocol** set to **OpenAI Chat Completions**: `https://api.z.ai/api/paas/v4` or `https://open.bigmodel.cn/api/paas/v4`, and `…/api/coding/paas/v4` on a GLM Coding Plan. Claude Code's requests are then converted, so the Anthropic address is the more direct choice.
    - GLM with an account: **Z.ai / BigModel account**. Select the **Account service**, tick **Acknowledge the notes above and continue signing in**, choose **Sign in** and authorize in the browser. The app creates an API key named `thinkwatch` on the account and saves the upstream.
    - Kimi: **Custom**, with the Anthropic-compatible base URL from Kimi's documentation and **Protocol** set to **Anthropic Messages**. For Kimi For Coding, also turn on **Forward client identity**.
 
