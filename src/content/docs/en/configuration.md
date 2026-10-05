@@ -22,6 +22,7 @@ PostgreSQL connection string. ThinkWatch requires PostgreSQL 15 or later.
 - In production, use `sslmode=require` to enforce encrypted connections: `postgres://user:pass@host:5432/db?sslmode=require`
 - Avoid embedding passwords in URLs checked into version control. Use a secrets manager.
 - The database user needs permissions to create tables (for migrations) or should have migrations applied separately.
+- Connect directly or through a pooler in session mode, not transaction mode: schema setup at startup holds a session-level advisory lock. See [External PostgreSQL and Redis](/docs/deployment-guide#46-external-postgresql-and-redis).
 
 ---
 
@@ -38,6 +39,7 @@ Redis connection string. Used for rate limiting, OIDC state/nonce storage, and s
 **Security notes:**
 - In production, enable Redis authentication: `redis://:yourpassword@host:6379`
 - For TLS-enabled Redis, use the `rediss://` scheme: `rediss://:password@host:6380`
+- For a Redis Cluster, use `redis-cluster://` (`rediss-cluster://` over TLS). For a certificate signed by a private CA, set `REDIS_CA_CERT` to the CA's PEM file. See [External PostgreSQL and Redis](/docs/deployment-guide#46-external-postgresql-and-redis).
 
 ---
 

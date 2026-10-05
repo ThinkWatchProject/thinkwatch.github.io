@@ -4,7 +4,7 @@ A relay receives every request in full, including keys that end up in the conver
 
 ## Before you start
 
-- ThinkWatch Lite, [installed](/lite/#install), with clients connected to the gateway. This guide follows version 2026.10.4.
+- ThinkWatch Lite, [installed](/lite/#install), with clients connected to the gateway. This guide follows version 2026.10.6.
 - Both protections start in **Observe**: they record what they find and change nothing. **Off** checks nothing.
 
 ## Steps
@@ -28,7 +28,7 @@ A relay receives every request in full, including keys that end up in the conver
 - **What is cut off.** Calls that download or decode code and run it, send out environment variables or credential files, read private keys or cloud credentials, send a credential to an unknown host, or install startup items or scheduled jobs. Built-in rules for deleting home or root, world-writable permissions and uploading a local file only record.
 - **What the relay still sees.** The key configured for its upstream in the app, and the rest of the request as written: code, file contents, the conversation. The key a client uses for the gateway is not forwarded, and neither is the client's identity unless **Forward client identity** is on for that upstream.
 - **Rules, not judgement.** Only values that match a rule are replaced; a credential without a recognizable prefix, such as an AWS secret access key, needs a custom rule. A dangerous command written in a form no rule matches passes tool-call inspection.
-- **Nothing beyond the gateway.** What a relay does on its own servers, such as keeping requests or answering with another model, is out of sight; the **Check-up** tab on the Upstreams page can show signs of the latter, not prove it.
+- **Nothing beyond the gateway.** What a relay does on its own servers, such as keeping requests or answering with another model, is out of sight; a mark such as **Model name differs** next to an upstream on the Upstreams page can show signs of the latter, not prove it.
 - **The cost of acting.** Changed request content may miss the upstream's prompt cache, and a false match in **Cut off** stops the answer at that call.
 
 Related: [Features](/docs/lite/features/#security), including the third protection, the content filter; [Install and update](/docs/lite/install/).
