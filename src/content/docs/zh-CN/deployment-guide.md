@@ -21,7 +21,7 @@
 |------------|---------|----------------------------------|
 | Rust       | Edition 2024（见 `rust-toolchain.toml`） | 构建服务器         |
 | Node.js    | 20+     | 构建 Web UI                      |
-| pnpm       | 9+      | Web UI 包管理器                  |
+| pnpm       | 12（见 `web/package.json`） | Web UI 包管理器 |
 | Docker     | 24+     | 运行基础设施服务                 |
 | Docker Compose | v2+ | 编排开发服务                     |
 
@@ -228,10 +228,10 @@ docker compose -f deploy/docker-compose.yml --env-file .env.production pull
 docker compose -f deploy/docker-compose.yml --env-file .env.production up -d
 ```
 
-如需固定特定版本而非 `latest`：
+如需固定某个版本而非 `latest`，将 `IMAGE_TAG` 设为该版本号，或 `main` 分支上某次提交的 SHA：
 
 ```bash
-IMAGE_TAG=<git-sha> docker compose -f deploy/docker-compose.yml --env-file .env.production up -d
+IMAGE_TAG=3.2.1 docker compose -f deploy/docker-compose.yml --env-file .env.production up -d
 ```
 
 这将启动：
@@ -345,14 +345,16 @@ server {
 
 ### 4.1 镜像
 
-预构建镜像在每次推送到 `main` 分支时自动发布到 GitHub Container Registry：
+每个版本发布时，镜像推送到 GitHub Container Registry，标签为版本号，正式版本另加 `latest`；每次推送到 `main` 分支时，还会发布以提交 SHA 为标签的镜像：
 
 ```
-ghcr.io/thinkwatch/think-watch-server:latest
-ghcr.io/thinkwatch/think-watch-server:<git-sha>
+ghcr.io/thinkwatchproject/think-watch-server:<version>
+ghcr.io/thinkwatchproject/think-watch-server:latest
+ghcr.io/thinkwatchproject/think-watch-server:<git-sha>
 
-ghcr.io/thinkwatch/think-watch-web:latest
-ghcr.io/thinkwatch/think-watch-web:<git-sha>
+ghcr.io/thinkwatchproject/think-watch-web:<version>
+ghcr.io/thinkwatchproject/think-watch-web:latest
+ghcr.io/thinkwatchproject/think-watch-web:<git-sha>
 ```
 
 镜像为公开可访问，无需认证即可拉取。
@@ -368,7 +370,7 @@ helm install think-watch deploy/helm/think-watch \
 
 Chart 会在服务器旁一并运行 PostgreSQL、Redis 和 ClickHouse。留空的密钥在首次安装时自动生成，升级时保留。改用托管数据库见 [4.6 外部 PostgreSQL 与 Redis](#46-外部-postgresql-与-redis)。
 
-如需部署特定版本：
+Chart 默认部署与其自身版本（`Chart.yaml` 中的 `appVersion`）相同的镜像。如需部署其他标签，例如 `main` 分支上的某次提交：
 
 ```bash
 helm install think-watch deploy/helm/think-watch \
@@ -742,7 +744,8 @@ ThinkWatch 在 Web 控制台中内置了**配置指南**页面，位于 `/gatewa
 ```bash
 # Update the image tag
 helm upgrade think-watch deploy/helm/think-watch \
-  --set image.server.tag=0.2.0 \
+  --set image.server.tag=3.2.1 \
+  --set image.web.tag=3.2.1 \
   --reuse-values
 ```
 

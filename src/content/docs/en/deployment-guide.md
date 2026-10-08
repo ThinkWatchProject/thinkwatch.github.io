@@ -21,7 +21,7 @@ The server process itself is lightweight (Rust binary, ~50 MB RSS typical). Most
 |------------|---------|----------------------------------|
 | Rust       | Edition 2024 (see `rust-toolchain.toml`) | Build the server          |
 | Node.js    | 20+     | Build the web UI                 |
-| pnpm       | 9+      | Web UI package manager           |
+| pnpm       | 12 (see `web/package.json`) | Web UI package manager |
 | Docker     | 24+     | Run infrastructure services      |
 | Docker Compose | v2+ | Orchestrate dev services         |
 
@@ -228,10 +228,10 @@ docker compose -f deploy/docker-compose.yml --env-file .env.production pull
 docker compose -f deploy/docker-compose.yml --env-file .env.production up -d
 ```
 
-To pin a specific release instead of `latest`:
+To pin a release instead of `latest`, set `IMAGE_TAG` to its version, or to the SHA of a commit on `main`:
 
 ```bash
-IMAGE_TAG=<git-sha> docker compose -f deploy/docker-compose.yml --env-file .env.production up -d
+IMAGE_TAG=3.2.1 docker compose -f deploy/docker-compose.yml --env-file .env.production up -d
 ```
 
 This starts:
@@ -345,14 +345,16 @@ A Helm chart is provided at `deploy/helm/think-watch/`.
 
 ### 4.1 Images
 
-Pre-built images are published automatically to GitHub Container Registry on every push to `main`:
+Each release publishes its images to GitHub Container Registry, tagged with the version and, for a stable release, `latest`. Every push to `main` also publishes images tagged with the commit SHA:
 
 ```
-ghcr.io/thinkwatch/think-watch-server:latest
-ghcr.io/thinkwatch/think-watch-server:<git-sha>
+ghcr.io/thinkwatchproject/think-watch-server:<version>
+ghcr.io/thinkwatchproject/think-watch-server:latest
+ghcr.io/thinkwatchproject/think-watch-server:<git-sha>
 
-ghcr.io/thinkwatch/think-watch-web:latest
-ghcr.io/thinkwatch/think-watch-web:<git-sha>
+ghcr.io/thinkwatchproject/think-watch-web:<version>
+ghcr.io/thinkwatchproject/think-watch-web:latest
+ghcr.io/thinkwatchproject/think-watch-web:<git-sha>
 ```
 
 No authentication is needed — the packages are public.
@@ -368,7 +370,7 @@ helm install think-watch deploy/helm/think-watch \
 
 The chart runs PostgreSQL, Redis and ClickHouse alongside the server. Secrets left empty are generated on the first install and kept across upgrades. To use managed databases instead, see [4.6 External PostgreSQL and Redis](#46-external-postgresql-and-redis).
 
-To deploy a specific image tag:
+The chart deploys the images of its own version (`appVersion` in `Chart.yaml`). To deploy another tag, such as a commit on `main`:
 
 ```bash
 helm install think-watch deploy/helm/think-watch \
@@ -742,7 +744,8 @@ The server is stateless, so rolling updates work out of the box:
 ```bash
 # Update the image tag
 helm upgrade think-watch deploy/helm/think-watch \
-  --set image.server.tag=0.2.0 \
+  --set image.server.tag=3.2.1 \
+  --set image.web.tag=3.2.1 \
   --reuse-values
 ```
 

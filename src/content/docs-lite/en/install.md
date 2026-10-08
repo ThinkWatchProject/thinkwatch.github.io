@@ -79,7 +79,7 @@ The tray icon relies on AppIndicator. Ubuntu ships the GNOME extension for it; F
 
 The app looks for a new version two minutes after it starts and once a day after that, reading a small manifest and nothing else. The automatic check can be turned off in Settings › About.
 
-When the automatic check finds a new version, the app posts a system notification, unless **Notices** in Settings › General is set to **In app only** or **Off**. The notification, the **Install Version** item in the menu bar or tray menu, and **Update to** in Settings › About open the update window; **Check for updates**, in the same menu or in Settings › About, opens it at once when there is a new version. What happens next depends on how the app was installed.
+When the automatic check finds a new version, the app lists it among the notices and posts a system notification. With **Notices** in Settings › General set to **In app only**, only the notice appears; with **Off**, neither does. The notice, the notification, the **Install Version** item in the menu bar or tray menu, and **Update to** in Settings › About open the update window; **Check for updates**, in the same menu or in Settings › About, opens it at once when there is a new version. What happens next depends on how the app was installed.
 
 **Downloaded from the releases page on macOS:** one press on the install button does the rest. The app downloads the update, verifies it against a key compiled into itself, waits for the requests the gateway is serving to finish — up to three minutes — then replaces itself and restarts. A task in the middle of a response is not cut off to make room for the update.
 
