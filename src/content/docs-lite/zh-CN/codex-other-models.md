@@ -10,7 +10,7 @@ ThinkWatch Lite 把 Codex 接到本机的网关上，网关接收 OpenAI Respons
 
 ## 步骤
 
-1. 在「上游」页点击「新建上游」，选择「服务类型」：Claude 选「Anthropic」，Gemini 选「Google Gemini」，接口地址和接口协议会自动填入。中转站选「自定义」，「接口地址」填它的 Base URL（不含 `/chat/completions` 等接口路径），「接口协议」选「OpenAI Chat Completions」；例如 GLM 填 `https://api.z.ai/api/paas/v4`，GLM Coding Plan 填 `…/api/coding/paas/v4`。以自带版本号结尾的地址（如 `/v4`、火山方舟的 `/api/v3`），自 ThinkWatch Lite 2026.10.5 起按原样使用。填写「API 密钥」，点击「检测连接」，再点击「下一步」。中转站不提供模型列表时，在「手动清单」中每行填写一个模型 ID。再点击「下一步」，然后点击「创建」。
+1. 在「上游」页点击「新建上游」，选择「服务类型」：Claude 选「Anthropic」，Gemini 选「Google Gemini」，接口地址和接口协议会自动填入。中转站选「自定义」，「接口地址」填它的 Base URL（不含 `/chat/completions` 等接口路径），「接口协议」选「OpenAI Chat Completions」；例如 GLM 填 `https://api.z.ai/api/paas/v4`，GLM Coding Plan 填 `…/api/coding/paas/v4`。以自带版本号结尾的地址（如 `/v4`、火山方舟的 `/api/v3`），自 ThinkWatch Lite 2026.10.5 起按原样使用。填写「API 密钥」，点击「检测连接」，再点击「下一步」。中转站不提供模型列表或没有列全时，在「模型」一节末尾的输入框中逐个填写缺少的模型 ID 并回车。再点击「下一步」，然后点击「创建」。
 2. 在「客户端」页 Codex 一行点击「接管…」。对话框列出对 `~/.codex/config.toml` 的修改：
 
    | 字段 | 写入 |
@@ -31,8 +31,9 @@ ThinkWatch Lite 把 Codex 接到本机的网关上，网关接收 OpenAI Respons
 
 - **Codex 的内置模型表。**Codex 把自家模型的元数据（上下文窗口等）编在程序里。它不认识的模型，例如 Claude 或 Gemini 的模型，按兜底元数据运行，上下文窗口为 272,000 token，并提示「Model metadata for `<模型>` not found. Defaulting to fallback metadata; this can degrade performance and cause issues.」。模型的上下文窗口更小时，可在 `config.toml` 中用 `model_context_window` 设定 Codex 采用的窗口。网关的模型列表不会出现在 Codex 的模型选择中，因为 Codex 要求的是它自己格式的模型目录。
 - **格式转换。**请求和流式回答双向转换。「流量」页把这类请求标为「已转换」，目标格式无法承载的字段被丢弃，并在请求详情中列出。网页搜索这类服务端工具只能由所属的服务商执行，转换时被丢弃。Codex 的 `wire_api` 只支持 `responses`，只提供 Chat Completions 的中转正是靠这一转换才能使用。
+- **工具、历史与压缩。**自 ThinkWatch Lite 2026.10.11 起，Codex 声明的所有工具都会发给上游，包括写在输入中而不在 `tools` 里的工具，工具调用按 Codex 给出的名称返回。历史中的本地 shell 调用、工具搜索和推理强度的变更同样会转换。长会话的上下文压缩可以正常进行：由上游写出摘要，Codex 把它作为压缩结果保存，并在之后的请求中带回。OpenAI 加密的压缩结果无法由其他上游读取，带有这类内容的请求会被拒绝，并说明原因。Codex 在对话中途加入的指令留在原位，系统提示词因此每轮保持不变，提示缓存持续命中。
 - **凭据。**`requires_openai_auth = false` 使 Codex 用自己的网关密钥连接网关，不发送 OpenAI 密钥或 ChatGPT 令牌。应用内登录的 ChatGPT 账号仍可同时作为 OpenAI 模型的上游：每个请求都交给模型列表中有所请求模型的上游。
 - **会话。**接管前后的会话在 Codex 中分开显示。运行 `codex resume <会话 ID> -c model_provider=thinkwatch` 可以通过网关继续之前的会话。「还原…」之后，接管期间的会话仍可打开，此时直连 OpenAI。
-- **费用。**改写过模型名的请求按实际发出的模型计价。
+- **费用。**改写过模型名的请求按实际发出的模型计价。Codex 不标注提示缓存断点，因此发往 Anthropic Messages 格式的上游或 Bedrock 上的 Claude 模型时，网关在工具、系统提示词和最后两轮用户消息处标注，每一轮都能读取上一轮写入的缓存。缓存写入与读取按价目表的缓存单价计费；Anthropic 的缓存写入比输入贵 25%，读取为输入的十分之一。
 
 相关文档：[功能详解](/zh-CN/docs/lite/features/)、[让 Claude Code 使用 GLM、DeepSeek 或 Kimi](/zh-CN/docs/lite/claude-code-other-models/)、[安装与更新](/zh-CN/docs/lite/install/)。
