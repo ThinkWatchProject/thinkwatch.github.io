@@ -231,7 +231,7 @@ docker compose -f deploy/docker-compose.yml --env-file .env.production up -d
 如需固定某个版本而非 `latest`，将 `IMAGE_TAG` 设为该版本号，或 `main` 分支上某次提交的 SHA：
 
 ```bash
-IMAGE_TAG=3.2.1 docker compose -f deploy/docker-compose.yml --env-file .env.production up -d
+IMAGE_TAG=3.3.0 docker compose -f deploy/docker-compose.yml --env-file .env.production up -d
 ```
 
 这将启动：
@@ -744,8 +744,8 @@ ThinkWatch 在 Web 控制台中内置了**配置指南**页面，位于 `/gatewa
 ```bash
 # Update the image tag
 helm upgrade think-watch deploy/helm/think-watch \
-  --set image.server.tag=3.2.1 \
-  --set image.web.tag=3.2.1 \
+  --set image.server.tag=3.3.0 \
+  --set image.web.tag=3.3.0 \
   --reuse-values
 ```
 
