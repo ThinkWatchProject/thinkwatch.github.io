@@ -23,7 +23,7 @@ The web form suits emails and dashboards whose users may not have the app yet. T
 | `name` | No | The upstream's name in the app. When omitted, the app derives one from the address. |
 | `protocol` | No | `anthropic`, `openai-chat`, `openai-responses` or `gemini`. When omitted, the app detects the protocol from the address. |
 | `key` | No | The API key, stored as given. Letters, digits and `- _ . ~ + / = :` only. |
-| `models` | No | Comma-separated model IDs. The app uses this list when the service does not list its models itself. |
+| `models` | No | Comma-separated model IDs, added to the upstream by hand. The app offers them next to the models the service lists, so a service that lists only some of its models can name the rest here; when the service lists none, they are its whole list. |
 
 Encoding rules:
 
@@ -44,7 +44,7 @@ Limits:
 ## What the app does with a link
 
 1. **Checks the link.** Every rule above is applied in the app, whatever the page that produced the link has checked.
-2. **Shows a confirmation dialog.** The dialog states the host that will receive request content and the API key, in ASCII: an internationalized domain name is shown as punycode (`xn--…`), so a look-alike domain cannot pass for a familiar one. It also shows the base URL, the protocol, the key (hidden until revealed) and the model list. Only the name can be changed. Values are displayed as plain text.
+2. **Shows a confirmation dialog.** The dialog states the host that will receive request content and the API key, in ASCII: an internationalized domain name is shown as punycode (`xn--…`), so a look-alike domain cannot pass for a familiar one. It also shows the base URL, the protocol, the key (hidden until revealed) and the models added by hand. Only the name can be changed. Values are displayed as plain text.
 3. **Saves nothing before confirmation.** Until **Create** is chosen, the configuration is not written and the app makes no network request to the address: no connection test and no model listing.
 4. **Creates one new upstream.** An import never changes, replaces or deletes an existing upstream. When the name is already in use, a different name must be entered; there is no option to overwrite. The new upstream is not made the default and is not added to any route. After creation it behaves like an upstream added by hand, including fetching its model list.
 5. **Handles one link at a time.** Links that arrive while the dialog is open, or within a few seconds after it closes, are ignored and do not bring the window to the front.
