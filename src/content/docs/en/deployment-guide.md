@@ -231,7 +231,7 @@ docker compose -f deploy/docker-compose.yml --env-file .env.production up -d
 To pin a release instead of `latest`, set `IMAGE_TAG` to its version, or to the SHA of a commit on `main`:
 
 ```bash
-IMAGE_TAG=3.2.1 docker compose -f deploy/docker-compose.yml --env-file .env.production up -d
+IMAGE_TAG=3.3.0 docker compose -f deploy/docker-compose.yml --env-file .env.production up -d
 ```
 
 This starts:
@@ -744,8 +744,8 @@ The server is stateless, so rolling updates work out of the box:
 ```bash
 # Update the image tag
 helm upgrade think-watch deploy/helm/think-watch \
-  --set image.server.tag=3.2.1 \
-  --set image.web.tag=3.2.1 \
+  --set image.server.tag=3.3.0 \
+  --set image.web.tag=3.3.0 \
   --reuse-values
 ```
 
