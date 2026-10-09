@@ -34,6 +34,6 @@ ThinkWatch Lite 把 Codex 接到本机的网关上，网关接收 OpenAI Respons
 - **工具、历史与压缩。**自 ThinkWatch Lite 2026.10.11 起，Codex 声明的所有工具都会发给上游，包括写在输入中而不在 `tools` 里的工具，工具调用按 Codex 给出的名称返回。历史中的本地 shell 调用、工具搜索和推理强度的变更同样会转换。长会话的上下文压缩可以正常进行：由上游写出摘要，Codex 把它作为压缩结果保存，并在之后的请求中带回。OpenAI 加密的压缩结果无法由其他上游读取，带有这类内容的请求会被拒绝，并说明原因。Codex 在对话中途加入的指令留在原位，系统提示词因此每轮保持不变，提示缓存持续命中。
 - **凭据。**`requires_openai_auth = false` 使 Codex 用自己的网关密钥连接网关，不发送 OpenAI 密钥或 ChatGPT 令牌。应用内登录的 ChatGPT 账号仍可同时作为 OpenAI 模型的上游：每个请求都交给模型列表中有所请求模型的上游。
 - **会话。**接管前后的会话在 Codex 中分开显示。运行 `codex resume <会话 ID> -c model_provider=thinkwatch` 可以通过网关继续之前的会话。「还原…」之后，接管期间的会话仍可打开，此时直连 OpenAI。
-- **费用。**改写过模型名的请求按实际发出的模型计价。Codex 不标注提示缓存断点，因此发往 Anthropic Messages 格式的上游或 Bedrock 上的 Claude 模型时，网关在工具、系统提示词和最后两轮用户消息处标注，每一轮都能读取上一轮写入的缓存。缓存写入与读取按价目表的缓存单价计费；Anthropic 的缓存写入比输入贵 25%，读取为输入的十分之一。
+- **费用。**改写过模型名的请求按实际发出的模型计价。Codex 不标注提示缓存断点，因此发往 Anthropic Messages 格式的上游，或 Bedrock 上 AWS 列为支持提示缓存的 Claude 模型（Claude 3.5 Sonnet v2、Claude 3.7 Sonnet 以及 Claude 4.5 起的模型）时，网关在工具、系统提示词和最后两轮用户消息处标注，每一轮都能读取上一轮写入的缓存。Bedrock 上更早的 Claude 模型（如 Sonnet 4）不标注；上游拒绝这些标注时，网关去掉标注重新发送一次。缓存写入与读取按价目表的缓存单价计费；Anthropic 的缓存写入比输入贵 25%，读取为输入的十分之一。
 
 相关文档：[功能详解](/zh-CN/docs/lite/features/)、[让 Claude Code 使用 GLM、DeepSeek 或 Kimi](/zh-CN/docs/lite/claude-code-other-models/)、[安装与更新](/zh-CN/docs/lite/install/)。
