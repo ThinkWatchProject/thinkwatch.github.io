@@ -18,7 +18,7 @@ const t = zh
       protocol: "接口协议",
       auto: "自动识别（不写入链接）",
       key: "API 密钥（可选）",
-      models: "手动模型清单（可选，逗号分隔）",
+      models: "手动添加的模型（可选，逗号分隔）",
       appLink: "应用链接",
       webLink: "网页链接",
       copy: "复制",
@@ -35,7 +35,7 @@ const t = zh
         url: "接口地址不符合要求：须为 https 地址（http 仅限 localhost、127.0.0.1、[::1]），不含账号、查询串、片段、空白与 % $ { } 等字符。",
         protocol: "接口协议不受支持。",
         key: "API 密钥只能包含字母、数字与 - _ . ~ + / = :，最长 512 个字符。",
-        models: "模型清单不符合要求：以逗号分隔，每项只含字母、数字与 - _ . : / @ +，最多 64 项。",
+        models: "手动添加的模型不符合要求：以逗号分隔，每项只含字母、数字与 - _ . : / @ +，最多 64 项。",
       },
     }
   : {
@@ -46,7 +46,7 @@ const t = zh
       protocol: "Protocol",
       auto: "Auto-detect (left out of the link)",
       key: "API key (optional)",
-      models: "Manual model list (optional, comma-separated)",
+      models: "Models added by hand (optional, comma-separated)",
       appLink: "App link",
       webLink: "Web link",
       copy: "Copy",
@@ -63,7 +63,7 @@ const t = zh
         url: "The base URL is not accepted: it must be an https address (http only for localhost, 127.0.0.1 and [::1]) without credentials, a query, a fragment, spaces or characters such as % $ { }.",
         protocol: "The protocol is not supported.",
         key: "The API key may contain only letters, digits and - _ . ~ + / = :, up to 512 characters.",
-        models: "The model list is not accepted: comma-separated, each entry only letters, digits and - _ . : / @ +, at most 64 entries.",
+        models: "The models added by hand are not accepted: comma-separated, each entry only letters, digits and - _ . : / @ +, at most 64 entries.",
       },
     };
 
