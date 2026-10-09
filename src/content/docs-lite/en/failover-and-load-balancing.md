@@ -4,7 +4,7 @@ ThinkWatch Lite turns each relay key into an upstream and puts several upstreams
 
 ## Before you start
 
-- ThinkWatch Lite, [installed](/lite/#install), with a client connected on the Clients page. This guide follows version 2026.10.6.
+- ThinkWatch Lite, [installed](/lite/#install), with a client connected on the Clients page. This guide follows version 2026.10.10.
 - The base URL and API keys of each relay.
 
 ## Steps
@@ -32,7 +32,7 @@ A strategy only sets the order; every member remains available for failover.
 - **Concurrency limits.** An upstream with a **Concurrency limit** takes at most that many requests at once. When it is full, a conversation that stays on it waits for a free slot and then moves on, and other requests go straight to the next member; when every member is full, a request waits for the first free slot for up to **Wait for a free slot at most** in Settings › Failover, 30 seconds by default, and then receives a 429 with `Retry-After`, or the error of an earlier attempt when one was sent. The same wait covers a key's per-minute and per-hour usage limits, and the Traffic page shows each skip and the time queued.
 - **Pauses.** A failing upstream is paused for as long as Settings › Failover sets: by default 60 seconds after 3 **Consecutive failures**, doubling up to 600; 30 minutes for **Insufficient balance**; until the reset time, or 60 minutes, for **Quota used up**; the wait a rate-limited upstream asks for, up to 60 minutes. A rule with a single upstream is never held back, and when every member is paused they are tried anyway.
 - **Sessions and prompt cache.** Within a turn, while the client sends tool results back, requests keep the rule chosen at the start of the turn and the upstream that answered. Across turns, a conversation stays with the upstream that answered last if that answer read or wrote at least 1,024 cached tokens within the last five minutes; moving would rebuild the cache at full price. Otherwise, or when that upstream is paused, the strategy orders the members again, which is when **Round robin** moves on. The **Conversation** line on a request's **Routing** tab shows when a request stayed.
-- **Same model name.** Every member is asked for the model the client sent, or the name a rule rewrote it to. A member whose model list lacks it is skipped; one without a list is tried, and its 404 moves the request on.
+- **Same model name.** Every member is asked for the model the client sent, or the name a rule rewrote it to. A member whose model list lacks it is skipped; one without a list is tried, and its 404 moves the request on. A model that a member serves but leaves out of its list can be added with **Add models…** in the member's model list on the Upstreams page.
 - **Falling back to another model.** Add a rule with the condition **Selected upstream** set to the backup upstream, **On match** set to **Continue matching**, and its model in **Change model to** under **Parameter rewrites**. Such a rule is evaluated for each upstream as it is tried, failover included. The changed model no longer hits the cached prompt, and the request is priced by the name sent.
 
 Related: [Switch relays, upstreams or models without restarting Claude Code or Codex](/docs/lite/switch-upstreams-without-restart/), [Features](/docs/lite/features/#routing-and-failover), [Install and update](/docs/lite/install/).
