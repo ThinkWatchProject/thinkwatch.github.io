@@ -91,7 +91,7 @@ export const homeCopy = {
       ],
       pills: ["Available", "macOS (Apple silicon)", "Windows (x64, ARM64)", "Linux (x86_64, aarch64)"],
       shotAlt:
-        "The Overview page for the last 7 days: 83.1M tokens, $68.11 in cost including $0.441 estimated and 13 unpriced requests, and 1,339 requests of which 11 failed, each compared with the prior 7 days; a token trend stacked by model with the periods that had failures marked; and the models ranked by tokens",
+        "The Overview page for the last 7 days: notices that 11 requests failed, a suspicious tool call was cut off and 13 requests are unpriced; cards for 87.5M tokens, a cost of at least about $71.89, 92% cache hits, 1,400 requests, a 1.26 s median first token and 310 MB of traffic, each with the change against the prior 7 days and a chart or breakdown; and the statistics by model below",
       cta: "Explore ThinkWatch Lite",
     },
     core: {
@@ -219,7 +219,7 @@ export const homeCopy = {
       ],
       pills: ["已发布", "macOS（Apple silicon）", "Windows（x64、ARM64）", "Linux（x86_64、aarch64）"],
       shotAlt:
-        "概览页（最近 7 天）：token 83.1M、费用 $68.11（含估算 $0.441，13 条无法计价）、请求 1,339 次（失败 11 次），均与上一个 7 天对比；按模型分层的 token 趋势，并标出存在失败的时段；以及按 token 排序的模型列表",
+        "概览页（最近 7 天）：提示 11 次请求失败、切断了 1 个可疑工具调用、13 条请求无法计价；token 87.5M、费用不低于约 $71.89、缓存命中 92%、请求 1,400 次、首 token 中位数 1.26 秒、流量 310 MB 六张卡片，各带与上一个 7 天的对比和趋势图或构成；下方是按模型的统计",
       cta: "了解 ThinkWatch Lite",
     },
     core: {

@@ -12,9 +12,9 @@
 // alt text changes with it.
 
 const overviewAlt = {
-  en: "The Overview page for the last 7 days: 83.1M tokens, $68.11 in cost including $0.441 estimated and 13 unpriced requests, and 1,339 requests of which 11 failed, each compared with the prior 7 days; a token trend stacked by model with the periods that had failures marked; and the models ranked by tokens",
+  en: "The Overview page for the last 7 days: notices that 11 requests failed, a suspicious tool call was cut off and 13 requests are unpriced; cards for 87.5M tokens, a cost of at least about $71.89, 92% cache hits, 1,400 requests, a 1.26 s median first token and 310 MB of traffic, each with the change against the prior 7 days and a chart or breakdown; and the statistics by model below",
   "zh-CN":
-    "概览页（最近 7 天）：token 83.1M、费用 $68.11（含估算 $0.441，13 条无法计价）、请求 1,339 次（失败 11 次），均与上一个 7 天对比；按模型分层的 token 趋势，并标出存在失败的时段；以及按 token 排序的模型列表",
+    "概览页（最近 7 天）：提示 11 次请求失败、切断了 1 个可疑工具调用、13 条请求无法计价；token 87.5M、费用不低于约 $71.89、缓存命中 92%、请求 1,400 次、首 token 中位数 1.26 秒、流量 310 MB 六张卡片，各带与上一个 7 天的对比和趋势图或构成；下方是按模型的统计",
 } as const;
 
 export const liteCopy = {
@@ -207,9 +207,9 @@ export const liteCopy = {
       body: "The macOS menu bar shows today's tokens and cost, in orange when a subscription quota is nearly used up and red once it has run out. Its menu gives the gateway's state, each quota with its reset time and the requests in progress, and copies the gateway address or default key without opening the window. Windows and Linux have the same menu in the tray.",
       notices:
         "A system notification reports a gateway that stopped forwarding, a lost remote connection, a quota that ran out, a credential that stopped working, an unreachable proxy, configuration that did not take effect, a dangerous tool call that was cut off, and suspicious content in client configuration.",
-      chipAlt: "The menu bar item: the ThinkWatch mark with today's 13.3M tokens above today's cost, $9.34",
+      chipAlt: "The menu bar item: the ThinkWatch mark with today's 13.3M tokens above today's cost, 9.34$",
       menuAlt:
-        "The menu bar menu: the gateway's address, output speed and state; the ChatGPT account's 5-hour and weekly quotas with their reset times; today's requests, tokens and cost; the request in progress; and items to open the app, copy the gateway address or the default key, switch connection, open settings and check for updates",
+        "The menu bar menu: an item to open ThinkWatch Lite; today's 13.3M tokens, 204 requests of which 4 failed and $9.34, with the gateway's state and output speed; the ChatGPT account's 5-hour and weekly quotas with their reset times; the request in progress; and items to copy the gateway address or the default key, open settings, switch connection, check for updates and quit",
     },
     built: {
       eyebrow: "Architecture",
@@ -449,9 +449,9 @@ export const liteCopy = {
       body: "macOS 菜单栏显示今日 token 与费用，订阅额度将尽时变为橙色，用完后变为红色。点开的菜单给出网关状态、各项额度及重置时间与进行中的请求，不打开主窗口即可复制网关地址或默认密钥。Windows 与 Linux 的托盘提供相同的菜单。",
       notices:
         "网关停止转发、远程连接断开、额度用完、凭据失效、代理无法连接、配置未能生效、危险工具调用被切断，以及客户端配置中出现可疑内容时，应用发送系统通知。",
-      chipAlt: "菜单栏：ThinkWatch 标识，右侧上行为今日 token 13.3M，下行为今日费用 $9.34",
+      chipAlt: "菜单栏：ThinkWatch 标识，右侧上行为今日 token 13.3M，下行为今日费用 9.34$",
       menuAlt:
-        "菜单栏菜单：网关地址、输出速率与状态；ChatGPT 账号的 5 小时与每周额度及重置时间；今日请求数、token 与费用；进行中的请求；以及打开主界面、复制网关地址、复制默认密钥、切换连接、设置与检查更新等菜单项",
+        "菜单栏菜单：打开主界面；今日 token 13.3M、请求 204 次（失败 4 次）、费用 $9.34，以及网关状态与输出速率；ChatGPT 账号的 5 小时与每周额度及重置时间；进行中的请求；以及复制网关地址、复制默认密钥、设置、切换连接、检查更新与退出等菜单项",
     },
     built: {
       eyebrow: "架构",
