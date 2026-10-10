@@ -30,7 +30,7 @@ Through the gateway, Claude Code can use an Anthropic API key, Amazon Bedrock, a
 
 ## Can ThinkWatch Lite use relays and Chinese models such as GLM, Kimi, Qwen or DeepSeek?
 
-Yes. Any service with an Anthropic, OpenAI or Gemini API can be an upstream: on the Upstreams page, choose **New upstream**, set **Service** to **Custom**, and enter the **Base URL** and **API key**. DeepSeek is in the Service list, and a Z.ai or BigModel account can be signed in directly, with its GLM Coding Plan quota shown in the app.
+Yes. Any service with an Anthropic, OpenAI or Gemini API can be an upstream: on the Upstreams page, choose **New upstream**, set **Service** to **Custom**, and enter the **Base URL** and **API key**. DeepSeek, OpenRouter, Sub2API and New API / One API are in the Service list, and a Z.ai or BigModel account can be signed in directly, with its GLM Coding Plan quota shown in the app.
 
 Upstreams that accept only particular clients, such as Kimi For Coding or Bailian Coding Plan, need **Forward client identity** turned on in the upstream's connection settings; otherwise requests identify themselves as ThinkWatch. A custom price sheet covers a relay whose prices differ from the official ones, and a routing rule can rewrite the model name, in which case the request is priced by the name it was sent with.
 

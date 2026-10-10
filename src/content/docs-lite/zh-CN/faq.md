@@ -30,7 +30,7 @@ ThinkWatch Lite 支持 macOS 12 及以上（Apple 芯片，不提供 Intel 芯�
 
 ## ThinkWatch Lite 能使用中转站和 GLM、Kimi、通义千问、DeepSeek 等国产模型吗？
 
-能。任何提供 Anthropic、OpenAI 或 Gemini 接口的服务都可以作为上游：在上游页点击「新建上游」，「服务类型」选择「自定义」，填写「接口地址」与「API 密钥」。「服务类型」中列有 DeepSeek；Z.ai 或 BigModel 账号可以直接在应用内登录，并显示 GLM Coding Plan 的额度。
+能。任何提供 Anthropic、OpenAI 或 Gemini 接口的服务都可以作为上游：在上游页点击「新建上游」，「服务类型」选择「自定义」，填写「接口地址」与「API 密钥」。「服务类型」中列有 DeepSeek、OpenRouter、Sub2API 与 New API / One API；Z.ai 或 BigModel 账号可以直接在应用内登录，并显示 GLM Coding Plan 的额度。
 
 Kimi For Coding、百炼 Coding Plan 等只接受特定客户端的上游，需要在该上游的连接设置中打开「转发客户端身份」，否则请求以 ThinkWatch 的身份发出。中转站的价格与官方不同时，可以使用自定义价目表；路由规则可以改写客户端请求的模型名，此时按发出的模型名计价。
 

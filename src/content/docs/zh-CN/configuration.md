@@ -498,6 +498,7 @@ openssl rand -base64 32
 | `security.redact`            | `{}`    | 出站脱敏的策略，见[请求防护](#请求防护) |
 | `security.inspect_tools`     | `{}`    | 工具调用审查的策略，见[请求防护](#请求防护) |
 | `security.content`           | `{}`    | 内容过滤的策略，见[请求防护](#请求防护) |
+| `security.rate_limit_fail_closed` | `false` | 限额无法检查时拒绝请求，见[无法检查限额时](#无法检查限额时) |
 
 #### 请求防护
 
@@ -515,6 +516,15 @@ openssl rand -base64 32
 ```
 
 控制台的「内容安全」页编辑这些对象。经 `PATCH /api/admin/settings` 写入时，一个键整体写入，写入前先校验：字段名拼错、内置规则 id 不存在、正则无法编译或码位写法有误时返回 `400`。写入 `security.redact` 需要 `pii_redactor:write` 权限，另外两个键需要 `content_filter:write`。`GET /api/admin/security` 列出每项防护的档位与全部规则，`POST /api/admin/security/{guard}/test` 用一段样本测试这些规则。从仍使用 `security.content_filter_patterns`、`security.pii_redactor_patterns`、`security.hidden_text` 和 `security.tool_inspection` 的版本升级时，这些设置在首次启动时转换为上述三个键。
+
+#### 无法检查限额时
+
+请求的限额无法检查时，即 Redis 无法访问，或加载请求的限流与预算时数据库出错，由 `security.rate_limit_fail_closed` 决定如何处理。这一设置覆盖用户、API 密钥与角色的限流和预算，以及路由的 RPM 与 TPM 上限，对 AI 网关和 MCP 网关都有效。
+
+- `false`（默认）：请求照常进行，不受无法检查的限额约束；错误作为警告写入日志，并计入 `*_fail_open_total` 指标。
+- `true`：拒绝请求，标签为 `limits_unavailable`、`budget_unavailable` 或 `rate_limiter_unavailable`。AI 网关按客户端的 API 格式返回 `429` 和 `Retry-After: 30`；MCP 网关返回 `429` 和 JSON-RPC 错误。
+
+漏算限额比拒绝请求更糟时，应打开这一设置。无论如何设置，限额无法读取时 `GET /v1/usage` 都返回 `503`。在控制台中，这一设置是「设置 › 安全 › 限速引擎」中的「限额无法检查时拒绝请求」。
 
 ### 预算
 
