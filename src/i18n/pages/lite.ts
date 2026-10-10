@@ -204,7 +204,7 @@ export const liteCopy = {
     menubar: {
       eyebrow: "Outside the main window",
       title: "Menu bar, tray and notifications",
-      body: "The macOS menu bar shows today's tokens and cost, in orange when a subscription quota is nearly used up and red once it has run out. Its menu gives the gateway's state, each quota with its reset time and the requests in progress, and copies the gateway address or default key without opening the window. Windows and Linux have the same menu in the tray.",
+      body: "The macOS menu bar shows today's tokens and cost. Its menu gives the gateway's state, each quota with its reset time and the requests in progress, and copies the gateway address or default key without opening the window. Windows and Linux have the same menu in the tray.",
       notices:
         "A system notification reports a gateway that stopped forwarding, a lost remote connection, a quota that ran out, a credential that stopped working, an unreachable proxy, configuration that did not take effect, a dangerous tool call that was cut off, and suspicious content in client configuration.",
       chipAlt: "The menu bar item: the ThinkWatch mark with today's 13.3M tokens above today's cost, $9.34",
@@ -446,7 +446,7 @@ export const liteCopy = {
     menubar: {
       eyebrow: "主窗口之外",
       title: "菜单栏、托盘与系统通知",
-      body: "macOS 菜单栏显示今日 token 与费用，订阅额度将尽时变为橙色，用完后变为红色。点开的菜单给出网关状态、各项额度及重置时间与进行中的请求，不打开主窗口即可复制网关地址或默认密钥。Windows 与 Linux 的托盘提供相同的菜单。",
+      body: "macOS 菜单栏显示今日 token 与费用。点开的菜单给出网关状态、各项额度及重置时间与进行中的请求，不打开主窗口即可复制网关地址或默认密钥。Windows 与 Linux 的托盘提供相同的菜单。",
       notices:
         "网关停止转发、远程连接断开、额度用完、凭据失效、代理无法连接、配置未能生效、危险工具调用被切断，以及客户端配置中出现可疑内容时，应用发送系统通知。",
       chipAlt: "菜单栏：ThinkWatch 标识，右侧上行为今日 token 13.3M，下行为今日费用 $9.34",
