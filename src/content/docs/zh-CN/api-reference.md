@@ -31,8 +31,19 @@
 | `POST /v1/messages`         | Anthropic Messages API  | Claude Code、Anthropic SDK                   |
 | `POST /v1/responses`        | OpenAI Responses API    | OpenAI SDK（2025 格式）                      |
 | `GET /v1/models`            | OpenAI Models           | 所有客户端                                   |
+| `GET /v1/usage`             | 调用方密钥的用量与限额  | 持有网关 API 密钥的任何客户端                |
 
 三个端点使用相同的认证方式（API Key 或 JWT），经过相同的模型路由器和速率限制器，并生成相同的用量记录和审计日志。
+
+### 限流与预算
+
+请求发往上游之前，按此前的用量检查其 API 密钥与密钥所属用户的限流和预算；token 在响应之后计入，由响应缓存应答的请求同样计入。所属用户的限额来自其角色（全局分配的角色，以及用户所在团队挂载的角色），按最严格的合并，再应用用户自己的覆盖。超出限额的请求返回 `429`，`Retry-After` 给出限额释放前的秒数，错误消息注明是哪一项限额，例如 `Rate limited: user:requests/1m`。被这些限额拒绝的请求，以及密钥无权使用所请求模型的请求，不计入任何限额。
+
+**路由上限。**模型路由可以设置「RPM 上限」和「TPM 上限」（在路由编辑器中设置），都按一分钟的滑动窗口计数，TPM 上限与其他 token 限额一样按加权 token 计。达到任一上限的路由会被跳过，由该模型的下一条路由处理请求；剩余路由全部达到上限时，请求返回 `429` 和 `Retry-After`，标签为 `route:requests/1m` 或 `route:tokens/1m`。这样的请求已经通过调用方自己的限额，并计入其中。
+
+**无法检查限额时。**Redis 无法访问，或加载请求的限额时数据库出错，由 `security.rate_limit_fail_closed` 决定：关闭（默认）时请求照常进行，不受这些限额约束，并记录一条警告；打开时拒绝请求，返回 `429` 和 `Retry-After: 30`，标签为 `rate_limiter_unavailable`、`budget_unavailable` 或 `limits_unavailable`。路由上限同样遵循这一设置。见[无法检查限额时](/zh-CN/docs/configuration#无法检查限额时)。
+
+[`GET /v1/usage`](#get-v1usage) 告诉客户端它的密钥已用多少、限额还剩多少。
 
 ### POST /v1/chat/completions
 
@@ -193,6 +204,95 @@ curl http://localhost:3000/v1/models \
 | 状态码 | 条件               |
 | ------ | -------------------- |
 | 401    | 无效凭证           |
+
+---
+
+### GET /v1/usage
+
+查询调用方 API 密钥在 AI 网关上已用多少、限额还剩多少。客户端可以据此向用户显示剩余额度，或在限额拒绝请求之前放慢速度。
+
+**认证：** 可访问 AI 网关的 API Key，与模型请求相同
+
+调用它不计入任何限额，不写请求日志，也不算作一次使用密钥：`last_used_at` 保持不变，因此轮询不会让闲置的密钥免于不活跃超时。
+
+#### 请求
+
+无请求体。无查询参数。
+
+#### 响应体
+
+```json
+{
+  "scope": "key",
+  "usage": {
+    "requests_today": 12,
+    "tokens_today": 48210,
+    "requests_month": 340,
+    "tokens_month": 1290455,
+    "cost_usd_month": 3.82
+  },
+  "limits": [
+    {
+      "scope": "key",
+      "kind": "tokens",
+      "window": "daily",
+      "window_secs": null,
+      "limit": 100000,
+      "used": 48210,
+      "resets_at": "2026-10-12T00:00:00Z"
+    },
+    {
+      "scope": "key",
+      "kind": "requests",
+      "window": "1m",
+      "window_secs": 60,
+      "limit": 60,
+      "used": 4,
+      "resets_at": null
+    }
+  ],
+  "expires_at": "2026-12-31T00:00:00Z"
+}
+```
+
+回答针对两种对象之一，由 `scope` 指明：
+
+- `"key"`：密钥在 AI 网关上设有自己的限额。`limits` 只列出密钥自己的限额，`used` 按这把密钥计数；`usage` 是密钥自己的用量，跨轮换累计。
+- `"user"`：密钥没有自己的限额。`limits` 列出其所属用户的有效限额（各角色的限额，包括团队授予的角色，按最严格的合并，再应用用户自己的覆盖），`used` 按该用户的全部用量计数；`usage` 是该用户所有密钥的合计。用户也没有限额时，`limits` 为空。
+
+因此，持有一把没有自己限额的密钥，就能看到其所属用户的合计用量与限额；交给他人使用的密钥应设置自己的限额。
+
+| 字段                                            | 类型           | 描述                                                                        |
+| ----------------------------------------------- | -------------- | --------------------------------------------------------------------------- |
+| `scope`                                         | string         | `key` 或 `user`，见上文                                                     |
+| `usage.requests_today`、`usage.requests_month`  | integer        | UTC 当天与当月通过限流的请求数，包括由响应缓存应答的请求                     |
+| `usage.tokens_today`、`usage.tokens_month`      | integer        | UTC 当天与当月的加权 token，计法与限额相同                                  |
+| `usage.cost_usd_month`                          | number \| null | 本月费用，取自请求日志；未配置 ClickHouse 时为 `null`                       |
+| `limits[].scope`                                | string         | 限额属于谁，与 `scope` 相同                                                 |
+| `limits[].kind`                                 | string         | `requests` 或 `tokens`（加权）                                              |
+| `limits[].window`                               | string         | 限流的滑动窗口（`1m`、`5m`、`1h`、`5h`、`1d`、`1w`），或预算的日历周期（`daily`、`weekly`、`monthly`） |
+| `limits[].window_secs`                          | integer \| null | 滑动窗口的长度（秒）；日历周期为 `null`                                   |
+| `limits[].limit`                                | integer        | 限额                                                                        |
+| `limits[].used`                                 | integer        | 已用量，读自拒绝请求所依据的计数器                                          |
+| `limits[].resets_at`                            | string \| null | 日历周期的结束时间（UTC）；滑动窗口为 `null`                              |
+| `expires_at`                                    | string \| null | 密钥的过期时间或轮换宽限期的结束时间，取较早者；两者都没有时为 `null`     |
+
+剩余比例最小的限额排在最前。MCP 网关上的限额不列出。`usage` 从升级到 ThinkWatch 3.5.0 时开始计数。
+
+#### 示例
+
+```bash
+curl http://localhost:3000/v1/usage \
+  -H "Authorization: Bearer tw-your-api-key"
+```
+
+#### 错误响应
+
+| 状态码 | 条件                                                                      |
+| ------ | ------------------------------------------------------------------------- |
+| 401    | 密钥缺失或无效，与模型请求相同                                            |
+| 403    | 密钥不能使用 AI 网关，与模型请求相同                                      |
+| 503    | 无法读取密钥的限额或其计数器，与 `security.rate_limit_fail_closed` 的设置无关 |
 
 ---
 
@@ -996,6 +1096,8 @@ curl http://localhost:3001/api/auth/me \
 ---
 
 ### API 密钥
+
+API 密钥自己的限流与预算在控制台中密钥编辑对话框的「限额」标签页里编辑：按请求数或加权 token 计的限流（窗口为 1m、5m、1h、5h、1d 或 1w），以及按日、周或月计的加权 token 预算，各自显示已用量。它们叠加在所属用户的限额之上，单独计数，并在密钥轮换后保留。该标签页通过 `/api/admin/limits/api_key/{id}/rules`、`/api/admin/limits/api_key/{id}/budgets` 和 `/api/admin/limits/api_key/{id}/usage` 读取和修改限额。读取需要 `rate_limits:read`，修改需要 `rate_limits:write`，且权限范围须覆盖这把密钥；没有修改权限时标签页只读，没有读取权限时对话框中不显示「限额」标签页。
 
 #### GET /api/keys
 

@@ -724,6 +724,7 @@ ThinkWatch 在 Web 控制台中内置了**配置指南**页面，位于 `/gatewa
 | `POST /v1/messages`         | Anthropic Messages API  | Claude Code、Anthropic SDK                   |
 | `POST /v1/responses`        | OpenAI Responses API    | OpenAI SDK（2025 格式）                      |
 | `GET /v1/models`            | OpenAI Models 列表      | 所有客户端                                   |
+| `GET /v1/usage`             | 调用方密钥的用量与限额  | 持有网关 API 密钥的任何客户端                |
 
 所有端点通过 `Authorization: Bearer` 请求头接受 `tw-` API 密钥。
 

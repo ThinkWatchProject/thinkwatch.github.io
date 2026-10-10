@@ -724,6 +724,7 @@ The gateway (port 3000) serves three API formats on a single port:
 | `POST /v1/messages`         | Anthropic Messages API  | Claude Code, Anthropic SDK                   |
 | `POST /v1/responses`        | OpenAI Responses API    | OpenAI SDK (2025 format)                     |
 | `GET /v1/models`            | OpenAI Models list      | All clients                                  |
+| `GET /v1/usage`             | Usage and limits of the calling key | Any client with a gateway API key |
 
 All endpoints accept `tw-` API keys via the `Authorization: Bearer` header.
 
