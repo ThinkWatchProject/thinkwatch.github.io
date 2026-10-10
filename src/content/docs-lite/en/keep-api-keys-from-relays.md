@@ -14,7 +14,7 @@ A relay receives every request in full, including keys that end up in the conver
 3. For a key format the built-in rules do not cover, choose **New rule**, enter a **Name**, a pattern under **Match (regular expression)** and a **Placeholder name** such as `INTERNAL` (giving `<<TW_INTERNAL_1>>`), then choose **Create**.
 4. Set the mode at the top of the tab to **Replace**.
 5. Open **Tool calls**. Each built-in rule is marked **Cut off** or **Record only**, which **View rule** can change. Set the mode to **Cut off**.
-6. The log's **Action** column then shows **Replaced** or **Cut off**, and a cut-off call also raises a system notification.
+6. The log's **Action** column then shows **Replaced** or **Cut off**, and a cut-off call also raises a system notification. From ThinkWatch Lite 2026.10.12, an entry opens in place to show where the value was found and the placeholder it was replaced with, or the tool call that was cut off and the notice the client received.
 
 ## Notes
 

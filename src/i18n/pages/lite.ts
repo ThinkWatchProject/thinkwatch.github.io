@@ -136,7 +136,7 @@ export const liteCopy = {
         {
           id: "traffic",
           title: "Every request, traceable",
-          body: "A request shows the rule it matched, each upstream it tried, any conversion between API formats and how its cost was calculated. A finished request can be replayed against another upstream and the two answers compared side by side, and the whole history can be searched, including the text of requests and answers.",
+          body: "A request shows the rule it matched, each upstream it tried, any conversion between API formats and how its cost was calculated, and its content can be read live while the answer streams. A finished request can be replayed against another upstream and the two answers compared side by side, and the whole history can be searched, including the text of requests and answers.",
           alt: "The Traffic page: each request with its key, model, upstream, time to first token, total time, tokens and cost, with marks for converted formats, redacted keys and a blocked request, and one request answered locally by the gateway",
         },
         {
@@ -154,7 +154,7 @@ export const liteCopy = {
         {
           id: "overview",
           title: "Costs stated as they are",
-          body: "Tokens, cost, cache savings, time to first token and generation speed, by model and by upstream. Estimated amounts are marked, and requests without a price are counted separately instead of as zero; prices follow LiteLLM's public list, refreshed daily, or a custom price sheet.",
+          body: "Tokens, cost, cache hits, requests, time to first token and traffic on one screen, each against the previous period and broken down by model, upstream or key. Estimated amounts are marked, and requests without a price are counted separately instead of as zero; prices follow LiteLLM's public list, refreshed daily, or a custom price sheet.",
           alt: overviewAlt.en,
         },
         {
@@ -379,7 +379,7 @@ export const liteCopy = {
         {
           id: "traffic",
           title: "每个请求都可追溯",
-          body: "请求详情给出命中的规则、尝试过的每个上游、API 格式转换，以及费用的计算依据。已结束的请求可以重放到另一个上游，并排对比两次回答；全部请求记录都可以搜索，包括请求与回答的内容。",
+          body: "请求详情给出命中的规则、尝试过的每个上游、API 格式转换，以及费用的计算依据，回答生成期间即可实时查看请求与回答的内容。已结束的请求可以重放到另一个上游，并排对比两次回答；全部请求记录都可以搜索，包括请求与回答的内容。",
           alt: "流量页：逐条列出请求的密钥、模型、上游、首 token 时间、总耗时、token 与费用，标出格式转换、密钥脱敏与被拦截的请求，其中一条由网关在本地应答",
         },
         {
@@ -397,7 +397,7 @@ export const liteCopy = {
         {
           id: "overview",
           title: "费用如实计算",
-          body: "按模型与上游统计 token、费用、缓存节省、首 token 时间与生成速度。估算的金额单独标注，无法计价的请求单独计数，不按零计入；价格每日按 LiteLLM 公开价更新，也可以使用自定义价目表。",
+          body: "token、费用、缓存命中、请求、首 token 时间与流量集中在一屏，均与上一个区间对比，并可按模型、上游或密钥查看明细。估算的金额单独标注，无法计价的请求单独计数，不按零计入；价格每日按 LiteLLM 公开价更新，也可以使用自定义价目表。",
           alt: overviewAlt["zh-CN"],
         },
         {
