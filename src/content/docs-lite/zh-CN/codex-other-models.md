@@ -10,7 +10,7 @@ ThinkWatch Lite 把 Codex 接到本机的网关上，网关接收 OpenAI Respons
 
 ## 步骤
 
-1. 在「上游」页点击「新建上游」，选择「服务类型」：Claude 选「Anthropic」，Gemini 选「Google Gemini」，接口地址和接口协议会自动填入。中转站选「自定义」，「接口地址」填它的 Base URL（不含 `/chat/completions` 等接口路径），「接口协议」选「OpenAI Chat Completions」；例如 GLM 填 `https://api.z.ai/api/paas/v4`，GLM Coding Plan 填 `…/api/coding/paas/v4`。以自带版本号结尾的地址（如 `/v4`、火山方舟的 `/api/v3`），自 ThinkWatch Lite 2026.10.5 起按原样使用。填写「API 密钥」，点击「检测连接」，再点击「下一步」。中转站不提供模型列表或没有列全时，在「模型」一节末尾的输入框中逐个填写缺少的模型 ID 并回车。再点击「下一步」，然后点击「创建」。
+1. 在「上游」页点击「新建上游」，在第一步「服务类型」中选择服务，选定后直接进入「连接」：Claude 选「Anthropic」，Gemini 选「Google Gemini」，接口地址和接口协议会自动填入。中转站选「自定义」，「接口地址」填它的 Base URL（不含 `/chat/completions` 等接口路径），「接口协议」选「OpenAI Chat Completions」；例如 GLM 填 `https://api.z.ai/api/paas/v4`，GLM Coding Plan 填 `…/api/coding/paas/v4`。以自带版本号结尾的地址（如 `/v4`、火山方舟的 `/api/v3`），自 ThinkWatch Lite 2026.10.5 起按原样使用。填写「API 密钥」，点击「检测连接」，再点击「下一步」。中转站不提供模型列表或没有列全时，在「模型」一节末尾的输入框中逐个填写缺少的模型 ID 并回车。再点击「下一步」，然后点击「创建」。
 2. 在「客户端」页 Codex 一行点击「接管…」。对话框列出对 `~/.codex/config.toml` 的修改：
 
    | 字段 | 写入 |

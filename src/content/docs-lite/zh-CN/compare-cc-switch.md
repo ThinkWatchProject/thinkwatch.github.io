@@ -17,7 +17,7 @@ ThinkWatch Lite 在本机运行网关 ThinkWatch Core。在客户端页把每个
 | | CC Switch | ThinkWatch Lite |
 |---|---|---|
 | 客户端 | Claude Code、Claude Desktop、Codex、Gemini CLI、Grok Build、OpenCode、OpenClaw、Hermes Agent、Pi、MiniMax Code | 一键接管：Claude Code、Claude Desktop、Codex（含 ChatGPT 桌面版中的 Codex）、opencode、Pi、oh-my-pi、Grok Build、Qwen Code、Hermes Agent、Zed、Aider、DeepSeek Harness；提供配置方法：Cursor、Continue、Antigravity CLI |
-| 添加供应商 | 50 余个供应商预设；`ccswitch://` 链接可导入供应商、MCP 服务器、提示词与技能 | 服务类型中列有 Anthropic、OpenAI、Google Gemini、Amazon Bedrock、DeepSeek 与 Ollama，也可填写任何兼容接口；中转站或服务商可通过 `thinkwatch://import` 链接预填一个上游 |
+| 添加供应商 | 50 余个供应商预设；`ccswitch://` 链接可导入供应商、MCP 服务器、提示词与技能 | 新建上游先选择服务：ChatGPT 与 Z.ai / BigModel 账号登录，或 Anthropic、OpenAI、Google Gemini、Amazon Bedrock、DeepSeek、Ollama 的 API 接入，也可填写任何兼容接口；中转站或服务商可通过 `thinkwatch://import` 链接预填一个上游 |
 | 路由 | 代理模式下，每个客户端的请求发往它当前的供应商；可按供应商映射模型 | 每把密钥的规则按顺序匹配模型、API 格式、输入 token、工具、图片、扩展思考等条件；规则可以改写模型 |
 | 故障转移 | 按优先级排列的故障转移队列，带熔断（代理模式） | 回答开始之前尝试失败时，转到策略组中的下一个上游；同一会话默认保持在同一个上游 |
 | 负载均衡 | — | 策略组：按顺序、手动选择、轮询、延迟最低、费用最低 |

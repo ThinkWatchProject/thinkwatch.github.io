@@ -17,7 +17,7 @@ A dash means the feature is not described in that product's documentation.
 | | CC Switch | ThinkWatch Lite |
 |---|---|---|
 | Clients | Claude Code, Claude Desktop, Codex, Gemini CLI, Grok Build, OpenCode, OpenClaw, Hermes Agent, Pi, MiniMax Code | In one step: Claude Code, Claude Desktop, Codex (also in the ChatGPT desktop app), opencode, Pi, oh-my-pi, Grok Build, Qwen Code, Hermes Agent, Zed, Aider, DeepSeek Harness. With instructions: Cursor, Continue, Antigravity CLI |
-| Adding providers | More than 50 presets; `ccswitch://` links import providers, MCP servers, prompts and skills | Anthropic, OpenAI, Google Gemini, Amazon Bedrock, DeepSeek and Ollama in the service list, or any compatible endpoint; `thinkwatch://import` links from a relay or vendor pre-fill one upstream |
+| Adding providers | More than 50 presets; `ccswitch://` links import providers, MCP servers, prompts and skills | A new upstream starts from the service: a ChatGPT or Z.ai / BigModel account sign-in, API access to Anthropic, OpenAI, Google Gemini, Amazon Bedrock, DeepSeek or Ollama, or any compatible endpoint; `thinkwatch://import` links from a relay or vendor pre-fill one upstream |
 | Routing | In proxy mode, each client's requests go to its current provider; models can be mapped per provider | Ordered rules per key by model, API format, input tokens, tools, images, extended thinking and more; rules can rewrite the model |
 | Failover | Queue in priority order with a circuit breaker (proxy mode) | Next upstream in the group when an attempt fails before the answer begins; a session stays on one upstream |
 | Load balancing | — | Group strategies: in order, manual, round robin, lowest latency, lowest cost |
