@@ -10,7 +10,7 @@ ThinkWatch Lite 把 Claude Code 接到本机的网关上，网关再把每个请
 
 ## 步骤
 
-1. 在「上游」页点击「新建上游」，选择「服务类型」：
+1. 在「上游」页点击「新建上游」。第一步「服务类型」列出可接入的服务，账号登录在前、API 接入在后，可以搜索；选定后直接进入「连接」：
    - 「DeepSeek」：自动填入 `https://api.deepseek.com/anthropic` 和接口协议，再填写「API 密钥」。
    - GLM（API 密钥）：选「自定义」，「接口地址」填 `https://open.bigmodel.cn/api/anthropic` 或 `https://api.z.ai/api/anthropic`，「接口协议」选「Anthropic Messages」，再填写「API 密钥」。自 ThinkWatch Lite 2026.10.5 起，也可以使用 GLM 的 OpenAI 兼容地址，「接口协议」选「OpenAI Chat Completions」：`https://api.z.ai/api/paas/v4` 或 `https://open.bigmodel.cn/api/paas/v4`，GLM Coding Plan 使用 `…/api/coding/paas/v4`。这时 Claude Code 的请求需要转换格式，因此 Anthropic 地址更直接。
    - GLM（账号登录）：选「Z.ai / BigModel 账号」，在「账号归属」中选择站点，勾选「已阅读上述说明，继续登录」，点击「登录」并在浏览器中完成授权。应用在该账号中创建一把名为 `thinkwatch` 的 API 密钥，并写入上游。

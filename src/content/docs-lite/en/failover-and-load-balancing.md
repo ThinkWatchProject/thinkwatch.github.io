@@ -9,7 +9,7 @@ ThinkWatch Lite turns each relay key into an upstream and puts several upstreams
 
 ## Steps
 
-1. On the Upstreams page, choose **New upstream**. Under **Connection**, enter a **Name**, the **Base URL** and one **API key**, choose **Check connection**, then **Next** until **Create**. Repeat for each key: an upstream holds one key, and failover and pauses work per upstream.
+1. On the Upstreams page, choose **New upstream** and pick the service under **Service** (**Custom** for a relay). Under **Connection**, enter a **Name**, the **Base URL** and one **API key**, choose **Check connection**, then **Next** until **Create**. Repeat for each key: an upstream holds one key, and failover and pauses work per upstream.
 2. On the Routing page, choose **New group** under **Groups**. Enter a **Name**, choose a **Strategy**, tick the upstreams under **Members**, drag them into order and choose **Create**. For **Round robin**, also enter each member's **Weight** and choose **Distribute by**.
 3. Under **Routes**, open the route, choose **Edit…** on the rule that should use the group (usually **All requests (catch-all)**), select the group in **Forward to** and choose **Save** in both dialogs.
 4. **Dry run** checks the result without sending anything. On the Traffic page, a request's **Routing** tab lists the upstreams it tried under **Attempts**.
