@@ -19,7 +19,7 @@ ThinkWatch Lite is a local gateway for Claude Code, Codex and other AI clients, 
 
 | Page | Contents |
 |---|---|
-| Overview | Tokens, cost and requests over a period, trends by model, cache, latency, generation speed and security results |
+| Overview | Tokens, cost, cache hits, requests, time to first token and traffic over a period, what needs attention, and a breakdown by model, upstream or key |
 | Traffic | Every request, or requests grouped into sessions, with the details of each |
 | Clients | Pointing clients at the gateway, and restoring them |
 | Keys | The gateway keys clients connect with, each with its route and limits |
