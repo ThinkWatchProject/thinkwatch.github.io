@@ -231,7 +231,7 @@ docker compose -f deploy/docker-compose.yml --env-file .env.production up -d
 如需固定某个版本而非 `latest`，将 `IMAGE_TAG` 设为该版本号，或 `main` 分支上某次提交的 SHA：
 
 ```bash
-IMAGE_TAG=3.4.0 docker compose -f deploy/docker-compose.yml --env-file .env.production up -d
+IMAGE_TAG=3.5.0 docker compose -f deploy/docker-compose.yml --env-file .env.production up -d
 ```
 
 这将启动：
@@ -724,6 +724,7 @@ ThinkWatch 在 Web 控制台中内置了**配置指南**页面，位于 `/gatewa
 | `POST /v1/messages`         | Anthropic Messages API  | Claude Code、Anthropic SDK                   |
 | `POST /v1/responses`        | OpenAI Responses API    | OpenAI SDK（2025 格式）                      |
 | `GET /v1/models`            | OpenAI Models 列表      | 所有客户端                                   |
+| `GET /v1/usage`             | 调用方密钥的用量与限额  | 持有网关 API 密钥的任何客户端                |
 
 所有端点通过 `Authorization: Bearer` 请求头接受 `tw-` API 密钥。
 
@@ -744,8 +745,8 @@ ThinkWatch 在 Web 控制台中内置了**配置指南**页面，位于 `/gatewa
 ```bash
 # Update the image tag
 helm upgrade think-watch deploy/helm/think-watch \
-  --set image.server.tag=3.4.0 \
-  --set image.web.tag=3.4.0 \
+  --set image.server.tag=3.5.0 \
+  --set image.web.tag=3.5.0 \
   --reuse-values
 ```
 

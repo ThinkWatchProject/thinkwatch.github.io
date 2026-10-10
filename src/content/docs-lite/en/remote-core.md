@@ -52,7 +52,7 @@ Clients on this computer, including those inside WSL on Windows, that point to t
 - **Overview, Traffic, Keys, Upstreams, Routing and Security** show and change the configuration and history of the core on the server.
 - **Clients and MCP** still act on the computer the app runs on: the Clients page points this computer's clients at the server's gateway, and the MCP page checks this computer's MCP servers, skills and hooks. A note at the top of each page says so. Clients on other machines are configured by hand with the server's gateway address and a gateway key.
 - **Settings** is divided into the app on this computer (connection, general settings, about, uninstall) and the configuration on the server (listening, log retention). The remote control port and its key can be changed only on the server.
-- **ChatGPT sign-in** uses a device code: a browser sign-in returns to the machine that runs core, which is the server.
+- **ChatGPT sign-in** uses a device code only, with the verification address and the code each ready to copy: a browser sign-in returns to the machine that runs core, which is the server.
 - `${NAME}` in an upstream's key or headers reads the environment of the core process on the server, and the **system proxy** option means the server's system proxy.
 - The **diagnostics bundle** is not available. The server refuses three things over a remote connection: producing the bundle, stopping core, and changing `listen.control`.
 - If the connection drops, the pages keep showing the state at the moment of the disconnect and cannot be changed until the connection is restored. A system notification reports the disconnect, and the app reconnects on its own.

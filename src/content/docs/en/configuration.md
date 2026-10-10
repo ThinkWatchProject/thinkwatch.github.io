@@ -498,6 +498,7 @@ Changes to dynamic settings take effect immediately without requiring a server r
 | `security.redact`            | `{}`    | Outbound redaction policy, see [Request guards](#request-guards) |
 | `security.inspect_tools`     | `{}`    | Tool-call inspection policy, see [Request guards](#request-guards) |
 | `security.content`           | `{}`    | Content filter policy, see [Request guards](#request-guards) |
+| `security.rate_limit_fail_closed` | `false` | Refuse requests whose limits cannot be checked, see [Limits that cannot be checked](#limits-that-cannot-be-checked) |
 
 #### Request guards
 
@@ -515,6 +516,15 @@ Outbound redaction, tool-call inspection and the content filter each keep their 
 ```
 
 The Content Security page of the console edits these objects. Through `PATCH /api/admin/settings` a key is written whole and checked first: a misspelt field, an unknown built-in rule, a pattern that does not compile or a malformed code point is refused with `400`. Writing `security.redact` takes the `pii_redactor:write` permission, and the other two keys take `content_filter:write`. `GET /api/admin/security` lists each guard's mode and every rule, and `POST /api/admin/security/{guard}/test` tries a sample against them. A deployment upgraded from a version that kept `security.content_filter_patterns`, `security.pii_redactor_patterns`, `security.hidden_text` and `security.tool_inspection` has them converted into these keys at its first start.
+
+#### Limits that cannot be checked
+
+`security.rate_limit_fail_closed` decides what happens to a request whose limits cannot be checked: Redis cannot be reached, or the database fails while the request's rate limits and budgets are loaded. It covers the rate limits and budgets of users, API keys and roles and the RPM and TPM caps of routes, on the AI gateway and the MCP gateway.
+
+- `false`, the default: the request goes on without the limits that could not be checked, and a warning with the error is logged and counted in the `*_fail_open_total` metrics.
+- `true`: the request is refused, labelled `limits_unavailable`, `budget_unavailable` or `rate_limiter_unavailable`. The AI gateway answers `429` with `Retry-After: 30` in the client's API format; the MCP gateway answers `429` with a JSON-RPC error.
+
+Turn it on where a request that escapes its limits is worse than a refused one. `GET /v1/usage` answers `503` while the limits cannot be read, whichever way the setting is. In the console, the setting is **Fail closed when limits can't be checked** under Settings › Security › Rate Limiter.
 
 ### Budget
 

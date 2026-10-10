@@ -31,8 +31,19 @@ The gateway serves three API formats on a single port, allowing clients to use w
 | `POST /v1/messages`         | Anthropic Messages API  | Claude Code, Anthropic SDK                   |
 | `POST /v1/responses`        | OpenAI Responses API    | OpenAI SDK (2025 format)                     |
 | `GET /v1/models`            | OpenAI Models           | All clients                                  |
+| `GET /v1/usage`             | Usage and limits of the calling key | Any client with a gateway API key |
 
 All three endpoints authenticate identically (API Key or JWT), route through the same model router and rate limiter, and produce the same usage records and audit logs.
+
+### Limits and budgets
+
+Before a request is sent upstream, it is checked against the rate limits and budgets of its API key and of the key's owner, using what earlier requests have used; tokens are counted after the response, answers from the response cache included. The owner's limits come from their roles, those assigned globally and those attached to a team they belong to, merged most-restrictive, then from the user's own overrides. A request over a limit gets `429` with `Retry-After`, the seconds until the limit frees, and a message that names the limit, such as `Rate limited: user:requests/1m`. A request refused by these limits, or because its key may not use the model, counts against none of them.
+
+**Route caps.** A model route can carry an **RPM cap** and a **TPM cap**, set in the route editor. Both count over a sliding minute, the TPM cap in weighted tokens like the other token limits. A route at either cap is skipped, and the model's next route serves the request; when every remaining route is at its cap, the request gets `429` with `Retry-After`, labelled `route:requests/1m` or `route:tokens/1m`. Such a request has passed the caller's own limits and counts on them.
+
+**Limits that cannot be checked.** When Redis cannot be reached, or the database fails while a request's limits are loaded, `security.rate_limit_fail_closed` decides. Off, the default, the request goes on without those limits and a warning is logged; on, it is refused with `429` and `Retry-After: 30`, labelled `rate_limiter_unavailable`, `budget_unavailable` or `limits_unavailable`. Route caps follow the same setting. See [Limits that cannot be checked](/docs/configuration#limits-that-cannot-be-checked).
+
+[`GET /v1/usage`](#get-v1usage) tells a client what its key has used and how much room its limits leave.
 
 ### POST /v1/chat/completions
 
@@ -193,6 +204,95 @@ curl http://localhost:3000/v1/models \
 | Status | Condition            |
 | ------ | -------------------- |
 | 401    | Invalid credentials  |
+
+---
+
+### GET /v1/usage
+
+What the calling API key has used and how much room its limits leave on the AI gateway. A client can show its user what is left, or slow down before a limit refuses its requests.
+
+**Authentication:** API Key with access to the AI gateway, as for a model request
+
+Calling it charges no limit, writes no request log entry and is not a use of the key: `last_used_at` stays as it was, so polling does not keep an idle key from its inactivity timeout.
+
+#### Request
+
+No request body. No query parameters.
+
+#### Response Body
+
+```json
+{
+  "scope": "key",
+  "usage": {
+    "requests_today": 12,
+    "tokens_today": 48210,
+    "requests_month": 340,
+    "tokens_month": 1290455,
+    "cost_usd_month": 3.82
+  },
+  "limits": [
+    {
+      "scope": "key",
+      "kind": "tokens",
+      "window": "daily",
+      "window_secs": null,
+      "limit": 100000,
+      "used": 48210,
+      "resets_at": "2026-10-12T00:00:00Z"
+    },
+    {
+      "scope": "key",
+      "kind": "requests",
+      "window": "1m",
+      "window_secs": 60,
+      "limit": 60,
+      "used": 4,
+      "resets_at": null
+    }
+  ],
+  "expires_at": "2026-12-31T00:00:00Z"
+}
+```
+
+The answer is about one of two subjects, named in `scope`:
+
+- `"key"` when the key has limits of its own on the AI gateway: `limits` lists only the key's limits, each with `used` counted for the key, and `usage` is the key's own, across its rotations.
+- `"user"` when it has none: `limits` lists its owner's effective limits (their roles, including those a team grants, merged most-restrictive, then the user's overrides), each with `used` counted for everything the owner does, and `usage` is the owner's total over all of their keys. With no limits on the owner either, `limits` is empty.
+
+Whoever holds a key without limits of its own therefore sees its owner's totals and limits; a key handed to someone else should carry limits of its own.
+
+| Field                                           | Type           | Description                                                                 |
+| ----------------------------------------------- | -------------- | --------------------------------------------------------------------------- |
+| `scope`                                         | string         | `key` or `user`, as above                                                   |
+| `usage.requests_today`, `usage.requests_month`  | integer        | Requests the rate limits let through in the UTC day and month, answers from the response cache included |
+| `usage.tokens_today`, `usage.tokens_month`      | integer        | Weighted tokens, counted as limits count them, in the UTC day and month     |
+| `usage.cost_usd_month`                          | number \| null | Cost this month from the request log; `null` without ClickHouse            |
+| `limits[].scope`                                | string         | Whose limit it is; the same as `scope`                                      |
+| `limits[].kind`                                 | string         | `requests` or `tokens` (weighted)                                           |
+| `limits[].window`                               | string         | A rate limit's sliding window (`1m`, `5m`, `1h`, `5h`, `1d`, `1w`) or a budget's calendar period (`daily`, `weekly`, `monthly`) |
+| `limits[].window_secs`                          | integer \| null | The sliding window's length in seconds; `null` for a calendar period      |
+| `limits[].limit`                                | integer        | The limit                                                                   |
+| `limits[].used`                                 | integer        | What has been used, read from the counter that refuses requests             |
+| `limits[].resets_at`                            | string \| null | The end of a calendar period (UTC); `null` for a sliding window           |
+| `expires_at`                                    | string \| null | The key's expiry or the end of its rotation grace period, whichever comes first; `null` when there is neither |
+
+The limit with the least left comes first. Limits on the MCP gateway are not listed. `usage` counts from the upgrade to ThinkWatch 3.5.0 on.
+
+#### Example
+
+```bash
+curl http://localhost:3000/v1/usage \
+  -H "Authorization: Bearer tw-your-api-key"
+```
+
+#### Error Responses
+
+| Status | Condition                                                                 |
+| ------ | ------------------------------------------------------------------------- |
+| 401    | Missing or invalid key, as for a model request                            |
+| 403    | The key may not use the AI gateway, as for a model request                |
+| 503    | The key's limits or their counters could not be read, whichever way `security.rate_limit_fail_closed` is set |
 
 ---
 
@@ -996,6 +1096,8 @@ curl http://localhost:3001/api/auth/me \
 ---
 
 ### API Keys
+
+An API key's own rate limits and budgets are edited on the **Limits** tab of the key's edit dialog in the console: rate limits on requests or weighted tokens over 1m, 5m, 1h, 5h, 1d or 1w, and daily, weekly or monthly budgets in weighted tokens, each with what it has used. They apply on top of the owner's limits, on counters of their own, and follow the key across rotations. The tab reads and changes them through `/api/admin/limits/api_key/{id}/rules`, `/api/admin/limits/api_key/{id}/budgets` and `/api/admin/limits/api_key/{id}/usage`. Reading needs `rate_limits:read` and changing `rate_limits:write`, in a scope that covers the key; without write access the tab is read-only, and without read access the dialog has no Limits tab.
 
 #### GET /api/keys
 

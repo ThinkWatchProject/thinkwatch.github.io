@@ -23,7 +23,7 @@ ThinkWatch Lite is a local gateway for Claude Code, Codex and other AI clients, 
 | Traffic | Every request, or requests grouped into sessions, with the details of each |
 | Clients | Pointing clients at the gateway, and restoring them |
 | Keys | The gateway keys clients connect with, each with its route and limits |
-| Upstreams | Upstreams, outbound proxies and price sheets |
+| Upstreams | Upstreams with their balances and quotas, outbound proxies and price sheets |
 | Routing | Routes, rules and groups, auxiliary requests, and the dry run |
 | Security | The security log and the three protections with their rules |
 | MCP | MCP servers, skills and hooks in each client, and the configuration scan |

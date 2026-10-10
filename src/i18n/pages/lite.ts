@@ -148,7 +148,7 @@ export const liteCopy = {
         {
           id: "upstreams",
           title: "Any upstream, any API format",
-          body: "API keys, Amazon Bedrock, ChatGPT and Z.ai accounts, relays such as OpenRouter and local Ollama models all serve as upstreams, with subscription quotas and reset times shown. Requests are converted between the Anthropic, OpenAI and Gemini APIs, so Codex can also use models that only speak Chat Completions.",
+          body: "API keys, Amazon Bedrock, ChatGPT and Z.ai accounts, relays such as OpenRouter and local Ollama models all serve as upstreams, with the balances, quotas and reset times their services report shown. Requests are converted between the Anthropic, OpenAI and Gemini APIs, so Codex can also use models that only speak Chat Completions.",
           alt: "The Upstreams page: API-key upstreams for Anthropic, DeepSeek and Gemini, a relay priced with its own price sheet, a ChatGPT Plus account with 58% of its 5-hour limit used, OpenRouter through a proxy and a local Ollama set to free, each with its requests, cost and latency over 24 hours",
         },
         {
@@ -391,7 +391,7 @@ export const liteCopy = {
         {
           id: "upstreams",
           title: "多种上游，接口互转",
-          body: "API 密钥、Amazon Bedrock、ChatGPT 与 Z.ai 账号、OpenRouter 等中转服务以及本机 Ollama 均可作为上游，订阅额度与重置时间一并显示。Anthropic、OpenAI、Gemini 接口之间自动转换，Codex 也能使用只支持 Chat Completions 的模型。",
+          body: "API 密钥、Amazon Bedrock、ChatGPT 与 Z.ai 账号、OpenRouter 等中转服务以及本机 Ollama 均可作为上游，服务报告的余额、额度与重置时间一并显示。Anthropic、OpenAI、Gemini 接口之间自动转换，Codex 也能使用只支持 Chat Completions 的模型。",
           alt: "上游页：Anthropic、DeepSeek、Gemini 等 API 密钥上游，按自有价目表计价的中转，5 小时额度已用 58% 的 ChatGPT Plus 账号，经代理访问的 OpenRouter，以及设为免费的本机 Ollama，并列出各自 24 小时的请求数、费用与延迟",
         },
         {

@@ -10,13 +10,13 @@ ThinkWatch Lite 把 Claude Code 接到本机的网关上，网关再把每个请
 
 ## 步骤
 
-1. 在「上游」页点击「新建上游」。第一步「服务类型」列出可接入的服务，账号登录在前、API 接入在后，可以搜索；选定后直接进入「连接」：
+1. 在「上游」页点击「新建上游」。第一步「服务类型」把服务分三组列出，可以搜索；选定后直接进入「连接」，只询问该服务需要的内容：
    - 「DeepSeek」：自动填入 `https://api.deepseek.com/anthropic` 和接口协议，再填写「API 密钥」。
-   - GLM（API 密钥）：选「自定义」，「接口地址」填 `https://open.bigmodel.cn/api/anthropic` 或 `https://api.z.ai/api/anthropic`，「接口协议」选「Anthropic Messages」，再填写「API 密钥」。自 ThinkWatch Lite 2026.10.5 起，也可以使用 GLM 的 OpenAI 兼容地址，「接口协议」选「OpenAI Chat Completions」：`https://api.z.ai/api/paas/v4` 或 `https://open.bigmodel.cn/api/paas/v4`，GLM Coding Plan 使用 `…/api/coding/paas/v4`。这时 Claude Code 的请求需要转换格式，因此 Anthropic 地址更直接。
-   - GLM（账号登录）：选「Z.ai / BigModel 账号」，在「账号归属」中选择站点，勾选「已阅读上述说明，继续登录」，点击「登录」并在浏览器中完成授权。应用在该账号中创建一把名为 `thinkwatch` 的 API 密钥，并写入上游。
+   - GLM（API 密钥）：选「Z.ai / BigModel」，在「站点」中选择「Z.ai（国际）」或「BigModel（中国大陆）」，兼容 Anthropic 接口的地址随之确定，再填写「API 密钥」。自 ThinkWatch Lite 2026.10.5 起，也可以选「自定义」使用 GLM 的 OpenAI 兼容地址，「接口协议」选「OpenAI Chat Completions」：`https://api.z.ai/api/paas/v4` 或 `https://open.bigmodel.cn/api/paas/v4`，GLM Coding Plan 使用 `…/api/coding/paas/v4`。这时 Claude Code 的请求需要转换格式，因此 Anthropic 地址更直接。
+   - GLM（账号登录）：选「Z.ai / BigModel」，「认证方式」选「账号登录」，在「站点」中选择站点，勾选「已阅读上述说明」，点击「在浏览器中登录」并完成授权；要在默认浏览器以外的浏览器中登录，改点「复制登录链接」。应用在该账号中创建一把名为 `thinkwatch` 的 API 密钥，并写入上游。
    - Kimi：选「自定义」，「接口地址」填 Kimi 文档给出的兼容 Anthropic 接口的地址，「接口协议」选「Anthropic Messages」。Kimi For Coding 还需打开「转发客户端身份」。
 
-   「检测连接」验证地址与凭据并获取模型列表，不产生费用。之后点击两次「下一步」，再点击「创建」。
+   使用 API 密钥时，「检测连接」验证地址与凭据并获取模型列表，不产生费用；之后点击两次「下一步」，再点击「创建」。账号登录后上游已经写入，点击两次「下一步」，再点击「完成」。
 2. 在「客户端」页 Claude Code 一行点击「接管…」。对话框列出 `~/.claude/settings.json` 中要修改的字段：`env.ANTHROPIC_BASE_URL`、`env.ANTHROPIC_AUTH_TOKEN`（新密钥 `claude-code`）和 `env.CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY`。点击「接管」。
 3. 选择指定模型的方式：
    - **直接使用模型名。**在 Claude Code 中输入 `/model <模型 ID>` 即切换到该模型，也可以用 `claude --model <模型 ID>` 启动。要让 Claude Code 的模型别名对应到该模型，在 `~/.claude/settings.json` 的 `env` 中加入以下变量；其中 Haiku 一项也用于后台任务。
@@ -35,6 +35,7 @@ ThinkWatch Lite 把 Claude Code 接到本机的网关上，网关再把每个请
 - **格式转换。**Claude Code 发出的是 Anthropic Messages；接口协议同为 Anthropic Messages 时，请求按原格式发出，网关只去掉 `metadata.user_id` 等身份字段。只有上游使用其他格式时才会转换，例如兼容 OpenAI 的地址配合接口协议 OpenAI Chat Completions：此时「流量」页把该请求标为「已转换」，请求详情列出被丢弃的字段。网页搜索是服务端工具，无法转换，这类请求不会发往此类上游。「自动识别」认不出这三个服务商的地址，会按客户端的原格式转发，对 Claude Code 可用，对 Codex 这类使用其他格式的客户端则不可用。
 - **转发客户端身份**默认关闭，上游看到的是 ThinkWatch 的 User-Agent，不带客户端身份。Kimi For Coding、百炼 Coding Plan 等上游只接受特定客户端；打开开关后，上游收到 Claude Code 自己的 User-Agent、`x-app` 等身份请求头和请求体中的身份字段，均为原值。
 - **GLM Coding Plan。**地址在 `api.z.ai` 或 `open.bigmodel.cn` 上的上游，无论应用内登录还是手动填写密钥，都在「额度 / 计费」列和菜单栏（或托盘菜单）中显示 5 小时与每周额度，积分制套餐另外显示剩余积分。
+- **余额。**DeepSeek 上游，以及地址在 `api.moonshot.cn` 或 `api.moonshot.ai` 上的 Kimi 上游，在「额度 / 计费」列中显示账户余额。
 - **`/model` 列表**只显示名称含 `claude` 或 `anthropic` 的网关模型；其他模型需要输入名称，或用 `ANTHROPIC_CUSTOM_MODEL_OPTION` 加入一项。
 - **费用。**改写过模型名的请求按实际发出的模型计价。
 - **「还原…」**只恢复应用写入的字段，手动加入的模型变量仍留在 `settings.json` 中。
