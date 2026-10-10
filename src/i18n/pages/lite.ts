@@ -207,7 +207,7 @@ export const liteCopy = {
       body: "The macOS menu bar shows today's tokens and cost, in orange when a subscription quota is nearly used up and red once it has run out. Its menu gives the gateway's state, each quota with its reset time and the requests in progress, and copies the gateway address or default key without opening the window. Windows and Linux have the same menu in the tray.",
       notices:
         "A system notification reports a gateway that stopped forwarding, a lost remote connection, a quota that ran out, a credential that stopped working, an unreachable proxy, configuration that did not take effect, a dangerous tool call that was cut off, and suspicious content in client configuration.",
-      chipAlt: "The menu bar item: the ThinkWatch mark with today's 13.3M tokens above today's cost, 9.34$",
+      chipAlt: "The menu bar item: the ThinkWatch mark with today's 13.3M tokens above today's cost, $9.34",
       menuAlt:
         "The menu bar menu: an item to open ThinkWatch Lite; today's 13.3M tokens, 204 requests of which 4 failed and $9.34, with the gateway's state and output speed; the ChatGPT account's 5-hour and weekly quotas with their reset times; the request in progress; and items to copy the gateway address or the default key, open settings, switch connection, check for updates and quit",
     },
@@ -449,7 +449,7 @@ export const liteCopy = {
       body: "macOS 菜单栏显示今日 token 与费用，订阅额度将尽时变为橙色，用完后变为红色。点开的菜单给出网关状态、各项额度及重置时间与进行中的请求，不打开主窗口即可复制网关地址或默认密钥。Windows 与 Linux 的托盘提供相同的菜单。",
       notices:
         "网关停止转发、远程连接断开、额度用完、凭据失效、代理无法连接、配置未能生效、危险工具调用被切断，以及客户端配置中出现可疑内容时，应用发送系统通知。",
-      chipAlt: "菜单栏：ThinkWatch 标识，右侧上行为今日 token 13.3M，下行为今日费用 9.34$",
+      chipAlt: "菜单栏：ThinkWatch 标识，右侧上行为今日 token 13.3M，下行为今日费用 $9.34",
       menuAlt:
         "菜单栏菜单：打开主界面；今日 token 13.3M、请求 204 次（失败 4 次）、费用 $9.34，以及网关状态与输出速率；ChatGPT 账号的 5 小时与每周额度及重置时间；进行中的请求；以及复制网关地址、复制默认密钥、设置、切换连接、检查更新与退出等菜单项",
     },
