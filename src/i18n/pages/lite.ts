@@ -12,9 +12,9 @@
 // alt text changes with it.
 
 const overviewAlt = {
-  en: "The Overview page for the last 7 days: 83.1M tokens, $68.11 in cost including $0.441 estimated and 13 unpriced requests, and 1,339 requests of which 11 failed, each compared with the prior 7 days; a token trend stacked by model with the periods that had failures marked; and the models ranked by tokens",
+  en: "The Overview page for the last 7 days: notices that 11 requests failed, a suspicious tool call was cut off and 13 requests are unpriced; cards for 87.5M tokens, a cost of at least about $71.89, 92% cache hits, 1,400 requests, a 1.26 s median first token and 310 MB of traffic, each with the change against the prior 7 days and a chart or breakdown; and the statistics by model below",
   "zh-CN":
-    "概览页（最近 7 天）：token 83.1M、费用 $68.11（含估算 $0.441，13 条无法计价）、请求 1,339 次（失败 11 次），均与上一个 7 天对比；按模型分层的 token 趋势，并标出存在失败的时段；以及按 token 排序的模型列表",
+    "概览页（最近 7 天）：提示 11 次请求失败、切断了 1 个可疑工具调用、13 条请求无法计价；token 87.5M、费用不低于约 $71.89、缓存命中 92%、请求 1,400 次、首 token 中位数 1.26 秒、流量 310 MB 六张卡片，各带与上一个 7 天的对比和趋势图或构成；下方是按模型的统计",
 } as const;
 
 export const liteCopy = {
@@ -136,7 +136,7 @@ export const liteCopy = {
         {
           id: "traffic",
           title: "Every request, traceable",
-          body: "A request shows the rule it matched, each upstream it tried, any conversion between API formats and how its cost was calculated. A finished request can be replayed against another upstream and the two answers compared side by side, and the whole history can be searched, including the text of requests and answers.",
+          body: "A request shows the rule it matched, each upstream it tried, any conversion between API formats and how its cost was calculated, and its content can be read live while the answer streams. A finished request can be replayed against another upstream and the two answers compared side by side, and the whole history can be searched, including the text of requests and answers.",
           alt: "The Traffic page: each request with its key, model, upstream, time to first token, total time, tokens and cost, with marks for converted formats, redacted keys and a blocked request, and one request answered locally by the gateway",
         },
         {
@@ -154,7 +154,7 @@ export const liteCopy = {
         {
           id: "overview",
           title: "Costs stated as they are",
-          body: "Tokens, cost, cache savings, time to first token and generation speed, by model and by upstream. Estimated amounts are marked, and requests without a price are counted separately instead of as zero; prices follow LiteLLM's public list, refreshed daily, or a custom price sheet.",
+          body: "Tokens, cost, cache hits, requests, time to first token and traffic on one screen, each against the previous period and broken down by model, upstream or key. Estimated amounts are marked, and requests without a price are counted separately instead of as zero; prices follow LiteLLM's public list, refreshed daily, or a custom price sheet.",
           alt: overviewAlt.en,
         },
         {
@@ -209,7 +209,7 @@ export const liteCopy = {
         "A system notification reports a gateway that stopped forwarding, a lost remote connection, a quota that ran out, a credential that stopped working, an unreachable proxy, configuration that did not take effect, a dangerous tool call that was cut off, and suspicious content in client configuration.",
       chipAlt: "The menu bar item: the ThinkWatch mark with today's 13.3M tokens above today's cost, $9.34",
       menuAlt:
-        "The menu bar menu: the gateway's address, output speed and state; the ChatGPT account's 5-hour and weekly quotas with their reset times; today's requests, tokens and cost; the request in progress; and items to open the app, copy the gateway address or the default key, switch connection, open settings and check for updates",
+        "The menu bar menu: an item to open ThinkWatch Lite; today's 13.3M tokens, 204 requests of which 4 failed and $9.34, with the gateway's state and output speed; the ChatGPT account's 5-hour and weekly quotas with their reset times; the request in progress; and items to copy the gateway address or the default key, open settings, switch connection, check for updates and quit",
     },
     built: {
       eyebrow: "Architecture",
@@ -379,7 +379,7 @@ export const liteCopy = {
         {
           id: "traffic",
           title: "每个请求都可追溯",
-          body: "请求详情给出命中的规则、尝试过的每个上游、API 格式转换，以及费用的计算依据。已结束的请求可以重放到另一个上游，并排对比两次回答；全部请求记录都可以搜索，包括请求与回答的内容。",
+          body: "请求详情给出命中的规则、尝试过的每个上游、API 格式转换，以及费用的计算依据，回答生成期间即可实时查看请求与回答的内容。已结束的请求可以重放到另一个上游，并排对比两次回答；全部请求记录都可以搜索，包括请求与回答的内容。",
           alt: "流量页：逐条列出请求的密钥、模型、上游、首 token 时间、总耗时、token 与费用，标出格式转换、密钥脱敏与被拦截的请求，其中一条由网关在本地应答",
         },
         {
@@ -397,7 +397,7 @@ export const liteCopy = {
         {
           id: "overview",
           title: "费用如实计算",
-          body: "按模型与上游统计 token、费用、缓存节省、首 token 时间与生成速度。估算的金额单独标注，无法计价的请求单独计数，不按零计入；价格每日按 LiteLLM 公开价更新，也可以使用自定义价目表。",
+          body: "token、费用、缓存命中、请求、首 token 时间与流量集中在一屏，均与上一个区间对比，并可按模型、上游或密钥查看明细。估算的金额单独标注，无法计价的请求单独计数，不按零计入；价格每日按 LiteLLM 公开价更新，也可以使用自定义价目表。",
           alt: overviewAlt["zh-CN"],
         },
         {
@@ -451,7 +451,7 @@ export const liteCopy = {
         "网关停止转发、远程连接断开、额度用完、凭据失效、代理无法连接、配置未能生效、危险工具调用被切断，以及客户端配置中出现可疑内容时，应用发送系统通知。",
       chipAlt: "菜单栏：ThinkWatch 标识，右侧上行为今日 token 13.3M，下行为今日费用 $9.34",
       menuAlt:
-        "菜单栏菜单：网关地址、输出速率与状态；ChatGPT 账号的 5 小时与每周额度及重置时间；今日请求数、token 与费用；进行中的请求；以及打开主界面、复制网关地址、复制默认密钥、切换连接、设置与检查更新等菜单项",
+        "菜单栏菜单：打开主界面；今日 token 13.3M、请求 204 次（失败 4 次）、费用 $9.34，以及网关状态与输出速率；ChatGPT 账号的 5 小时与每周额度及重置时间；进行中的请求；以及复制网关地址、复制默认密钥、设置、切换连接、检查更新与退出等菜单项",
     },
     built: {
       eyebrow: "架构",
