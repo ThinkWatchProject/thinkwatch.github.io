@@ -162,7 +162,7 @@ curl -X POST http://localhost:3000/v1/chat/completions \
 
 ### GET /v1/models
 
-列出通过网关可用的所有模型。
+列出通过网关可用的模型。使用 API 密钥调用时，只列出该密钥可以使用的模型。
 
 **认证：** API Key 或 JWT
 

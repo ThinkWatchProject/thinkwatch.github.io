@@ -700,7 +700,7 @@ These tasks run within the server process and do not require external schedulers
 
 ## 8. Client Configuration Guide
 
-ThinkWatch includes a built-in **Configuration Guide** page in the web console at `/gateway/guide`. This page provides copy-paste setup instructions for connecting various AI client tools to your gateway and auto-detects the gateway URL.
+ThinkWatch includes a built-in **Configuration Guide** page in the web console at `/guide`. This page provides copy-paste setup instructions for connecting various AI client tools to your gateway and auto-detects the gateway URL.
 
 ### Supported Client Tools
 
@@ -713,6 +713,13 @@ The Configuration Guide provides ready-to-use instructions for:
 - **OpenAI SDK** -- set `OPENAI_BASE_URL` and `OPENAI_API_KEY` environment variables (uses `/v1/chat/completions` or `/v1/responses`)
 - **Anthropic SDK** -- set `ANTHROPIC_BASE_URL` and `ANTHROPIC_API_KEY` environment variables (uses `/v1/messages`)
 - **cURL** -- example commands for all three API formats
+- **ThinkWatch Lite** -- the **Add to ThinkWatch Lite** button adds the gateway to the desktop app (see below)
+
+### Adding the Gateway to ThinkWatch Lite
+
+The **Add to ThinkWatch Lite** button opens the New upstream dialog of [ThinkWatch Lite](/lite) with the gateway's address and the key already filled in, so a user connects the desktop app in one step. It appears after a key is created or rotated, at the end of the first-run setup, and on the ThinkWatch Lite tab of the Configuration Guide.
+
+The button needs ThinkWatch Lite 2026.10.16 or later. The address comes from the **Public Gateway URL** setting, and the link format is described in [Import links](/docs/lite/import-links). A gateway served over plain `http://` on the company network works too; ThinkWatch Lite states that the key travels unencrypted.
 
 ### Gateway API Endpoints
 
@@ -723,7 +730,7 @@ The gateway (port 3000) serves three API formats on a single port:
 | `POST /v1/chat/completions` | OpenAI Chat Completions | Cursor, Continue, Cline, OpenAI SDK          |
 | `POST /v1/messages`         | Anthropic Messages API  | Claude Code, Anthropic SDK                   |
 | `POST /v1/responses`        | OpenAI Responses API    | OpenAI SDK (2025 format)                     |
-| `GET /v1/models`            | OpenAI Models list      | All clients                                  |
+| `GET /v1/models`            | Models the calling key may use | All clients                           |
 | `GET /v1/usage`             | Usage and limits of the calling key | Any client with a gateway API key |
 
 All endpoints accept `tw-` API keys via the `Authorization: Bearer` header.

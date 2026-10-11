@@ -101,7 +101,7 @@ curl -X POST /api/keys/{key_id}/rotate \
 1. Navigate to **AI Gateway → API Keys**
 2. Click the **Rotate** button on the key row
 3. Confirm the rotation in the dialog
-4. Copy the new key immediately (shown only once)
+4. Copy the new key immediately (shown only once), or choose **Add to ThinkWatch Lite** to put it into the desktop app
 5. Update your applications with the new key
 6. The old key remains active for the configured grace period (default: 24 hours)
 
