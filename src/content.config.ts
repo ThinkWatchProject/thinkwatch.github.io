@@ -21,7 +21,7 @@ const changelog_zh = defineCollection({
   schema: changelogSchema,
 });
 
-// Docs imported from /Users/faz/Dev/ThinkWatch/docs.
+// Docs imported from the ThinkWatch repository's docs/ directory.
 // They have no frontmatter; the schema allows an empty object.
 const docs = defineCollection({
   loader: glob({ pattern: "**/*.md", base: "./src/content/docs" }),
