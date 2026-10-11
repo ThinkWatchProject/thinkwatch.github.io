@@ -1,11 +1,14 @@
 ---
 // /import: the web form of a ThinkWatch Lite import link.
 //
-// A relay links to https://thinkwat.ch/import#name=…&url=…&key=…. The
-// parameters stay in the fragment, which browsers never send to a server; the
-// script below reads them, checks them with the same rules as the app
-// (src/lib/import-link.ts), shows what would be imported and offers a button
-// that opens thinkwatch://import?… built from the checked values only.
+// A relay, a vendor or a ThinkWatch Enterprise console links to
+// https://thinkwat.ch/import#service=…&url=…&key=…. The parameters stay in the
+// fragment, which browsers never send to a server; the script below reads them,
+// checks them with the same rules as the app (src/lib/import-link.ts), shows the
+// receiving hosts and the settings grouped the way the New upstream dialog
+// groups them, and offers a button that opens thinkwatch://import?… built from
+// the checked values only. Parameters from a newer version of the link are passed
+// on, re-encoded, with a note that a newer app is needed.
 //
 // The page loads no third-party script (no analytics: the fragment may hold an
 // API key), is kept out of search results, renders every value with
@@ -15,65 +18,103 @@ import SiteHeader from "~/components/SiteHeader.astro";
 import SiteFooter from "~/components/SiteFooter.astro";
 import LiteDownload from "~/components/LiteDownload.astro";
 import { getLang, localePath } from "~/i18n";
+import { importLinkText } from "~/lib/import-link-text";
 
 const lang = getLang(Astro);
 const zh = lang === "zh-CN";
 const docs = localePath(lang, "/docs/lite/import-links");
 
+const shared = importLinkText(zh);
+
 const t = zh
   ? {
       title: "导入上游 · ThinkWatch Lite",
-      description: "把中转站或服务商提供的上游设置导入 ThinkWatch Lite。",
+      description: "把中转站、服务商或企业网关提供的上游设置导入 ThinkWatch Lite。",
       heading: "导入上游到 ThinkWatch Lite",
-      intro: "以下设置来自一条导入链接。ThinkWatch Lite 打开后会先请求确认，确认之前不保存任何设置。",
-      sendsTo: "请求内容与 API 密钥将发送至",
-      name: "名称",
-      nameAuto: "由应用按地址生成",
-      url: "接口地址",
-      protocol: "接口协议",
+      intro:
+        "以下设置来自一条导入链接。ThinkWatch Lite 打开后在「新建上游」对话框中预填这些设置；选择「下一步」或开始登录之前，不保存任何设置，也不发出任何请求。",
+      sendsTo: "请求与密钥将发往",
+      tokenEndpoint: "Token 端点",
+      plainHttp: "这个地址不加密，密钥和请求内容以明文传输。",
+      signsIn: "登录账号",
+      signInNote: "链接不含任何凭据，登录在 ThinkWatch Lite 中进行。",
+      accounts: { openai: "ChatGPT", zai: "Z.ai", bigmodel: "BigModel" },
+      updateTitle: "需要更新版本的 ThinkWatch Lite",
+      updateBody: "链接含有{p}，本页无法识别。请先更新 ThinkWatch Lite，再打开这条链接；以下只列出本页能识别的设置。",
+      recognized: "按接口地址识别",
+      nameAuto: "由应用生成",
       auto: "自动识别",
-      key: "API 密钥",
       noKey: "未提供",
+      on: "开启",
+      selected: "指定模型：",
       show: "显示",
       hide: "隐藏",
-      models: "手动添加的模型",
+      spec: {
+        context: "上下文窗口",
+        maxOutput: "输出上限",
+        reasoning: "推理",
+        image: "图片输入",
+        yes: "支持",
+        no: "不支持",
+      },
+      sheet: "新建价目表「{name}」，倍率 ×{multiplier}",
+      sheetUnnamed: "新建价目表，与上游同名，倍率 ×{multiplier}",
+      price: {
+        input: "输入",
+        output: "输出",
+        cacheRead: "缓存读取",
+        cacheWrite5m: "缓存写入 5 分钟",
+        cacheWrite1h: "缓存写入 1 小时",
+        unit: "美元 / 百万 tokens",
+      },
       open: "在 ThinkWatch Lite 中打开",
       notInstalled: "尚未安装 ThinkWatch Lite 时，先下载并安装，再回到此页面。",
       invalidTitle: "此导入链接无效",
       invalidBody: "链接的参数不完整或不符合要求，未显示任何内容。请联系提供链接的服务商。",
       noscript: "此页面需要启用 JavaScript 读取链接中的参数。",
       docs: "导入链接说明",
-      problems: {
-        empty: "链接中没有参数。",
-        tooLong: "链接过长。",
-        unknownParam: "链接包含不支持的参数",
-        duplicateParam: "同一参数出现了多次",
-        emptyValue: "参数的值为空",
-        missingUrl: "缺少接口地址（url）。",
-        name: "名称不符合要求。",
-        url: "接口地址不符合要求：须为 https 地址（http 仅限本机），且不含账号、查询串或片段。",
-        protocol: "接口协议不受支持。",
-        key: "API 密钥包含不支持的字符。",
-        models: "手动添加的模型不符合要求。",
-      },
     }
   : {
       title: "Import an upstream · ThinkWatch Lite",
-      description: "Import an upstream provided by a relay or vendor into ThinkWatch Lite.",
+      description: "Import an upstream provided by a relay, a vendor or an enterprise gateway into ThinkWatch Lite.",
       heading: "Import an upstream into ThinkWatch Lite",
       intro:
-        "The settings below come from an import link. ThinkWatch Lite asks for confirmation when it opens, and saves nothing before that.",
-      sendsTo: "Request content and the API key will be sent to",
-      name: "Name",
-      nameAuto: "Chosen by the app from the address",
-      url: "Base URL",
-      protocol: "Protocol",
+        "The settings below come from an import link. ThinkWatch Lite opens them in the New upstream dialog, filled in, and saves nothing and sends nothing before Next is chosen or a sign-in is started.",
+      sendsTo: "Requests and keys will be sent to",
+      tokenEndpoint: "Token endpoint",
+      plainHttp: "This address is not encrypted; the key and request content travel in plain text.",
+      signsIn: "Account sign-in",
+      signInNote: "The link carries no credential. Sign-in happens in ThinkWatch Lite.",
+      accounts: { openai: "ChatGPT", zai: "Z.ai", bigmodel: "BigModel" },
+      updateTitle: "This link needs a newer ThinkWatch Lite",
+      updateBody:
+        "The link contains {p}, which this page does not recognize. Update ThinkWatch Lite before opening the link; only the settings this page recognizes are listed below.",
+      recognized: "recognized from the base URL",
+      nameAuto: "Chosen by the app",
       auto: "Auto-detect",
-      key: "API key",
       noKey: "Not provided",
+      on: "On",
+      selected: "Selected models: ",
       show: "Show",
       hide: "Hide",
-      models: "Models added by hand",
+      spec: {
+        context: "context window",
+        maxOutput: "max output",
+        reasoning: "reasoning",
+        image: "image input",
+        yes: "yes",
+        no: "no",
+      },
+      sheet: "New price sheet “{name}”, multiplier ×{multiplier}",
+      sheetUnnamed: "New price sheet named after the upstream, multiplier ×{multiplier}",
+      price: {
+        input: "input",
+        output: "output",
+        cacheRead: "cache reads",
+        cacheWrite5m: "cache writes 5m",
+        cacheWrite1h: "cache writes 1h",
+        unit: "USD / million tokens",
+      },
       open: "Open in ThinkWatch Lite",
       notInstalled: "If ThinkWatch Lite is not installed yet, download and install it, then return to this page.",
       invalidTitle: "This import link is not valid",
@@ -81,29 +122,18 @@ const t = zh
         "The link's parameters are incomplete or not accepted, so nothing is shown. Contact the provider of the link.",
       noscript: "This page needs JavaScript to read the parameters of the link.",
       docs: "About import links",
-      problems: {
-        empty: "The link has no parameters.",
-        tooLong: "The link is too long.",
-        unknownParam: "The link contains an unsupported parameter",
-        duplicateParam: "A parameter appears more than once",
-        emptyValue: "A parameter has an empty value",
-        missingUrl: "The base URL (url) is missing.",
-        name: "The name is not accepted.",
-        url: "The base URL is not accepted: it must be an https address (http only for this computer) without credentials, a query or a fragment.",
-        protocol: "The protocol is not supported.",
-        key: "The API key contains unsupported characters.",
-        models: "The models added by hand are not accepted.",
-      },
     };
 
-const row = "grid gap-1 border-b border-[var(--color-border)] py-3 sm:grid-cols-[10rem_1fr] sm:gap-4";
+const strings = { ...shared, ...t };
+
+const row = "grid gap-1 border-b border-[var(--color-border)] py-3 sm:grid-cols-[11rem_1fr] sm:gap-4";
 const label = "text-sm text-[var(--color-muted)]";
 const value = "min-w-0 break-all font-mono text-[15px] text-[var(--color-text)]";
 ---
 
 <Base title={t.title} description={t.description} noindex analytics={false}>
   <SiteHeader />
-  <main id="main" class="container-page py-16 md:py-24" data-import-page data-strings={JSON.stringify(t)}>
+  <main id="main" class="container-page py-16 md:py-24" data-import-page data-strings={JSON.stringify(strings)}>
     <div class="mx-auto max-w-2xl">
       <h1 class="text-3xl font-semibold tracking-tight md:text-4xl">{t.heading}</h1>
 
@@ -114,43 +144,25 @@ const value = "min-w-0 break-all font-mono text-[15px] text-[var(--color-text)]"
       <section data-valid hidden>
         <p class="mt-4 leading-relaxed text-[var(--color-muted)]">{t.intro}</p>
 
-        <div class="mt-8 rounded-xl border border-amber-400/40 bg-amber-400/10 px-5 py-4">
-          <p class="text-sm font-medium text-amber-200">{t.sendsTo}</p>
-          <p class="mt-1 break-all font-mono text-lg font-semibold text-[var(--color-text)]" data-field="host"></p>
+        <div class="mt-8 rounded-xl border border-amber-400/40 bg-amber-400/10 px-5 py-4" data-update hidden>
+          <p class="font-medium text-amber-200">{t.updateTitle}</p>
+          <p class="mt-1 text-sm leading-relaxed text-[var(--color-muted)]" data-update-body></p>
         </div>
 
-        <dl class="mt-6">
-          <div class={row}>
-            <dt class={label}>{t.name}</dt>
-            <dd class={value} data-field="name"></dd>
-          </div>
-          <div class={row}>
-            <dt class={label}>{t.url}</dt>
-            <dd class={value} data-field="url"></dd>
-          </div>
-          <div class={row}>
-            <dt class={label}>{t.protocol}</dt>
-            <dd class={value} data-field="protocol"></dd>
-          </div>
-          <div class={row}>
-            <dt class={label}>{t.key}</dt>
-            <dd class="flex min-w-0 items-center gap-3">
-              <span class={value} data-field="key"></span>
-              <button
-                type="button"
-                class="shrink-0 text-sm text-[var(--color-brand-1)] hover:text-[var(--color-brand-2)]"
-                data-toggle-key
-                hidden
-              ></button>
-            </dd>
-          </div>
-          <div class={row} data-models-row hidden>
-            <dt class={label}>{t.models}</dt>
-            <dd class={value} data-field="models"></dd>
-          </div>
-        </dl>
+        <div class="mt-8 rounded-xl border border-[var(--color-border-strong)] bg-[var(--color-surface)]/60 px-5 py-4" data-hosts hidden>
+          <p class="text-sm text-[var(--color-muted)]">{t.sendsTo}</p>
+          <ul class="mt-1 grid gap-1" data-host-list></ul>
+        </div>
 
-        <div class="mt-8">
+        <div class="mt-8 rounded-xl border border-[var(--color-border-strong)] bg-[var(--color-surface)]/60 px-5 py-4" data-account hidden>
+          <p class="text-sm text-[var(--color-muted)]">{t.signsIn}</p>
+          <p class="mt-1 font-mono text-lg font-semibold text-[var(--color-text)]" data-account-name></p>
+          <p class="mt-1 text-sm leading-relaxed text-[var(--color-muted)]">{t.signInNote}</p>
+        </div>
+
+        <div data-groups></div>
+
+        <div class="mt-10">
           <button
             type="button"
             class="inline-flex min-h-11 items-center justify-center rounded-full bg-[#f7f8f8] px-[22px] py-3 text-base font-semibold text-[#08090a] transition hover:bg-white hover:shadow-[0_8px_30px_-8px_rgba(34,229,242,0.5)]"
@@ -158,6 +170,7 @@ const value = "min-w-0 break-all font-mono text-[15px] text-[var(--color-text)]"
           >
             {t.open}
           </button>
+          <p class="mt-3 text-sm text-[var(--color-muted)]" data-version hidden>{shared.needsVersion}</p>
         </div>
 
         <div class="mt-12 border-t border-[var(--color-border)] pt-8">
@@ -178,21 +191,71 @@ const value = "min-w-0 break-all font-mono text-[15px] text-[var(--color-text)]"
         <a href={docs} class="text-[var(--color-brand-1)] hover:text-[var(--color-brand-2)]">{t.docs}</a>
       </p>
     </div>
+
+    <!-- Filled by the script below, with textContent only -->
+    <template data-host-tpl>
+      <li class="break-all font-mono text-lg font-semibold text-[var(--color-text)]">
+        <span data-host></span>
+        <span class="ml-2 font-sans text-sm font-normal text-[var(--color-muted)]" data-host-note></span>
+        <span class="mt-0.5 block font-sans text-sm font-normal text-[var(--color-muted)]" data-host-plain hidden></span>
+      </li>
+    </template>
+    <template data-group-tpl>
+      <section class="mt-10">
+        <h2 class="text-sm font-medium tracking-wide text-[var(--color-muted)]" data-group-title></h2>
+        <dl class="mt-2 border-t border-[var(--color-border)]" data-rows></dl>
+      </section>
+    </template>
+    <template data-row-tpl>
+      <div class={row}>
+        <dt class={label}></dt>
+        <dd class="flex min-w-0 items-start gap-3">
+          <span class={value} data-value></span>
+          <button
+            type="button"
+            class="shrink-0 text-sm text-[var(--color-brand-1)] hover:text-[var(--color-brand-2)]"
+            data-toggle
+            hidden></button>
+        </dd>
+      </div>
+    </template>
   </main>
   <SiteFooter />
 </Base>
 
 <script>
-  import { appLink, parseParams, type Problem } from "~/lib/import-link";
+  import {
+    SERVICE_RULES,
+    appLink,
+    fieldsFor,
+    parseParams,
+    showableParam,
+    type ImportLink,
+  } from "~/lib/import-link";
+  import type { ImportLinkText } from "~/lib/import-link-text";
 
-  type Strings = {
+  type Strings = ImportLinkText & {
+    tokenEndpoint: string;
+    plainHttp: string;
+    accounts: Record<string, string>;
+    updateBody: string;
+    recognized: string;
     nameAuto: string;
     auto: string;
     noKey: string;
+    on: string;
+    selected: string;
     show: string;
     hide: string;
-    problems: Record<Problem, string>;
+    spec: Record<string, string>;
+    sheet: string;
+    sheetUnnamed: string;
+    price: Record<string, string>;
   };
+
+  /** A value: one line, several lines, or a credential hidden until shown. */
+  type Value = string | string[] | { secret: string };
+  type Row = [label: string, value: Value];
 
   const root = document.querySelector<HTMLElement>("[data-import-page]");
   // Another import link opened while this page is showing only changes the
@@ -205,21 +268,30 @@ const value = "min-w-0 break-all font-mono text-[15px] text-[var(--color-text)]"
     // fragment may hold an API key.
     if (fragment) history.replaceState(null, "", location.pathname + location.search);
 
-    const result = parseParams(fragment);
-    const field = (name: string) => root.querySelector<HTMLElement>(`[data-field="${name}"]`)!;
+    const $ = <T extends Element = HTMLElement>(sel: string, within: ParentNode = root) => within.querySelector<T>(sel)!;
+    const clone = (sel: string) => ($<HTMLTemplateElement>(sel).content.firstElementChild!.cloneNode(true) as HTMLElement);
+    const named = (param: string | undefined) =>
+      showableParam(param) ? s.param.replace("{name}", param) : s.someParam;
 
-    if (result.ok) {
-      const l = result.link;
-      field("host").textContent = l.host;
-      field("name").textContent = l.name ?? s.nameAuto;
-      field("url").textContent = l.baseUrl;
-      field("protocol").textContent = l.protocol ?? s.auto;
-      const key = field("key");
-      const toggle = root.querySelector<HTMLButtonElement>("[data-toggle-key]")!;
-      if (l.key) {
+    const secret = (v: string | undefined): Value => (v ? { secret: v } : s.noKey);
+
+    const fillValue = (dd: HTMLElement, v: Value) => {
+      const span = $("[data-value]", dd);
+      if (typeof v === "string") {
+        span.textContent = v;
+      } else if (Array.isArray(v)) {
+        for (const line of v) {
+          const el = document.createElement("span");
+          // A line breaks between words where it can, unlike a single value such as a key
+          el.className = "block [word-break:normal] [overflow-wrap:anywhere]";
+          el.textContent = line;
+          span.append(el);
+        }
+      } else {
+        const toggle = $<HTMLButtonElement>("[data-toggle]", dd);
         let shown = false;
         const paint = () => {
-          key.textContent = shown ? l.key! : "•".repeat(Math.min(l.key!.length, 24));
+          span.textContent = shown ? v.secret : "•".repeat(Math.min(v.secret.length, 24));
           toggle.textContent = shown ? s.hide : s.show;
           toggle.setAttribute("aria-pressed", String(shown));
         };
@@ -229,25 +301,153 @@ const value = "min-w-0 break-all font-mono text-[15px] text-[var(--color-text)]"
           paint();
         });
         paint();
+      }
+    };
+
+    const addGroup = (title: string, rows: Row[]) => {
+      if (!rows.length) return;
+      const group = clone("[data-group-tpl]");
+      $("[data-group-title]", group).textContent = title;
+      const dl = $("[data-rows]", group);
+      for (const [label, v] of rows) {
+        const row = clone("[data-row-tpl]");
+        $("dt", row).textContent = label;
+        fillValue($("dd", row), v);
+        dl.append(row);
+      }
+      $("[data-groups]").append(group);
+    };
+
+    /** The settings, grouped the way the New upstream dialog groups them. */
+    const show = (l: ImportLink) => {
+      const L = s.labels;
+      const rules = SERVICE_RULES[l.service];
+      const fields = fieldsFor(l.service, l.auth);
+      const account = l.auth === "account";
+
+      const service: Row[] = [
+        [L.service, l.recognized ? `${s.services[l.service]} · ${s.recognized}` : s.services[l.service]],
+      ];
+      if (rules.auth.length > 1)
+        service.push([L.auth, account && l.service === "openai" ? s.auths.chatgpt : s.auths[l.auth]]);
+      if (l.site) service.push([L.site, s.sites[l.site]]);
+      addGroup(s.groups.service, service);
+
+      // An account sign-in asks only for the name here: the sign-in itself happens in the app.
+      const connection: Row[] = [[L.name, l.name ?? s.nameAuto]];
+      if (!account) {
+        connection.push([L.url, l.address!]);
+        if (fields.has("protocol")) {
+          const fixed = rules.protocol;
+          const shown =
+            l.protocol ??
+            (typeof fixed === "string" ? fixed : l.service === "openai" ? "openai-chat" : s.auto);
+          connection.push([L.protocol, shown]);
+        }
+        if (l.region) connection.push([L.region, l.region]);
+        if (fields.has("key")) connection.push([L.key, secret(l.key)]);
+        if (l.oauth) {
+          connection.push([L.oauthEndpoint, l.oauth.endpoint]);
+          connection.push([L.oauthRefresh, secret(l.oauth.refresh)]);
+          if (l.oauth.clientId) connection.push([L.oauthClientId, l.oauth.clientId]);
+          if (l.oauth.clientSecret) connection.push([L.oauthClientSecret, secret(l.oauth.clientSecret)]);
+        }
+        if (l.aws) {
+          connection.push([L.awsKeyId, l.aws.accessKeyId]);
+          connection.push([L.awsSecret, secret(l.aws.secretAccessKey)]);
+          if (l.aws.sessionToken) connection.push([L.awsToken, secret(l.aws.sessionToken)]);
+        }
+      }
+      addGroup(account ? s.groups.account : s.groups.connection, connection);
+
+      const advanced: Row[] = [];
+      if (l.headers.length) advanced.push([L.headers, l.headers.map((h) => `${h.name}: ${h.value}`)]);
+      if (l.clientIdentity) advanced.push([L.clientIdentity, s.on]);
+      if (l.concurrency !== undefined) advanced.push([L.concurrency, String(l.concurrency)]);
+      if (l.balance) advanced.push([L.balance, s.balances[l.balance]]);
+      addGroup(s.groups.advanced, advanced);
+
+      const yesNo = (b: boolean) => (b ? s.spec.yes : s.spec.no);
+      const models: Row[] = [];
+      if (l.models.length) models.push([L.models, l.models.join(", ")]);
+      if (l.modelsOnly) models.push([L.modelsOnly, s.selected + l.modelsOnly.join(", ")]);
+      if (l.specs.length)
+        models.push([
+          L.specs,
+          l.specs.map((x) => {
+            const parts: string[] = [];
+            if (x.context !== undefined) parts.push(`${s.spec.context} ${x.context.toLocaleString()}`);
+            if (x.maxOutput !== undefined) parts.push(`${s.spec.maxOutput} ${x.maxOutput.toLocaleString()}`);
+            if (x.reasoning !== undefined) parts.push(`${s.spec.reasoning} ${yesNo(x.reasoning)}`);
+            if (x.image !== undefined) parts.push(`${s.spec.image} ${yesNo(x.image)}`);
+            return `${x.model} · ${parts.join(" · ")}`;
+          }),
+        ]);
+      addGroup(s.groups.models, models);
+
+      const billing: Row[] = [];
+      if (l.billing) billing.push([L.billing, s.billings[l.billing]]);
+      if (l.priceSheet) {
+        const p = s.price;
+        const sheet = l.name
+          ? s.sheet.replace("{name}", l.name).replace("{multiplier}", l.priceSheet.multiplier)
+          : s.sheetUnnamed.replace("{multiplier}", l.priceSheet.multiplier);
+        billing.push([
+          L.priceSheet,
+          [
+            sheet,
+            ...l.priceSheet.prices.map(
+              (x) =>
+                `${x.model} · ${p.input} ${x.input} · ${p.output} ${x.output} · ${p.cacheRead} ${x.cacheRead} · ${p.cacheWrite5m} ${x.cacheWrite5m} · ${p.cacheWrite1h} ${x.cacheWrite1h}`,
+            ),
+            ...(l.priceSheet.prices.length ? [p.unit] : []),
+          ],
+        ]);
+      }
+      addGroup(s.groups.billing, billing);
+    };
+
+    const result = parseParams(fragment);
+
+    if (result.ok) {
+      const l = result.link;
+      // The receiving hosts come first; an account sign-in has none in the link.
+      if (l.hosts.length) {
+        const list = $("[data-host-list]");
+        l.hosts.forEach((host, i) => {
+          const item = clone("[data-host-tpl]");
+          $("[data-host]", item).textContent = host;
+          $("[data-host-note]", item).textContent = i > 0 ? s.tokenEndpoint : "";
+          // Plain http is accepted on private networks; say plainly that it is not encrypted.
+          if (l.plainHosts.includes(host)) {
+            const plain = $("[data-host-plain]", item);
+            plain.textContent = s.plainHttp;
+            plain.hidden = false;
+          }
+          list.append(item);
+        });
+        $("[data-hosts]").hidden = false;
       } else {
-        key.textContent = s.noKey;
+        $("[data-account-name]").textContent =
+          l.service === "openai" ? s.accounts.openai : s.accounts[l.site ?? "bigmodel"];
+        $("[data-account]").hidden = false;
       }
-      if (l.models.length) {
-        field("models").textContent = l.models.join(", ");
-        root.querySelector<HTMLElement>("[data-models-row]")!.hidden = false;
+      if (result.unknown.length) {
+        $("[data-update-body]").textContent = s.updateBody.replace("{p}", named(result.unknown[0]![0]));
+        $("[data-update]").hidden = false;
       }
-      // The only place this page navigates to, built from the checked values.
-      const target = appLink(l);
-      root.querySelector<HTMLButtonElement>("[data-open]")!.addEventListener("click", () => {
+      show(l);
+      $("[data-version]").hidden = !l.v2;
+      // The only place this page navigates to, built from the checked values
+      // (and the parameters of a newer version, re-encoded).
+      const target = appLink(l, result.unknown);
+      $<HTMLButtonElement>("[data-open]").addEventListener("click", () => {
         window.location.href = target;
       });
-      root.querySelector<HTMLElement>("[data-valid]")!.hidden = false;
+      $("[data-valid]").hidden = false;
     } else {
-      const text = s.problems[result.problem];
-      // The parameter name is shown only when it is short and plain.
-      const param = result.param && /^[A-Za-z0-9_-]{1,32}$/.test(result.param) ? `: ${result.param}` : "";
-      root.querySelector<HTMLElement>("[data-problem]")!.textContent = param ? `${text}${param}` : text;
-      root.querySelector<HTMLElement>("[data-invalid]")!.hidden = false;
+      $("[data-problem]").textContent = s.problems[result.problem].replace("{p}", named(result.param));
+      $("[data-invalid]").hidden = false;
     }
   }
 </script>
