@@ -203,6 +203,16 @@ thinkwatch://import?name=example-relay&url=https%3A%2F%2Fapi.relay.example&proto
 
 即使识别出的服务类型不接受，为更早版本编写的链接仍然有效：例如官方地址带有其他路径（`https://api.openai.com/v1`）、Ollama 地址带有 `key`，或 `https://api.deepseek.com` 配合 `protocol=openai-chat`。这样的链接与以前一样创建为自定义上游。
 
+## 在 New API 站点上
+
+New API 或 One API 站点不用改代码，就能为每一把密钥提供 ThinkWatch Lite。在站点的系统设置中添加一个聊天预设，名称为 ThinkWatch Lite，地址为：
+
+```text
+thinkwatch://import?service=newapi&url={address}&key={key}
+```
+
+站点会填入自己的服务器地址和这一行的密钥，每把密钥的聊天菜单中随之出现这一项。打开它需要 ThinkWatch Lite 2026.10.16 或更新版本；版本更早或没有安装应用时，点击没有反应。
+
 ## 链接中的密钥
 
 含有密钥、Refresh Token 或私有访问密钥的链接本身就是凭据。应为每位客户单独生成链接，并通过私密渠道提供，例如客户自己的控制台。不含密钥的链接会让密钥栏位留空，由用户在对话框中填写。

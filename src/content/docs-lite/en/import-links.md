@@ -203,6 +203,16 @@ thinkwatch://import?name=example-relay&url=https%3A%2F%2Fapi.relay.example&proto
 
 Links written for earlier versions keep working even where the recognized service would not take them: an official address with another path such as `https://api.openai.com/v1`, an Ollama address with a `key`, or `https://api.deepseek.com` with `protocol=openai-chat`. Such a link becomes a custom upstream, as it did before.
 
+## On a New API site
+
+A New API or One API site can offer ThinkWatch Lite for every key without changing its code. In the site's system settings, add a chat preset named ThinkWatch Lite with this URL:
+
+```text
+thinkwatch://import?service=newapi&url={address}&key={key}
+```
+
+The site fills in its server address and the key of the row, and the preset appears in the chat menu of each key. Opening it needs ThinkWatch Lite 2026.10.16 or later; with an earlier version, or without the app, nothing happens.
+
 ## Keys in links
 
 A link that contains a key, a refresh token or a secret access key is a credential. Generate a separate link for each customer and deliver it through a private channel, such as the customer's own dashboard. A link without a key leaves the key field empty, to be filled in the dialog.
