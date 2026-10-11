@@ -1,8 +1,10 @@
 # Import links
 
-ThinkWatch Lite accepts links that pre-fill a new upstream. A relay or a model vendor can place such a link in its dashboard or in a welcome message. A user who has the app installed opens the link, reviews the settings in a confirmation dialog, and creates the upstream in one step.
+ThinkWatch Lite accepts links that open the New upstream dialog with the settings already filled in. A relay, a model vendor or a ThinkWatch Enterprise console can place such a link in its dashboard or in a welcome message. The user opens it, checks the settings in the same dialog used to add an upstream by hand, and creates the upstream with a few clicks.
 
-This page is written for relay and vendor operators. It describes the two forms of the link, the parameters, what the app checks, and what a link intentionally cannot do. A link builder is at the end of the page.
+This page is written for relay and vendor operators. It describes the two forms of the link, the parameters grouped the way the dialog groups them, which service takes which parameter, the encodings, and what a link intentionally cannot set. A link builder is at the end of the page.
+
+The parameters other than `name`, `url`, `protocol`, `key` and `models` need ThinkWatch Lite 2026.10.16 or later. A link that uses only those five also opens in earlier versions, and every link written for earlier versions stays valid.
 
 ## Link forms
 
@@ -10,85 +12,193 @@ Both forms carry the same parameters.
 
 | Form | Description |
 |---|---|
-| `thinkwatch://import?…` | Opens the app directly. The browser asks for permission before it hands the link to the app. |
-| `https://thinkwat.ch/import#…` | A web page that shows the settings, opens the app with a button, and offers the download when the app is not installed. The parameters are in the fragment after `#`, which browsers do not send to any server. The page loads no analytics or third-party scripts and removes the fragment from the address bar after reading it. |
+| `thinkwatch://import?…` | Opens the app directly. The browser asks for permission before it hands the link to the app. `thinkwatch://import/?…` is accepted too. |
+| `https://thinkwat.ch/import#…` | A web page that shows the hosts that will receive requests and the settings, opens the app with a button, and offers the download when the app is not installed. The parameters are in the fragment after `#`, which browsers do not send to any server. The page loads no analytics or third-party scripts and removes the fragment from the address bar after reading it. |
 
 The web form suits emails and dashboards whose users may not have the app yet. The page checks the parameters with the same rules as the app and shows nothing for a link that fails them.
 
 ## Parameters
 
-| Parameter | Required | Value |
+A parameter is accepted only where the New upstream dialog shows its field for the chosen service and authentication method. A value the dialog fills in by itself, such as the address of an official service or the only protocol it speaks, may be repeated in the link but not changed. [By service](#by-service) lists what each service takes.
+
+### Service
+
+| Parameter | Value |
+|---|---|
+| `service` | `anthropic`, `openai`, `gemini`, `deepseek`, `zai`, `bedrock`, `openrouter`, `thinkwatch` (a ThinkWatch Enterprise gateway), `sub2api`, `newapi` (New API / One API), `ollama` or `custom`. When omitted, the app recognizes the service from `url` the way the edit dialog does: official addresses by host, standard Bedrock addresses, port 11434 as Ollama, and any other address as `custom`. |
+| `auth` | `key` (the default), `oauth`, `account` or `aws-keys`, among the methods the service offers. `account` is the ChatGPT account for `openai` and the account sign-in for `zai`. |
+| `site` | `bigmodel` (mainland China) or `zai` (international), for `zai` only. When omitted, it is taken from `url`, or is `bigmodel`. |
+
+### Connection
+
+| Parameter | Value |
+|---|---|
+| `name` | The upstream's name in the app. When omitted, the app chooses one from the service or the address. |
+| `url` | The base URL, without endpoint paths such as `/chat/completions` or `/messages`. `https://` only; `http://` is accepted only for `localhost`, `127.0.0.1` and `[::1]`. No user name or password, query string or fragment. Required for `custom`, `thinkwatch`, `sub2api` and `newapi`. Optional for Bedrock (an endpoint such as a VPC endpoint) and Ollama (another machine). Services with their own address accept only that address. Not accepted with `auth=account`. |
+| `protocol` | `anthropic`, `openai-chat`, `openai-responses` or `gemini`, where the dialog offers a choice. When omitted, the app detects it from the address. |
+| `region` | The AWS region, such as `eu-west-1`, for Bedrock only. Without `url`, it chooses the standard address of that region. With a standard address, it must match the region in it. With another address, it is the signing region and needs `auth=aws-keys`. |
+| `key` | The API key, stored as given (for Bedrock, the Bedrock API key). With `auth=key`. Ollama has no key field. |
+| `oauth_endpoint` | The token endpoint, with the same rules as `url` and usually a path. Required with `auth=oauth`. When its host differs from the address, the app names both hosts. |
+| `oauth_refresh` | The refresh token. Required with `auth=oauth`. |
+| `oauth_client_id` | The client ID, with `auth=oauth`. Optional. |
+| `oauth_client_secret` | The client secret, with `auth=oauth`. Optional. |
+| `aws_access_key_id` | The access key ID, with `service=bedrock` and `auth=aws-keys`. Required there. |
+| `aws_secret_access_key` | The secret access key. Required with `auth=aws-keys`. |
+| `aws_session_token` | The session token of temporary credentials, with `auth=aws-keys`. Optional. |
+
+### Advanced settings
+
+| Parameter | Value |
+|---|---|
+| `headers` | Extra request headers, one `Name: Value` per line. The encoding is described under [Encodings](#encodings). Not accepted with `auth=account`. |
+| `client_identity` | `on` turns on Forward client identity, for relays that accept only specific clients. Sub2API, New API and custom upstreams only. |
+| `concurrency` | The concurrency limit: a whole number from 1 to 1000, without a sign or leading zeros. Not accepted with `auth=account`. |
+| `balance` | Where the balance is read: `off`, `openrouter`, `deepseek`, `moonshot`, `sub2api`, `newapi` or `thinkwatch`. Custom upstreams only; other services decide their own source. |
+
+### Models
+
+| Parameter | Value |
+|---|---|
+| `models` | Comma-separated model IDs, added to the upstream by hand. The app offers them next to the models the service lists, so a service that lists only some of its models can name the rest here; when the service lists none, they are its whole list. Repeated IDs are kept once. |
+| `models_only` | Comma-separated model IDs or patterns with `*` and `?`. Sets the enabled models to these models only. |
+| `specs` | Model specs, entries separated by `;`, each `model\|context\|max_output\|reasoning\|image`. They are saved once the upstream exists, for models on its final list. A spec for a model that is neither in `models` nor listed by the upstream is not saved, and the Models step says so. |
+
+### Billing
+
+| Parameter | Value |
+|---|---|
+| `billing` | `per-token` or `free`. When omitted, the service's default applies: free for Ollama, per token for the others. |
+| `price_multiplier` | The multiplier of a new price sheet, above 0 and at most 100, such as `0.8`. Not accepted with free billing. |
+| `prices` | Price overrides for the new price sheet, entries separated by `;`, each `model\|input\|output\|cache_read\|cache_write_5m\|cache_write_1h`. Not accepted with free billing. |
+
+When `price_multiplier` or `prices` is present, the Billing step preselects a new price sheet named after the upstream, with the multiplier (1 when omitted) and the overrides from the link. The sheet can be edited like any new sheet and is created together with the upstream when **Create** is chosen. When a sheet of that name exists, the dialog asks for another name, as it does for a taken upstream name.
+
+## By service
+
+| Service | `service` | `auth` | Address | Protocol |
+|---|---|---|---|---|
+| Anthropic | `anthropic` | `key` | `https://api.anthropic.com` | `anthropic` |
+| OpenAI | `openai` | `key`, `account` (ChatGPT account) | `https://api.openai.com` | `openai-chat` (default) or `openai-responses` |
+| Google Gemini | `gemini` | `key` | `https://generativelanguage.googleapis.com` | `gemini` |
+| DeepSeek | `deepseek` | `key` | `https://api.deepseek.com/anthropic` | `anthropic` |
+| Z.ai / BigModel | `zai` | `key`, `account` | `https://open.bigmodel.cn/api/anthropic` or `https://api.z.ai/api/anthropic`, by `site` | `anthropic` |
+| Amazon Bedrock | `bedrock` | `key` (Bedrock API key), `aws-keys` | The standard address of `region`, or an endpoint in `url` | Not set by a link |
+| OpenRouter | `openrouter` | `key` | `https://openrouter.ai/api` | `openai-chat` |
+| ThinkWatch Enterprise | `thinkwatch` | `key` | `url`, required | Not set by a link; the gateway accepts each client's format |
+| Sub2API | `sub2api` | `key` | `url`, required | Any, or detected |
+| New API / One API | `newapi` | `key` | `url`, required | Any, or detected |
+| Ollama | `ollama` | `key`, without a key field | `http://127.0.0.1:11434`, or another address in `url` | `openai-chat` |
+| Custom | `custom` | `key`, `oauth` | `url`, required | Any, or detected |
+
+`headers` and `concurrency` apply to every service except an account sign-in. `client_identity` applies to Sub2API, New API and custom upstreams, and `balance` to custom upstreams. The parameters of the Models and Billing groups apply to every service, account sign-ins included.
+
+A link with `auth=account` carries no credential: the sign-in happens in the app. Such a link takes `service`, `auth`, `site`, `name` and the Models and Billing parameters only.
+
+## Encodings
+
+- Each value is percent-encoded, for example with `encodeURIComponent`, and decoded once. A literal `+` means a space, so a key that contains `+` is written as `%2B`.
+- Each parameter appears at most once, and an empty value is rejected.
+- No value may contain `$`, `{` or `}`, control characters or invisible characters. The app reads `${NAME}` from the user's environment, so these characters could make it send a local secret to the link's host.
+- A value that fails its rule rejects the whole link. The app records only the reason, never the content.
+
+Lists and entries:
+
+| Parameter | Encoding | Example value, before percent-encoding |
 |---|---|---|
-| `url` | Yes | The base URL of the service, without endpoint paths such as `/chat/completions` or `/messages`. `https://` only; `http://` is accepted only for `localhost`, `127.0.0.1` and `[::1]`. No user name or password, query string or fragment. |
-| `name` | No | The upstream's name in the app. When omitted, the app derives one from the address. |
-| `protocol` | No | `anthropic`, `openai-chat`, `openai-responses` or `gemini`. When omitted, the app detects the protocol from the address. |
-| `key` | No | The API key, stored as given. Letters, digits and `- _ . ~ + / = :` only. |
-| `models` | No | Comma-separated model IDs, added to the upstream by hand. The app offers them next to the models the service lists, so a service that lists only some of its models can name the rest here; when the service lists none, they are its whole list. |
+| `models` | Model IDs separated by `,`; letters, digits and `- _ . : / @ +` | `glm-5,glm-5-air` |
+| `models_only` | As `models`, plus `*` and `?` in patterns | `claude-*,gpt-5` |
+| `headers` | Lines separated by a line feed (`%0A`), each `Name: Value` | `X-Relay-Group: pro`, line feed, `X-Relay-Region: hk` |
+| `specs` | Entries separated by `;`, each `model\|context\|max_output\|reasoning\|image` | `glm-5-air\|128000\|96000\|y\|n` |
+| `prices` | Entries separated by `;`, each `model\|input\|output\|cache_read\|cache_write_5m\|cache_write_1h` | `glm-5\|1\|3.2\|0.2` |
 
-Encoding rules:
+In `headers`, a name uses the token characters of HTTP (letters, digits and ``! # % & ' * + - . ^ _ ` | ~``), and a value is printable ASCII with surrounding spaces removed. No name may appear twice, ignoring case. Headers that carry credentials or that the gateway writes itself are rejected: `Authorization`, `Proxy-Authorization`, `X-Api-Key`, `X-Goog-Api-Key`, `Api-Key`, `Cookie`, `Host`, `Content-Length`, `Content-Type`, `Content-Encoding`, `Transfer-Encoding`, `Connection`, `Keep-Alive`, `Upgrade`, `TE`, `Trailer`, `User-Agent`, and any name starting with `Proxy-` or `Sec-`.
 
-- Each value is percent-encoded, for example with `encodeURIComponent`. A literal `+` means a space, so a key that contains `+` is written as `%2B`.
-- Each parameter appears at most once.
-- A link with any other parameter, an empty value, or a value that fails its rule is rejected as a whole. The app ignores such a link without opening a window.
+In `specs`, `context` and `max_output` are token counts from 1 to 10,000,000, and `reasoning` and `image` are `y` or `n`. Any of the four may be empty, but not all of them.
+
+In `prices`, each price is in USD per million tokens, with up to six digits before and six after the decimal point. `input` and `output` are required. A cache price that is empty or left out takes the input price.
 
 Limits:
 
 | Item | Limit |
 |---|---|
 | Whole link | 8192 characters |
-| `name` | 64 characters; no leading or trailing spaces; none of `/`, `\`, `$`, `{`, `}`, `<`, `>`, `"` or the backtick; not starting with `__`; no control or invisible characters |
-| `url` | 2048 characters |
-| `key` | 512 characters |
-| `models` | 64 entries, 128 characters each; letters, digits and `- _ . : / @ +` |
+| `name` | 64 characters; no leading or trailing spaces; none of `/`, `\`, `$`, `{`, `}`, `<`, `>`, `"` or the backtick; not `.` or `..`; not starting with `__` |
+| `url`, `oauth_endpoint` | 2048 characters |
+| `key`, `oauth_client_id`, `oauth_client_secret`, `aws_secret_access_key` | 512 characters; letters, digits and `- _ . ~ + / = :` |
+| `oauth_refresh`, `aws_session_token` | 4096 characters; the same characters as `key` |
+| `aws_access_key_id` | 16 to 128 capital letters and digits |
+| `region` | 32 characters; lowercase letters, digits and `-` |
+| `headers` | 16 lines; names up to 64 characters, values up to 1024 |
+| `models`, `models_only`, `specs`, `prices` | 64 entries each; model IDs up to 128 characters; no model twice in `specs` or `prices` |
 
 ## What the app does with a link
 
-1. **Checks the link.** Every rule above is applied in the app, whatever the page that produced the link has checked.
-2. **Shows a confirmation dialog.** The dialog states the host that will receive request content and the API key, in ASCII: an internationalized domain name is shown as punycode (`xn--…`), so a look-alike domain cannot pass for a familiar one. It also shows the base URL, the protocol, the key (hidden until revealed) and the models added by hand. Only the name can be changed. Values are displayed as plain text.
-3. **Saves nothing before confirmation.** Until **Create** is chosen, the configuration is not written and the app makes no network request to the address: no connection test and no model listing.
-4. **Creates one new upstream.** An import never changes, replaces or deletes an existing upstream. When the name is already in use, a different name must be entered; there is no option to overwrite. The new upstream is not made the default and is not added to any route. After creation it behaves like an upstream added by hand, including fetching its model list.
-5. **Handles one link at a time.** Links that arrive while the dialog is open, or within a few seconds after it closes, are ignored and do not bring the window to the front.
+1. **Checks the link.** Every rule on this page is applied in the app, whatever the page that produced the link has checked.
+2. **Opens the New upstream dialog, filled in.** The dialog opens on its second step, Connection, or Account for an account sign-in. A note under the steps names the host that will receive requests and keys, and the token endpoint's host when it differs. Hosts are shown in ASCII: an internationalized domain name appears as punycode (`xn--…`), so a look-alike domain cannot pass for a familiar one. Every value can be changed, and going back to the first step to pick another service drops the values that service does not take.
+3. **Writes and sends nothing before the user acts.** Until **Next** is chosen on the second step, which checks the connection, or a sign-in is started, the configuration is not written and no request leaves the machine.
+4. **Creates one new upstream.** An import never changes, replaces or deletes an existing upstream, never makes the new one the default and never adds it to a route. When the name is taken, the dialog asks for another. Several upstreams on one address with different keys are normal.
+5. **Handles one link at a time.** Links that arrive while the dialog is open are ignored. When a New upstream or Edit upstream dialog is already open, an arriving link is dropped, so a form being filled in is never replaced.
+
+## Links from a newer version
+
+A parameter that the installed app does not know no longer fails silently. The app shows **Cannot import this link**, names the parameter, and offers to install an update when one is available. The web form behaves the same way: it lists the settings it recognizes, states that a newer ThinkWatch Lite is needed, and still offers to open the link. A parameter name is shown only when it consists of up to 32 lowercase letters, digits and underscores.
+
+## What a link can never set
+
+Any web page can open a link, so a link is limited to what a user can judge in the dialog. A link that tries to set one of the following is rejected as a whole.
+
+| Not accepted | Reason |
+|---|---|
+| Outbound proxy, and what happens when it is unavailable | The sender does not know the user's network. The user picks them in the dialog. |
+| AWS profile, and environment variable references (`${NAME}`) | They would make the app read local credentials or the environment and send them to the link's host. A link with `key=${OPENAI_API_KEY}` would send the user's own key to the relay. |
+| Aliases, routes, the default upstream and route weights | They would redirect clients that are already configured. |
+| The disabled switch and the access token used only for checking | A new upstream starts enabled, and the access token is obtained with the refresh token. |
+| Credentials for an account sign-in | The sign-in happens in the app, with the service. |
+| Authentication, cookie and connection headers | A header must not replace the key or the identity the gateway sends. |
+| Plain `http://` to other hosts | The key would travel unencrypted. |
+| MCP servers and client configuration | They run commands or change the settings of other applications. |
+| Icons and other presentation | Not needed to connect, and a way to imitate a familiar service. |
+
+These settings can be changed in the app after the upstream is created.
 
 ## Examples
 
-An Anthropic-compatible relay:
+A relay that needs two headers, limits concurrency to 4, lists only some of its models, and charges 0.8 times the public prices with one override (no `service`: the address is recognized as a custom upstream):
+
+```text
+thinkwatch://import?name=example-relay&url=https%3A%2F%2Fapi.relay.example%2Fv1&protocol=openai-chat&key=sk-relay-EXAMPLE&headers=X-Relay-Group%3A%20pro%0AX-Relay-Region%3A%20hk&concurrency=4&models=glm-5%2Cglm-5-air&specs=glm-5-air%7C128000%7C96000%7Cy%7Cn&price_multiplier=0.8&prices=glm-5%7C1%7C3.2%7C0.2
+```
+
+The same link in its web form:
+
+```text
+https://thinkwat.ch/import#name=example-relay&url=https%3A%2F%2Fapi.relay.example%2Fv1&protocol=openai-chat&key=sk-relay-EXAMPLE&headers=X-Relay-Group%3A%20pro%0AX-Relay-Region%3A%20hk&concurrency=4&models=glm-5%2Cglm-5-air&specs=glm-5-air%7C128000%7C96000%7Cy%7Cn&price_multiplier=0.8&prices=glm-5%7C1%7C3.2%7C0.2
+```
+
+Amazon Bedrock in `eu-west-1` with access keys:
+
+```text
+thinkwatch://import?service=bedrock&auth=aws-keys&region=eu-west-1&aws_access_key_id=AKIAIOSFODNN7EXAMPLE&aws_secret_access_key=wJalrXUtnFEMI%2FK7MDENG%2FbPxRfiCYEXAMPLEKEY
+```
+
+A ThinkWatch Enterprise gateway. The **Add to ThinkWatch Lite** button in the ThinkWatch Enterprise console writes this link with the gateway's address and the new key:
+
+```text
+thinkwatch://import?service=thinkwatch&name=thinkwatch&url=https%3A%2F%2Fai.example.com&key=tw-EXAMPLE
+```
+
+A ChatGPT account. The link opens the sign-in; it carries no credential:
+
+```text
+thinkwatch://import?service=openai&auth=account&name=chatgpt
+```
+
+A link written for earlier versions, still valid:
 
 ```text
 thinkwatch://import?name=example-relay&url=https%3A%2F%2Fapi.relay.example&protocol=anthropic&key=sk-relay-EXAMPLE
 ```
 
-```text
-https://thinkwat.ch/import#name=example-relay&url=https%3A%2F%2Fapi.relay.example&protocol=anthropic&key=sk-relay-EXAMPLE
-```
-
-An OpenAI-compatible relay that does not list its models:
-
-```text
-thinkwatch://import?name=example-openai&url=https%3A%2F%2Fapi.relay.example%2Fv1&protocol=openai-chat&key=sk-relay-EXAMPLE&models=gpt-5%2Cgpt-5-mini
-```
-
-```text
-https://thinkwat.ch/import#name=example-openai&url=https%3A%2F%2Fapi.relay.example%2Fv1&protocol=openai-chat&key=sk-relay-EXAMPLE&models=gpt-5%2Cgpt-5-mini
-```
-
-## What a link cannot set
-
-Any web page can open a link, so a link is limited to what a user can judge in one dialog. The following are intentionally not supported:
-
-| Not supported | Reason |
-|---|---|
-| Environment variable references in the key (`${NAME}`) | The app reads `${NAME}` from the user's environment. A link with `key=${OPENAI_API_KEY}` would send the user's own key to the relay's host. Keys containing `$`, `{` or `}` are rejected. |
-| Request headers | Header values can reference environment variables and credentials, and can change how requests are authenticated in ways the dialog cannot show clearly. |
-| Outbound proxy | A link must not route traffic through a third party. |
-| Pricing and billing | How cost is counted is the user's decision. |
-| Routing rules and the default upstream | A link must not redirect the traffic of clients that are already configured. |
-| MCP servers and client configuration | They run commands or change the settings of other applications. |
-| Icons and other presentation | Not needed to connect, and a way to imitate a familiar service. |
-| Plain `http://` to other hosts | The key would travel unencrypted. |
-| ChatGPT account sign-in and Amazon Bedrock | They need an interactive sign-in or AWS credentials, which a link cannot carry. |
-
-These settings can be changed in the app after the upstream is created.
-
 ## Keys in links
 
-A link that contains a key is a credential. Generate a separate link for each customer and deliver it through a private channel, such as the customer's own dashboard. A link without `key` creates the upstream without a key; the key is then added by editing the upstream in the app.
+A link that contains a key, a refresh token or a secret access key is a credential. Generate a separate link for each customer and deliver it through a private channel, such as the customer's own dashboard. A link without a key leaves the key field empty, to be filled in the dialog.

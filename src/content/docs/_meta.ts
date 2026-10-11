@@ -318,8 +318,8 @@ export const products: Product[] = [
         locales: both,
         group: "reference",
         summary: {
-          en: "For relays and vendors: links that pre-fill a new upstream in the app, their parameters, what the app checks, and a link builder.",
-          "zh-CN": "面向中转站与服务商：在应用中预填新上游的链接、参数、应用所做的校验，以及链接生成器。",
+          en: "For relays, vendors and ThinkWatch Enterprise: links that open the New upstream dialog filled in, the parameters each service takes, what the app checks, and a link builder.",
+          "zh-CN": "面向中转站、服务商与 ThinkWatch 企业版：打开预填好的「新建上游」对话框的链接、各服务类型接受的参数、应用所做的校验，以及链接生成器。",
         },
       },
       {

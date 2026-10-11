@@ -700,7 +700,7 @@ ThinkWatch 运行多个自动执行的后台任务：
 
 ## 8. 客户端配置指南
 
-ThinkWatch 在 Web 控制台中内置了**配置指南**页面，位于 `/gateway/guide`。该页面提供了将各种 AI 客户端工具连接到网关的一键复制配置说明，并自动检测网关 URL。
+ThinkWatch 在 Web 控制台中内置了**配置指南**页面，位于 `/guide`。该页面提供了将各种 AI 客户端工具连接到网关的一键复制配置说明，并自动检测网关 URL。
 
 ### 支持的客户端工具
 
@@ -713,6 +713,13 @@ ThinkWatch 在 Web 控制台中内置了**配置指南**页面，位于 `/gatewa
 - **OpenAI SDK** -- 设置 `OPENAI_BASE_URL` 和 `OPENAI_API_KEY` 环境变量（使用 `/v1/chat/completions` 或 `/v1/responses`）
 - **Anthropic SDK** -- 设置 `ANTHROPIC_BASE_URL` 和 `ANTHROPIC_API_KEY` 环境变量（使用 `/v1/messages`）
 - **cURL** -- 三种 API 格式的示例命令
+- **ThinkWatch Lite** -- 「添加到 ThinkWatch Lite」按钮把网关添加到桌面应用（见下文）
+
+### 把网关添加到 ThinkWatch Lite
+
+「添加到 ThinkWatch Lite」按钮打开 [ThinkWatch Lite](/zh-CN/lite) 的「新建上游」对话框，网关地址与密钥都已填好，用户一步即可接入桌面应用。这个按钮出现在创建或轮换密钥之后、首次运行设置的最后一步，以及配置指南的 ThinkWatch Lite 标签页。
+
+该按钮需要 ThinkWatch Lite 2026.10.16 或更高版本。地址取自「网关公开地址」设置，链接格式见[导入链接](/zh-CN/docs/lite/import-links)。
 
 ### 网关 API 端点
 
@@ -723,7 +730,7 @@ ThinkWatch 在 Web 控制台中内置了**配置指南**页面，位于 `/gatewa
 | `POST /v1/chat/completions` | OpenAI Chat Completions | Cursor、Continue、Cline、OpenAI SDK          |
 | `POST /v1/messages`         | Anthropic Messages API  | Claude Code、Anthropic SDK                   |
 | `POST /v1/responses`        | OpenAI Responses API    | OpenAI SDK（2025 格式）                      |
-| `GET /v1/models`            | OpenAI Models 列表      | 所有客户端                                   |
+| `GET /v1/models`            | 调用方密钥可用的模型    | 所有客户端                                   |
 | `GET /v1/usage`             | 调用方密钥的用量与限额  | 持有网关 API 密钥的任何客户端                |
 
 所有端点通过 `Authorization: Bearer` 请求头接受 `tw-` API 密钥。

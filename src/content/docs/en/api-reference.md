@@ -162,7 +162,7 @@ curl -X POST http://localhost:3000/v1/chat/completions \
 
 ### GET /v1/models
 
-List all models available through the gateway.
+List the models available through the gateway. With an API key, the list holds only the models that key may use.
 
 **Authentication:** API Key or JWT
 

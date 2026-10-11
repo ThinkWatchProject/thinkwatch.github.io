@@ -1,117 +1,281 @@
 ---
 // The link builder on the "Import links" page of the Lite docs. It runs in the
-// browser only: the values are checked with the same rules as the app
-// (src/lib/import-link.ts) and the two links are written with textContent.
-// Nothing is sent anywhere.
+// browser only: the form asks what the New upstream dialog asks for the chosen
+// service and authentication method, the values are checked with the same rules
+// as the app (src/lib/import-link.ts), and the two links are written with
+// textContent. Nothing is sent anywhere.
 import { getLang } from "~/i18n";
-import { PROTOCOLS } from "~/lib/import-link";
+import { BALANCES, BILLINGS, SERVICES, SITES } from "~/lib/import-link";
+import { importLinkText } from "~/lib/import-link-text";
 
 const lang = getLang(Astro);
 const zh = lang === "zh-CN";
+const shared = importLinkText(zh);
+const L = shared.labels;
 
 const t = zh
   ? {
       heading: "链接生成器",
       note: "在浏览器中生成，不发送任何内容。",
-      name: "名称（可选）",
-      url: "接口地址",
-      protocol: "接口协议",
-      auto: "自动识别（不写入链接）",
-      key: "API 密钥（可选）",
-      models: "手动添加的模型（可选，逗号分隔）",
+      optional: "（可选）",
+      auto: "自动识别",
+      defaultBalance: "自动",
+      defaultBilling: "服务的默认值",
+      clientIdentityOn: "开启",
+      urlOptional: "留空时使用标准地址。",
+      regionHint: "标准地址按区域生成；其他地址在使用访问密钥时按此区域签名。",
+      perLine: "每行一项。",
+      commaSeparated: "以逗号分隔。",
       appLink: "应用链接",
       webLink: "网页链接",
       copy: "复制",
       copied: "已复制",
-      fill: "填写接口地址后生成链接。",
-      problems: {
-        empty: "填写接口地址后生成链接。",
-        tooLong: "链接过长。",
-        unknownParam: "包含不支持的参数。",
-        duplicateParam: "同一参数出现了多次。",
-        emptyValue: "参数的值为空。",
-        missingUrl: "填写接口地址后生成链接。",
-        name: "名称不符合要求：最多 64 个字符，首尾无空白，不含 / \\ $ { } < > \" `，不以 __ 开头。",
-        url: "接口地址不符合要求：须为 https 地址（http 仅限 localhost、127.0.0.1、[::1]），不含账号、查询串、片段、空白与 % $ { } 等字符。",
-        protocol: "接口协议不受支持。",
-        key: "API 密钥只能包含字母、数字与 - _ . ~ + / = :，最长 512 个字符。",
-        models: "手动添加的模型不符合要求：以逗号分隔，每项只含字母、数字与 - _ . : / @ +，最多 64 项。",
+      fill: "选择服务类型并填写设置后生成链接。",
+      worksBefore: "此链接也适用于更早版本的 ThinkWatch Lite。",
+      rules: {
+        name: "最多 64 个字符，首尾无空白，不含 / \\ $ { } < > \" `，不以 __ 开头。",
+        url: "须为 https 地址（http 仅限 localhost、127.0.0.1、[::1]），不含账号、查询串、片段、空白与 % $ { } 等字符。",
+        key: "只能包含字母、数字与 - _ . ~ + / = :，最长 512 个字符。",
+        long: "只能包含字母、数字与 - _ . ~ + / = :，最长 4096 个字符。",
+        region: "小写字母、数字与连字符，例如 us-east-1。",
+        awsId: "大写字母与数字，16 到 128 个字符。",
+        headers: "每行一个「名称: 值」，最多 16 行，名称不重复，值为可打印 ASCII；鉴权、Cookie、Host、内容与连接相关的请求头、User-Agent 及 proxy-*、sec-* 开头的请求头不接受。",
+        concurrency: "1 到 1000 之间的整数。",
+        models: "模型 ID 以逗号分隔，只含字母、数字与 - _ . : / @ +，最多 64 项。",
+        modelsOnly: "模型 ID 或含 * ? 的通配规则，以逗号分隔，最多 64 项。",
+        specs: "每行一个 model|context|max_output|reasoning|image：数值为 1 到 10000000，reasoning 与 image 为 y 或 n，至少填写一项。",
+        multiplier: "大于 0、不超过 100 的数，最多 6 位小数。",
+        prices: "每行一个 model|input|output|cache_read|cache_write_5m|cache_write_1h，单位为美元 / 百万 tokens；缓存单价可省略，省略时等于输入单价。",
       },
     }
   : {
       heading: "Link builder",
       note: "Runs in the browser; nothing is sent.",
-      name: "Name (optional)",
-      url: "Base URL",
-      protocol: "Protocol",
-      auto: "Auto-detect (left out of the link)",
-      key: "API key (optional)",
-      models: "Models added by hand (optional, comma-separated)",
+      optional: " (optional)",
+      auto: "Auto-detect",
+      defaultBalance: "Automatic",
+      defaultBilling: "The service's default",
+      clientIdentityOn: "On",
+      urlOptional: "Leave empty for the standard address.",
+      regionHint: "Standard addresses follow the region; with access keys, another address is signed for this region.",
+      perLine: "One per line.",
+      commaSeparated: "Comma-separated.",
       appLink: "App link",
       webLink: "Web link",
       copy: "Copy",
       copied: "Copied",
-      fill: "Enter a base URL to generate the links.",
-      problems: {
-        empty: "Enter a base URL to generate the links.",
-        tooLong: "The link is too long.",
-        unknownParam: "The link contains an unsupported parameter.",
-        duplicateParam: "A parameter appears more than once.",
-        emptyValue: "A parameter has an empty value.",
-        missingUrl: "Enter a base URL to generate the links.",
-        name: "The name is not accepted: at most 64 characters, no leading or trailing spaces, none of / \\ $ { } < > \" `, and not starting with __.",
-        url: "The base URL is not accepted: it must be an https address (http only for localhost, 127.0.0.1 and [::1]) without credentials, a query, a fragment, spaces or characters such as % $ { }.",
-        protocol: "The protocol is not supported.",
-        key: "The API key may contain only letters, digits and - _ . ~ + / = :, up to 512 characters.",
-        models: "The models added by hand are not accepted: comma-separated, each entry only letters, digits and - _ . : / @ +, at most 64 entries.",
+      fill: "Choose the service and fill in the settings to generate the links.",
+      worksBefore: "This link also works with earlier versions of ThinkWatch Lite.",
+      rules: {
+        name: "At most 64 characters, no leading or trailing spaces, none of / \\ $ { } < > \" `, and not starting with __.",
+        url: "An https address (http only for localhost, 127.0.0.1 and [::1]) without credentials, a query, a fragment, spaces or characters such as % $ { }.",
+        key: "Letters, digits and - _ . ~ + / = : only, up to 512 characters.",
+        long: "Letters, digits and - _ . ~ + / = : only, up to 4096 characters.",
+        region: "Lowercase letters, digits and hyphens, such as us-east-1.",
+        awsId: "Uppercase letters and digits, 16 to 128 characters.",
+        headers: "One Name: Value per line, at most 16, no repeated names, printable ASCII values; authentication, cookie, host, content and connection headers, User-Agent, and names starting with proxy- or sec- are not accepted.",
+        concurrency: "A whole number from 1 to 1000.",
+        models: "Comma-separated model IDs of letters, digits and - _ . : / @ +, at most 64.",
+        modelsOnly: "Comma-separated model IDs or patterns with * and ?, at most 64.",
+        specs: "One model|context|max_output|reasoning|image per line: numbers from 1 to 10000000, y or n, at least one field filled.",
+        multiplier: "A number above 0 and at most 100, with up to six decimals.",
+        prices: "One model|input|output|cache_read|cache_write_5m|cache_write_1h per line, in USD per million tokens; a cache price left out is the input price.",
       },
     };
+
+/** Which rule explains a rejected value */
+const ruleOf: Record<string, keyof typeof t.rules> = {
+  name: "name",
+  url: "url",
+  oauth_endpoint: "url",
+  key: "key",
+  oauth_client_id: "key",
+  oauth_client_secret: "key",
+  aws_secret_access_key: "key",
+  oauth_refresh: "long",
+  aws_session_token: "long",
+  region: "region",
+  aws_access_key_id: "awsId",
+  headers: "headers",
+  concurrency: "concurrency",
+  models: "models",
+  models_only: "modelsOnly",
+  specs: "specs",
+  price_multiplier: "multiplier",
+  prices: "prices",
+};
+
+const strings = { ...shared, ...t, ruleOf };
 
 const input =
   "w-full rounded-lg border border-[var(--color-border-strong)] bg-[var(--color-bg)] px-3 py-2 font-mono text-sm text-[var(--color-text)] outline-none focus:border-[var(--color-brand-1)]";
 const labelCls = "mb-1.5 block text-sm text-[var(--color-muted)]";
+const hintCls = "mt-1 block text-xs leading-relaxed text-[var(--color-muted)]";
+const legendCls = "mb-3 text-sm font-medium text-[var(--color-text)]";
+const fieldsetCls = "grid gap-4 border-t border-[var(--color-border)] pt-5";
 ---
 
 <section
   class="mt-10 rounded-xl border border-[var(--color-border-strong)] bg-[var(--color-surface)]/60 p-5 sm:p-6"
   data-link-builder
-  data-strings={JSON.stringify(t)}
+  data-strings={JSON.stringify(strings)}
   data-pagefind-ignore
 >
   <h2 class="text-xl font-semibold tracking-tight text-[var(--color-text)]">{t.heading}</h2>
   <p class="mt-1 text-sm text-[var(--color-muted)]">{t.note}</p>
 
-  <form class="mt-5 grid gap-4" autocomplete="off">
-    <label>
-      <span class={labelCls}>{t.url}</span>
-      <input class={input} name="url" type="url" spellcheck="false" placeholder="https://api.relay.example/v1" />
-    </label>
-    <div class="grid gap-4 sm:grid-cols-2">
-      <label>
-        <span class={labelCls}>{t.name}</span>
-        <input class={input} name="name" type="text" spellcheck="false" placeholder="example-relay" />
-      </label>
-      <label>
-        <span class={labelCls}>{t.protocol}</span>
-        <select class={input} name="protocol">
-          <option value="">{t.auto}</option>
-          {PROTOCOLS.map((p) => <option value={p}>{p}</option>)}
+  <form class="mt-5 grid gap-6" autocomplete="off">
+    <fieldset class="grid gap-4 sm:grid-cols-3">
+      <legend class={legendCls}>{shared.groups.service}</legend>
+      <label data-field="service">
+        <span class={labelCls}>{L.service}</span>
+        <select class={input} name="service">
+          {SERVICES.map((s) => <option value={s} selected={s === "custom"}>{shared.services[s]}</option>)}
         </select>
       </label>
-    </div>
-    <label>
-      <span class={labelCls}>{t.key}</span>
-      <input class={input} name="key" type="text" spellcheck="false" placeholder="sk-…" />
-    </label>
-    <label>
-      <span class={labelCls}>{t.models}</span>
-      <input class={input} name="models" type="text" spellcheck="false" placeholder="gpt-5,gpt-5-mini" />
-    </label>
+      <label data-field="auth">
+        <span class={labelCls}>{L.auth}</span>
+        <select class={input} name="auth"></select>
+      </label>
+      <label data-field="site">
+        <span class={labelCls}>{L.site}</span>
+        <select class={input} name="site">
+          {SITES.map((s) => <option value={s}>{shared.sites[s]}</option>)}
+        </select>
+      </label>
+    </fieldset>
+
+    <fieldset class={fieldsetCls}>
+      <legend class={legendCls} data-connection-legend>{shared.groups.connection}</legend>
+      <label data-field="url">
+        <span class={labelCls}>{L.url}</span>
+        <input class={input} name="url" type="url" spellcheck="false" placeholder="https://api.relay.example" />
+        <span class={hintCls} data-url-optional>{t.urlOptional}</span>
+      </label>
+      <div class="grid gap-4 sm:grid-cols-2">
+        <label data-field="name">
+          <span class={labelCls}>{L.name}{t.optional}</span>
+          <input class={input} name="name" type="text" spellcheck="false" placeholder="example-relay" />
+        </label>
+        <label data-field="protocol">
+          <span class={labelCls}>{L.protocol}</span>
+          <select class={input} name="protocol"></select>
+        </label>
+        <label data-field="region">
+          <span class={labelCls}>{L.region}{t.optional}</span>
+          <input class={input} name="region" type="text" spellcheck="false" placeholder="us-east-1" />
+          <span class={hintCls}>{t.regionHint}</span>
+        </label>
+      </div>
+      <label data-field="key">
+        <span class={labelCls}>{L.key}{t.optional}</span>
+        <input class={input} name="key" type="text" spellcheck="false" placeholder="sk-…" />
+      </label>
+      <div class="grid gap-4 sm:grid-cols-2">
+        <label data-field="oauth_endpoint">
+          <span class={labelCls}>{L.oauthEndpoint}</span>
+          <input class={input} name="oauth_endpoint" type="url" spellcheck="false" placeholder="https://auth.relay.example/oauth/token" />
+        </label>
+        <label data-field="oauth_refresh">
+          <span class={labelCls}>{L.oauthRefresh}</span>
+          <input class={input} name="oauth_refresh" type="text" spellcheck="false" />
+        </label>
+        <label data-field="oauth_client_id">
+          <span class={labelCls}>{L.oauthClientId}{t.optional}</span>
+          <input class={input} name="oauth_client_id" type="text" spellcheck="false" />
+        </label>
+        <label data-field="oauth_client_secret">
+          <span class={labelCls}>{L.oauthClientSecret}{t.optional}</span>
+          <input class={input} name="oauth_client_secret" type="text" spellcheck="false" />
+        </label>
+        <label data-field="aws_access_key_id">
+          <span class={labelCls}>{L.awsKeyId}</span>
+          <input class={input} name="aws_access_key_id" type="text" spellcheck="false" placeholder="AKIA…" />
+        </label>
+        <label data-field="aws_secret_access_key">
+          <span class={labelCls}>{L.awsSecret}</span>
+          <input class={input} name="aws_secret_access_key" type="text" spellcheck="false" />
+        </label>
+        <label data-field="aws_session_token">
+          <span class={labelCls}>{L.awsToken}{t.optional}</span>
+          <input class={input} name="aws_session_token" type="text" spellcheck="false" />
+        </label>
+      </div>
+    </fieldset>
+
+    <fieldset class={fieldsetCls} data-group="advanced">
+      <legend class={legendCls}>{shared.groups.advanced}</legend>
+      <label data-field="headers">
+        <span class={labelCls}>{L.headers}{t.optional}</span>
+        <textarea class={input} name="headers" rows="2" spellcheck="false" placeholder="X-Relay-Group: pro"></textarea>
+        <span class={hintCls}>{t.perLine}</span>
+      </label>
+      <div class="grid gap-4 sm:grid-cols-3">
+        <label data-field="concurrency">
+          <span class={labelCls}>{L.concurrency}{t.optional}</span>
+          <input class={input} name="concurrency" type="text" inputmode="numeric" spellcheck="false" placeholder="4" />
+        </label>
+        <label data-field="balance">
+          <span class={labelCls}>{L.balance}</span>
+          <select class={input} name="balance">
+            <option value="">{t.defaultBalance}</option>
+            {BALANCES.map((b) => <option value={b}>{shared.balances[b]}</option>)}
+          </select>
+        </label>
+        <label class="flex items-center gap-2 self-end pb-2 text-sm text-[var(--color-text)]" data-field="client_identity">
+          <input type="checkbox" name="client_identity" />
+          {L.clientIdentity}
+        </label>
+      </div>
+    </fieldset>
+
+    <fieldset class={fieldsetCls}>
+      <legend class={legendCls}>{shared.groups.models}</legend>
+      <div class="grid gap-4 sm:grid-cols-2">
+        <label data-field="models">
+          <span class={labelCls}>{L.models}{t.optional}</span>
+          <input class={input} name="models" type="text" spellcheck="false" placeholder="gpt-5,gpt-5-mini" />
+          <span class={hintCls}>{t.commaSeparated}</span>
+        </label>
+        <label data-field="models_only">
+          <span class={labelCls}>{L.modelsOnly}{t.optional}</span>
+          <input class={input} name="models_only" type="text" spellcheck="false" placeholder="claude-*,gpt-5" />
+          <span class={hintCls}>{t.commaSeparated}</span>
+        </label>
+      </div>
+      <label data-field="specs">
+        <span class={labelCls}>{L.specs}{t.optional}</span>
+        <textarea class={input} name="specs" rows="2" spellcheck="false" placeholder="glm-5|200000|128000|y|n"></textarea>
+        <span class={hintCls}>{t.perLine} model|context|max_output|reasoning|image</span>
+      </label>
+    </fieldset>
+
+    <fieldset class={fieldsetCls}>
+      <legend class={legendCls}>{shared.groups.billing}</legend>
+      <div class="grid gap-4 sm:grid-cols-2">
+        <label data-field="billing">
+          <span class={labelCls}>{L.billing}</span>
+          <select class={input} name="billing">
+            <option value="">{t.defaultBilling}</option>
+            {BILLINGS.map((b) => <option value={b}>{shared.billings[b]}</option>)}
+          </select>
+        </label>
+        <label data-field="price_multiplier">
+          <span class={labelCls}>{L.priceMultiplier}{t.optional}</span>
+          <input class={input} name="price_multiplier" type="text" inputmode="decimal" spellcheck="false" placeholder="1" />
+        </label>
+      </div>
+      <label data-field="prices">
+        <span class={labelCls}>{L.prices}{t.optional}</span>
+        <textarea class={input} name="prices" rows="2" spellcheck="false" placeholder="glm-5|1|3.2"></textarea>
+        <span class={hintCls}>{t.perLine} model|input|output|cache_read|cache_write_5m|cache_write_1h</span>
+      </label>
+    </fieldset>
   </form>
 
-  <p class="mt-5 text-sm leading-relaxed text-[var(--color-muted)]" data-message role="status">{t.fill}</p>
+  <p class="mt-6 text-sm leading-relaxed text-[var(--color-muted)]" data-message role="status">{t.fill}</p>
 
-  <div class="mt-5 grid gap-4" data-output hidden>
+  <div class="mt-6 grid gap-4" data-output hidden>
     {
       (["app", "web"] as const).map((kind) => (
         <div>
@@ -129,46 +293,176 @@ const labelCls = "mb-1.5 block text-sm text-[var(--color-muted)]";
         </div>
       ))
     }
+    <p class="text-sm text-[var(--color-muted)]" data-version></p>
   </div>
 </section>
 
 <script>
-  import { appLink, validate, webLink, type Problem } from "~/lib/import-link";
+  import {
+    PARAMS,
+    PROTOCOLS,
+    SERVICE_RULES,
+    appLink,
+    fieldsFor,
+    serviceOfUrl,
+    showableParam,
+    validateParams,
+    webLink,
+    type Auth,
+    type Param,
+    type Service,
+  } from "~/lib/import-link";
+  import type { ImportLinkText } from "~/lib/import-link-text";
 
-  type Strings = { copy: string; copied: string; fill: string; problems: Record<Problem, string> };
+  type Strings = ImportLinkText & {
+    auto: string;
+    copy: string;
+    copied: string;
+    fill: string;
+    worksBefore: string;
+    rules: Record<string, string>;
+    ruleOf: Record<string, string>;
+  };
+
+  const LF = String.fromCharCode(10);
 
   for (const root of document.querySelectorAll<HTMLElement>("[data-link-builder]")) {
     const s = JSON.parse(root.dataset.strings ?? "{}") as Strings;
     const form = root.querySelector("form")!;
     const message = root.querySelector<HTMLElement>("[data-message]")!;
     const output = root.querySelector<HTMLElement>("[data-output]")!;
+    const version = root.querySelector<HTMLElement>("[data-version]")!;
     const code = (kind: string) => root.querySelector<HTMLElement>(`[data-link="${kind}"]`)!;
-    const value = (name: string) => {
-      const v = (form.elements.namedItem(name) as HTMLInputElement | HTMLSelectElement).value;
-      return v === "" ? undefined : v;
+    const el = <T extends HTMLElement = HTMLInputElement>(name: string) => form.elements.namedItem(name) as unknown as T;
+    const wrap = (p: Param) => root.querySelector<HTMLElement>(`[data-field="${p}"]`);
+    const setOptions = (select: HTMLSelectElement, options: [string, string][]) => {
+      const keep = select.value;
+      select.replaceChildren(
+        ...options.map(([value, label]) => {
+          const o = document.createElement("option");
+          o.value = value;
+          o.textContent = label;
+          return o;
+        }),
+      );
+      if (options.some(([v]) => v === keep)) select.value = keep;
     };
 
+    /** The authentication methods and protocols on offer follow the service, as in the dialog. */
+    const refreshChoices = () => {
+      const service = el<HTMLSelectElement>("service").value as Service;
+      const rules = SERVICE_RULES[service];
+      setOptions(
+        el<HTMLSelectElement>("auth"),
+        rules.auth.map((a): [string, string] => [a, a === "account" && service === "openai" ? s.auths.chatgpt : s.auths[a]]),
+      );
+      const p = rules.protocol;
+      setOptions(
+        el<HTMLSelectElement>("protocol"),
+        Array.isArray(p)
+          ? p.length === PROTOCOLS.length
+            ? [["", s.auto], ...p.map((x): [string, string] => [x, x])]
+            : p.map((x): [string, string] => [x, x])
+          : [],
+      );
+      el("url").placeholder =
+        service === "thinkwatch"
+          ? "https://gateway.example.com"
+          : service === "ollama"
+            ? (rules.address ?? "")
+            : service === "bedrock"
+              ? "https://vpce-….bedrock-runtime.us-east-1.vpce.amazonaws.com"
+              : "https://api.relay.example";
+    };
+
+    /** Shows the fields the dialog shows. Fields with only one possible value are left out of the form. */
+    const refreshFields = (service: Service, auth: Auth) => {
+      const rules = SERVICE_RULES[service];
+      const fields = fieldsFor(service, auth);
+      const billing = el<HTMLSelectElement>("billing").value || rules.billing;
+      const visible = (p: Param) =>
+        fields.has(p) &&
+        !(p === "url" && rules.url === "own") &&
+        !(p === "protocol" && !Array.isArray(rules.protocol)) &&
+        !(p === "auth" && rules.auth.length < 2) &&
+        !((p === "price_multiplier" || p === "prices") && billing === "free");
+      for (const p of PARAMS) {
+        const w = wrap(p);
+        if (w) w.hidden = !visible(p);
+      }
+      root.querySelector<HTMLElement>("[data-url-optional]")!.hidden = rules.url !== "any";
+      root.querySelector<HTMLElement>("[data-group='advanced']")!.hidden = auth === "account";
+      root.querySelector<HTMLElement>("[data-connection-legend]")!.textContent =
+        auth === "account" ? s.groups.account : s.groups.connection;
+      return visible;
+    };
+
+    /** The values of the visible fields, as link parameters. */
+    const collect = (visible: (p: Param) => boolean): Map<string, string> => {
+      const m = new Map<string, string>();
+      const lines = (v: string) =>
+        v
+          .split(LF)
+          .map((x) => x.trim())
+          .filter(Boolean);
+      for (const p of PARAMS) {
+        if (!visible(p) || p === "service") continue;
+        const field = el<HTMLInputElement>(p);
+        if (!field) continue;
+        let v: string;
+        if (p === "client_identity") v = field.checked ? "on" : "";
+        else if (p === "headers") v = lines(field.value).join(LF);
+        else if (p === "specs" || p === "prices") v = lines(field.value).join(";");
+        else if (p === "models" || p === "models_only")
+          v = field.value
+            .split(",")
+            .map((x) => x.trim())
+            .filter(Boolean)
+            .join(",");
+        else v = field.value.trim();
+        if (p === "auth" && v === "key") continue;
+        if (v) m.set(p, v);
+      }
+      // `service` is left out when the address alone gives it: such a link also opens in earlier versions.
+      const service = el<HTMLSelectElement>("service").value as Service;
+      const url = m.get("url");
+      if (!url || serviceOfUrl(url) !== service) m.set("service", service);
+      return new Map([...m].sort(([a], [b]) => PARAMS.indexOf(a as Param) - PARAMS.indexOf(b as Param)));
+    };
+
+    const named = (p: string | undefined) => (showableParam(p) ? s.param.replace("{name}", p) : s.someParam);
+
     const update = () => {
-      const r = validate({
-        url: value("url") ?? "",
-        name: value("name"),
-        protocol: value("protocol"),
-        key: value("key"),
-        models: value("models"),
-      });
+      const service = el<HTMLSelectElement>("service").value as Service;
+      const auth = (el<HTMLSelectElement>("auth").value || "key") as Auth;
+      const visible = refreshFields(service, auth);
+      const r = validateParams(collect(visible));
       if (r.ok) {
         code("app").textContent = appLink(r.link);
         code("web").textContent = webLink(r.link);
+        version.textContent = r.link.v2 ? s.needsVersion : s.worksBefore;
         output.hidden = false;
         message.hidden = true;
-      } else {
-        output.hidden = true;
-        message.hidden = false;
-        message.textContent = s.problems[r.problem] ?? s.fill;
+        return;
       }
+      output.hidden = true;
+      message.hidden = false;
+      if (r.problem === "missing" && r.param === "url" && !el("url").value.trim()) {
+        message.textContent = s.fill;
+        return;
+      }
+      const text = s.problems[r.problem].replace("{p}", named(r.param));
+      const rule = r.problem === "invalid" && r.param ? s.rules[s.ruleOf[r.param] ?? ""] : undefined;
+      message.textContent = rule ? `${text} ${rule}` : text;
     };
+
     form.addEventListener("submit", (e) => e.preventDefault());
-    form.addEventListener("input", update);
+    form.addEventListener("input", (e) => {
+      if ((e.target as HTMLElement).getAttribute("name") === "service") refreshChoices();
+      update();
+    });
+    form.addEventListener("change", update);
+    refreshChoices();
     update();
 
     for (const btn of root.querySelectorAll<HTMLButtonElement>("[data-copy]")) {
