@@ -25,7 +25,7 @@ ThinkWatch Lite 支持通过链接打开预填好设置的「新建上游」对�
 
 | 参数 | 取值 |
 |---|---|
-| `service` | `anthropic`、`openai`、`gemini`、`deepseek`、`zai`、`bedrock`、`openrouter`、`thinkwatch`（ThinkWatch 企业网关）、`sub2api`、`newapi`（New API / One API）、`ollama` 或 `custom`。省略时由应用按 `url` 识别，与编辑对话框的识别方式相同：官方地址按主机识别，标准 Bedrock 地址识别为 Bedrock，端口 11434 识别为 Ollama，其余地址一律为 `custom`。 |
+| `service` | `anthropic`、`openai`、`gemini`、`deepseek`、`zai`、`bedrock`、`openrouter`、`thinkwatch`（ThinkWatch 企业网关）、`sub2api`、`newapi`（New API / One API）、`ollama` 或 `custom`。省略时由应用按 `url` 识别，与编辑对话框的识别方式相同：官方地址按主机识别，标准 Bedrock 地址识别为 Bedrock，端口 11434 识别为 Ollama，其余地址一律为 `custom`。链接中有参数不适用于识别出的服务类型时，按 `custom` 处理，自定义上游接受全部参数。明确写出的 `service` 不会被改变。 |
 | `auth` | `key`（默认）、`oauth`、`account` 或 `aws-keys`，须为该服务类型提供的认证方式。`openai` 的 `account` 是 ChatGPT 账号，`zai` 的 `account` 是账号登录。 |
 | `site` | `bigmodel`（中国大陆）或 `zai`（国际），仅用于 `zai`。省略时按 `url` 确定，没有 `url` 时为 `bigmodel`。 |
 
@@ -53,7 +53,7 @@ ThinkWatch Lite 支持通过链接打开预填好设置的「新建上游」对�
 | `headers` | 额外的请求头，每行一个 `名称: 值`，编码方式见[编码](#编码)。`auth=account` 时不接受。 |
 | `client_identity` | `on` 表示开启「转发客户端身份」，用于只接受特定客户端的中转站。仅用于 Sub2API、New API 与自定义上游。 |
 | `concurrency` | 并发上限：1 到 1000 之间的整数，不带正负号，不以 0 开头。`auth=account` 时不接受。 |
-| `balance` | 余额的读取来源：`off`、`openrouter`、`deepseek`、`moonshot`、`sub2api`、`newapi` 或 `thinkwatch`。仅用于自定义上游，其他服务类型自行决定来源。 |
+| `balance` | 余额的读取来源：`off`、`openrouter`、`deepseek`、`moonshot`、`sub2api`、`newapi` 或 `thinkwatch`。省略时自动识别。仅用于自定义上游，其他服务类型自行决定来源。 |
 
 ### 模型
 
@@ -198,6 +198,8 @@ thinkwatch://import?service=openai&auth=account&name=chatgpt
 ```text
 thinkwatch://import?name=example-relay&url=https%3A%2F%2Fapi.relay.example&protocol=anthropic&key=sk-relay-EXAMPLE
 ```
+
+即使识别出的服务类型不接受，为更早版本编写的链接仍然有效：例如官方地址带有其他路径（`https://api.openai.com/v1`）、Ollama 地址带有 `key`，或 `https://api.deepseek.com` 配合 `protocol=openai-chat`。这样的链接与以前一样创建为自定义上游。
 
 ## 链接中的密钥
 

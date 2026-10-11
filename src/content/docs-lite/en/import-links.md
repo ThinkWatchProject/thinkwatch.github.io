@@ -25,7 +25,7 @@ A parameter is accepted only where the New upstream dialog shows its field for t
 
 | Parameter | Value |
 |---|---|
-| `service` | `anthropic`, `openai`, `gemini`, `deepseek`, `zai`, `bedrock`, `openrouter`, `thinkwatch` (a ThinkWatch Enterprise gateway), `sub2api`, `newapi` (New API / One API), `ollama` or `custom`. When omitted, the app recognizes the service from `url` the way the edit dialog does: official addresses by host, standard Bedrock addresses, port 11434 as Ollama, and any other address as `custom`. |
+| `service` | `anthropic`, `openai`, `gemini`, `deepseek`, `zai`, `bedrock`, `openrouter`, `thinkwatch` (a ThinkWatch Enterprise gateway), `sub2api`, `newapi` (New API / One API), `ollama` or `custom`. When omitted, the app recognizes the service from `url` the way the edit dialog does: official addresses by host, standard Bedrock addresses, port 11434 as Ollama, and any other address as `custom`. When a parameter of the link does not fit the recognized service, the link is a `custom` upstream, which takes every parameter. An explicit `service` is never changed. |
 | `auth` | `key` (the default), `oauth`, `account` or `aws-keys`, among the methods the service offers. `account` is the ChatGPT account for `openai` and the account sign-in for `zai`. |
 | `site` | `bigmodel` (mainland China) or `zai` (international), for `zai` only. When omitted, it is taken from `url`, or is `bigmodel`. |
 
@@ -53,7 +53,7 @@ A parameter is accepted only where the New upstream dialog shows its field for t
 | `headers` | Extra request headers, one `Name: Value` per line. The encoding is described under [Encodings](#encodings). Not accepted with `auth=account`. |
 | `client_identity` | `on` turns on Forward client identity, for relays that accept only specific clients. Sub2API, New API and custom upstreams only. |
 | `concurrency` | The concurrency limit: a whole number from 1 to 1000, without a sign or leading zeros. Not accepted with `auth=account`. |
-| `balance` | Where the balance is read: `off`, `openrouter`, `deepseek`, `moonshot`, `sub2api`, `newapi` or `thinkwatch`. Custom upstreams only; other services decide their own source. |
+| `balance` | Where the balance is read: `off`, `openrouter`, `deepseek`, `moonshot`, `sub2api`, `newapi` or `thinkwatch`. When omitted, the source is detected automatically. Custom upstreams only; other services decide their own source. |
 
 ### Models
 
@@ -198,6 +198,8 @@ A link written for earlier versions, still valid:
 ```text
 thinkwatch://import?name=example-relay&url=https%3A%2F%2Fapi.relay.example&protocol=anthropic&key=sk-relay-EXAMPLE
 ```
+
+Links written for earlier versions keep working even where the recognized service would not take them: an official address with another path such as `https://api.openai.com/v1`, an Ollama address with a `key`, or `https://api.deepseek.com` with `protocol=openai-chat`. Such a link becomes a custom upstream, as it did before.
 
 ## Keys in links
 

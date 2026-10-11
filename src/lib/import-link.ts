@@ -200,8 +200,8 @@ export function fieldsFor(service: Service, auth: Auth): Set<Param> {
   const f = new Set<Param>(["service", "auth", "name", "models", "models_only", "specs", "billing", "price_multiplier", "prices"]);
   if (service === "zai") f.add("site");
   if (service === "bedrock") f.add("region");
-  if (service === "custom") f.add("balance");
   if (auth === "account") return f;
+  if (service === "custom") f.add("balance");
   f.add("url");
   f.add("headers");
   f.add("concurrency");
@@ -541,6 +541,11 @@ export function parseParams(query: string): Result {
 /**
  * Validates decoded parameters: the parsed link, or the values entered in the link
  * builder. The first problem found is returned, in parameter order.
+ *
+ * Without `service`, the service is the one the address is recognized as, as long
+ * as every parameter fits it; otherwise the link is a custom upstream, which takes
+ * every parameter. So a link written for the first version, such as an official
+ * address with another path, stays valid as it was. An explicit `service` is strict.
  */
 export function validateParams(input: Map<string, string>): Result {
   const unknown: [string, string][] = [];
@@ -550,28 +555,37 @@ export function validateParams(input: Map<string, string>): Result {
     if (unsafe(v, k === "headers")) return fail("invalid", k);
     if (!includes(PARAMS, k)) unknown.push([k, v]);
   }
-  const get = (p: Param) => input.get(p);
-  const out: [Param, string][] = [];
-  const put = (p: Param, v: string | undefined) => {
-    if (v !== undefined) out.push([p, v]);
-  };
 
-  // Service: given, or recognized from the address
-  const rawService = get("service");
-  const rawUrl = get("url");
+  const rawService = input.get("service");
+  const rawUrl = input.get("url");
   let url: { url: string; host: string } | null = null;
   if (rawUrl !== undefined) {
     url = checkUrl(rawUrl);
     if (!url) return fail("invalid", "url");
   }
-  let service: Service;
   if (rawService !== undefined) {
     if (!includes(SERVICES, rawService)) return fail("invalid", "service");
-    service = rawService;
-  } else {
-    if (!url) return fail("missing", "url");
-    service = serviceOfUrl(url.url);
+    return validateFor(input, rawService, false, url, unknown);
   }
+  if (!url) return fail("missing", "url");
+  const recognized = serviceOfUrl(url.url);
+  const r = validateFor(input, recognized, true, url, unknown);
+  return r.ok || recognized === "custom" ? r : validateFor(input, "custom", true, url, unknown);
+}
+
+/** Validates the parameters for one service. `recognized`: the link has no `service`. */
+function validateFor(
+  input: Map<string, string>,
+  service: Service,
+  recognized: boolean,
+  url: { url: string; host: string } | null,
+  unknown: [string, string][],
+): Result {
+  const get = (p: Param) => input.get(p);
+  const out: [Param, string][] = [];
+  const put = (p: Param, v: string | undefined) => {
+    if (v !== undefined) out.push([p, v]);
+  };
   const rules = SERVICE_RULES[service];
 
   // Authentication method
@@ -750,7 +764,7 @@ export function validateParams(input: Map<string, string>): Result {
 
   const link: ImportLink = {
     service,
-    recognized: rawService === undefined,
+    recognized,
     auth,
     site,
     name,
