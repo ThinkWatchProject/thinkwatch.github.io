@@ -34,7 +34,7 @@ A parameter is accepted only where the New upstream dialog shows its field for t
 | Parameter | Value |
 |---|---|
 | `name` | The upstream's name in the app. When omitted, the app chooses one from the service or the address. |
-| `url` | The base URL, without endpoint paths such as `/chat/completions` or `/messages`. `https://` only; `http://` is accepted only for `localhost`, `127.0.0.1` and `[::1]`. No user name or password, query string or fragment. Required for `custom`, `thinkwatch`, `sub2api` and `newapi`. Optional for Bedrock (an endpoint such as a VPC endpoint) and Ollama (another machine). Services with their own address accept only that address. Not accepted with `auth=account`. |
+| `url` | The base URL, without endpoint paths such as `/chat/completions` or `/messages`. `https://`, or `http://` on this computer or a private network (see below). No user name or password, query string or fragment. Required for `custom`, `thinkwatch`, `sub2api` and `newapi`. Optional for Bedrock (an endpoint such as a VPC endpoint) and Ollama (another machine). Services with their own address accept only that address. Not accepted with `auth=account`. |
 | `protocol` | `anthropic`, `openai-chat`, `openai-responses` or `gemini`, where the dialog offers a choice. When omitted, the app detects it from the address. |
 | `region` | The AWS region, such as `eu-west-1`, for Bedrock only. Without `url`, it chooses the standard address of that region. With a standard address, it must match the region in it. With another address, it is the signing region and needs `auth=aws-keys`. |
 | `key` | The API key, stored as given (for Bedrock, the Bedrock API key). With `auth=key`. Ollama has no key field. |
@@ -45,6 +45,8 @@ A parameter is accepted only where the New upstream dialog shows its field for t
 | `aws_access_key_id` | The access key ID, with `service=bedrock` and `auth=aws-keys`. Required there. |
 | `aws_secret_access_key` | The secret access key. Required with `auth=aws-keys`. |
 | `aws_session_token` | The session token of temporary credentials, with `auth=aws-keys`. Optional. |
+
+Plain `http://` is accepted in `url` and `oauth_endpoint` for addresses on this computer or a private network, such as an enterprise gateway on the company intranet. The host must be `localhost`, `127.0.0.1` or `[::1]`; an IPv4 address in `10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`, `100.64.0.0/10` or `169.254.0.0/16`; an IPv6 address in `fc00::/7` or `fe80::/10`; a name without a dot; or a name ending in `.local`, `.lan`, `.internal`, `.intranet`, `.corp`, `.home.arpa` or `.localhost`. Any other `http://` address is rejected. For a plain `http://` address other than this computer, the dialog and the web page state under the host that the key and request content travel unencrypted.
 
 ### Advanced settings
 
@@ -155,7 +157,7 @@ Any web page can open a link, so a link is limited to what a user can judge in t
 | The disabled switch and the access token used only for checking | A new upstream starts enabled, and the access token is obtained with the refresh token. |
 | Credentials for an account sign-in | The sign-in happens in the app, with the service. |
 | Authentication, cookie and connection headers | A header must not replace the key or the identity the gateway sends. |
-| Plain `http://` to other hosts | The key would travel unencrypted. |
+| Plain `http://` to public hosts | The key would cross the internet unencrypted. On this computer and private networks, plain `http://` is accepted and marked as unencrypted. |
 | MCP servers and client configuration | They run commands or change the settings of other applications. |
 | Icons and other presentation | Not needed to connect, and a way to imitate a familiar service. |
 

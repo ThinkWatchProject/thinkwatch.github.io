@@ -719,7 +719,7 @@ The Configuration Guide provides ready-to-use instructions for:
 
 The **Add to ThinkWatch Lite** button opens the New upstream dialog of [ThinkWatch Lite](/lite) with the gateway's address and the key already filled in, so a user connects the desktop app in one step. It appears after a key is created or rotated, at the end of the first-run setup, and on the ThinkWatch Lite tab of the Configuration Guide.
 
-The button needs ThinkWatch Lite 2026.10.16 or later. The address comes from the **Public Gateway URL** setting, and the link format is described in [Import links](/docs/lite/import-links).
+The button needs ThinkWatch Lite 2026.10.16 or later. The address comes from the **Public Gateway URL** setting, and the link format is described in [Import links](/docs/lite/import-links). A gateway served over plain `http://` on the company network works too; ThinkWatch Lite states that the key travels unencrypted.
 
 ### Gateway API Endpoints
 

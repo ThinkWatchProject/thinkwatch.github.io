@@ -719,7 +719,7 @@ ThinkWatch 在 Web 控制台中内置了**配置指南**页面，位于 `/guide`
 
 「添加到 ThinkWatch Lite」按钮打开 [ThinkWatch Lite](/zh-CN/lite) 的「新建上游」对话框，网关地址与密钥都已填好，用户一步即可接入桌面应用。这个按钮出现在创建或轮换密钥之后、首次运行设置的最后一步，以及配置指南的 ThinkWatch Lite 标签页。
 
-该按钮需要 ThinkWatch Lite 2026.10.16 或更高版本。地址取自「网关公开地址」设置，链接格式见[导入链接](/zh-CN/docs/lite/import-links)。
+该按钮需要 ThinkWatch Lite 2026.10.16 或更高版本。地址取自「网关公开地址」设置，链接格式见[导入链接](/zh-CN/docs/lite/import-links)。部署在公司内网、使用 `http://` 的网关同样可用，ThinkWatch Lite 会写明密钥以明文传输。
 
 ### 网关 API 端点
 

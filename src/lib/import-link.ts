@@ -248,6 +248,8 @@ export type ImportLink = {
   address?: string;
   /** The receiving hosts, in ASCII, with the port when there is one: the address, then the token endpoint when it differs */
   hosts: string[];
+  /** Those of `hosts` reached over plain http, other than this computer */
+  plainHosts: string[];
   protocol?: Protocol;
   region?: string;
   key?: string;
@@ -364,7 +366,50 @@ function checkName(n: string): boolean {
   );
 }
 
-/** An https address (http only for this computer) without credentials, query or fragment. */
+const isLoopback = (hostname: string) => hostname === "localhost" || hostname === "127.0.0.1" || hostname === "[::1]";
+
+const PRIVATE_V4: [number, number, number][] = [
+  // first octet, second octet from, second octet to
+  [10, 0, 255],
+  [172, 16, 31],
+  [192, 168, 168],
+  [100, 64, 127],
+  [169, 254, 254],
+];
+const PRIVATE_SUFFIXES = [".local", ".lan", ".internal", ".intranet", ".corp", ".home.arpa", ".localhost"];
+
+/**
+ * A host on this computer or a private network, where plain `http://` is accepted:
+ * loopback, private IPv4 ranges (10/8, 172.16/12, 192.168/16, 100.64/10, 169.254/16),
+ * unique-local and link-local IPv6 (fc00::/7, fe80::/10), names without a dot, and
+ * names under the intranet-style suffixes. `hostname` is as `URL` gives it: lowercase,
+ * IPv4 in dotted decimal, IPv6 in brackets and compressed.
+ */
+export function onLocalNetwork(hostname: string): boolean {
+  if (isLoopback(hostname)) return true;
+  const v4 = /^(\d+)\.(\d+)\.\d+\.\d+$/.exec(hostname);
+  if (v4) {
+    const [a, b] = [Number(v4[1]), Number(v4[2])];
+    return PRIVATE_V4.some(([first, from, to]) => a === first && b >= from && b <= to);
+  }
+  if (hostname.startsWith("[")) {
+    const head = hostname.slice(1).split(":")[0];
+    const first = head ? parseInt(head, 16) : 0;
+    return (first & 0xfe00) === 0xfc00 || (first & 0xffc0) === 0xfe80;
+  }
+  return !hostname.includes(".") || PRIVATE_SUFFIXES.some((x) => hostname.endsWith(x));
+}
+
+/** A plain `http://` address that is not on this computer: the key and requests travel unencrypted. */
+export function plainHttp(url: string): boolean {
+  const u = new URL(url);
+  return u.protocol === "http:" && !isLoopback(u.hostname);
+}
+
+/**
+ * An https address without credentials, query or fragment; plain http only for this
+ * computer and private networks (`onLocalNetwork`).
+ */
 function checkUrl(raw: string, keepPath = false): { url: string; host: string } | null {
   if (raw.length > MAX_URL || /[\s\\$\{\}%"<>`^|@#?]/.test(raw)) return null;
   const lower = raw.slice(0, 8).toLowerCase();
@@ -376,8 +421,7 @@ function checkUrl(raw: string, keepPath = false): { url: string; host: string } 
     return null;
   }
   if (u.username || u.password || u.search || u.hash || !u.hostname) return null;
-  const loopback = u.hostname === "localhost" || u.hostname === "127.0.0.1" || u.hostname === "[::1]";
-  if (u.protocol !== "https:" && !(u.protocol === "http:" && loopback)) return null;
+  if (u.protocol !== "https:" && !(u.protocol === "http:" && onLocalNetwork(u.hostname))) return null;
   // `URL` gives the host in ASCII: an internationalized name comes out as punycode.
   if (!/^[\x21-\x7E]+$/.test(u.host)) return null;
   const url = keepPath ? u.href : u.href.replace(/\/+$/, "");
@@ -654,7 +698,6 @@ function validateFor(
   if (key !== undefined && !keyLike(key, MAX_KEY)) return fail("invalid", "key");
 
   let oauth: ImportLink["oauth"];
-  let endpointHost: string | undefined;
   if (auth === "oauth") {
     const e = get("oauth_endpoint");
     if (e === undefined) return fail("missing", "oauth_endpoint");
@@ -668,7 +711,6 @@ function validateFor(
     const clientSecret = get("oauth_client_secret");
     if (clientSecret !== undefined && !keyLike(clientSecret, MAX_KEY)) return fail("invalid", "oauth_client_secret");
     oauth = { endpoint: endpoint.url, refresh, clientId, clientSecret };
-    endpointHost = endpoint.host;
   }
 
   let aws: ImportLink["aws"];
@@ -759,8 +801,13 @@ function validateFor(
   }
 
   const hosts: string[] = [];
-  if (address) hosts.push(new URL(address).host);
-  if (endpointHost && !hosts.includes(endpointHost)) hosts.push(endpointHost);
+  const plainHosts: string[] = [];
+  for (const u of [address, oauth?.endpoint]) {
+    if (!u) continue;
+    const host = new URL(u).host;
+    if (!hosts.includes(host)) hosts.push(host);
+    if (plainHttp(u) && !plainHosts.includes(host)) plainHosts.push(host);
+  }
 
   const link: ImportLink = {
     service,
@@ -770,6 +817,7 @@ function validateFor(
     name,
     address,
     hosts,
+    plainHosts,
     protocol,
     region,
     key,

@@ -34,7 +34,7 @@ ThinkWatch Lite 支持通过链接打开预填好设置的「新建上游」对�
 | 参数 | 取值 |
 |---|---|
 | `name` | 上游在应用中的名称。省略时由应用按服务类型或地址生成。 |
-| `url` | 服务的 Base URL，不含 `/chat/completions`、`/messages` 等接口路径。只接受 `https://`；`http://` 仅限 `localhost`、`127.0.0.1` 与 `[::1]`。不得包含用户名或密码、查询串或片段。`custom`、`thinkwatch`、`sub2api`、`newapi` 必须提供；Bedrock 可选（VPC 端点等），Ollama 可选（其他机器）；自带地址的服务只接受该地址。`auth=account` 时不接受。 |
+| `url` | 服务的 Base URL，不含 `/chat/completions`、`/messages` 等接口路径。须为 `https://`，本机与内网地址也可以使用 `http://`（见下文）。不得包含用户名或密码、查询串或片段。`custom`、`thinkwatch`、`sub2api`、`newapi` 必须提供；Bedrock 可选（VPC 端点等），Ollama 可选（其他机器）；自带地址的服务只接受该地址。`auth=account` 时不接受。 |
 | `protocol` | `anthropic`、`openai-chat`、`openai-responses` 或 `gemini`，仅用于对话框提供选择的服务类型。省略时由应用按地址识别。 |
 | `region` | AWS 区域，例如 `eu-west-1`，仅用于 Bedrock。没有 `url` 时，按该区域生成标准地址；`url` 为标准地址时，须与其中的区域一致；`url` 为其他地址时，它是签名所用的区域，须配合 `auth=aws-keys`。 |
 | `key` | API 密钥，按原样保存（Bedrock 为 Bedrock API 密钥）。配合 `auth=key`。Ollama 没有密钥栏位。 |
@@ -45,6 +45,8 @@ ThinkWatch Lite 支持通过链接打开预填好设置的「新建上游」对�
 | `aws_access_key_id` | 访问密钥 ID，配合 `service=bedrock` 与 `auth=aws-keys`，此时必须提供。 |
 | `aws_secret_access_key` | 私有访问密钥。`auth=aws-keys` 时必须提供。 |
 | `aws_session_token` | 临时凭证的会话令牌，配合 `auth=aws-keys`，可选。 |
+
+`url` 与 `oauth_endpoint` 指向本机或内网时也接受 `http://`，例如部署在公司内网的企业网关。主机须为 `localhost`、`127.0.0.1` 或 `[::1]`；`10.0.0.0/8`、`172.16.0.0/12`、`192.168.0.0/16`、`100.64.0.0/10`、`169.254.0.0/16` 内的 IPv4 地址；`fc00::/7`、`fe80::/10` 内的 IPv6 地址；不含点的主机名；或以 `.local`、`.lan`、`.internal`、`.intranet`、`.corp`、`.home.arpa`、`.localhost` 结尾的主机名。其他 `http://` 地址一律拒绝。本机以外的 `http://` 地址，对话框与网页会在主机下方写明密钥和请求内容以明文传输。
 
 ### 高级设置
 
@@ -155,7 +157,7 @@ ThinkWatch Lite 支持通过链接打开预填好设置的「新建上游」对�
 | 停用开关，以及仅用于检测的 Access Token | 新上游创建后即为启用状态，Access Token 由 Refresh Token 换取。 |
 | 账号登录的凭据 | 登录在应用中与服务直接进行。 |
 | 鉴权、Cookie 与连接相关的请求头 | 请求头不得取代密钥，也不得改变网关发出的身份。 |
-| 指向其他主机的 `http://` | 密钥将以明文传输。 |
+| 指向公网主机的 `http://` | 密钥将以明文经过互联网传输。本机与内网地址接受 `http://`，并标明不加密。 |
 | MCP 服务与客户端配置 | 它们会执行命令或修改其他应用的设置。 |
 | 图标等展示内容 | 连接不需要它们，且可被用于仿冒熟悉的服务。 |
 

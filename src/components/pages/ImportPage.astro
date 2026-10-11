@@ -35,6 +35,7 @@ const t = zh
         "以下设置来自一条导入链接。ThinkWatch Lite 打开后在「新建上游」对话框中预填这些设置；选择「下一步」或开始登录之前，不保存任何设置，也不发出任何请求。",
       sendsTo: "请求与密钥将发往",
       tokenEndpoint: "Token 端点",
+      plainHttp: "这个地址不加密，密钥和请求内容以明文传输。",
       signsIn: "登录账号",
       signInNote: "链接不含任何凭据，登录在 ThinkWatch Lite 中进行。",
       accounts: { openai: "ChatGPT", zai: "Z.ai", bigmodel: "BigModel" },
@@ -81,6 +82,7 @@ const t = zh
         "The settings below come from an import link. ThinkWatch Lite opens them in the New upstream dialog, filled in, and saves nothing and sends nothing before Next is chosen or a sign-in is started.",
       sendsTo: "Requests and keys will be sent to",
       tokenEndpoint: "Token endpoint",
+      plainHttp: "This address is not encrypted; the key and request content travel in plain text.",
       signsIn: "Account sign-in",
       signInNote: "The link carries no credential. Sign-in happens in ThinkWatch Lite.",
       accounts: { openai: "ChatGPT", zai: "Z.ai", bigmodel: "BigModel" },
@@ -195,6 +197,7 @@ const value = "min-w-0 break-all font-mono text-[15px] text-[var(--color-text)]"
       <li class="break-all font-mono text-lg font-semibold text-[var(--color-text)]">
         <span data-host></span>
         <span class="ml-2 font-sans text-sm font-normal text-[var(--color-muted)]" data-host-note></span>
+        <span class="mt-0.5 block font-sans text-sm font-normal text-[var(--color-muted)]" data-host-plain hidden></span>
       </li>
     </template>
     <template data-group-tpl>
@@ -233,6 +236,7 @@ const value = "min-w-0 break-all font-mono text-[15px] text-[var(--color-text)]"
 
   type Strings = ImportLinkText & {
     tokenEndpoint: string;
+    plainHttp: string;
     accounts: Record<string, string>;
     updateBody: string;
     recognized: string;
@@ -414,6 +418,12 @@ const value = "min-w-0 break-all font-mono text-[15px] text-[var(--color-text)]"
           const item = clone("[data-host-tpl]");
           $("[data-host]", item).textContent = host;
           $("[data-host-note]", item).textContent = i > 0 ? s.tokenEndpoint : "";
+          // Plain http is accepted on private networks; say plainly that it is not encrypted.
+          if (l.plainHosts.includes(host)) {
+            const plain = $("[data-host-plain]", item);
+            plain.textContent = s.plainHttp;
+            plain.hidden = false;
+          }
           list.append(item);
         });
         $("[data-hosts]").hidden = false;
