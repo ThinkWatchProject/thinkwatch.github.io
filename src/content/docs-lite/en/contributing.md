@@ -8,6 +8,10 @@ gh pr create --base dev --head your-branch
 
 `main` is the release branch; `dev` receives routine work. GitHub sets the base of a new pull request to the default branch, `main`, which is not the intended target. If a pull request was opened against `main`, select *Edit* next to its title and change the base; the commits and the discussion are preserved.
 
+## Contributor License Agreement
+
+A first pull request asks its author to sign the [Contributor License Agreement](https://github.com/ThinkWatchProject/ThinkWatch-Lite/blob/main/CLA.md) once, by replying on the pull request with the sentence the bot gives. The signature covers every later pull request to the repository. The author keeps the copyright, and the agreement lets the project license the contribution under any terms, commercial ones included.
+
 ## Settled scope
 
 The following decisions are settled and are not open to change through a pull request:

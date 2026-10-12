@@ -8,6 +8,10 @@ gh pr create --base dev --head your-branch
 
 `main` 为发布分支，`dev` 用于合入日常工作。GitHub 新建 PR 时以默认分支 `main` 作为 base，**该默认值并非正确的目标分支**。如已向 `main` 提交 PR，点击 PR 标题旁的 *Edit* 修改 base 即可，提交与讨论记录均会保留。
 
+## 贡献者许可协议
+
+首次提交 PR 时，需在 PR 中按机器人给出的句子回复，签署一次[贡献者许可协议](https://github.com/ThinkWatchProject/ThinkWatch-Lite/blob/main/CLA.zh-CN.md)。签署后，此后向该仓库提交的 PR 均已涵盖。贡献的版权仍归作者所有，协议授权项目以任何条款（包括商业条款）许可该贡献。
+
 ## 已确定的范围
 
 以下决定已经确定，不接受相关 PR：
