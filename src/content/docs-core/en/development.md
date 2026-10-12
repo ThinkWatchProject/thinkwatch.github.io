@@ -32,6 +32,10 @@ gh pr create --base main --head your-branch
 
 Commit messages follow Conventional Commits (`fix(scope): subject`) and are written in English. The body explains *why*, not only *what*.
 
+## Contributor License Agreement
+
+A first pull request asks its author to sign the [Contributor License Agreement](https://github.com/ThinkWatchProject/ThinkWatch-Core/blob/main/CLA.md) once, by replying on the pull request with the sentence the bot gives. The signature covers every later pull request to the repository. The author keeps the copyright, and the agreement lets the project license the contribution under any terms, commercial ones included.
+
 ## Mandatory rules
 
 ThinkWatch Lite and ThinkWatch Enterprise both depend on these crates, so working for a single use case is not sufficient. A pull request that violates any of these rules will be returned for revision, regardless of the quality of the diff:

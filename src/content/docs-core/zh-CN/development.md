@@ -32,6 +32,10 @@ gh pr create --base main --head your-branch
 
 提交信息遵循 Conventional Commits（`fix(scope): subject`），以英文书写。正文应说明*原因*，而不仅是*改动内容*。
 
+## 贡献者许可协议
+
+首次提交 PR 时，需在 PR 中按机器人给出的句子回复，签署一次[贡献者许可协议](https://github.com/ThinkWatchProject/ThinkWatch-Core/blob/main/CLA.zh-CN.md)。签署后，此后向该仓库提交的 PR 均已涵盖。贡献的版权仍归作者所有，协议授权项目以任何条款（包括商业条款）许可该贡献。
+
 ## 强制规则
 
 ThinkWatch Lite 与 ThinkWatch 企业版都依赖这些 crate，因此仅满足单一场景并不足够。违反以下任何一条规则的 PR 都将被要求修改，无论 diff 质量如何：
