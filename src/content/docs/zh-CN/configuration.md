@@ -506,16 +506,18 @@ openssl rand -base64 32
 
 - `mode` 为 `off`、`observe` 或 `enforce`。出厂为 `observe`：命中的内容记入审计日志，不做任何改动；`enforce` 在控制台中按作用命名，出站脱敏为「替换」，工具调用审查为「切断」，内容过滤为「处置」。
 - `enable` 和 `disable` 按 id 启用或停用内置规则，`actions` 改变内置规则在 `enforce` 下的处置，`custom` 保存部署自己的规则。
+- 出站脱敏的自定义规则以 `match` 指定匹配方式：`contains`（默认）按原样查找 `pattern`，`.`、`*`、`\d` 等没有特殊含义；`regex` 把 `pattern` 作为正则表达式。`case_sensitive` 为 `true` 时区分大小写，否则不区分。控制台中两项分别为「匹配方式」和「区分大小写」。
+- 出站脱敏不查找字段名；自定义脱敏规则还会跳过 `id`、`call_id`、`item_id`、`tool_use_id`、`tool_call_id`、`toolUseId`、`previous_response_id`、`response_id`、`type`、`role`、`name`、`namespace`、`model`、`status`、`object` 和 `phase` 的值。内置规则照常查找这些值，其余的值由所有规则照常查找。按 `audit.body_redact_pii` 对存储的请求体脱敏时同样如此。
 
 ```json
 {
   "mode": "enforce",
   "enable": ["email"],
-  "custom": [{ "name": "员工编号", "pattern": "EMP-\\d{6}", "label": "EMPLOYEE" }]
+  "custom": [{ "name": "员工编号", "pattern": "EMP-\\d{6}", "match": "regex", "label": "EMPLOYEE" }]
 }
 ```
 
-控制台的「内容安全」页编辑这些对象。经 `PATCH /api/admin/settings` 写入时，一个键整体写入，写入前先校验：字段名拼错、内置规则 id 不存在、正则无法编译或码位写法有误时返回 `400`。写入 `security.redact` 需要 `pii_redactor:write` 权限，另外两个键需要 `content_filter:write`。`GET /api/admin/security` 列出每项防护的档位与全部规则，`POST /api/admin/security/{guard}/test` 用一段样本测试这些规则。从仍使用 `security.content_filter_patterns`、`security.pii_redactor_patterns`、`security.hidden_text` 和 `security.tool_inspection` 的版本升级时，这些设置在首次启动时转换为上述三个键。
+控制台的「内容安全」页编辑这些对象。经 `PATCH /api/admin/settings` 写入时，一个键整体写入，写入前先校验：字段名拼错、内置规则 id 不存在、正则无法编译或码位写法有误时返回 `400`。写入 `security.redact` 需要 `pii_redactor:write` 权限，另外两个键需要 `content_filter:write`。`GET /api/admin/security` 列出每项防护的档位与全部规则，`POST /api/admin/security/{guard}/test` 用一段样本测试这些规则。ThinkWatch 3.0 至 3.6 保存的自定义脱敏规则不带 `match` 和 `case_sensitive`，自 3.7.0 起按原样查找文字、不区分大小写；按正则表达式编写的规则需要加上 `"match": "regex"`，需要区分大小写的再加上 `"case_sensitive": true`。3.6 读不了使用这两个键的脱敏策略，因此应在所有副本都升级到 3.7.0 之后再修改。从仍使用 `security.content_filter_patterns`、`security.pii_redactor_patterns`、`security.hidden_text` 和 `security.tool_inspection` 的版本升级时，这些设置在首次启动时转换为上述三个键，原有的脱敏写法转换为区分大小写的 `regex` 规则。
 
 #### 无法检查限额时
 

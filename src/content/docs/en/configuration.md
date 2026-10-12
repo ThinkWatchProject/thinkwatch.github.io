@@ -506,16 +506,18 @@ Outbound redaction, tool-call inspection and the content filter each keep their 
 
 - `mode` is `off`, `observe` or `enforce`. `observe`, the factory mode, records matches in the audit log and changes nothing; the console calls `enforce` Replace for outbound redaction, Cut off for tool-call inspection and Enforce for the content filter.
 - `enable` and `disable` switch built-in rules on and off by id, `actions` changes what a built-in rule does under `enforce`, and `custom` holds rules of the deployment's own.
+- A custom redaction rule's `match` is `contains`, the default, which looks for `pattern` as written, so `.`, `*` and `\d` have no special meaning, or `regex`, which takes `pattern` as a regular expression. It ignores case unless `case_sensitive` is `true`. The console calls these Match by and Case-sensitive.
+- Redaction does not search field names, and custom redaction rules leave alone the values of `id`, `call_id`, `item_id`, `tool_use_id`, `tool_call_id`, `toolUseId`, `previous_response_id`, `response_id`, `type`, `role`, `name`, `namespace`, `model`, `status`, `object` and `phase`. Built-in rules still search those values, and every other value is searched by every rule. The same holds when stored bodies are masked with `audit.body_redact_pii`.
 
 ```json
 {
   "mode": "enforce",
   "enable": ["email"],
-  "custom": [{ "name": "Employee ID", "pattern": "EMP-\\d{6}", "label": "EMPLOYEE" }]
+  "custom": [{ "name": "Employee ID", "pattern": "EMP-\\d{6}", "match": "regex", "label": "EMPLOYEE" }]
 }
 ```
 
-The Content Security page of the console edits these objects. Through `PATCH /api/admin/settings` a key is written whole and checked first: a misspelt field, an unknown built-in rule, a pattern that does not compile or a malformed code point is refused with `400`. Writing `security.redact` takes the `pii_redactor:write` permission, and the other two keys take `content_filter:write`. `GET /api/admin/security` lists each guard's mode and every rule, and `POST /api/admin/security/{guard}/test` tries a sample against them. A deployment upgraded from a version that kept `security.content_filter_patterns`, `security.pii_redactor_patterns`, `security.hidden_text` and `security.tool_inspection` has them converted into these keys at its first start.
+The Content Security page of the console edits these objects. Through `PATCH /api/admin/settings` a key is written whole and checked first: a misspelt field, an unknown built-in rule, a pattern that does not compile or a malformed code point is refused with `400`. Writing `security.redact` takes the `pii_redactor:write` permission, and the other two keys take `content_filter:write`. `GET /api/admin/security` lists each guard's mode and every rule, and `POST /api/admin/security/{guard}/test` tries a sample against them. Custom redaction rules saved by ThinkWatch 3.0 to 3.6 carry neither `match` nor `case_sensitive`, so from 3.7.0 they look for their text as written and ignore case; one written as a regular expression needs `"match": "regex"`, and `"case_sensitive": true` where case matters. Change them only once every replica runs 3.7.0, since 3.6 cannot read a redaction policy that uses these keys. A deployment upgraded from a version that kept `security.content_filter_patterns`, `security.pii_redactor_patterns`, `security.hidden_text` and `security.tool_inspection` has them converted into these keys at its first start; the old redaction patterns become case-sensitive `regex` rules.
 
 #### Limits that cannot be checked
 
