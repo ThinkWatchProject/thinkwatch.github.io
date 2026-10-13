@@ -749,21 +749,23 @@ refuses, deletes, replaces or only records.
 
 | Field | Type | Default | Description |
 |---|---|---|---|
-| `redact` | object, [`security.redact`](#cfg-security-redact) | — | Outbound redaction (Secrets & privacy in the app): credentials and personal information anywhere in a request are replaced with placeholders before it leaves, or only recorded, rule by rule. |
+| `redact` | object, [`security.redact`](#cfg-security-redact) | — | Outbound redaction (Secrets & privacy in the app): credentials and personal information in the text a request carries (messages, system prompts, reasoning, tool arguments and results, tool descriptions) are replaced with placeholders before it leaves, or only recorded, rule by rule. Identifiers, model names and other protocol fields are sent as they are. |
 | `inspect_tools` | object, [`security.inspect_tools`](#cfg-security-inspect_tools) | — | Tool-call inspection (Dangerous commands in the app): dangerous commands in the tool calls a model returns cut the response off. |
 | `content` | object, [`security.content`](#cfg-security-content) | — | Content filter: words, patterns or characters (hidden ones among them) in what the caller sends, and words or patterns in the text of the answer; each rule refuses the request, deletes or replaces what it matched, or only records it. |
 <!-- /generated -->
 
 #### `security.redact`
 
-Before a request leaves, the whole request (system prompt, earlier answers
-and tool calls included) is searched for credentials and personal
-information. Under `enforce` what a rule finds is replaced with placeholders,
-and put back where the answer repeats them; what a rule with `action: record`
-finds is sent as it is and only recorded. Images, files and other base64
-payloads are not searched, nor are field names; custom rules also leave alone
-the identifiers a protocol needs as they are, such as item and call ids,
-types, roles, tool names and model names.
+Before a request leaves, the text written in it is searched for credentials
+and personal information: system prompts, the messages of every role
+(earlier answers included), reasoning, tool-call arguments, tool results and
+tool descriptions. Under `enforce` what a rule finds is replaced with
+placeholders, and put back where the answer repeats them; what a rule with
+`action: record` finds is sent as it is and only recorded. Values the
+protocol needs as they are, such as ids, types, roles, tool names, model
+names and signatures, are never searched, nor are field names, images,
+files, settings, or parts of a request the gateway does not recognize as
+written text.
 
 <!-- generated: table security.redact -->
 <a id="cfg-security-redact"></a>

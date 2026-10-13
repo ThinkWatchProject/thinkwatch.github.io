@@ -1,9 +1,9 @@
 {
   "repository": "ThinkWatchProject/ThinkWatch-Core",
-  "ref": "v0.73.0",
+  "ref": "v0.74.0",
   "files": {
-    "docs/config.md": "986aa44925c1d0e4143c35d19a9b233ae831352df0cb0ebb1f5e1948a3db2a3b",
-    "docs/config.zh-CN.md": "8337946ff902c365f02ff3c11fbd97c62f3458b42ba428f5d49cc7a797ffb9dc",
+    "docs/config.md": "d8027cba044015bd3ff43a8471280a3e755a0227d190838a53cd4baabf2aa1eb",
+    "docs/config.zh-CN.md": "705c4e1b2be4c6e05da083521a84cf904175a4523a8120b9dcac282047ea3279",
     "docs/server.md": "5e1e9b901bef2b46d417aea057a1db24c78457d3c1938b8540ecb4766515b68f",
     "docs/server.zh-CN.md": "1f508e7c39b8ded28653773ca4d8701e6bdc2247bcd359c3a8fd00fd1401a6ff"
   }
