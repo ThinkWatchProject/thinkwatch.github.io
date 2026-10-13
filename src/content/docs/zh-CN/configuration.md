@@ -508,7 +508,7 @@ openssl rand -base64 32
 - `enable` 和 `disable` 按 id 启用或停用内置规则，`actions` 改变内置规则在 `enforce` 下的动作，`custom` 保存部署自己的规则，每条规则各带 `action`。脱敏规则替换为占位符（`placeholder`，默认）或只记录（`record`）；工具调用规则切断回答（`cut`）或只记录；内容规则拒绝请求（`block`）、删除命中内容（`strip`）、替换命中内容（`replace`）或只记录。
 - 只记录的脱敏规则把值原样发往上游，防护处于「开启」时写入 `gateway.redaction_flagged`。与要替换的命中重叠时，该值照常替换。开启 `audit.body_redact_pii` 时，存储的请求体中该值仍以掩码保存。
 - 自定义脱敏规则以 `match` 指定匹配方式：`contains`（默认）按原样查找 `pattern`，`.`、`*`、`\d` 等没有特殊含义；`regex` 把 `pattern` 作为正则表达式。`case_sensitive` 为 `true` 时区分大小写，否则不区分。控制台中两项分别为「匹配方式」和「区分大小写」。
-- 脱敏不查找字段名；自定义脱敏规则还会跳过 `id`、`call_id`、`item_id`、`tool_use_id`、`tool_call_id`、`toolUseId`、`previous_response_id`、`response_id`、`type`、`role`、`name`、`namespace`、`model`、`status`、`object` 和 `phase` 的值。内置规则照常查找这些值，其余的值由所有规则照常查找。按 `audit.body_redact_pii` 对存储的请求体脱敏时同样如此。
+- 脱敏只在请求中写出的正文里查找，按请求的格式定位：系统提示、各角色的消息、推理、工具调用的参数和输入、工具结果和工具说明。id、类型、角色、工具名、模型名、签名、配置项和字段名一律不查，因此规则不会改坏上游要求原样保留的值。按 `audit.body_redact_pii` 对存储的请求体脱敏时查找整段文字，字段名和 base64 数据除外。
 - 自定义内容规则以 `scope` 指定检查对象：`["request"]`（默认，即调用方的消息与工具结果）、`["response"]` 或两者。检查回答时，规则读取客户端看到的正文，以及 Codex `apply_patch` 等自由格式工具的输入，不含工具调用与思考过程；整份回答、流式回答、缓存命中的回答与 Responses WebSocket 都在其内。检查回答的规则不能使用 `block`，也不能使用 `"match": "codepoints"`，这样的策略在保存时被拒绝。内置内容规则只检查请求。
 - `replace` 把命中内容替换为规则的 `replacement`（省略时为 `***`，最多 200 个字符），请求与回答中均适用。替换后的文字在回答中不还原，也不再检查。`case_sensitive: true` 使内容规则区分大小写；内容规则默认不区分。
 - 防护处于「开启」且有检查回答的规则会删除或替换时，流式回答不整体缓冲，只暂缓末尾可能构成命中的字符，正则规则至多 256 个字符。此时流式回答以及正文有改动的整份回答不再附带 logprobs，日志行保存客户端实际收到的回答。处于「监控」或检查回答的规则全部只记录时，回答原样通过。
