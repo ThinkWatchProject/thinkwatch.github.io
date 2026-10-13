@@ -42,7 +42,7 @@ export const liteCopy = {
         aria: "Illustration: requests passing through the gateway, in turn a request whose key is replaced, one whose upstream fails and is replaced by the next, and one whose dangerous tool call is cut off",
         scenes: [
           {
-            checks: [["Routing", "main → anthropic"], ["Outbound redaction", "1 credential"], ["Tool-call inspection", "passed"], ["Cost", "$0.0124"]],
+            checks: [["Routing", "main → anthropic"], ["Secrets & privacy", "1 credential"], ["Dangerous commands", "passed"], ["Cost", "$0.0124"]],
             log: [
               "<time>16:42:07</time><b>claude-code</b> POST /v1/messages · claude-sonnet-5",
               "<time>route</time>rule <b>main</b> matched, sent to <b>anthropic</b>",
@@ -62,7 +62,7 @@ export const liteCopy = {
             ],
           },
           {
-            checks: [["Routing", "budget → relay"], ["Outbound redaction", "2 credentials"], ["Tool-call inspection", "cut off"], ["Cost", "$0.0032"]],
+            checks: [["Routing", "budget → relay"], ["Secrets & privacy", "2 credentials"], ["Dangerous commands", "cut off"], ["Cost", "$0.0032"]],
             log: [
               "<time>16:43:02</time><b>cursor</b> POST /v1/chat/completions · claude-sonnet-5",
               "<time>route</time>rule <b>budget</b> matched, sent to <b>relay</b>",
@@ -124,7 +124,7 @@ export const liteCopy = {
         {
           id: "security",
           title: "Protection against relays: keys replaced, malicious tool calls cut off",
-          body: "API keys, private keys, connection-string passwords, ID numbers and bank card numbers can be replaced with placeholders before a request leaves, so a relay never holds the real values, and an answer whose tool call downloads and runs code or sends out credentials can be cut off before the client runs it. Hidden characters that smuggle in instructions can be deleted and prompt injection refused; the three protections start in Observe, recording without changing anything, and each switches to Replace, Cut off or Enforce on its own.",
+          body: "API keys, private keys, connection-string passwords, ID numbers and bank card numbers can be replaced with placeholders before a request leaves, so a relay never holds the real values, and an answer whose tool call downloads and runs code or sends out credentials can be cut off before the client runs it. Hidden characters that smuggle in instructions can be deleted, prompt injection refused, and chosen words deleted or replaced in requests and answers. The three protections start in Monitor, which records and notifies without changing anything; each is switched on separately, and every rule has its own action.",
           alt: "The Security page log: credentials replaced before a request left, one of them matched by a custom rule; a download-and-run tool call cut off; and hidden characters, a delete command and an injected instruction recorded, each with the key, client, model and upstream of its request",
         },
         {
@@ -295,7 +295,7 @@ export const liteCopy = {
         aria: "示意：请求经过网关，依次展示密钥被替换的请求、上游出错时换用下一个上游的请求，以及危险工具调用被切断的请求",
         scenes: [
           {
-            checks: [["路由", "main → anthropic"], ["出站脱敏", "1 处凭据"], ["工具调用审查", "通过"], ["记账", "$0.0124"]],
+            checks: [["路由", "main → anthropic"], ["密钥与隐私", "1 处凭据"], ["危险命令", "通过"], ["记账", "$0.0124"]],
             log: [
               "<time>16:42:07</time><b>claude-code</b> POST /v1/messages · claude-sonnet-5",
               "<time>路由</time>命中规则 <b>main</b>，交给 <b>anthropic</b>",
@@ -315,7 +315,7 @@ export const liteCopy = {
             ],
           },
           {
-            checks: [["路由", "budget → relay"], ["出站脱敏", "2 处凭据"], ["工具调用审查", "已切断"], ["记账", "$0.0032"]],
+            checks: [["路由", "budget → relay"], ["密钥与隐私", "2 处凭据"], ["危险命令", "已切断"], ["记账", "$0.0032"]],
             log: [
               "<time>16:43:02</time><b>cursor</b> POST /v1/chat/completions · claude-sonnet-5",
               "<time>路由</time>命中规则 <b>budget</b>，交给 <b>relay</b>",
@@ -367,7 +367,7 @@ export const liteCopy = {
         {
           id: "security",
           title: "防范中转站：替换密钥，切断恶意工具调用",
-          body: "API 密钥、私钥、连接串口令、身份证号与银行卡号可在请求发出前换成占位符，中转站拿不到原值；回答中的工具调用若是下载即执行或外发凭据，可在客户端执行之前切断。夹带指令的隐藏字符可以删除，提示注入可以拒绝；三项防护出厂只记录、不改动请求，可逐项切换到「替换」「切断」或「处置」。",
+          body: "API 密钥、私钥、连接串口令、身份证号与银行卡号可在请求发出前换成占位符，中转站拿不到原值；回答中的工具调用若是下载即执行或外发凭据，可在客户端执行之前切断。夹带指令的隐藏字符可以删除，提示注入可以拒绝，请求和回答中的指定词语可以删除或替换。三项防护出厂为「监控」，只记录并发出通知、不改动内容；各项单独开启，每条规则可单独设定动作。",
           alt: "安全页日志：请求发出前替换的凭据（其中一条由自定义规则命中）、被切断的下载即执行工具调用，以及记录在案的隐藏字符、删除命令与注入指令，每条都注明所属请求的密钥、客户端、模型与上游",
         },
         {

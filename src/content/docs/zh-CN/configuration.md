@@ -495,29 +495,46 @@ openssl rand -base64 32
 | ---------------------------- | ------- | -------------------------------------------- |
 | `signature_drift_seconds`    | `300`   | 签名请求允许的最大时钟偏差                   |
 | `nonce_ttl_seconds`          | `300`   | 用于重放保护的 nonce 值 TTL                  |
-| `security.redact`            | `{}`    | 出站脱敏的策略，见[请求防护](#请求防护) |
-| `security.inspect_tools`     | `{}`    | 工具调用审查的策略，见[请求防护](#请求防护) |
+| `security.redact`            | `{}`    | 「密钥与隐私」（出站脱敏）的策略，见[请求防护](#请求防护) |
+| `security.inspect_tools`     | `{}`    | 「危险命令」（工具调用审查）的策略，见[请求防护](#请求防护) |
 | `security.content`           | `{}`    | 内容过滤的策略，见[请求防护](#请求防护) |
 | `security.rate_limit_fail_closed` | `false` | 限额无法检查时拒绝请求，见[无法检查限额时](#无法检查限额时) |
 
 #### 请求防护
 
-出站脱敏、工具调用审查和内容过滤各以一个 JSON 对象保存完整的策略，分别位于 `security.redact`、`security.inspect_tools` 和 `security.content`。对象的结构与 ThinkWatch Core 的 `config.yaml` 中 `security` 一节相同，各字段与全部内置规则见 [Core 配置手册](/zh-CN/docs/core/configuration#cfg-security)；`{}` 即出厂设置。
+三项请求防护，即「密钥与隐私」（出站脱敏）、「危险命令」（工具调用审查）和「内容过滤」，各以一个 JSON 对象保存完整的策略，分别位于 `security.redact`、`security.inspect_tools` 和 `security.content`。对象的结构与 ThinkWatch Core 的 `config.yaml` 中 `security` 一节相同，各字段与全部内置规则见 [Core 配置手册](/zh-CN/docs/core/configuration#cfg-security)；`{}` 即出厂设置。
 
-- `mode` 为 `off`、`observe` 或 `enforce`。出厂为 `observe`：命中的内容记入审计日志，不做任何改动；`enforce` 在控制台中按作用命名，出站脱敏为「替换」，工具调用审查为「切断」，内容过滤为「处置」。
-- `enable` 和 `disable` 按 id 启用或停用内置规则，`actions` 改变内置规则在 `enforce` 下的处置，`custom` 保存部署自己的规则。
-- 出站脱敏的自定义规则以 `match` 指定匹配方式：`contains`（默认）按原样查找 `pattern`，`.`、`*`、`\d` 等没有特殊含义；`regex` 把 `pattern` 作为正则表达式。`case_sensitive` 为 `true` 时区分大小写，否则不区分。控制台中两项分别为「匹配方式」和「区分大小写」。
-- 出站脱敏不查找字段名；自定义脱敏规则还会跳过 `id`、`call_id`、`item_id`、`tool_use_id`、`tool_call_id`、`toolUseId`、`previous_response_id`、`response_id`、`type`、`role`、`name`、`namespace`、`model`、`status`、`object` 和 `phase` 的值。内置规则照常查找这些值，其余的值由所有规则照常查找。按 `audit.body_redact_pii` 对存储的请求体脱敏时同样如此。
+- `mode` 为 `off`、`observe` 或 `enforce`，控制台中分别显示为「关闭」「监控」「开启」。出厂为 `observe`：命中的内容记入审计日志，不做任何改动；`enforce` 按命中规则的动作处理。
+- `enable` 和 `disable` 按 id 启用或停用内置规则，`actions` 改变内置规则在 `enforce` 下的动作，`custom` 保存部署自己的规则，每条规则各带 `action`。脱敏规则替换为占位符（`placeholder`，默认）或只记录（`record`）；工具调用规则切断回答（`cut`）或只记录；内容规则拒绝请求（`block`）、删除命中内容（`strip`）、替换命中内容（`replace`）或只记录。
+- 只记录的脱敏规则把值原样发往上游，防护处于「开启」时写入 `gateway.redaction_flagged`。与要替换的命中重叠时，该值照常替换。开启 `audit.body_redact_pii` 时，存储的请求体中该值仍以掩码保存。
+- 自定义脱敏规则以 `match` 指定匹配方式：`contains`（默认）按原样查找 `pattern`，`.`、`*`、`\d` 等没有特殊含义；`regex` 把 `pattern` 作为正则表达式。`case_sensitive` 为 `true` 时区分大小写，否则不区分。控制台中两项分别为「匹配方式」和「区分大小写」。
+- 脱敏不查找字段名；自定义脱敏规则还会跳过 `id`、`call_id`、`item_id`、`tool_use_id`、`tool_call_id`、`toolUseId`、`previous_response_id`、`response_id`、`type`、`role`、`name`、`namespace`、`model`、`status`、`object` 和 `phase` 的值。内置规则照常查找这些值，其余的值由所有规则照常查找。按 `audit.body_redact_pii` 对存储的请求体脱敏时同样如此。
+- 自定义内容规则以 `scope` 指定检查对象：`["request"]`（默认，即调用方的消息与工具结果）、`["response"]` 或两者。检查回答时，规则读取客户端看到的正文，以及 Codex `apply_patch` 等自由格式工具的输入，不含工具调用与思考过程；整份回答、流式回答、缓存命中的回答与 Responses WebSocket 都在其内。检查回答的规则不能使用 `block`，也不能使用 `"match": "codepoints"`，这样的策略在保存时被拒绝。内置内容规则只检查请求。
+- `replace` 把命中内容替换为规则的 `replacement`（省略时为 `***`，最多 200 个字符），请求与回答中均适用。替换后的文字在回答中不还原，也不再检查。`case_sensitive: true` 使内容规则区分大小写；内容规则默认不区分。
+- 防护处于「开启」且有检查回答的规则会删除或替换时，流式回答不整体缓冲，只暂缓末尾可能构成命中的字符，正则规则至多 256 个字符。此时流式回答以及正文有改动的整份回答不再附带 logprobs，日志行保存客户端实际收到的回答。处于「监控」或检查回答的规则全部只记录时，回答原样通过。
+- 各项防护的命中都是审计事件，也随之进入日志转发。替换内容的内容规则写入 `gateway.content_replaced`；内容事件带 `direction`（`request` 或 `response`），回答中的事件在 `resource` 中注明上游。内容、脱敏与工具调用事件都带防护的 `mode`，脱敏事件另带规则的 `action`。指标 `gateway_content_matched_total` 带 `direction` 标签。
 
 ```json
 {
   "mode": "enforce",
   "enable": ["email"],
+  "actions": { "email": "record" },
   "custom": [{ "name": "员工编号", "pattern": "EMP-\\d{6}", "match": "regex", "label": "EMPLOYEE" }]
 }
 ```
 
-控制台的「内容安全」页编辑这些对象。经 `PATCH /api/admin/settings` 写入时，一个键整体写入，写入前先校验：字段名拼错、内置规则 id 不存在、正则无法编译或码位写法有误时返回 `400`。写入 `security.redact` 需要 `pii_redactor:write` 权限，另外两个键需要 `content_filter:write`。`GET /api/admin/security` 列出每项防护的档位与全部规则，`POST /api/admin/security/{guard}/test` 用一段样本测试这些规则。ThinkWatch 3.0 至 3.6 保存的自定义脱敏规则不带 `match` 和 `case_sensitive`，自 3.7.0 起按原样查找文字、不区分大小写；按正则表达式编写的规则需要加上 `"match": "regex"`，需要区分大小写的再加上 `"case_sensitive": true`。3.6 读不了使用这两个键的脱敏策略，因此应在所有副本都升级到 3.7.0 之后再修改。从仍使用 `security.content_filter_patterns`、`security.pii_redactor_patterns`、`security.hidden_text` 和 `security.tool_inspection` 的版本升级时，这些设置在首次启动时转换为上述三个键，原有的脱敏写法转换为区分大小写的 `regex` 规则。
+在请求与回答中替换项目代号的 `security.content` 策略：
+
+```json
+{
+  "mode": "enforce",
+  "custom": [{ "name": "项目代号", "pattern": "polaris", "scope": ["request", "response"], "action": "replace", "replacement": "[代号]" }]
+}
+```
+
+控制台的「内容安全」页编辑这些对象：「日志」标签页向拥有 `logs:read_all` 权限的用户列出各项防护的审计事件，每项防护各有一个标签页，可在列表中直接启用或停用每条规则并设定动作。经 `PATCH /api/admin/settings` 写入时，一个键整体写入，写入前先校验：字段名拼错、内置规则 id 不存在、正则无法编译、码位写法有误，或检查回答的规则使用拒绝或码位时，返回 `400`。写入 `security.redact` 需要 `pii_redactor:write` 权限（角色页中显示为「密钥与隐私」），另外两个键需要 `content_filter:write`（显示为「内容过滤与危险命令」）。`GET /api/admin/security` 列出每项防护的状态与全部规则，`POST /api/admin/security/{guard}/test` 用一段样本测试这些规则；测试内容过滤时可传入 `scope`，按请求或按回答测试，并可传入 `replacement`。
+
+3.8.0 之前保存的策略行为不变：脱敏规则替换为占位符，内容规则只检查请求、不区分大小写，回答不作改动。ThinkWatch 3.7 拒绝含有不认识的键的策略，并让该项防护按出厂策略运行；因此脱敏规则的 `actions` 或自定义规则的 `action`，以及内容规则的 `scope`、`case_sensitive`、`replacement` 和动作 `replace`，应在所有副本都升级到 3.8.0 之后再使用，回滚前须先删除这些键。ThinkWatch 3.0 至 3.6 保存的自定义脱敏规则不带 `match` 和 `case_sensitive`，自 3.7.0 起按原样查找文字、不区分大小写；按正则表达式编写的规则需要加上 `"match": "regex"`，需要区分大小写的再加上 `"case_sensitive": true`。从仍使用 `security.content_filter_patterns`、`security.pii_redactor_patterns`、`security.hidden_text` 和 `security.tool_inspection` 的版本升级时，这些设置在首次启动时转换为上述三个键，原有的脱敏写法转换为区分大小写的 `regex` 规则。
 
 #### 无法检查限额时
 

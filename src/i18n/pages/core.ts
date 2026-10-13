@@ -58,7 +58,7 @@ export const coreCopy = {
         },
         {
           title: "Malicious tool calls cut off",
-          body: "A relay can rewrite an answer and slip in a tool call for the client to run; a call that downloads and runs code, sends out credentials or does something similar can be cut off mid-stream. A content filter can also delete hidden characters that smuggle in instructions, and all three guards start by only recording.",
+          body: "A relay can rewrite an answer and slip in a tool call for the client to run; a call that downloads and runs code, sends out credentials or does something similar can be cut off mid-stream. A content filter can also delete hidden characters that smuggle in instructions, and delete or replace chosen words in answers. All three guards start by only recording, and every rule has its own action.",
         },
         {
           title: "Encrypted control plane",
@@ -182,7 +182,7 @@ export const coreCopy = {
         },
         {
           title: "切断恶意工具调用",
-          body: "中转站可以改写回答，塞入让客户端执行的工具调用；下载即执行、外发凭据之类的危险调用可在流式传输中途切断。内容过滤还可删除夹带指令的隐藏字符，三项防护出厂均只记录。",
+          body: "中转站可以改写回答，塞入让客户端执行的工具调用；下载即执行、外发凭据之类的危险调用可在流式传输中途切断。内容过滤还可删除夹带指令的隐藏字符，删除或替换回答中的指定词语。三项防护出厂均只记录，每条规则可单独设定动作。",
         },
         {
           title: "加密的控制面",

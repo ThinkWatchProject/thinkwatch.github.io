@@ -2054,6 +2054,7 @@ Search audit log entries. Backed by ClickHouse for SQL-based search and analytic
 | Parameter | Type    | Required | Default | Description                            |
 | --------- | ------- | -------- | ------- | -------------------------------------- |
 | `q`       | string  | No       | —       | Full-text search query                 |
+| `action`  | string  | No       | —       | One action, or several separated by commas (the first 32 are used); an entry matches any of them |
 | `from`    | string  | No       | —       | Start datetime (ISO 8601)              |
 | `to`      | string  | No       | —       | End datetime (ISO 8601)                |
 | `limit`   | integer | No       | 50      | Number of results (max 1000)           |

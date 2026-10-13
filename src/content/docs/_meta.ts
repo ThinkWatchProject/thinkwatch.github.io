@@ -255,8 +255,8 @@ export const products: Product[] = [
         locales: both,
         group: "guides",
         summary: {
-          en: "Outbound redaction swaps keys in requests for placeholders before a relay sees them; tool-call inspection cuts off dangerous calls.",
-          "zh-CN": "出站脱敏在中转站看到请求之前把其中的密钥换成占位符，工具调用审查切断危险的工具调用。",
+          en: "Secrets & privacy swaps keys in requests for placeholders before a relay sees them; Dangerous commands cuts off dangerous tool calls.",
+          "zh-CN": "「密钥与隐私」在中转站看到请求之前把其中的密钥换成占位符，「危险命令」切断危险的工具调用。",
         },
       },
       {
