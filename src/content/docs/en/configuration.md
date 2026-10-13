@@ -495,29 +495,46 @@ Changes to dynamic settings take effect immediately without requiring a server r
 | ---------------------------- | ------- | ---------------------------------------------------- |
 | `signature_drift_seconds`    | `300`   | Maximum allowed clock drift for signed requests      |
 | `nonce_ttl_seconds`          | `300`   | TTL for nonce values used in replay protection       |
-| `security.redact`            | `{}`    | Outbound redaction policy, see [Request guards](#request-guards) |
-| `security.inspect_tools`     | `{}`    | Tool-call inspection policy, see [Request guards](#request-guards) |
+| `security.redact`            | `{}`    | Secrets & privacy (outbound redaction) policy, see [Request guards](#request-guards) |
+| `security.inspect_tools`     | `{}`    | Dangerous commands (tool-call inspection) policy, see [Request guards](#request-guards) |
 | `security.content`           | `{}`    | Content filter policy, see [Request guards](#request-guards) |
 | `security.rate_limit_fail_closed` | `false` | Refuse requests whose limits cannot be checked, see [Limits that cannot be checked](#limits-that-cannot-be-checked) |
 
 #### Request guards
 
-Outbound redaction, tool-call inspection and the content filter each keep their whole policy as one JSON object under `security.redact`, `security.inspect_tools` and `security.content`. The object has the shape of the `security` section of ThinkWatch Core's `config.yaml`, which the [Core configuration reference](/docs/core/configuration#cfg-security) describes field by field, built-in rules included; `{}` is the factory setting.
+The three request guards, Secrets & privacy (outbound redaction), Dangerous commands (tool-call inspection) and the content filter, each keep their whole policy as one JSON object under `security.redact`, `security.inspect_tools` and `security.content`. The object has the shape of the `security` section of ThinkWatch Core's `config.yaml`, which the [Core configuration reference](/docs/core/configuration#cfg-security) describes field by field, built-in rules included; `{}` is the factory setting.
 
-- `mode` is `off`, `observe` or `enforce`. `observe`, the factory mode, records matches in the audit log and changes nothing; the console calls `enforce` Replace for outbound redaction, Cut off for tool-call inspection and Enforce for the content filter.
-- `enable` and `disable` switch built-in rules on and off by id, `actions` changes what a built-in rule does under `enforce`, and `custom` holds rules of the deployment's own.
+- `mode` is `off`, `observe` or `enforce`, shown in the console as Off, Monitor and On. `observe`, the factory mode, records matches in the audit log and changes nothing; `enforce` handles each match by the action of the rule that found it.
+- `enable` and `disable` switch built-in rules on and off by id, `actions` changes what a built-in rule does under `enforce`, and `custom` holds rules of the deployment's own, each with its own `action`. A redaction rule replaces what it finds with a placeholder (`placeholder`, the default) or only records it (`record`); a tool-call rule cuts the answer off (`cut`) or records; a content rule refuses the request (`block`), deletes the match (`strip`), replaces it (`replace`) or records.
+- A record-only redaction rule sends the value upstream unchanged and writes `gateway.redaction_flagged` while the guard is On. Where its match overlaps a match that is replaced, the value is replaced. With `audit.body_redact_pii` on, the value is still masked in stored bodies.
 - A custom redaction rule's `match` is `contains`, the default, which looks for `pattern` as written, so `.`, `*` and `\d` have no special meaning, or `regex`, which takes `pattern` as a regular expression. It ignores case unless `case_sensitive` is `true`. The console calls these Match by and Case-sensitive.
 - Redaction does not search field names, and custom redaction rules leave alone the values of `id`, `call_id`, `item_id`, `tool_use_id`, `tool_call_id`, `toolUseId`, `previous_response_id`, `response_id`, `type`, `role`, `name`, `namespace`, `model`, `status`, `object` and `phase`. Built-in rules still search those values, and every other value is searched by every rule. The same holds when stored bodies are masked with `audit.body_redact_pii`.
+- A custom content rule's `scope` says what it checks: `["request"]` (the default, the caller's messages and tool results), `["response"]` or both. On an answer the rule reads the text the client is shown and the input of freeform tools such as Codex's `apply_patch`, not tool calls and not reasoning, in whole and streamed answers, answers served from the cache and the Responses WebSocket. A rule that checks answers cannot use `block` or `"match": "codepoints"`; such a policy is refused when saved. Built-in content rules check requests only.
+- `replace` writes the rule's `replacement` (`***` when left out, at most 200 characters) in place of a match, in requests and in answers. A replacement is not put back in the answer and is not checked again. `case_sensitive: true` makes a content rule tell capital letters from small ones; content rules ignore case by default.
+- Under On, with a rule that checks answers and deletes or replaces, a streamed answer is never held back whole: only the last characters that could still grow into a match wait for the next piece, at most 256 for a regular expression. Logprobs are then removed from streamed answers, and from a whole answer whose text changed, and the log row stores the answer as the client received it. Under Monitor, or when every answer rule only records, answers pass unchanged.
+- Guard hits are audit events, and with them reach the log forwarders. A content rule that replaces writes `gateway.content_replaced`; a content event carries `direction` (`request` or `response`), and an answer's event names the upstream in `resource`. Content, redaction and tool-call events carry the guard's `mode`, and redaction events the rule's `action`. The `gateway_content_matched_total` metric has a `direction` label.
 
 ```json
 {
   "mode": "enforce",
   "enable": ["email"],
+  "actions": { "email": "record" },
   "custom": [{ "name": "Employee ID", "pattern": "EMP-\\d{6}", "match": "regex", "label": "EMPLOYEE" }]
 }
 ```
 
-The Content Security page of the console edits these objects. Through `PATCH /api/admin/settings` a key is written whole and checked first: a misspelt field, an unknown built-in rule, a pattern that does not compile or a malformed code point is refused with `400`. Writing `security.redact` takes the `pii_redactor:write` permission, and the other two keys take `content_filter:write`. `GET /api/admin/security` lists each guard's mode and every rule, and `POST /api/admin/security/{guard}/test` tries a sample against them. Custom redaction rules saved by ThinkWatch 3.0 to 3.6 carry neither `match` nor `case_sensitive`, so from 3.7.0 they look for their text as written and ignore case; one written as a regular expression needs `"match": "regex"`, and `"case_sensitive": true` where case matters. Change them only once every replica runs 3.7.0, since 3.6 cannot read a redaction policy that uses these keys. A deployment upgraded from a version that kept `security.content_filter_patterns`, `security.pii_redactor_patterns`, `security.hidden_text` and `security.tool_inspection` has them converted into these keys at its first start; the old redaction patterns become case-sensitive `regex` rules.
+A `security.content` policy that replaces a codename in requests and answers:
+
+```json
+{
+  "mode": "enforce",
+  "custom": [{ "name": "Codename", "pattern": "polaris", "scope": ["request", "response"], "action": "replace", "replacement": "[codename]" }]
+}
+```
+
+The Content Security page of the console edits these objects: a Log tab, for holders of `logs:read_all`, lists the guards' audit events, and each guard has a tab where every rule is switched on or off and given its action in place. Through `PATCH /api/admin/settings` a key is written whole and checked first: a misspelt field, an unknown built-in rule, a pattern that does not compile, a malformed code point or a rule on answers that refuses or matches code points is refused with `400`. Writing `security.redact` takes the `pii_redactor:write` permission, shown on the role pages as Secrets & privacy, and the other two keys take `content_filter:write`, shown as Content filter & dangerous commands. `GET /api/admin/security` lists each guard's mode and every rule, and `POST /api/admin/security/{guard}/test` tries a sample against them; for the content filter it takes `scope`, to try the sample as a request or as an answer, and `replacement`.
+
+Policies saved before 3.8.0 keep their behaviour: redaction rules replace with placeholders, content rules check requests only and ignore case, and answers are not changed. ThinkWatch 3.7 refuses a policy with keys it does not know and runs that guard on its factory policy, so use `actions` or a custom rule's `action` on redaction rules, or `scope`, `case_sensitive`, `replacement` or the action `replace` on content rules, only once every replica runs 3.8.0, and remove those keys before rolling back. Custom redaction rules saved by ThinkWatch 3.0 to 3.6 carry neither `match` nor `case_sensitive`, so from 3.7.0 they look for their text as written and ignore case; one written as a regular expression needs `"match": "regex"`, and `"case_sensitive": true` where case matters. A deployment upgraded from a version that kept `security.content_filter_patterns`, `security.pii_redactor_patterns`, `security.hidden_text` and `security.tool_inspection` has them converted into these keys at its first start; the old redaction patterns become case-sensitive `regex` rules.
 
 #### Limits that cannot be checked
 

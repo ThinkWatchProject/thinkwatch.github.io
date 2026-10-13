@@ -324,7 +324,7 @@ MCP 代理引擎。包含：
 所有其他 crate 使用的共享基础设施。包含：
 
 - **`config.rs`** —— 从环境变量加载的 `AppConfig` 结构体。
-- **`dynamic_config.rs`** —— `DynamicConfig` 系统，从 `system_settings` 数据库表加载配置。支持通过 Redis Pub/Sub 的多实例同步和内存缓存。涵盖 JWT TTL、缓存 TTL、请求防护（出站脱敏、工具调用审查、内容过滤）的策略、预算阈值、API Key 策略和数据保留设置。
+- **`dynamic_config.rs`** —— `DynamicConfig` 系统，从 `system_settings` 数据库表加载配置。支持通过 Redis Pub/Sub 的多实例同步和内存缓存。涵盖 JWT TTL、缓存 TTL、请求防护（`security.redact`、`security.inspect_tools`、`security.content`，控制台中为「密钥与隐私」「危险命令」「内容过滤」）的策略、预算阈值、API Key 策略和数据保留设置。
 - **`db.rs`** —— 使用 `sqlx` 设置 PostgreSQL 连接池。
 - **`models/`** —— 数据库模型结构体（每个领域实体一个）：`user.rs`、`team.rs`、`api_key.rs`、`provider.rs`、`mcp_server.rs`、`usage.rs`、`audit_log.rs`。
 - **`dto/`** —— 用于 API 请求/响应序列化的数据传输对象。

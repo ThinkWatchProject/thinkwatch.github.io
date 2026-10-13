@@ -324,7 +324,7 @@ Authentication and authorization library. Contains:
 Shared infrastructure used by all other crates. Contains:
 
 - **`config.rs`** -- `AppConfig` struct loaded from environment variables.
-- **`dynamic_config.rs`** -- `DynamicConfig` system that loads settings from the `system_settings` database table. Supports multi-instance sync via Redis Pub/Sub and in-memory caching. Covers JWT TTLs, cache TTL, the policies of the request guards (outbound redaction, tool-call inspection and the content filter), budget thresholds, API key policies, and data retention settings.
+- **`dynamic_config.rs`** -- `DynamicConfig` system that loads settings from the `system_settings` database table. Supports multi-instance sync via Redis Pub/Sub and in-memory caching. Covers JWT TTLs, cache TTL, the policies of the request guards (`security.redact`, `security.inspect_tools` and `security.content`: Secrets & privacy, Dangerous commands and the content filter in the console), budget thresholds, API key policies, and data retention settings.
 - **`db.rs`** -- PostgreSQL connection pool setup using `sqlx`.
 - **`models/`** -- Database model structs (one per domain entity): `user.rs`, `team.rs`, `api_key.rs`, `provider.rs`, `mcp_server.rs`, `usage.rs`, `audit_log.rs`.
 - **`dto/`** -- Data transfer objects for API request/response serialization.

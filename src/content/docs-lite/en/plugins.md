@@ -26,13 +26,13 @@ A request is routed first, on what the client sent: the routing rules, a rule's 
 1. Keys in the request are replaced with placeholders.
 2. The request hooks in scope for this attempt run in list order, starting from the request as the client sent it. The placeholders are restored after them.
 3. If a plugin changed the request, the content filter checks it again, hidden-character rules included, and reports only what the plugins added. A block refuses the whole request; it is not tried on another upstream.
-4. The request is converted to the upstream's format if needed, outbound redaction applies, and it is sent.
+4. The request is converted to the upstream's format if needed, Secrets & privacy applies, and it is sent.
 
 When an attempt fails and the request moves to another upstream, the hooks run again from the request as the client sent it, so changes made for one upstream never reach another. A retry to the same upstream, such as the one after a sign-in token is refreshed, reuses what the hooks produced.
 
 A plugin that changes the model renames only what is sent to the upstream of this attempt, like a routing rule's rename, and replaces any name a rule set. The request is not routed again and the upstream's model list is not checked again, but the models the key may use still apply: a model outside them refuses the request.
 
-On the answer side, the hooks run after the answer is converted to the client's format and before the tool-call inspection.
+On the answer side, the hooks run after the answer is converted to the client's format. The content filter's rules on answers and Dangerous commands then check what the hooks produced.
 
 ## Adding and editing a plugin
 
@@ -238,7 +238,7 @@ A permission decides both what a plugin sees and what it may change. Sections th
 | `tools` | Tool definitions | Changes which tools the model can use |
 | `params` | Model, `max_tokens`, `temperature`, `top_p`, `stop`; for embeddings, the model only | Can change the model sent to the upstream, and so what the request costs |
 | `reply.text` | The text of answers | |
-| `reply.tool_calls` | The tool calls in answers: change, remove, add | High risk, shown in red: a plugin can change what the client runs. The tool-call inspection still checks the result, and installing such a plugin, turning it on, changing its code and approving a change to its file are confirmed in a system dialog. |
+| `reply.tool_calls` | The tool calls in answers: change, remove, add | High risk, shown in red: a plugin can change what the client runs. Dangerous commands still checks the result, and installing such a plugin, turning it on, changing its code and approving a change to its file are confirmed in a system dialog. |
 
 ## When a plugin fails
 
@@ -264,8 +264,8 @@ Across the gateway, at most 32 answer-hook instances run at the same time. Each 
 
 - **A sandbox with nothing in it.** Plugins run in QuickJS compiled to WebAssembly and executed by Wasmtime inside core. Plugin code never runs in the app's window and never runs as native code. The sandbox has no network, files, environment variables or processes; even a flaw in the JavaScript engine reaches only the sandbox's own memory, not the keys and tokens in core's memory.
 - **Nothing is kept.** Every request-hook call runs in a new instance. For each answer, a plugin gets one instance, shared by its hooks for that answer and discarded when the answer ends. Plugins share nothing with each other.
-- **Placeholders instead of keys.** Keys that the outbound redaction rules recognize are replaced with placeholders before a plugin sees them and restored after it, on the request and on the answer, whatever mode the protection is in. The answer side matters as much as the request: answers become part of the conversation and are sent upstream again with the next request, so a plugin that could see a real key could hide it, encoded, in an answer.
-- **The protections still apply.** Request hooks run after routing, and a request they change is checked again by the content filter before outbound redaction; answer hooks run before the tool-call inspection. Whatever a plugin writes is checked like anything else, and plugins cannot change where a request is routed or switch to a model the key may not use.
+- **Placeholders instead of keys.** Keys that the Secrets & privacy rules replace with placeholders are replaced before a plugin sees them and restored after it, on the request and on the answer, whatever state the protection is in. The answer side matters as much as the request: answers become part of the conversation and are sent upstream again with the next request, so a plugin that could see a real key could hide it, encoded, in an answer.
+- **The protections still apply.** Request hooks run after routing, and a request they change is checked again by the content filter before Secrets & privacy applies; answer hooks run before the content filter's rules on answers and before Dangerous commands. Whatever a plugin writes is checked like anything else, and plugins cannot change where a request is routed or switch to a model the key may not use.
 - **Approved code only.** A plugin runs only while its file matches the approved SHA-256 hash, and a save in the app updates the file and the hash together. Installing a plugin that may change tool calls, turning it on, changing its code and approving a change to its file are confirmed in a system dialog outside the page, as described in [Confirmation in a system dialog](#confirmation-in-a-system-dialog).
 - **Every change is visible.** Each run is recorded on the request, a changed request is stored as it was sent to the upstream that answered (with keys replaced, like every stored request), and requests changed by plugins are marked on the Traffic page.
 - **Bounded.** Every call has limits on CPU time, memory, output and log volume, and the number of answer instances alive at once is capped. Plugins run in a separate thread pool, so a slow plugin does not hold up the gateway's own work.
@@ -273,7 +273,7 @@ Across the gateway, at most 32 answer-hook instances run at the same time. Each 
 
 ## What the sandbox cannot prevent
 
-A plugin is allowed to change content, and the sandbox cannot judge whether a change is honest. A plugin with `system` or `messages` can write instructions into the prompt, and one with `reply.text` can make an answer misleading. A plugin with `params` can switch to a more expensive model among those the key may use. A plugin with `reply.tool_calls` can change what the client runs; the tool-call inspection catches only the patterns in its rules. Keys that the outbound redaction rules do not recognize are visible to plugins; they are also sent to the upstream as they are, and a custom rule on the Security page covers such a format.
+A plugin is allowed to change content, and the sandbox cannot judge whether a change is honest. A plugin with `system` or `messages` can write instructions into the prompt, and one with `reply.text` can make an answer misleading. A plugin with `params` can switch to a more expensive model among those the key may use. A plugin with `reply.tool_calls` can change what the client runs; Dangerous commands catches only the patterns in its rules. Keys that the Secrets & privacy rules do not recognize, or that a **Record only** rule finds, are visible to plugins; they are also sent to the upstream as they are, and a custom rule on the Security page covers such a format.
 
 These risks are limited by granting a plugin only the permissions it needs, by reading its code before installing it, and by comparing the request before and after the plugins in the request's detail.
 
