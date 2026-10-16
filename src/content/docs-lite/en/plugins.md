@@ -89,11 +89,11 @@ export const manifest = {
 
 export function onRequest(req, ctx) {
   const notes = String(ctx.settings.notes).trim();
-  if (notes === "") return; // nothing to add: the request is sent as it is
-  req.system = req.system ? `${req.system}\n\n${notes}` : notes;
-  return req;
+  if (notes !== "") tw.appendSystem(req, notes);
 }
 ```
+
+Changes made to `req` take effect when the hook ends, without returning it. `tw.appendSystem` is one of the [helpers](#helpers) for common edits.
 
 ### Manifest
 
@@ -138,11 +138,11 @@ All three lists apply to request hooks and answer hooks alike, and patterns igno
 | `onReplyTextEnd(ctx)` | `reply.text` | In stream mode, at the end of each text block. Optional. |
 | `onToolCall(call, ctx)` | `reply.tool_calls` | For each tool call in the answer, once it is complete. |
 
-**`onRequest`** receives the [request view](#the-request-view) and returns it changed, or returns nothing to leave the request as it is. Calling `reject("reason")` refuses the request, and the client receives an error that names the plugin; `reject` ends the hook by throwing, and the refusal stands even if the plugin catches what it throws. The hook runs once for each attempt to send the request to an upstream, as described in [Where plugins run](#where-plugins-run). Besides requests that generate an answer, it runs on token counts (`/v1/messages/count_tokens`, Gemini's `countTokens` and the Responses API's `input_tokens`) and on Responses compaction, which carry the same conversation, so that what a plugin removes is not sent through them either. On these, a changed model is applied but changes to the other `params` are not, because these endpoints do not accept them. A token count that the gateway estimates itself, without contacting an upstream, runs no plugin.
+**`onRequest`** receives the [request view](#the-request-view). Changes made to it take effect when the hook ends, whether or not the hook returns it; returning a different object uses that object instead. A view that ends up as it came in leaves the request as it is. Calling `reject("reason")` refuses the request, and the client receives an error that names the plugin; `reject` ends the hook by throwing, and the refusal stands even if the plugin catches what it throws. The hook runs once for each attempt to send the request to an upstream, as described in [Where plugins run](#where-plugins-run). Besides requests that generate an answer, it runs on token counts (`/v1/messages/count_tokens`, Gemini's `countTokens` and the Responses API's `input_tokens`) and on Responses compaction, which carry the same conversation, so that what a plugin removes is not sent through them either. On these, a changed model is applied but changes to the other `params` are not, because these endpoints do not accept them. A token count that the gateway estimates itself, without contacting an upstream, runs no plugin.
 
-**`onReplyText`** in block mode, the default, is called once for each text block with the whole text of the block, and the text reaches the client after the call. In stream mode it is called for each piece of streamed text and returns what to send now; returning `""` holds the text back, and `onReplyTextEnd` returns whatever is still held when the block ends. An answer that is not streamed is passed in one call, followed by `onReplyTextEnd` in stream mode. Returning nothing leaves the text unchanged.
+**`onReplyText`** in block mode, the default, is called once for each text block with the whole text of the block, and the text reaches the client after the call. In stream mode it is called for each piece of streamed text and returns what to send now; returning `""` holds the text back, and `onReplyTextEnd` returns whatever is still held when the block ends. An answer that is not streamed is passed in one call, followed by `onReplyTextEnd` in stream mode. Returning nothing leaves the text unchanged. For find-and-replace in stream mode, `tw.streamReplace` provides both hooks; see [Replacing streamed text](#replacing-streamed-text).
 
-**`onToolCall`** receives `{ id, name, input }`. Streamed arguments are collected until the call is complete, and the result is sent in the client's format. The hook returns nothing to leave the call unchanged, an object to replace it, `null` to remove it, or an array to replace it with several calls. An `id` is generated where one is missing.
+**`onToolCall`** receives `{ id, name, input }`. Streamed arguments are collected until the call is complete, and the result is sent in the client's format. When the hook returns nothing, changes made to the call take effect, and a call that ends up as it came in is left unchanged. The hook can also return an object to replace the call, `null` to remove it, or an array to replace it with several calls. An `id` is generated where one is missing.
 
 Answer hooks run only on the answers to conversations. Thinking blocks are not passed to plugins and reach the client unchanged.
 
@@ -223,9 +223,84 @@ type Ctx = {
 
 `ctx` is frozen and cannot be changed.
 
+### Helpers
+
+The global object `tw` provides functions for common edits. Like the rest of a plugin, they are plain JavaScript that runs with the plugin's permissions and limits, and what they produce is checked like any other result.
+
+| Function | Does |
+|---|---|
+| `tw.appendSystem(req, text)` | Adds `text` to the end of the system prompt, after a blank line. Does nothing when the system prompt already contains `text`. Needs `system`. |
+| `tw.texts(req, fn)` | Calls `fn(text, place)` for each piece of text that can be changed, in order: the system prompt, the text parts of messages, and tool results. When `fn` returns a string, it replaces the text; returning nothing keeps it. `place` is `{ kind, role }`: `kind` is `"system"`, `"text"` or `"tool_result"`, and `role` is the role of the message, or `null` for the system prompt. Thinking, image and other parts are not passed. For embeddings and legacy completions, the text of each input comes as `"text"`. Needs `system` or `messages`, and passes only the sections granted. |
+| `tw.toolCalls(req, fn)` | Calls `fn(call)` for each earlier tool call in the conversation; changes made to `call.input` take effect. Needs `messages`. |
+| `tw.mapStrings(value, fn)` | Returns a copy of `value` in which each string is replaced by `fn(string, key)`, where `key` is the property name or array index, or `null` for a string at the top level. Keys and other values are copied as they are. |
+| `tw.replace(text, rules)` | Applies [replacement rules](#replacement-rules) to `text` and returns the result. |
+| `tw.streamReplace(rules, options)` | Returns `{ onReplyText, onReplyTextEnd }`, which apply replacement rules to streamed answer text; see [Replacing streamed text](#replacing-streamed-text). |
+| `tw.lines(text)` | Splits a setting into lines, trims each one and leaves out empty lines. |
+| `tw.pairs(text, separator)` | Reads a setting with one pair per line, such as `npm => pnpm`, into `[from, to]` pairs. The separator is `"=>"` unless one is given. A line without the separator, or with nothing before it, is an error that names the line. |
+
+A helper that needs a section the plugin was not granted throws an error that names the permission. Errors thrown by helpers are errors of the plugin, handled as described in [When a plugin fails](#when-a-plugin-fails).
+
+For editors that read TypeScript declarations:
+
+```ts
+declare const tw: {
+  appendSystem(req: RequestView, text: string): void;
+  texts(
+    req: RequestView | InputsView,
+    fn: (text: string, place: { kind: "system" | "text" | "tool_result"; role: Message["role"] | null }) => string | undefined,
+  ): void;
+  toolCalls(req: RequestView, fn: (call: { id: string; name: string; input: unknown }) => void): void;
+  mapStrings<T>(value: T, fn: (s: string, key: string | number | null) => string): T;
+  replace(text: string, rules: Rules): string;
+  streamReplace(rules: Rules | ((ctx: Ctx) => Rules), options?: { maxMatch?: number }): {
+    onReplyText(text: string, ctx: Ctx): string;
+    onReplyTextEnd(ctx: Ctx): string;
+  };
+  lines(text: string): string[];
+  pairs(text: string, separator?: string): [string, string][];
+};
+type Rules = Iterable<[string | RegExp, string | ((match: string, ...groups: unknown[]) => string)]>;
+```
+
+#### Replacement rules
+
+Rules are a list of `[find, replacement]` pairs, as an array or a `Map`. `tw.replace` and `tw.streamReplace` treat them the same way.
+
+- A string matches literally and is case-sensitive. A regular expression matches globally without the `g` flag; the `i` flag ignores case. An empty string and the `y` flag are errors, and so is a regular expression that matches an empty string.
+- The replacement for a string is inserted literally. The replacement for a regular expression may use `$1`, `$<name>` and the other forms that `String.prototype.replace` accepts, or be a function.
+- The text is scanned once, from left to right. Where several rules match at the same position, the one listed first applies. Replaced text is not scanned again, so with `A => B` and `B => C`, `A` becomes `B`.
+- Placeholders, such as `<<TW_SECRET_1>>`, are skipped whole: a rule never matches inside one or across one, and `^`, `$` and lookarounds treat a placeholder as the edge of the text.
+
+#### Replacing streamed text
+
+```js
+export const manifest = {
+  name: "Unify terms",
+  api: 1,
+  description: "Replaces the terms listed here in requests and answers.",
+  permissions: ["messages", "reply.text"],
+  reply: "stream",
+  settings: {
+    terms: { type: "string", label: "Terms, one pair per line (old => new)", value: "" },
+  },
+};
+
+const rules = (ctx) => tw.pairs(ctx.settings.terms);
+
+export function onRequest(req, ctx) {
+  tw.texts(req, (text) => tw.replace(text, rules(ctx)));
+}
+
+export const { onReplyText, onReplyTextEnd } = tw.streamReplace(rules);
+```
+
+`tw.streamReplace` needs `reply: "stream"`. Its `rules` are either a list of rules or a function that receives `ctx` and returns one; the function is called at the start of each text block, which is how rules come from settings.
+
+The streamed result is the same as `tw.replace` applied to the whole block. To catch a match that spans two pieces of the stream, the end of the text is held back until it cannot be the start of a match. With string rules only, that is just a tail that could begin one of the strings, which usually causes no visible delay. With any regular expression, it is the last 256 characters, so the client sees the text up to that many characters behind the model. `options.maxMatch` sets that number; a regular expression match longer than it may be missed when it spans two pieces. Text blocks streamed at the same time, such as the choices of a Chat Completions request with `n` greater than 1, are held separately. A replacement function, and `` $` `` and `$'` in a replacement string, see only the text held at that moment rather than the whole block.
+
 ### Available JavaScript
 
-Plugins have the standard JavaScript built-ins, such as `JSON`, `RegExp`, `Map`, `Date` and `Math`; `console.log`, `console.info`, `console.warn` and `console.error`, which write to the plugin's log; and `reject`, which is valid only in `onRequest`. There is no `fetch`, `require` or timer, `import` and `import()` load nothing, and there is no access to files, the network, environment variables or processes. The sandbox's clock is UTC. Nothing a plugin stores in a variable outlives the request attempt or answer it runs for.
+Plugins have the standard JavaScript built-ins, such as `JSON`, `RegExp`, `Map`, `Date` and `Math`; `console.log`, `console.info`, `console.warn` and `console.error`, which write to the plugin's log; `reject`, which is valid only in `onRequest`; and `tw`, the [helpers](#helpers). There is no `fetch`, `require` or timer, `import` and `import()` load nothing, and there is no access to files, the network, environment variables or processes. The sandbox's clock is UTC. Nothing a plugin stores in a variable outlives the request attempt or answer it runs for.
 
 ## Permissions
 
