@@ -89,11 +89,11 @@ export const manifest = {
 
 export function onRequest(req, ctx) {
   const notes = String(ctx.settings.notes).trim();
-  if (notes === "") return; // 没有要附加的内容：请求原样发出
-  req.system = req.system ? `${req.system}\n\n${notes}` : notes;
-  return req;
+  if (notes !== "") tw.appendSystem(req, notes);
 }
 ```
+
+钩子结束时，对 `req` 的修改即生效，无须返回。`tw.appendSystem` 是常用改写的[辅助函数](#辅助函数)之一。
 
 ### manifest
 
@@ -138,11 +138,11 @@ manifest 是纯数据，因此 core 可以直接从源码中读出它，应用�
 | `onReplyTextEnd(ctx)` | `reply.text` | 逐段模式下，每段文字结束时调用。可选。 |
 | `onToolCall(call, ctx)` | `reply.tool_calls` | 回答中的每个工具调用完整之后调用。 |
 
-**`onRequest`** 接收[请求视图](#请求视图)，返回改过的视图；不返回则请求保持原样。调用 `reject("原因")` 拒绝这次请求，客户端收到注明插件名称的错误；`reject` 通过抛出异常结束钩子，即使插件自己接住这个异常，拒绝依然成立。每次把请求发往一个上游之前调用一次，详见[插件在哪一步运行](#插件在哪一步运行)。除了生成回答的请求，计算 token 数的请求（`/v1/messages/count_tokens`、Gemini 的 `countTokens` 与 Responses 接口的 `input_tokens`）和 Responses 的压缩请求携带的是同一段对话，也经过它，插件删去的内容不会经由这些接口发出。这些请求只采用插件对模型的修改，不采用对其他 `params` 的修改，因为这些接口不接受那些参数。网关自行估算、不发往上游的 token 计数不运行插件。
+**`onRequest`** 接收[请求视图](#请求视图)。钩子结束时，对视图的修改即生效，无论是否返回它；返回另一个对象时，以返回的对象为准。视图与传入时相同时，请求保持原样。调用 `reject("原因")` 拒绝这次请求，客户端收到注明插件名称的错误；`reject` 通过抛出异常结束钩子，即使插件自己接住这个异常，拒绝依然成立。每次把请求发往一个上游之前调用一次，详见[插件在哪一步运行](#插件在哪一步运行)。除了生成回答的请求，计算 token 数的请求（`/v1/messages/count_tokens`、Gemini 的 `countTokens` 与 Responses 接口的 `input_tokens`）和 Responses 的压缩请求携带的是同一段对话，也经过它，插件删去的内容不会经由这些接口发出。这些请求只采用插件对模型的修改，不采用对其他 `params` 的修改，因为这些接口不接受那些参数。网关自行估算、不发往上游的 token 计数不运行插件。
 
-**`onReplyText`** 在整段模式（默认）下，每段文字到齐后调用一次，参数是整段文字，调用结束后文字才交给客户端。逐段模式下随流式输出逐段调用，返回值是此刻要发出的文字；返回 `""` 表示先扣住，这段文字结束时 `onReplyTextEnd` 的返回值把扣住的内容放出。非流式的回答一次传入全部文字，逐段模式下随后再调用 `onReplyTextEnd`。不返回表示文字不变。
+**`onReplyText`** 在整段模式（默认）下，每段文字到齐后调用一次，参数是整段文字，调用结束后文字才交给客户端。逐段模式下随流式输出逐段调用，返回值是此刻要发出的文字；返回 `""` 表示先扣住，这段文字结束时 `onReplyTextEnd` 的返回值把扣住的内容放出。非流式的回答一次传入全部文字，逐段模式下随后再调用 `onReplyTextEnd`。不返回表示文字不变。逐段模式下的查找替换可以由 `tw.streamReplace` 提供这两个钩子，见[逐段替换](#逐段替换)。
 
-**`onToolCall`** 接收 `{ id, name, input }`。流式输出的参数先收集完整，处理后按客户端的格式发出。不返回表示保持原样；返回一个对象替换这个调用；返回 `null` 删除它；返回一个数组则替换为多个调用。缺少 `id` 的由 core 生成。
+**`onToolCall`** 接收 `{ id, name, input }`。流式输出的参数先收集完整，处理后按客户端的格式发出。不返回时，对这个调用的修改即生效，与传入时相同则保持原样；返回一个对象替换这个调用；返回 `null` 删除它；返回一个数组则替换为多个调用。缺少 `id` 的由 core 生成。
 
 回答钩子只在对话的回答上运行。思考内容不交给插件，原样交给客户端。
 
@@ -223,9 +223,84 @@ type Ctx = {
 
 `ctx` 已冻结，不能修改。
 
+### 辅助函数
+
+全局对象 `tw` 提供常用改写的函数。它们和插件的其他代码一样是普通的 JavaScript，受插件的权限和限额约束，产生的结果和其他结果一样接受检查。
+
+| 函数 | 作用 |
+|---|---|
+| `tw.appendSystem(req, text)` | 在系统提示词末尾附加 `text`，与原文之间空一行；系统提示词已包含 `text` 时不再附加。需要 `system`。 |
+| `tw.texts(req, fn)` | 依次对每段可修改的文字调用 `fn(text, place)`：系统提示词、消息中的文字片段与工具结果。`fn` 返回字符串时替换这段文字，不返回则保持不变。`place` 为 `{ kind, role }`：`kind` 取 `"system"`、`"text"` 或 `"tool_result"`，`role` 为消息的角色，系统提示词为 `null`。思考、图片和其他片段不传入。嵌入与旧版补全的每项输入按 `"text"` 传入。需要 `system` 或 `messages`，只传入已授权的部分。 |
+| `tw.toolCalls(req, fn)` | 对对话中此前的每个工具调用调用 `fn(call)`，对 `call.input` 的修改即生效。需要 `messages`。 |
+| `tw.mapStrings(value, fn)` | 返回 `value` 的副本，其中每个字符串替换为 `fn(string, key)` 的返回值；`key` 为属性名或数组下标，顶层的字符串为 `null`。对象的键和其他值原样复制。 |
+| `tw.replace(text, rules)` | 按[替换规则](#替换规则)改写 `text`，返回结果。 |
+| `tw.streamReplace(rules, options)` | 返回 `{ onReplyText, onReplyTextEnd }`，在逐段输出的回答文字上应用替换规则，见[逐段替换](#逐段替换)。 |
+| `tw.lines(text)` | 把设置拆成各行，去除每行首尾的空白，略去空行。 |
+| `tw.pairs(text, separator)` | 把每行一对的设置（例如 `npm => pnpm`）读成 `[原文, 替换]` 对；分隔符缺省为 `"=>"`。缺少分隔符或分隔符前为空的行按出错处理，错误信息指明行号。 |
+
+辅助函数需要插件未获授权的部分时，抛出错误并指明所需的权限。辅助函数抛出的错误即插件的错误，处理方式见[插件出错时](#插件出错时)。
+
+供读取 TypeScript 声明的编辑器使用：
+
+```ts
+declare const tw: {
+  appendSystem(req: RequestView, text: string): void;
+  texts(
+    req: RequestView | InputsView,
+    fn: (text: string, place: { kind: "system" | "text" | "tool_result"; role: Message["role"] | null }) => string | undefined,
+  ): void;
+  toolCalls(req: RequestView, fn: (call: { id: string; name: string; input: unknown }) => void): void;
+  mapStrings<T>(value: T, fn: (s: string, key: string | number | null) => string): T;
+  replace(text: string, rules: Rules): string;
+  streamReplace(rules: Rules | ((ctx: Ctx) => Rules), options?: { maxMatch?: number }): {
+    onReplyText(text: string, ctx: Ctx): string;
+    onReplyTextEnd(ctx: Ctx): string;
+  };
+  lines(text: string): string[];
+  pairs(text: string, separator?: string): [string, string][];
+};
+type Rules = Iterable<[string | RegExp, string | ((match: string, ...groups: unknown[]) => string)]>;
+```
+
+#### 替换规则
+
+规则是 `[查找, 替换]` 对的列表，可以是数组或 `Map`。`tw.replace` 与 `tw.streamReplace` 对规则的处理相同。
+
+- 字符串按字面匹配，区分大小写。正则表达式按全局匹配，无须 `g` 标志；`i` 标志表示不区分大小写。空字符串和 `y` 标志按出错处理，正则表达式匹配到空串时同样按出错处理。
+- 查找为字符串时，替换按字面写入。查找为正则表达式时，替换可以使用 `$1`、`$<name>` 等 `String.prototype.replace` 支持的写法，也可以是函数。
+- 文字从左到右扫描一次；同一位置有多条规则命中时，取列表中靠前的一条；替换写入的文字不再参与匹配，因此 `A => B` 与 `B => C` 并存时，A 换成 B。
+- 占位符（例如 `<<TW_SECRET_1>>`）整体跳过：规则不会在占位符内部匹配，也不会跨过占位符匹配；`^`、`$` 与前后断言把占位符视为文字的边界。
+
+#### 逐段替换
+
+```js
+export const manifest = {
+  name: "统一用词",
+  api: 1,
+  description: "替换请求和回答中这里列出的用词。",
+  permissions: ["messages", "reply.text"],
+  reply: "stream",
+  settings: {
+    terms: { type: "string", label: "用词，每行一对（旧词 => 新词）", value: "" },
+  },
+};
+
+const rules = (ctx) => tw.pairs(ctx.settings.terms);
+
+export function onRequest(req, ctx) {
+  tw.texts(req, (text) => tw.replace(text, rules(ctx)));
+}
+
+export const { onReplyText, onReplyTextEnd } = tw.streamReplace(rules);
+```
+
+`tw.streamReplace` 要求 `reply: "stream"`。`rules` 可以是规则列表，也可以是接收 `ctx`、返回规则列表的函数；函数在每块文字开始时调用一次，用于从设置中读取规则。
+
+逐段替换的结果与对整块文字调用 `tw.replace` 相同。为了找到跨越两段的命中，文字的末尾会先扣住，直到确定它不是一处命中的开头。只有字符串规则时，只扣住可能是某个字符串开头的部分，通常没有可察觉的延迟。含有正则表达式时，扣住末尾 256 个字符，客户端看到的文字比模型的输出滞后至多这么多字符。`options.maxMatch` 设置这个数；长于它的正则命中跨越两段时可能漏掉。同时输出的多块文字（例如 Chat Completions 请求 `n` 大于 1 时的各个选项）分别扣住。替换函数收到的整段文字参数，以及替换字符串中的 `` $` `` 与 `$'`，在逐段替换时只涵盖当时扣住的文字，而不是整块文字。
+
 ### 可用的 JavaScript
 
-插件可以使用 JavaScript 标准内置对象，例如 `JSON`、`RegExp`、`Map`、`Date` 与 `Math`；`console.log`、`console.info`、`console.warn` 与 `console.error` 写入插件日志；`reject` 只在 `onRequest` 中有效。没有 `fetch`、`require` 和定时器，`import` 与 `import()` 加载不了任何模块，也无法访问文件、网络、环境变量和进程。沙箱里的时钟是 UTC。插件存进变量的内容，不会留到它所处理的这一次发送或这个回答之后。
+插件可以使用 JavaScript 标准内置对象，例如 `JSON`、`RegExp`、`Map`、`Date` 与 `Math`；`console.log`、`console.info`、`console.warn` 与 `console.error` 写入插件日志；`reject` 只在 `onRequest` 中有效；`tw` 提供[辅助函数](#辅助函数)。没有 `fetch`、`require` 和定时器，`import` 与 `import()` 加载不了任何模块，也无法访问文件、网络、环境变量和进程。沙箱里的时钟是 UTC。插件存进变量的内容，不会留到它所处理的这一次发送或这个回答之后。
 
 ## 权限
 
