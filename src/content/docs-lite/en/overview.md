@@ -13,6 +13,7 @@ ThinkWatch Lite is a local gateway for Claude Code, Codex and other AI clients, 
 - **Every request traceable.** The matched rule, each attempt, any format conversion and the cost, with replay against another upstream; the whole history can be searched, including the text of requests and answers.
 - **Routing and failover.** Rules by model, tools, images and more; groups that fail over before the answer begins and keep each session on one upstream.
 - **Any upstream.** API keys, Amazon Bedrock, ChatGPT and Z.ai accounts, relays and local models, with conversion between the Anthropic, OpenAI and Gemini APIs.
+- **Sync and backup.** The configuration can be exported to one file and imported on a new computer or after a reinstall, or synced between devices through a cloud drive folder, WebDAV or S3-compatible storage, encrypted by default. Every change to it leaves a version that can be restored.
 - **Costs stated as they are.** Estimates marked, unpriced requests counted separately rather than as zero.
 
 ## Pages
@@ -28,7 +29,7 @@ ThinkWatch Lite is a local gateway for Claude Code, Codex and other AI clients, 
 | Security | The security log and the three protections with their rules |
 | MCP | MCP servers, skills and hooks in each client, and the configuration scan |
 | Plugins | JavaScript plugins that change requests and answers, with their permissions, trial runs and logs |
-| Settings | Connection, language, appearance, menu bar, notifications, listening, retention, updates and uninstall |
+| Settings | Connection, language, appearance, menu bar, notifications, listening, retention, sync and backup, updates and uninstall |
 
 Each page is described in [Features](/docs/lite/features).
 

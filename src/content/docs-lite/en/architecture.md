@@ -10,7 +10,7 @@ src-tauri/        Tauri 2 shell: supervises core, renders the menu bar and the t
 src-tauri/crates/ client setup (tw-adopt) and the configuration scan (tw-scan)
 ```
 
-- **`src-tauri/`** is the Tauri 2 shell. It starts ThinkWatch Core and supervises it: a core that exits is restarted, and after repeated failed starts it runs in a safe mode in which only its control plane is up, so that configuration, history and rollback stay available. The shell renders the menu bar on macOS, the notification-area icon and menu on Windows, and the tray icon and menu on Linux, and it delivers system notifications. Launch at login starts the app, which then starts core; core is not registered on its own.
+- **`src-tauri/`** is the Tauri 2 shell. It starts ThinkWatch Core and supervises it: a core that exits is restarted, and after repeated failed starts it runs in a safe mode in which only its control plane is up, so that the configuration and restoring from backups stay available. The shell renders the menu bar on macOS, the notification-area icon and menu on Windows, and the tray icon and menu on Linux, and it delivers system notifications. Launch at login starts the app, which then starts core; core is not registered on its own.
 - **`src-tauri/crates/`** holds `tw-adopt`, which points clients at the gateway and restores them, and `tw-scan`, which scans client configuration for the MCP page. Both act on the computer the app runs on, also while the app is connected to a core on a server.
 - **`src/`** is the frontend, written in React 19 and Tailwind 4.
 

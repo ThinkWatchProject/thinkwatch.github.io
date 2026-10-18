@@ -46,9 +46,9 @@ ThinkWatch Lite changes a client's configuration when the client is connected on
 
 ## Where does ThinkWatch Lite store data, and what does it connect to?
 
-Configuration, keys and request history stay on the computer: in `~/.thinkwatch` on macOS and Linux, in `%APPDATA%\ThinkWatch` for the Windows installer, and in the `data\` folder next to the program for the Windows portable copy. The gateway listens on `127.0.0.1` port 8788 by default.
+Configuration, keys and request history stay on the computer: in `~/.thinkwatch` on macOS and Linux, in `%APPDATA%\ThinkWatch` for the Windows installer, and in the `data\` folder next to the program for the Windows portable copy. With sync turned on, a copy of the configuration, keys included, is also kept in the sync location the user chose, encrypted with the sync passphrase by default. The gateway listens on `127.0.0.1` port 8788 by default.
 
-Besides the upstreams it forwards requests to, ThinkWatch Lite connects to GitHub to check for updates and to refresh LiteLLM's public price list once a day. Signing in to a ChatGPT or Z.ai account goes through their sign-in pages, and a remote core is contacted only when one is configured.
+Besides the upstreams it forwards requests to, ThinkWatch Lite connects to GitHub to check for updates and to refresh LiteLLM's public price list once a day. Signing in to a ChatGPT or Z.ai account goes through their sign-in pages, a remote core is contacted only when one is configured, and a sync location only when sync is turned on.
 
 ## Does ThinkWatch Lite collect usage data?
 

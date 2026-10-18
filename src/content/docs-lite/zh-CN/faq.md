@@ -46,9 +46,9 @@ ThinkWatch Lite 只在客户端页接管客户端时修改它的配置，且只�
 
 ## ThinkWatch Lite 的数据保存在哪里？会连接哪些地址？
 
-配置、密钥与请求记录都保存在本机：macOS 与 Linux 在 `~/.thinkwatch`，Windows 安装版在 `%APPDATA%\ThinkWatch`，Windows 绿色版在程序旁边的 `data\` 文件夹。网关默认只监听本机 `127.0.0.1` 的 8788 端口。
+配置、密钥与请求记录都保存在本机：macOS 与 Linux 在 `~/.thinkwatch`，Windows 安装版在 `%APPDATA%\ThinkWatch`，Windows 绿色版在程序旁边的 `data\` 文件夹。开启同步后，配置（含密钥）另有一份保存在用户选择的同步位置，缺省以同步口令加密。网关默认只监听本机 `127.0.0.1` 的 8788 端口。
 
-除了转发请求时连接所配置的上游，ThinkWatch Lite 还会连接 GitHub 检查更新，并每天更新一次 LiteLLM 公开的价目表。登录 ChatGPT 或 Z.ai 账号时会打开它们的授权页面；只有配置了远程 core 时才会连接远程 core。
+除了转发请求时连接所配置的上游，ThinkWatch Lite 还会连接 GitHub 检查更新，并每天更新一次 LiteLLM 公开的价目表。登录 ChatGPT 或 Z.ai 账号时会打开它们的授权页面；只有配置了远程 core 时才会连接远程 core，只有开启同步时才会连接所设的同步位置。
 
 ## ThinkWatch Lite 会收集使用数据吗？
 

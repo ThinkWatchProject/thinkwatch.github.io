@@ -159,8 +159,8 @@ export const products: Product[] = [
         locales: both,
         group: "getStarted",
         summary: {
-          en: "Page by page: usage and cost, traffic, client setup, keys, upstreams, routing, the three protections, MCP, settings, the menu bar and notifications.",
-          "zh-CN": "逐页说明：用量与费用、流量、客户端接管、密钥、上游、路由、三项防护、MCP、设置、菜单栏与通知。",
+          en: "Page by page: usage and cost, traffic, client setup, keys, upstreams, routing, the three protections, MCP, settings, sync and backup, the menu bar and notifications.",
+          "zh-CN": "逐页说明：用量与费用、流量、客户端接管、密钥、上游、路由、三项防护、MCP、设置、同步与备份、菜单栏与通知。",
         },
       },
       {
@@ -181,6 +181,16 @@ export const products: Product[] = [
         summary: {
           en: "Connect the app to ThinkWatch Core on a server: what the server needs, the steps in the app, what changes while connected, and how the connection is secured.",
           "zh-CN": "让应用连接部署在服务器上的 ThinkWatch Core：服务器需要具备的条件、应用中的操作步骤、连接期间的变化，以及连接如何加密。",
+        },
+      },
+      {
+        slug: "sync-and-backup",
+        label: { en: "Sync and backup", "zh-CN": "同步与备份" },
+        locales: both,
+        group: "getStarted",
+        summary: {
+          en: "Export and import the configuration, sync it across devices through a folder, WebDAV or S3-compatible storage, resolve conflicts, and restore from backups.",
+          "zh-CN": "导出与导入配置，经文件夹、WebDAV 或 S3 兼容存储在多台设备之间同步，处理冲突，以及从备份恢复。",
         },
       },
       {
@@ -318,8 +328,8 @@ export const products: Product[] = [
         locales: both,
         group: "reference",
         summary: {
-          en: "For relays, vendors and ThinkWatch Enterprise: links that open the New upstream dialog filled in, the parameters each service takes, what the app checks, and a link builder.",
-          "zh-CN": "面向中转站、服务商与 ThinkWatch 企业版：打开预填好的「新建上游」对话框的链接、各服务类型接受的参数、应用所做的校验，以及链接生成器。",
+          en: "For relays, vendors and ThinkWatch Enterprise: links that open the New upstream dialog filled in, the parameters each service takes, what the app checks, the links the app writes for sharing, and a link builder.",
+          "zh-CN": "面向中转站、服务商与 ThinkWatch 企业版：打开预填好的「新建上游」对话框的链接、各服务类型接受的参数、应用所做的校验、应用分享上游时生成的链接，以及链接生成器。",
         },
       },
       {
