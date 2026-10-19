@@ -10,7 +10,7 @@ src-tauri/        Tauri 2 外壳：托管 core，渲染菜单栏与托盘
 src-tauri/crates/ 客户端接管（tw-adopt）与配置扫描（tw-scan）
 ```
 
-- **`src-tauri/`** 为 Tauri 2 外壳，负责启动并托管 ThinkWatch Core：core 退出后自动重启；连续多次启动失败后进入安全模式，只运行控制面，配置、历史与回滚仍然可用。外壳在 macOS 上渲染菜单栏，在 Windows 上渲染通知区域的图标与菜单，在 Linux 上渲染系统托盘的图标与菜单，并负责发送系统通知。开机启动时启动的是应用本身，再由应用启动 core；core 不单独注册开机启动。
+- **`src-tauri/`** 为 Tauri 2 外壳，负责启动并托管 ThinkWatch Core：core 退出后自动重启；连续多次启动失败后进入安全模式，只运行控制面，配置与从备份恢复仍然可用。外壳在 macOS 上渲染菜单栏，在 Windows 上渲染通知区域的图标与菜单，在 Linux 上渲染系统托盘的图标与菜单，并负责发送系统通知。开机启动时启动的是应用本身，再由应用启动 core；core 不单独注册开机启动。
 - **`src-tauri/crates/`** 包含 `tw-adopt` 与 `tw-scan`：前者把客户端指向网关并负责还原，后者为 MCP 页扫描客户端配置。两者都作用于运行应用的这台电脑，应用连接服务器上的 core 时也是如此。
 - **`src/`** 为前端，使用 React 19 与 Tailwind 4 编写。
 
