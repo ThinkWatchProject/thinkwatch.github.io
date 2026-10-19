@@ -12,7 +12,7 @@ A configuration pack is a single file with the `.twconfig` extension that holds 
 
 - An unencrypted pack is a ZIP file. A pack encrypted with a passphrase is in the age format, with the key derived from the passphrase by scrypt, and decrypts to the same ZIP file. Both have the same extension and are told apart by their header.
 - A pack is at most 16 MiB and may hold only the expected kinds of file; any other path, an absolute path or `..` rejects the whole pack. A plugin file whose SHA-256 does not match the configuration's record of it is marked as an error.
-- A pack exported by a newer version that this version cannot read is reported with “This configuration pack was exported by a newer version. Update ThinkWatch Lite first.” A pack from an older version is read as the current version reads it; fields that fail are listed in the preview and can be removed by the rules of **Repair** before importing.
+- A pack exported by a newer version asks for an update first: “This configuration pack was exported by a newer version. Update ThinkWatch Lite first.” A pack from an older version is repaired as it is imported: fields this version does not know are removed and invalid values go back to their defaults, and the preview lists each repair.
 - A wrong passphrase is reported as “Incorrect passphrase”.
 
 ## Backups
@@ -24,7 +24,7 @@ Backups are earlier versions of the configuration, kept in two places:
 | This device | On every change to the configuration: in the app, from the command line, by editing the file by hand, by sync, import, restore or **Repair**. Not when the content equals the previous version, and not when a ChatGPT token is renewed. | The last 10 versions |
 | Sync location | The versions each device uploads once sync is on | The latest and the previous version |
 
-A version on the device is a complete configuration pack, with the plugins, ChatGPT sign-in tokens and local settings, stored in `history/` in the data directory. The folder and files can be read only by their owner and are not encrypted, the same protection `config.yaml` itself has. These versions replace the former change history, and the history entry of the configuration file editor now opens the backup list.
+A version on the device is a complete configuration pack, with the plugins, the sign-in tokens of ChatGPT and OAuth upstreams, and the local settings (the control channel key masked), stored in `history/` in the data directory. The folder and files can be read only by their owner and are not encrypted, the same protection `config.yaml` itself has. These versions replace the former change history, and the history entry of the configuration file editor now opens the backup list.
 
 The **Backups** part lists the versions newest first: the time, the source (such as **Changed in the app**, **Imported**, **File edited by hand** or **Synced from MacBook Air**), where it is stored (this device, the sync location), what it holds (such as “7 upstreams, 2 plugins”) and the Core version that made it; the version in use is marked **Current**. A version stored both on the device and in the sync location is one row with both places marked. Every other version has **Restore…**, described under [Restore](#restore), and **Save as…**, which saves it as a configuration pack, optionally encrypted with a passphrase.
 
@@ -43,9 +43,9 @@ All three open the same export dialog. From the Upstreams page, the scope starts
 | Item | Description |
 |---|---|
 | Scope | **Whole configuration** or **Selected items**. Selected items lists the upstreams, proxies, gateway keys, aliases, groups, routes, price sheets, security rules, plugins and global settings by category. Items that the selected ones refer to are checked automatically and marked **Dependency**, such as the upstream of a route or the proxy of an upstream. |
-| Include keys | On by default. Covers upstream keys, header values, AWS credentials, proxy passwords, gateway keys and the keys obtained by signing in to a Z.ai / BigModel account. Values written as `${NAME}` are exported as written, not expanded. |
+| Include keys | On by default. Covers upstream keys, header values, AWS credentials, OAuth client secrets, proxy passwords, gateway keys and the keys obtained by signing in to a Z.ai / BigModel account. Values written as `${NAME}` are exported as written, not expanded. |
 | Encrypt with passphrase | Off by default. When on, the passphrase is entered twice and has at least 8 characters. It is not stored, and importing asks for the same passphrase. |
-| Not exported | What this export leaves out, such as “ChatGPT sign-in (1 upstream); sign in again after importing”, the listening, remote control and sync settings, and the request records. |
+| Not exported | What this export leaves out: the sign-ins of ChatGPT accounts and of upstreams that use an OAuth refresh token (such as “ChatGPT sign-in (1 upstream); sign in again after importing”), the listening, remote control and sync settings, and the request records. |
 
 With keys included and no encryption, the foot of the dialog warns: “The file contains keys in plain text. Keep it safe.”
 
@@ -65,8 +65,8 @@ An encrypted pack first asks for its passphrase. The dialog then states what the
 | Same | The same name with the same content | Nothing; counted in the summary |
 | Conflict | The same name with different content | **Overwrite**, **Import renamed** or **Skip** must be chosen; there is no default |
 | Conflict (global settings) | That section was changed on this device and differs from the pack | **Overwrite** or **Skip** must be chosen |
-| Key missing | The pack holds no keys | Imported disabled, with a **Key missing** tag on the upstream row; it can be enabled once the key is filled in |
-| Sign-in required | A ChatGPT upstream | Imported disabled, with **Sign in…** on the upstream row |
+| Key missing | The pack holds no keys; or the upstream uses an OAuth refresh token and no upstream of that name here uses the same token endpoint | Imported disabled, with a **Key missing** tag on the upstream row; it can be enabled once the key, or for an OAuth upstream the refresh token, is filled in |
+| Sign-in required | A ChatGPT upstream whose namesake here is not a ChatGPT account | Imported disabled, with **Sign in…** on the upstream row |
 | Plugin | A plugin script | Imported disabled; a plugin that may change tool calls is approved when it is turned on |
 | Error | It refers to an AWS profile, proxy or upstream that does not exist here; a field is invalid; or a gateway key has the value of another existing key | Cannot be imported, with the reason |
 
@@ -77,7 +77,7 @@ An import follows these rules:
 - Upstreams, proxies, gateway keys, aliases, groups, routes, price sheets, custom security rules and plugins are added one by one, by name. Items in the current configuration that the pack does not have stay as they are; an import never deletes anything. Replacing the whole configuration with another is a restore; see [Restore](#restore).
 - Each section of the global settings (failover, the state of each protection, the default route, the default key, auxiliary requests and the price sheet settings) is one item. When the section on this device is still at its defaults, the imported value is taken; otherwise a different imported value is a conflict.
 - **Import renamed** proposes the original name with a number, such as “Company relay (2)”, which can be edited in the row and must not be taken. Routes, aliases and groups in the pack that refer to the item use the new name.
-- **Overwrite** replaces the item of that name with the imported one. Routes and aliases on this device that refer to it stay as they are.
+- **Overwrite** replaces the item of that name with the imported one. Routes and aliases on this device that refer to it stay as they are. Overwriting a ChatGPT upstream here, or an OAuth upstream with the same token endpoint, keeps this device's sign-in tokens.
 - A route, alias or group that refers to a skipped upstream is marked as an error, naming the missing upstream. An upstream imported under a new name does not count as missing.
 - When the pack holds no keys, the imported gateway keys are generated anew.
 - An import is recorded as a version in the backups, so the configuration from before it can be restored. When the configuration changes after the preview, the import asks for a new preview.
@@ -92,7 +92,7 @@ Sync lets several devices share one configuration. A device is one Core taking p
 | WebDAV | Jianguoyun (Nutstore), Nextcloud, Synology NAS, InfiniCloud and others | Address, user name and password (or app password) |
 | S3-compatible storage | Amazon S3, Cloudflare R2, Alibaba Cloud OSS, Tencent Cloud COS, MinIO and others | Endpoint, region, bucket, prefix, Access Key ID and Secret Access Key |
 
-Requests to WebDAV and S3-compatible storage can go out through one of the outbound proxies; the default is direct.
+Requests to WebDAV and S3-compatible storage go out directly (the default), through the system proxy or through one of the outbound proxies. For both, plain `http://` is accepted only for this computer and private networks, by the same rules as [import links](/docs/lite/import-links#connection); any other address needs `https://`, and its certificate is always verified. Redirects are not followed, so that the sync location's password is never carried to another host; the address entered must be the final one.
 
 While sync is off, the **Sync** part holds only **Turn on sync…** and one line: “Devices share one configuration, and the sync location keeps the latest and the previous version.” Turning sync on takes three steps:
 
@@ -117,7 +117,7 @@ Renewing a ChatGPT token, changing local settings and upgrading a built-in plugi
 
 ## Setting up each sync location
 
-Every device connects to the same location: the same folder in the same cloud drive, the same WebDAV address, or the same bucket and prefix. A new, empty folder or prefix for ThinkWatch, such as `ThinkWatch`, is recommended.
+Every device connects to the same location: the same folder in the same cloud drive, the same WebDAV address, or the same bucket and prefix. The folder, address or prefix entered is itself the root of the sync location: `keyring` (when encrypted), `versions/` and `devices/` are placed directly in it, with no subfolder of their own. A new, empty folder or prefix for ThinkWatch, such as `ThinkWatch`, keeps them apart from other files.
 
 ### iCloud Drive, Dropbox, OneDrive and other folders
 
@@ -153,7 +153,11 @@ ThinkWatch writes each version under a temporary name and renames it when it is 
 2. Create a subfolder in a shared folder, such as `ThinkWatch`. A DSM account of its own for ThinkWatch, with read and write access to that folder only, is recommended.
 3. The address is `https://<NAS address>:5006/<shared folder>/ThinkWatch/`, with that DSM account's user name and password.
 
-ThinkWatch always verifies the TLS certificate, and the self-signed certificate DSM comes with does not pass. A Let's Encrypt certificate for the NAS's domain can be obtained in DSM under **Control Panel › Security › Certificate**. For use on the local network only, `http://<private IP>:5005/…` works too: plain `http://` is accepted for WebDAV only on this computer and private networks, by the same rules as [import links](/docs/lite/import-links#connection), and the password, and the configuration when it is not encrypted, then cross the local network unencrypted.
+ThinkWatch always verifies the TLS certificate, and the self-signed certificate DSM comes with does not pass. A Let's Encrypt certificate for the NAS's domain can be obtained in DSM under **Control Panel › Security › Certificate**. For use on the local network only, `http://<private IP>:5005/…` works too; the password, and the configuration when it is not encrypted, then cross the local network unencrypted.
+
+### Addressing on S3-compatible storage
+
+The endpoint decides how the bucket is addressed, with nothing to set: when the endpoint's host ends in `amazonaws.com`, `aliyuncs.com` or `myqcloud.com`, that is Amazon S3, Alibaba Cloud OSS and Tencent Cloud COS, the bucket goes in the host name (virtual-hosted style); every other endpoint, such as Cloudflare R2, MinIO or an IP address, puts it in the path (path style).
 
 ### Cloudflare R2
 
@@ -195,7 +199,7 @@ The key of a sub-user allowed to read and write that bucket only is recommended,
 
 | Field | Value |
 |---|---|
-| Endpoint | The S3 API address of MinIO, such as `https://minio.example.com:9000`; the default port is 9000, not the console's port |
+| Endpoint | The S3 API address of MinIO, such as `https://minio.example.com:9000`, or `http://192.168.1.20:9000` for use on the local network only. The default port is 9000, not the console's port. MinIO is addressed in path style, so its buckets need no domain names |
 | Region | The region set in MinIO, or `us-east-1` when none is set |
 | Bucket | A bucket created beforehand |
 | Access Key ID, Secret Access Key | An access key created for ThinkWatch, with a policy that allows reading and writing that bucket only |
@@ -215,9 +219,10 @@ The endpoint is the service's S3 API address, `https://s3.<region>.amazonaws.com
 
 ## What is synced
 
-Everything in the configuration is synced, keys included, except local settings, ChatGPT sign-in tokens and data such as request records. The full list is under [Never exported or synced](#never-exported-or-synced).
+Everything in the configuration is synced, keys included, except local settings, the sign-in tokens of ChatGPT and OAuth upstreams, and data such as request records. The full list is under [Never exported or synced](#never-exported-or-synced).
 
 - **ChatGPT upstreams** appear disabled on a new device, marked **Sign-in required**. The sign-in tokens and the account ID that comes with a sign-in stay on each device and are never compared; signing in, renewing and signing out do not trigger a sync. Each device can sign in to a different ChatGPT account.
+- **Upstreams that use an OAuth refresh token** are signed in on each device, as ChatGPT upstreams are. The token endpoint, client ID and client secret are synced; the refresh and access tokens stay on each device, and refreshing them triggers no sync. A device that has no token yet needs its own refresh token filled in before it can use the upstream. Many OAuth services issue a new refresh token on every refresh and invalidate the old one, so one token shared by two devices would invalidate itself.
 - **Upstreams not synced** are chosen in the sync settings under **Upstreams not synced**, a local setting. They are not uploaded, and an upstream of the same name from another device does not replace them, which suits an Ollama at a local address. Routes, aliases and groups that refer to them are not synced either and are listed in the sync settings under **Also not synced**. While sync is on, their rows carry a **Not synced** tag.
 - **Plugins** are synced, and each stays turned on or off alike on every device; a plugin that may change tool calls runs only once it is approved on each device. The scripts of the plugins built into Core come from each device's Core and are upgraded with it, so they are not synced; whether they are on and their settings are. Different Core versions on the devices cause no sync because of their built-in plugins.
 - **Environment variables** written as `${NAME}` are synced as written. On a device where the variable is not set, requests to that upstream fail there, the upstream row says why, and the rest of the configuration is unaffected.
@@ -276,13 +281,13 @@ A device record not updated for 180 days is removed automatically. Nothing syncs
 ## Restore
 
 - **Restore…** on a version in the **Backups** list opens a preview of the differences between that version and the current configuration, item by item: added, removed or changed. Every item is checked by default, which replaces the current configuration with the version as a whole; an unchecked item keeps its current content. To bring back one deleted upstream, check only that one.
-- Local settings keep their current values. A ChatGPT upstream of the same name keeps its current sign-in token rather than the older one in the backup, which a refresh may already have invalidated.
+- Local settings keep their current values. A ChatGPT upstream of the same name, and an OAuth upstream with the same token endpoint, keep their current sign-in tokens rather than the older ones in the backup, which a refresh may already have invalidated.
 - A restore is itself recorded as a new version, so it can be undone.
 - While sync is on, the restored configuration is uploaded as a new version and the other devices follow; the foot of the preview says so, for example “The restored configuration will sync to 2 other devices”. Upstreams not synced are not affected.
 
 ### When the configuration cannot be read
 
-When the configuration cannot be read and the app runs in safe mode, the error page offers **Restore from backup…** next to **Repair**. It lists the versions on the device, and those in the sync location when it can be reached, and opens the restore preview for the chosen one. An upgrade does not rewrite the configuration and therefore makes no version of its own: a configuration that cannot be read after an upgrade is the latest version, and the content from before a repair is kept in the backups as well.
+When the configuration cannot be read and the app runs in safe mode, the error page offers **Restore from backup…** next to **Repair**. It lists the versions on the device, and those in the sync location when it can be reached, and opens the restore preview for the chosen one. When the configuration cannot be read at all, a restore brings back the whole version, keeping only the current control channel key. An upgrade does not rewrite the configuration and therefore makes no version of its own: a configuration that cannot be read after an upgrade is the latest version, and the content from before a repair is kept in the backups as well.
 
 ## Connected clients
 
@@ -308,14 +313,26 @@ With a remote core, the Lite connected to it does the same when it is told of th
 On a server without a desktop, or to restore by hand when the configuration is broken, `twcore` has these commands:
 
 ```sh
-twcore export [--providers a,b] [--no-secrets] [--encrypt] -o FILE
-twcore import FILE [--dry-run] [--on-conflict overwrite|rename|skip]
+twcore export -o all.twconfig
+twcore export --providers relay --no-secrets --encrypt -o relay.twconfig
+twcore import all.twconfig --dry-run
+twcore import all.twconfig --on-conflict rename
 twcore backup list
-twcore backup restore ID [--dry-run]
-twcore sync status | now | enable | disable
+twcore backup restore <id> --dry-run
+twcore backup restore <id>
+twcore sync status
+twcore sync now
+twcore sync enable
+twcore sync disable --purge
 ```
 
-Without `--on-conflict`, `import` asks about each conflict in the terminal; `--dry-run` previews without writing. `sync enable` asks for the sync location and passphrase interactively. On a server set up by the install script, the commands start with `sudo -u thinkwatch THINKWATCH_HOME=/var/lib/thinkwatch`, like those in [Connecting to a remote core](/docs/lite/remote-core).
+- `export` writes the whole configuration; `--providers` limits it to the comma-separated upstreams, with what they refer to. `--no-secrets` leaves the keys out, and `--encrypt` encrypts the file with a passphrase typed in the terminal, without echo, or taken from the `TWCORE_PASSPHRASE` environment variable. With neither, the file holds keys in plain text.
+- `import` adds what is not here and asks about each item that differs; `--on-conflict overwrite|rename|skip` answers for all of them, and `--dry-run` shows what the import would do without writing. An encrypted pack asks for its passphrase or reads `TWCORE_PASSPHRASE` as well, and a pack from an older version lists its repairs first.
+- `backup list` lists the versions newest first, with their ids; `backup restore` brings back a whole version, and `--dry-run` lists what would change. A restore keeps the local settings, the ChatGPT sign-ins and the gateway keys that clients on this machine use.
+- `export`, `import` and `backup` work on the files in the data directory, so they work while core is not running, including when a broken configuration keeps it from starting; a running core picks their changes up within a second.
+- `sync` talks to the running core over the control channel: `status` prints the state, the location and the devices, `now` syncs once, `enable` asks for the sync location and passphrase interactively, and `disable` stops syncing with this device keeping its configuration; `--purge` also deletes every version, device record and `keyring` from the sync location.
+
+On a server set up by the install script, the commands start with `sudo -u thinkwatch THINKWATCH_HOME=/var/lib/thinkwatch`, like those in [Connecting to a remote core](/docs/lite/remote-core). `twcore <command> --help` lists every option.
 
 ## Never exported or synced
 
@@ -323,8 +340,8 @@ Without `--on-conflict`, `import` asks about each conflict in the terminal; `--d
 |---|---|---|---|---|
 | Upstreams, proxies, aliases, groups, routes, the default route, price sheets, security rules, failover, auxiliary requests | Included | Included | Included | — |
 | Plugin scripts and settings | Included | Included | Included | Imported disabled; for sync, see [What is synced](#what-is-synced) |
-| Upstream keys, header values, AWS credentials, proxy passwords, gateway keys, keys from a Z.ai / BigModel sign-in | Included by default; can be turned off | Included | Included | `${NAME}` is kept as written, not expanded. When an export leaves keys out, the upstream keys are filled in after importing and the gateway keys are generated anew |
-| ChatGPT sign-in tokens | Not included | Not included | Included | One refresh token used on two devices invalidates itself. The upstream itself is exported and synced, and each device signs in separately |
+| Upstream keys, header values, AWS credentials, OAuth client secrets, proxy passwords, gateway keys, keys from a Z.ai / BigModel sign-in | Included by default; can be turned off | Included | Included | `${NAME}` is kept as written, not expanded. When an export leaves keys out, the upstream keys are filled in after importing and the gateway keys are generated anew |
+| ChatGPT sign-in tokens; the refresh and access tokens of OAuth upstreams | Not included | Not included | Included | One refresh token used on two devices invalidates itself. The upstream itself is exported and synced, and each device signs in separately |
 | Lite's general preferences: language, appearance, menu bar item, notifications, update checks | Included | Included | Included | With the local core, Core keeps them in the data directory |
 | Local settings: listening, the control channel key, remote control, sync settings (including the upstreams not synced), log retention | Not included | Not included | Included | A restore keeps their current values |
 | Client config locations, which clients are connected | Not included | Not included | Not included | These are paths on the device and the clients' own configuration files; on a new computer, clients are connected again on the Clients page |
