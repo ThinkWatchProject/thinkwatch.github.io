@@ -61,7 +61,7 @@ Each upstream is also compared over the last 7 days with the others serving the 
 
 API keys and header values can be written as `${NAME}` to read a system environment variable. On macOS these come from the login shell, so variables exported in `~/.zshrc` and similar files apply, and the same holds on Linux (`~/.bashrc`, `~/.profile` and so on); on Windows they are the environment variables configured in system settings. After a variable changes, reopening the app picks it up. Proxy variables such as `HTTPS_PROXY`, and `PATH`, are not read.
 
-A relay, a vendor or a ThinkWatch Enterprise console can hand out an import link, `thinkwatch://import?…` or its web form `https://thinkwat.ch/import#…`, that opens the New upstream dialog with the service, address, key, headers, concurrency limit, models, model specs and a price sheet already filled in. The dialog names the host that will receive requests and keys, and nothing is written or sent before Next is chosen or a sign-in is started. A link only ever adds one upstream and cannot set proxies, aliases, routes or environment variable references; a link that needs a newer version of the app says so. The parameters for each service and a link builder are in [Import links](/docs/lite/import-links). **Share…** in an upstream row's menu writes an import link for an existing upstream, with or without its key, and **Export selected…** on the toolbar exports the selected upstreams as a configuration pack (see [Sync and backup](#sync-and-backup)).
+A relay, a vendor or a ThinkWatch Enterprise console can hand out an import link, `thinkwatch://import?…` or its web form `https://thinkwat.ch/import#…`, that opens the New upstream dialog with the service, address, key, headers, concurrency limit, models, model specs and a price sheet already filled in. The dialog names the host that will receive requests and keys, and nothing is written or sent before Next is chosen or a sign-in is started. A link only ever adds one upstream and cannot set proxies, aliases, routes or environment variable references; a link that needs a newer version of the app says so. The parameters for each service and a link builder are in [Import links](/docs/lite/import-links). **Share…** in an upstream row's menu writes an import link for an existing upstream, with or without its key, and **Export N selected upstreams…** on the toolbar exports the selected upstreams as a config pack (see [Sync and backup](#sync-and-backup)).
 
 ## Routing and failover
 
@@ -111,7 +111,7 @@ Settings has eight sections. Connection lists the local core and the saved remot
 
 A new computer, a reinstall or a second device does not mean entering the configuration again: it can be exported to one file and imported, or synced between devices automatically through a folder, WebDAV or S3-compatible storage of the user's choosing, encrypted with a passphrase by default. Every change to the configuration leaves a version that can be restored, and a deleted upstream can be brought back on its own.
 
-The export and import options, how to set up each sync location, conflicts and restoring are described in [Sync and backup](/docs/lite/sync-and-backup).
+It needs ThinkWatch Lite 2026.10.25 or later. The export and import options, how to set up each sync location, conflicts and restoring are described in [Sync and backup](/docs/lite/sync-and-backup).
 
 ## Menu bar, system tray and notifications
 
