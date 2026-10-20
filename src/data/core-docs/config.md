@@ -19,7 +19,7 @@ when they disagree, so a field listed here is a field the binary reads.
 
 `THINKWATCH_HOME` replaces the directory, and `--config <path>` names the
 file for a single command. The directory holds everything else core keeps
-as well: the request database (`data.db`), the configuration history
+as well: the request database (`data.db`), the backups of the configuration
 (`history/`), the downloaded price table (`model_prices.json`) and the local
 control socket (`twcore.sock`; on Windows a loopback port recorded in
 `control.port`). The directory is private to its owner (`0700`), the file is
@@ -116,23 +116,43 @@ reports why. Retention changes are applied on the next hourly clean-up.
 When two writers edit at once (the app and a hand edit), the second write
 is refused with a version mismatch instead of overwriting the first.
 
-### History and rollback
+### Backups, export and import
 
-Every version that was in effect is kept in `history/` beside the file,
-with where it came from (the app, the command line, an outside edit, a
-rollback, a credential rotation). The last 50 are kept.
+Every change to the configuration leaves a version in `history/` beside the
+file: a configuration pack (`.twconfig`) with the plugins and the app's
+preferences, recording where the change came from (the app, the command
+line, an outside edit, an import, a restore, sync). The last 10 are kept; a
+credential rotation does not make one. The control key is masked in them.
 
 ```sh
 twcore check                      # validate the file without starting anything
 twcore config show                # print it, with its version
-twcore config history             # list the versions, newest first
-twcore config rollback 3f9a2c     # go back to a version (a prefix is enough)
+twcore backup list                # list the versions, newest first
+twcore backup restore 1792315800000 --dry-run   # what going back would change
+twcore backup restore 1792315800000             # go back to a version
+twcore export -o all.twconfig     # the whole configuration as a pack
+twcore export --providers relay --no-secrets --encrypt -o relay.twconfig
+twcore import all.twconfig --dry-run            # what importing would do
 twcore config set /listen/gateway/port 8790 --int
 ```
 
-These commands work on the file directly, so they work when core is not
-running, which is when a rollback is most needed. A running core picks
-their changes up like any other save.
+A restore keeps the settings that belong to this machine (listening, the
+control key, retention, sync), the ChatGPT sign-ins and the gateway keys that
+clients set up on this machine use. An import adds what is not here and asks,
+item by item, what to do with what differs (`--on-conflict` answers for all).
+A pack carries no settings of this machine and no ChatGPT sign-in; without
+`--no-secrets` it holds keys in plain text unless `--encrypt` is given (the
+passphrase is asked for, or read from `TWCORE_PASSPHRASE`). Overwriting an
+item here with one from a pack without keys keeps this machine's keys only
+while the item still points at the same place (scheme, host and port; AWS
+region; OAuth token endpoint; the outbound proxy it goes through; a proxy's
+address); otherwise, and for an item imported under another name, the
+upstream comes in disabled until its key is entered.
+
+These commands work on the files directly, so they work when core is not
+running, which is when a restore is most needed; when the file does not
+load at all, a restore brings the whole version back with the current
+control key. A running core picks their changes up like any other save.
 
 `twcore config set <path> <value>` changes one value that is already written
 in the file. The path names list items by their `name`
@@ -178,6 +198,7 @@ means.
 | `default_route` | string | — | The route for keys that do not name one. Unset: the route named `default`, or the built-in failover when there is none. |
 | `default_key` | string | — | The gateway key for clients that were not given a key of their own. Unset: the key named `default`, or the first key. It cannot be disabled. |
 | `plugins` | list of [`plugins[]`](#cfg-plugins) | `[]` | Script plugins, in the order they run. The app installs them; each one's code and settings are a file next to this one. |
+| `sync` | object, [`sync`](#cfg-sync) | — | Multi-device sync. A local setting: configuration packs and other devices never carry it, and restoring a backup keeps the current one. Unset: sync is off. |
 <!-- /generated -->
 
 ### `listen`
@@ -244,7 +265,7 @@ complete the first message.
 
 `key` is written by `twcore serve` before the control channel starts
 listening, if it is missing, and by `twcore init`. It is masked wherever the
-configuration is shown or kept in the history; saving a masked value back
+configuration is shown or kept in a backup; saving a masked value back
 keeps the real one. A missing or malformed key (not 64 hexadecimal
 characters) makes the whole file invalid, so it cannot be replaced by a
 short, guessable one.
@@ -329,9 +350,11 @@ minute, hour, day, week or month. Each entry counts one of the three; a key
 can have several, and a request has to pass every one.
 
 `minute` and `hour` are rolling: the last 60 seconds, the last 60 minutes.
+With `every`, the window spans several of them: `{ per: hour, every: 5 }` is
+the last 5 hours.
 When one is used up, a request waits for the next free slot if it frees
-within `failover.slot_wait_secs` (30 seconds by default), and is refused
-otherwise. Any later wait for a busy upstream comes out of the same time.
+within `failover.wait_secs` (120 seconds by default), and is refused
+otherwise. Any later wait for an upstream comes out of the same time.
 `day`, `week` and `month` follow the calendar in the time zone of the machine
 twcore runs on and start again at midnight, on Monday and on the 1st. When one is used up, requests are refused until it starts again. If the
 machine's time zone changes, the current day, week and month are added up
@@ -362,7 +385,8 @@ all its answers count when it closes.
 
 | Field | Type | Default | Description |
 |---|---|---|---|
-| `per` | `minute` \| `hour` \| `day` \| `week` \| `month` | **required** | The period. `minute` and `hour` are rolling (the last 60 seconds, the last 60 minutes); `day`, `week` and `month` start again at local midnight, on Monday and on the 1st. |
+| `per` | `minute` \| `hour` \| `day` \| `week` \| `month` | **required** | The period. `minute` and `hour` are rolling (the last 60 seconds, the last 60 minutes, or `every` of them); `day`, `week` and `month` start again at local midnight, on Monday and on the 1st. |
+| `every` | integer | — | How many minutes or hours the rolling window spans: `{per: hour, every: 5}` is the last 5 hours. From 1 to 60 for `minute`, from 1 to 24 for `hour`; `day`, `week` and `month` do not take it. Unset: 1. |
 | `requests` | integer | — | At most this many requests. Token counts, answers the gateway gives itself and requests that never reach an upstream do not count. |
 | `tokens` | integer | — | At most this many tokens: uncached input, cache writes and output. |
 | `cost` | number | — | At most this much, in US dollars, as recorded for each request; at least 0.01. Models without a price and upstreams with `billing: free` count as 0. |
@@ -389,7 +413,7 @@ Upstreams: the APIs requests are forwarded to.
 | Field | Type | Default | Description |
 |---|---|---|---|
 | `name` | string | **required** | Name of the upstream; unique, and not the name of a group. Names starting with `__` are reserved. |
-| `base_url` | string | **required** | Endpoint, `http://` or `https://`, up to the version segment where the provider documents one (`https://api.anthropic.com`, `https://api.openai.com/v1`). For Bedrock, the region's runtime endpoint: `https://bedrock-runtime.<region>.amazonaws.com`. |
+| `base_url` | string | **required** | Endpoint, `http://` or `https://`, up to the version segment where the provider documents one (`https://api.anthropic.com`, `https://api.openai.com/v1`). For Bedrock, the region's runtime endpoint: `https://bedrock-runtime.<region>.amazonaws.com`. No backslashes, and no user name or password before the host (credentials go in `key` or `headers`). |
 | `key` | string, `${VAR}` allowed | — | API key. It goes in the header the protocol expects: `x-api-key` (Anthropic), `Authorization: Bearer` (OpenAI, and a Bedrock API key), `x-goog-api-key` (Gemini). Leave it out for upstreams without a key, or when the credential is written in `headers`. Cannot be combined with `oauth` or `aws`. |
 | `headers` | map of header name → value | `{}` | Additional request headers, in the order written; values may use `${VAR}`, and `{{access_token}}` where `oauth` is set. At most 32. Headers HTTP or the gateway manages (`host`, `content-length`, `connection`, …) cannot be set. |
 | `oauth` | object, [`providers[].oauth`](#cfg-providers-oauth) | — | OAuth credential: an access token obtained from a refresh token. Instead of `key`. |
@@ -403,7 +427,8 @@ Upstreams: the APIs requests are forwarded to.
 | `billing` | `per-token` \| `free` | `per-token` | `per-token`: cost is usage times the price in the upstream's price sheet, subscription accounts included. `free`: cost is recorded as 0. |
 | `pricing` | string | — | Name of a price sheet under `pricing.sheets`. Unset: the default price table. |
 | `model_specs` | map of model id → [`providers[].model_specs.*`](#cfg-providers-model_specs) | `{}` | Context window, output limit, reasoning and image input of single models of this upstream, written by hand, by exact model id. They take precedence over the price table: for models it does not know, or gets wrong. |
-| `max_concurrent` | integer | — | Most requests sent to this upstream at the same time, from 1 to 1000. When it is full, a conversation that stays on it waits for a free slot and other requests go to the next upstream; see `failover.slot_wait_secs`. Unset: no limit. |
+| `max_concurrent` | integer | — | Most requests sent to this upstream at the same time, from 1 to 1000. When it is full, a conversation that stays on it waits for a free slot and other requests go to the next upstream; see `failover.wait_secs`. Unset: no limit. |
+| `limits` | list of [`providers[].limits[]`](#cfg-providers-limits) | — | Usage limits of this upstream, written like its own quota: requests, tokens or cost every few minutes or hours, per day, week or month. Every one has to have room before a request is sent to it. When a rolling window is full, requests go to the next upstream or wait for room; when a day, week or month is used up, requests go to the next upstream until the next one starts. Unset: no limit. |
 | `disabled` | bool | `false` | Take the upstream out of routing and out of the model list, and keep its configuration. |
 | `balance` | `auto` \| `off` \| `openrouter` \| `deepseek` \| `moonshot` \| `sub2api` \| `newapi` \| `thinkwatch` | `auto` | Where the upstream's balance is read from, with its own key and proxy: `openrouter`, `deepseek`, `moonshot`, `sub2api`, `newapi` (New API and One API) or `thinkwatch` (a ThinkWatch Enterprise gateway). `auto`: recognized from `base_url` for OpenRouter, DeepSeek and Moonshot; any other address, except Anthropic's, OpenAI's and Gemini's own, is asked once whether it is a Sub2API, ThinkWatch Enterprise or New API relay, and the answer is kept in memory only. `off`: no balance. ChatGPT and Z.ai accounts and Bedrock have no balance whatever is written here. |
 | `signed_in` | `zai` \| `bigmodel` | — | Which account sign-in the `key` came from: `zai` (Z.ai) or `bigmodel` (BigModel). Signing in to the account in the desktop app writes it; replacing the key there removes it. It does not change how requests are sent. Unset: the key was written by hand. |
@@ -486,11 +511,58 @@ slot on the upstream when it is sent, and gives it back when the answer has
 been passed on in full or the client has gone. When the upstream is full, a
 conversation that stays on it to reuse its prompt cache waits for a slot;
 any other request goes straight to the next upstream. How long a request
-waits is `failover.slot_wait_secs`. Waiting is not a failure: the upstream is
+waits is `failover.wait_secs`. Waiting is not a failure: the upstream is
 not set aside. Requests that only count tokens do not take a slot. On a
 Responses WebSocket connection, each `response.create` takes a slot from when
 it is sent until its answer ends, and so does a key's `max_concurrent`; an
 idle connection takes none.
+
+#### `providers[].limits`
+
+Usage limits for an upstream, written like the quota the upstream itself
+enforces: at most so many requests, tokens or dollars every few minutes or
+hours, per day, week or month. The entries are written like a key's `limits`;
+an upstream can have several, and every one has to have room before a request
+is sent to it.
+
+Each attempt sent to the upstream counts as a request, whether it succeeds or
+fails, unless the upstream answers it with 429. Tokens and cost count for the
+attempt that is answered. Requests that only count tokens do not count. An
+attempt still running counts with an estimate of its input until it is
+recorded.
+
+When a `minute` or `hour` window is full, the upstream is passed over like a
+busy one: a conversation that stays on it waits for room, other requests go to
+the next upstream, and when no candidate has room a request waits for the
+first one that does, within the time a request may wait (see `failover`). When
+a `day`, `week` or `month` is used up, requests go to the next upstream until
+the period starts again; none waits for it. Being full is not a failure: the
+upstream is not set aside. After a restart the day, week and month are added up
+again from the request records, so `retention.row_days` has to cover the
+period, as for a key; minute and hour windows start empty.
+
+<!-- generated: table providers[].limits[] -->
+<a id="cfg-providers-limits"></a>
+
+| Field | Type | Default | Description |
+|---|---|---|---|
+| `per` | `minute` \| `hour` \| `day` \| `week` \| `month` | **required** | The period. `minute` and `hour` are rolling (the last 60 seconds, the last 60 minutes, or `every` of them); `day`, `week` and `month` start again at local midnight, on Monday and on the 1st. |
+| `every` | integer | — | How many minutes or hours the rolling window spans: `{per: hour, every: 5}` is the last 5 hours. From 1 to 60 for `minute`, from 1 to 24 for `hour`; `day`, `week` and `month` do not take it. Unset: 1. |
+| `requests` | integer | — | At most this many requests sent to this upstream. Each attempt that reaches it counts, unless it answers 429; token counts do not count. |
+| `tokens` | integer | — | At most this many tokens in the answers of this upstream: uncached input, cache writes and output. |
+| `cost` | number | — | At most this much, in US dollars, as recorded for the requests this upstream answers; at least 0.01. Models without a price count as 0, and so does everything with `billing: free`. |
+| `cache_reads` | bool | `false` | Count cache reads too. Only for a `tokens` limit. |
+<!-- /generated -->
+
+```yaml
+providers:
+  - name: relay
+    base_url: https://relay.example.com
+    key: sk-relay
+    limits:
+      - { per: hour, every: 5, requests: 200 }
+      - { per: week, cost: 50 }
+```
 
 #### `providers[].oauth`
 
@@ -1050,9 +1122,9 @@ mode, `off` included.
 
 An upstream that fails is set aside for a while, so that the next requests
 go straight to the next candidate. How long depends on the reason the
-upstream gives: an insufficient balance waits for a top-up, a used-up quota
-waits until the moment the upstream says it resets, and a rate limit usually
-passes within seconds. A request with a single candidate is never affected.
+upstream gives: an insufficient balance waits for a top-up, and a used-up
+quota waits until the moment the upstream says it resets. A request with a
+single candidate is never affected.
 On a Responses WebSocket connection, each `response.create` counts here like
 a request: one that fails because of the upstream before any content arrives
 counts as a failure, and so does a connection the upstream refuses or that
@@ -1101,16 +1173,39 @@ failover:
   idle_timeout_secs: 600
 ```
 
-When upstreams are at their `max_concurrent`, a request waits for a free slot
-for at most `slot_wait_secs` in all. The same time also covers waiting for a
-key's `minute` or `hour` limit, so a request never waits longer than
-`slot_wait_secs` for the two together. An ongoing conversation waits for the
-upstream it stays on and, if no slot frees in time, moves on to the next one,
-where its cache starts over. A new conversation skips a full upstream at once.
-When every candidate is full, the request waits for whichever frees first; if
-none does, the client gets a 429 with `Retry-After` saying the upstreams are
-busy. If an upstream did receive the request and failed, the client gets that
-failure instead.
+An upstream that answers 429 (rate limited) is not set aside but paused:
+for as long as it says (`retry-after-ms`, `Retry-After`, or a delay in the
+error body; under one second, or under one millisecond for `retry-after-ms`,
+counts as not said), and otherwise for 5, 10, 20 and 40 seconds, then 60
+seconds each time, by its consecutive 429s; any other answer starts the count
+again. The
+pause is at most `rate_limit_max_pause_secs`, and the circuit breaker and
+`load-balance` do not count it as a failure. The request that got the 429
+moves to the next candidate, or waits for the pause to end; the client sees
+nothing of it. A streamed answer that reports a rate limit before any content
+counts as a 429 too; only on a request's last candidate that has not been rate
+limited in the last five minutes does the client get that error (the upstream
+is paused all the same). When the pause ends, one request goes first, and the
+others follow once the upstream has accepted it (for a streamed answer, once
+its content starts), or at once if that request gets no answer, times out or
+finds the upstream's quota used up. A pause lasts until twcore restarts at
+most.
+
+A request waits for upstreams that cannot take it yet for at most `wait_secs`
+in all: an upstream at its `max_concurrent`, one paused after a 429, and one
+at its `minute` or `hour` usage limit. The same time also covers waiting for
+a key's `minute` or `hour` limit, so a request never waits longer than
+`wait_secs` for all of them together. An ongoing conversation waits for the
+upstream it stays on and, if it does not become available in time, moves on
+to the next one, where its cache starts over. A new conversation skips such an
+upstream at once. An upstream that has used up a day, week or month usage
+limit is skipped. When no candidate is left, the request waits for whichever
+becomes available first; streamed answers keep the client's connection open
+with the `200` and keep-alives described above. If none becomes available, the
+client gets a 429 with `Retry-After` and `retry-after-ms` set to when the
+first one will; when every candidate has used up its period, `Retry-After`
+is the earliest reset and `x-should-retry` is `false`. If an upstream did
+receive the request and failed, the client gets that failure instead.
 
 <!-- generated: table failover -->
 <a id="cfg-failover"></a>
@@ -1122,9 +1217,9 @@ failure instead.
 | `max_pause_secs` | integer | `600` | Upper bound on the doubled pause, in seconds; not less than `pause_secs`. |
 | `no_balance_pause_secs` | integer | `1800` | Seconds to set aside an upstream that reports an insufficient balance. |
 | `quota_pause_secs` | integer | `3600` | Seconds to set aside an upstream whose quota is used up when it does not say when the quota resets. When it does, the upstream is set aside until then. |
-| `rate_limit_max_pause_secs` | integer | `3600` | A rate-limited upstream is set aside for the time its `Retry-After` gives, at most this many seconds. Without `Retry-After` it counts as a failure without a stated reason. |
+| `rate_limit_max_pause_secs` | integer | `3600` | Longest pause, in seconds, after an upstream answers 429 (rate limited). The pause lasts as long as the upstream says (`retry-after-ms`, `Retry-After`, or a delay in the error body); when it says nothing, it backs off by the upstream's consecutive 429s: 5, 10, 20 and 40 seconds, then 60 seconds each time. A pause is not a failure: requests wait for the upstream within `wait_secs`, and the circuit breaker does not count it. |
 | `idle_timeout_secs` | integer | `300` | Seconds an upstream may go without sending content before the gateway stops waiting for it. Counted from the moment the request is sent and started again by every piece of content: text, reasoning and tool calls count, keep-alives do not. A whole (non-streamed) answer counts from sending to the complete answer. Before any content has reached the client, the upstream counts as failed and the request moves to the next one; with none left, the client gets a timeout error. After content has reached the client, the answer ends with an error. From 30 to 3600. |
-| `slot_wait_secs` | integer | `30` | Seconds a request waits in all, counted once the key's own `max_concurrent` lets it in: for a key's `minute` or `hour` limit to free up, and for a free slot on upstreams at their `max_concurrent`. A key limit that does not free up in time refuses the request; without an upstream slot in time it goes to the next upstream, or, when every candidate is full, is answered with 429. `0`: never wait. From 0 to 300. |
+| `wait_secs` | integer | `120` | Seconds a request waits in all, counted once the key's own `max_concurrent` lets it in: for a key's `minute` or `hour` limit to free up, and for an upstream that cannot take it yet — at its `max_concurrent`, paused after answering 429, or at one of its `minute` or `hour` usage limits. A key limit that does not free up in time refuses the request. An upstream that cannot take it is skipped for the next one, and when none is left the request waits for the first to become available; a conversation that stays on an upstream waits for it. When nothing became available in time, the client gets 429 with `Retry-After`. `0`: never wait. From 0 to 600. |
 <!-- /generated -->
 
 ### `aliases`
@@ -1236,12 +1331,13 @@ group shares out requests by the result in the same way as above.
   group has its weight multiplied by four, by at most ten and at least a
   tenth.
 - `health`: upstreams that fail less get a larger share. It looks at the
-  last 50 requests within the past 30 minutes. Server errors, rate limits,
-  used-up quota or balance, rejected credentials, timeouts (including
+  last 50 requests within the past 30 minutes. Server errors, used-up quota
+  or balance, rejected credentials, timeouts (including
   `failover.idle_timeout_secs` before any content) and connection errors
   count as failures; errors caused by the request itself do not, and neither
-  does a client that cancels, a request aborted by hand, or an upstream
-  skipped because it is at its `max_concurrent`. An upstream that keeps failing keeps a twentieth of its
+  does a rate limit (429), a client that cancels, a request aborted by hand,
+  or an upstream skipped because it is at its `max_concurrent` or at a usage
+  limit. An upstream that keeps failing keeps a twentieth of its
   weight, so it still gets the occasional request and its recovery
   is noticed; one that fails outright is set aside by
   [`failover`](#cfg-failover) as before.
@@ -1485,6 +1581,108 @@ export const manifest = {
     note: { type: "string", label: "Note", value: "Answer in English." },
   },
 };
+```
+
+### `sync`
+
+Several devices (this Mac, a laptop, a server running a remote core) can keep
+one configuration in step through a sync location you choose: a folder that a
+cloud drive carries between devices, a WebDAV server, or S3-compatible
+storage. Each change is merged object by object with what the other devices
+did since the last sync; only when two devices change the same part of the
+same object to different values is there a conflict, which the app shows on
+every device until one of them resolves it. Turn sync on, join a location and
+resolve conflicts in the app (Settings, Sync and backup) or with
+`twcore sync enable` on a server; this section records the result.
+
+What syncs is the configuration a configuration pack carries: upstreams,
+proxies, gateway keys, aliases, groups, routes, price sheets, security rules,
+plugins and the general settings, keys included. `listen`, `retention` and
+`sync` itself stay on this device, and so do a ChatGPT account's sign-in and
+OAuth tokens. An upstream signed in on another device stays turned off on this
+one until it is signed in here; that does not turn it off anywhere else.
+
+A device that joins with a configuration of its own merges it item by item;
+items that differ are chosen one by one, except the default gateway key: every
+installation makes one, so the joining device takes the sync data's value and
+the clients set up on it are updated.
+
+With encryption on, versions that are not encrypted are never read. A keyring
+that went missing, or an older one put back, does not turn encryption off: the
+app asks whether to put back the copy this device keeps. A location that reads
+as empty is checked a few more times before the app says so, and turning sync
+off is still up to you.
+
+<!-- generated: table sync -->
+<a id="cfg-sync"></a>
+
+| Field | Type | Default | Description |
+|---|---|---|---|
+| `device_id` | string | **required** | Generated when sync is turned on. File names at the sync location show its first 8 characters. |
+| `device_name` | string | **required** | Shown in the device list of every device that syncs here. |
+| `encrypt` | bool | `true` | Encrypt what goes to the sync location with the sync passphrase. Every device at one location uses the same setting; change it in the app, which re-uploads the latest version. |
+| `passphrase` | string | — | The sync passphrase; required when `encrypt` is on, and kept after encryption is turned off: the keyring that says it is off is checked with it. Kept here in the clear, like the other keys in this file. |
+| `exclude` | list of strings | `[]` | Upstreams, by name, that are not synced: they are not uploaded and another device's upstream of the same name does not replace them. Routes, aliases and groups that refer to them are not synced either. |
+| `target` | object, [`sync.target`](#cfg-sync-target) | **required** | The sync location. The keyring, `versions/` and `devices/` live directly in it. |
+<!-- /generated -->
+
+<!-- generated: table sync.target -->
+<a id="cfg-sync-target"></a>
+
+| Field | Type | Default | Description |
+|---|---|---|---|
+| `type` | `folder` \| `webdav` \| `s3` | **required** | Which kind of location; the other fields depend on it, see the three tables below. |
+<!-- /generated -->
+
+<!-- generated: table sync.target (folder) -->
+<a id="cfg-sync-target-folder"></a>
+
+| Field | Type | Default | Description |
+|---|---|---|---|
+| `type` | string | **required** | `folder` |
+| `path` | string | **required** | An absolute path on the machine core runs on: a folder that iCloud Drive, Dropbox, OneDrive, Syncthing or a NAS share carries between devices. |
+| `proxy` | string | `direct` | Not used for a folder. |
+<!-- /generated -->
+
+<!-- generated: table sync.target (webdav) -->
+<a id="cfg-sync-target-webdav"></a>
+
+| Field | Type | Default | Description |
+|---|---|---|---|
+| `type` | string | **required** | `webdav` |
+| `url` | string | **required** | The WebDAV address of the folder. `https://`, with the certificate checked; `http://` only for this machine and the local network. |
+| `user` | string | `''` | User name. |
+| `pass` | string | `''` | Password, or the app password the service issues for WebDAV. |
+| `proxy` | string | `direct` | Where requests to the sync location go out: `direct`, `system` (the system proxy), or the name of a proxy under `proxies`. An `http://` address on this machine or the local network has to be `direct`. |
+<!-- /generated -->
+
+<!-- generated: table sync.target (s3) -->
+<a id="cfg-sync-target-s3"></a>
+
+| Field | Type | Default | Description |
+|---|---|---|---|
+| `type` | string | **required** | `s3` |
+| `endpoint` | string | **required** | The S3 endpoint. Hosts ending in `amazonaws.com`, `aliyuncs.com` or `myqcloud.com` put the bucket in the host name; every other endpoint (Cloudflare R2, MinIO, an address) puts it in the path. `http://` only for this machine and the local network. |
+| `region` | string | **required** | The signing region; `auto` for Cloudflare R2. |
+| `bucket` | string | **required** | The bucket. Keep it private. |
+| `prefix` | string | `''` | A folder inside the bucket. No `..` parts, and not starting with `/`. |
+| `access_key_id` | string | **required** | Access key ID. |
+| `secret_access_key` | string | **required** | Secret access key. |
+| `proxy` | string | `direct` | Where requests to the sync location go out: `direct`, `system` (the system proxy), or the name of a proxy under `proxies`. An `http://` address on this machine or the local network has to be `direct`. |
+<!-- /generated -->
+
+```yaml
+sync:
+  device_id: 3f9a2c1e-0b1d-4e2f-9a3b-5c6d7e8f9a0b
+  device_name: Mac mini
+  encrypt: true
+  passphrase: "correct horse battery staple"
+  exclude: [local ollama]
+  target:
+    type: webdav
+    url: https://dav.example.com/dav/ThinkWatch
+    user: name@example.com
+    pass: "app password"
 ```
 
 ## Environment variables

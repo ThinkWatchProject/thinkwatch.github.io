@@ -170,7 +170,7 @@ const value = "min-w-0 break-all font-mono text-[15px] text-[var(--color-text)]"
           >
             {t.open}
           </button>
-          <p class="mt-3 text-sm text-[var(--color-muted)]" data-version hidden>{shared.needsVersion}</p>
+          <p class="mt-3 text-sm text-[var(--color-muted)]" data-version hidden></p>
         </div>
 
         <div class="mt-12 border-t border-[var(--color-border)] pt-8">
@@ -232,7 +232,7 @@ const value = "min-w-0 break-all font-mono text-[15px] text-[var(--color-text)]"
     showableParam,
     type ImportLink,
   } from "~/lib/import-link";
-  import type { ImportLinkText } from "~/lib/import-link-text";
+  import { limitPhrase, type ImportLinkText } from "~/lib/import-link-text";
 
   type Strings = ImportLinkText & {
     tokenEndpoint: string;
@@ -364,6 +364,7 @@ const value = "min-w-0 break-all font-mono text-[15px] text-[var(--color-text)]"
       if (l.headers.length) advanced.push([L.headers, l.headers.map((h) => `${h.name}: ${h.value}`)]);
       if (l.clientIdentity) advanced.push([L.clientIdentity, s.on]);
       if (l.concurrency !== undefined) advanced.push([L.concurrency, String(l.concurrency)]);
+      if (l.limits.length) advanced.push([L.limits, l.limits.map((x) => limitPhrase(s.limit, x))]);
       if (l.balance) advanced.push([L.balance, s.balances[l.balance]]);
       addGroup(s.groups.advanced, advanced);
 
@@ -437,7 +438,10 @@ const value = "min-w-0 break-all font-mono text-[15px] text-[var(--color-text)]"
         $("[data-update]").hidden = false;
       }
       show(l);
-      $("[data-version]").hidden = !l.v2;
+      if (l.since) {
+        $("[data-version]").textContent = s.needsVersion.replace("{v}", l.since);
+        $("[data-version]").hidden = false;
+      }
       // The only place this page navigates to, built from the checked values
       // (and the parameters of a newer version, re-encoded).
       const target = appLink(l, result.unknown);

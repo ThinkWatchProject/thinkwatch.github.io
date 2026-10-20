@@ -4,7 +4,7 @@ ThinkWatch Lite 支持通过链接打开预填好设置的「新建上游」对�
 
 本页面向中转站与服务商的运营人员，说明链接的两种形式、按对话框分组的参数、各服务类型接受哪些参数、编码方式，以及链接刻意不能设置的内容。页面末尾附有链接生成器。ThinkWatch Lite 自身也能为已有的上游生成这样的链接，见[由 Lite 生成](#由-lite-生成)。
 
-`name`、`url`、`protocol`、`key`、`models` 以外的参数需要 ThinkWatch Lite 2026.10.16 或更高版本。只用这五个参数的链接在更早的版本中同样可以打开，为更早版本编写的链接全部继续有效。
+`name`、`url`、`protocol`、`key`、`models` 以外的参数需要 ThinkWatch Lite 2026.10.16 或更高版本，`limits` 需要 2026.10.26 或更高版本。只用这五个参数的链接在更早的版本中同样可以打开，为更早版本编写的链接全部继续有效。
 
 ## 链接形式
 
@@ -55,6 +55,7 @@ ThinkWatch Lite 支持通过链接打开预填好设置的「新建上游」对�
 | `headers` | 额外的请求头，每行一个 `名称: 值`，编码方式见[编码](#编码)。`auth=account` 时不接受。 |
 | `client_identity` | `on` 表示开启「转发客户端身份」，用于只接受特定客户端的中转站。仅用于 Sub2API、New API 与自定义上游。 |
 | `concurrency` | 并发上限：1 到 1000 之间的整数，不带正负号，不以 0 开头。`auth=account` 时不接受。 |
+| `limits` | 用量上限，各项以 `;` 分隔，每项为 `per\|measure\|max\|every\|cache_reads`，例如每 5 分钟 10,000,000 token、每天 20 美元，编码方式见[编码](#编码)。`auth=account` 时不接受。 |
 | `balance` | 余额的读取来源：`off`、`openrouter`、`deepseek`、`moonshot`、`sub2api`、`newapi` 或 `thinkwatch`。省略时自动识别。仅用于自定义上游，其他服务类型自行决定来源。 |
 
 ### 模型
@@ -92,7 +93,7 @@ ThinkWatch Lite 支持通过链接打开预填好设置的「新建上游」对�
 | Ollama | `ollama` | `key`，没有密钥栏位 | `http://127.0.0.1:11434`，或 `url` 中的其他地址 | `openai-chat` |
 | 自定义 | `custom` | `key`、`oauth` | `url`，必须提供 | 任一协议，或自动识别 |
 
-`headers` 与 `concurrency` 适用于账号登录以外的所有服务类型；`client_identity` 适用于 Sub2API、New API 与自定义上游；`balance` 只适用于自定义上游。「模型」与「计费」两组参数适用于所有服务类型，包括账号登录。
+`headers`、`concurrency` 与 `limits` 适用于账号登录以外的所有服务类型；`client_identity` 适用于 Sub2API、New API 与自定义上游；`balance` 只适用于自定义上游。「模型」与「计费」两组参数适用于所有服务类型，包括账号登录。
 
 `auth=account` 的链接不含任何凭据，登录在应用中进行。这样的链接只接受 `service`、`auth`、`site`、`name` 以及「模型」与「计费」两组参数。
 
@@ -112,12 +113,15 @@ ThinkWatch Lite 支持通过链接打开预填好设置的「新建上游」对�
 | `headers` | 以换行符（`%0A`）分隔的多行，每行为 `名称: 值` | `X-Relay-Group: pro`、换行、`X-Relay-Region: hk` |
 | `specs` | 以 `;` 分隔的多项，每项为 `model\|context\|max_output\|reasoning\|image` | `glm-5-air\|128000\|96000\|y\|n` |
 | `prices` | 以 `;` 分隔的多项，每项为 `model\|input\|output\|cache_read\|cache_write_5m\|cache_write_1h` | `glm-5\|1\|3.2\|0.2` |
+| `limits` | 以 `;` 分隔的多项，每项为 `per\|measure\|max\|every\|cache_reads` | `minute\|tokens\|10000000\|5;day\|cost\|20` |
 
 `headers` 中，名称只能使用 HTTP 的 token 字符（字母、数字与 `` ! # % & ' * + - . ^ _ ` | ~ ``），值为可打印 ASCII 字符，首尾空白会被去除。名称不得重复（不区分大小写）。携带凭据或由网关自行写入的请求头一律拒绝：`Authorization`、`Proxy-Authorization`、`X-Api-Key`、`X-Goog-Api-Key`、`Api-Key`、`Cookie`、`Host`、`Content-Length`、`Content-Type`、`Content-Encoding`、`Transfer-Encoding`、`Connection`、`Keep-Alive`、`Upgrade`、`TE`、`Trailer`、`User-Agent`，以及以 `Proxy-` 或 `Sec-` 开头的名称。
 
 `specs` 中，`context` 与 `max_output` 为 1 到 10,000,000 之间的 token 数，`reasoning` 与 `image` 为 `y` 或 `n`。四项都可以留空，但不能全部留空。
 
 `prices` 中，各单价以美元 / 百万 tokens 计，整数部分与小数部分各最多 6 位。`input` 与 `output` 必须填写；缓存单价留空或省略时，等于输入单价。
+
+`limits` 中，`per` 为 `minute`、`hour`、`day`、`week` 或 `month`，`measure` 为 `requests`、`tokens` 或 `cost`。请求次数与 token 数的 `max` 为 1 到 999,999,999,999,999 之间的整数，不以 0 开头；费用的 `max` 为美元金额，至少 `0.01`，整数部分最多 9 位、小数部分最多 6 位，不以多余的 0 开头，例如 `5` 或 `0.5`。`every` 为窗口跨越的分钟数（1 到 60）或小时数（1 到 24），只用于 `minute` 与 `hour`，留空时为 1。`cache_reads` 写 `y` 表示计入缓存读取，只用于 `tokens`，留空时不计入。末尾留空的几项可以省略，因此 `day|cost|5` 是完整的一项。`per`、`every`、`measure` 与 `cache_reads` 都相同的两项不能同时出现。
 
 长度与字符限制：
 
@@ -132,6 +136,7 @@ ThinkWatch Lite 支持通过链接打开预填好设置的「新建上游」对�
 | `region` | 32 个字符；只含小写字母、数字与 `-` |
 | `headers` | 最多 16 行；名称最长 64 个字符，值最长 1024 个字符 |
 | `models`、`models_only`、`specs`、`prices` | 各最多 64 项；模型 ID 最长 128 个字符；`specs` 与 `prices` 中同一模型只能出现一次 |
+| `limits` | 最多 16 项 |
 
 ## 应用如何处理链接
 
@@ -165,16 +170,16 @@ ThinkWatch Lite 支持通过链接打开预填好设置的「新建上游」对�
 
 ## 示例
 
-需要两个请求头、并发上限为 4、只列出部分模型、按公开价格的 0.8 倍计费并覆盖一个模型价格的中转站（省略 `service`：该地址识别为自定义上游）：
+需要两个请求头、并发上限为 4、每 5 分钟最多 10,000,000 token 且每天最多 20 美元、只列出部分模型、按公开价格的 0.8 倍计费并覆盖一个模型价格的中转站（省略 `service`：该地址识别为自定义上游）：
 
 ```text
-thinkwatch://import?name=example-relay&url=https%3A%2F%2Fapi.relay.example%2Fv1&protocol=openai-chat&key=sk-relay-EXAMPLE&headers=X-Relay-Group%3A%20pro%0AX-Relay-Region%3A%20hk&concurrency=4&models=glm-5%2Cglm-5-air&specs=glm-5-air%7C128000%7C96000%7Cy%7Cn&price_multiplier=0.8&prices=glm-5%7C1%7C3.2%7C0.2
+thinkwatch://import?name=example-relay&url=https%3A%2F%2Fapi.relay.example%2Fv1&protocol=openai-chat&key=sk-relay-EXAMPLE&headers=X-Relay-Group%3A%20pro%0AX-Relay-Region%3A%20hk&concurrency=4&limits=minute%7Ctokens%7C10000000%7C5%3Bday%7Ccost%7C20&models=glm-5%2Cglm-5-air&specs=glm-5-air%7C128000%7C96000%7Cy%7Cn&price_multiplier=0.8&prices=glm-5%7C1%7C3.2%7C0.2
 ```
 
 同一条链接的网页形式：
 
 ```text
-https://thinkwat.ch/import#name=example-relay&url=https%3A%2F%2Fapi.relay.example%2Fv1&protocol=openai-chat&key=sk-relay-EXAMPLE&headers=X-Relay-Group%3A%20pro%0AX-Relay-Region%3A%20hk&concurrency=4&models=glm-5%2Cglm-5-air&specs=glm-5-air%7C128000%7C96000%7Cy%7Cn&price_multiplier=0.8&prices=glm-5%7C1%7C3.2%7C0.2
+https://thinkwat.ch/import#name=example-relay&url=https%3A%2F%2Fapi.relay.example%2Fv1&protocol=openai-chat&key=sk-relay-EXAMPLE&headers=X-Relay-Group%3A%20pro%0AX-Relay-Region%3A%20hk&concurrency=4&limits=minute%7Ctokens%7C10000000%7C5%3Bday%7Ccost%7C20&models=glm-5%2Cglm-5-air&specs=glm-5-air%7C128000%7C96000%7Cy%7Cn&price_multiplier=0.8&prices=glm-5%7C1%7C3.2%7C0.2
 ```
 
 使用访问密钥的 Amazon Bedrock，区域为 `eu-west-1`：
@@ -226,7 +231,7 @@ ThinkWatch Lite 2026.10.25 起也能为已有的上游生成导入链接，把�
 | 内容 | 是否写入 | 说明 |
 |---|---|---|
 | 服务类型、认证方式、站点、名称、地址、协议（`service`、`auth`、`site`、`name`、`url`、`protocol`） | 写入 | — |
-| 并发上限、转发客户端身份、余额来源、模型列表、只用这些模型、手动规格、计费方式、价格倍率、价目（`concurrency`、`client_identity`、`balance`、`models`、`models_only`、`specs`、`billing`、`price_multiplier`、`prices`） | 写入 | 与缺省值相同的不写 |
+| 并发上限、用量上限、转发客户端身份、余额来源、模型列表、只用这些模型、手动规格、计费方式、价格倍率、价目（`concurrency`、`limits`、`client_identity`、`balance`、`models`、`models_only`、`specs`、`billing`、`price_multiplier`、`prices`） | 写入 | 与缺省值相同的不写 |
 | 密钥、请求头、AWS 访问密钥、OAuth 凭据 | 由「包含密钥」决定，缺省写入 | 值写成 `${变量名}` 时不能写入，因为链接不接受这种写法；该项省略，并注明原因 |
 | 出站代理、别名、路由、权重、停用状态、AWS profile | 不写入 | 导入链接不接受这些参数，见[链接不能设置的内容](#链接不能设置的内容) |
 | ChatGPT、Z.ai / BigModel 的账号登录凭据 | 不写入 | 链接只写登录方式，接收方停在登录一步，自行登录 |

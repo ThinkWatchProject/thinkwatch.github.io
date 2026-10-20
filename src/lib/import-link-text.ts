@@ -1,8 +1,9 @@
 // Words shared by the import page and the link builder: the names of the
 // dialog's sections and fields as ThinkWatch Lite writes them, and the reasons a
 // link is rejected. `{p}` in a problem is the parameter, written with `param`
-// or, for a name that is not short and plain, `someParam`.
-import { V2_SINCE, type Problem } from "./import-link";
+// or, for a name that is not short and plain, `someParam`. `{v}` in
+// `needsVersion` is the version.
+import { microsText, type Limit, type Problem } from "./import-link";
 
 export function importLinkText(zh: boolean) {
   return zh
@@ -34,6 +35,7 @@ export function importLinkText(zh: boolean) {
           headers: "请求头",
           clientIdentity: "转发客户端身份",
           concurrency: "并发上限",
+          limits: "用量上限",
           balance: "余额来源",
           models: "手动添加的模型",
           modelsOnly: "启用范围",
@@ -69,7 +71,17 @@ export function importLinkText(zh: boolean) {
           thinkwatch: "ThinkWatch",
         },
         billings: { "per-token": "按量计费", free: "不计费" },
-        needsVersion: `需要 ThinkWatch Lite ${V2_SINCE} 或更高版本。`,
+        // A usage limit read as a phrase, as ThinkWatch Lite writes it: 「每 5 分钟 10,000,000 token」
+        limit: {
+          units: { minute: "分钟", hour: "小时", day: "天", week: "周", month: "月" },
+          unitsMany: { minute: "分钟", hour: "小时", day: "天", week: "周", month: "月" },
+          span: " {n} {unit}",
+          requests: "每{per} {n} 次请求",
+          tokens: "每{per} {n} token",
+          cost: "每{per} {n} 费用",
+          cacheReads: "（含缓存读取）",
+        },
+        needsVersion: "需要 ThinkWatch Lite {v} 或更高版本。",
         param: "参数「{name}」",
         someParam: "某个参数",
         problems: {
@@ -113,6 +125,7 @@ export function importLinkText(zh: boolean) {
           headers: "Headers",
           clientIdentity: "Forward client identity",
           concurrency: "Concurrency limit",
+          limits: "Usage limits",
           balance: "Balance source",
           models: "Models added by hand",
           modelsOnly: "Enabled models",
@@ -154,7 +167,16 @@ export function importLinkText(zh: boolean) {
           thinkwatch: "ThinkWatch",
         },
         billings: { "per-token": "Per token", free: "Free" },
-        needsVersion: `Needs ThinkWatch Lite ${V2_SINCE} or later.`,
+        limit: {
+          units: { minute: "minute", hour: "hour", day: "day", week: "week", month: "month" },
+          unitsMany: { minute: "minutes", hour: "hours", day: "days", week: "weeks", month: "months" },
+          span: "{n} {unit}",
+          requests: "{n} requests per {per}",
+          tokens: "{n} tokens per {per}",
+          cost: "{n} per {per}",
+          cacheReads: " (cache reads included)",
+        },
+        needsVersion: "Needs ThinkWatch Lite {v} or later.",
         param: "the parameter “{name}”",
         someParam: "a parameter",
         problems: {
@@ -173,3 +195,18 @@ export function importLinkText(zh: boolean) {
 }
 
 export type ImportLinkText = ReturnType<typeof importLinkText>;
+
+/** A usage limit as a phrase: 「每 5 分钟 10,000,000 token」, "$5.00 per day". */
+export function limitPhrase(t: ImportLinkText["limit"], l: Limit): string {
+  const per = l.every > 1 ? t.span.replace("{n}", String(l.every)).replace("{unit}", t.unitsMany[l.per]) : t.units[l.per];
+  const n = l.measure === "cost" ? `$${dollars(l.max)}` : l.max.toLocaleString("en-US");
+  const phrase = t[l.measure].replace("{per}", per).replace("{n}", n);
+  return l.cacheReads ? phrase + t.cacheReads : phrase;
+}
+
+/** Millionths of a dollar with at least two decimals: 5.00, 0.125. */
+function dollars(micros: number): string {
+  const text = microsText(micros);
+  const [whole, frac = ""] = text.split(".");
+  return `${Number(whole).toLocaleString("en-US")}.${frac.padEnd(2, "0")}`;
+}
