@@ -41,6 +41,8 @@ const t = zh
         awsId: "大写字母与数字，16 到 128 个字符。",
         headers: "每行一个「名称: 值」，最多 16 行，名称不重复，值为可打印 ASCII；鉴权、Cookie、Host、内容与连接相关的请求头、User-Agent 及 proxy-*、sec-* 开头的请求头不接受。",
         concurrency: "1 到 1000 之间的整数。",
+        limits:
+          "每行一个 per|measure|max|every|cache_reads，最多 16 行：per 为 minute、hour、day、week 或 month；measure 为 requests、tokens 或 cost；max 为不以 0 开头的整数，cost 为至少 0.01 的美元金额，最多 6 位小数；every 只用于 minute（1 到 60）与 hour（1 到 24）；cache_reads 写 y，只用于 tokens；末尾留空的几项可以省略；各行的 per、every、measure 与 cache_reads 不能完全相同。",
         models: "模型 ID 以逗号分隔，只含字母、数字与 - _ . : / @ +，最多 64 项。",
         modelsOnly: "模型 ID 或含 * ? 的通配规则，以逗号分隔，最多 64 项。",
         specs: "每行一个 model|context|max_output|reasoning|image：数值为 1 到 10000000，reasoning 与 image 为 y 或 n，至少填写一项。",
@@ -75,6 +77,8 @@ const t = zh
         awsId: "Uppercase letters and digits, 16 to 128 characters.",
         headers: "One Name: Value per line, at most 16, no repeated names, printable ASCII values; authentication, cookie, host, content and connection headers, User-Agent, and names starting with proxy- or sec- are not accepted.",
         concurrency: "A whole number from 1 to 1000.",
+        limits:
+          "One per|measure|max|every|cache_reads per line, at most 16: per is minute, hour, day, week or month; measure is requests, tokens or cost; max is a whole number without leading zeros, or for cost an amount in USD of at least 0.01 with up to six decimals; every is for minute (1 to 60) and hour (1 to 24) only; cache_reads is y, for tokens only; empty fields at the end may be left out; no two lines with the same per, every, measure and cache_reads.",
         models: "Comma-separated model IDs of letters, digits and - _ . : / @ +, at most 64.",
         modelsOnly: "Comma-separated model IDs or patterns with * and ?, at most 64.",
         specs: "One model|context|max_output|reasoning|image per line: numbers from 1 to 10000000, y or n, at least one field filled.",
@@ -98,6 +102,7 @@ const ruleOf: Record<string, keyof typeof t.rules> = {
   aws_access_key_id: "awsId",
   headers: "headers",
   concurrency: "concurrency",
+  limits: "limits",
   models: "models",
   models_only: "modelsOnly",
   specs: "specs",
@@ -227,6 +232,11 @@ const fieldsetCls = "grid gap-4 border-t border-[var(--color-border)] pt-5";
           {L.clientIdentity}
         </label>
       </div>
+      <label data-field="limits">
+        <span class={labelCls}>{L.limits}{t.optional}</span>
+        <textarea class={input} name="limits" rows="2" spellcheck="false" placeholder="minute|tokens|10000000|5"></textarea>
+        <span class={hintCls}>{t.perLine} per|measure|max|every|cache_reads</span>
+      </label>
     </fieldset>
 
     <fieldset class={fieldsetCls}>
@@ -412,7 +422,7 @@ const fieldsetCls = "grid gap-4 border-t border-[var(--color-border)] pt-5";
         let v: string;
         if (p === "client_identity") v = field.checked ? "on" : "";
         else if (p === "headers") v = lines(field.value).join(LF);
-        else if (p === "specs" || p === "prices") v = lines(field.value).join(";");
+        else if (p === "specs" || p === "prices" || p === "limits") v = lines(field.value).join(";");
         else if (p === "models" || p === "models_only")
           v = field.value
             .split(",")
@@ -440,7 +450,7 @@ const fieldsetCls = "grid gap-4 border-t border-[var(--color-border)] pt-5";
       if (r.ok) {
         code("app").textContent = appLink(r.link);
         code("web").textContent = webLink(r.link);
-        version.textContent = r.link.v2 ? s.needsVersion : s.worksBefore;
+        version.textContent = r.link.since ? s.needsVersion.replace("{v}", r.link.since) : s.worksBefore;
         output.hidden = false;
         message.hidden = true;
         return;

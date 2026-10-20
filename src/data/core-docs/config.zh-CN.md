@@ -13,7 +13,7 @@ ThinkWatch Core 只读一个文件：`config.yaml`。本文逐项说明其中每
 | macOS、Linux | `~/.thinkwatch/config.yaml` |
 | Windows | `%APPDATA%\ThinkWatch\config.yaml` |
 
-`THINKWATCH_HOME` 替换整个目录；`--config <路径>` 为单条命令指定文件。core 的其余数据也在这个目录里：请求数据库（`data.db`）、配置历史（`history/`）、下载的价目表（`model_prices.json`），以及本地控制通道的 socket 文件（`twcore.sock`；Windows 上是回环端口，记录在 `control.port` 中）。目录只有所有者可访问（`0700`），配置文件权限为 `0600`：其中以明文保存密钥。
+`THINKWATCH_HOME` 替换整个目录；`--config <路径>` 为单条命令指定文件。core 的其余数据也在这个目录里：请求数据库（`data.db`）、配置的备份（`history/`）、下载的价目表（`model_prices.json`），以及本地控制通道的 socket 文件（`twcore.sock`；Windows 上是回环端口，记录在 `control.port` 中）。目录只有所有者可访问（`0700`），配置文件权限为 `0600`：其中以明文保存密钥。
 
 这两项权限就是这份文件在本机上的全部保护：挡得住其他用户，挡不住以同一用户身份运行的程序。这样的程序能读到文件里的每一把密钥，也能用其中的控制通道密钥经控制通道修改配置。出站脱敏不改变这一点：它保护的是请求带出本机的内容，不是磁盘上的文件。显示配置时给控制通道密钥打码，是为了让经控制通道的写入改不了它（见 [`listen.control`](#cfg-listen-control)），而不是对本机程序隐藏它；上游密钥和网关密钥按原样显示。
 
@@ -65,19 +65,25 @@ providers:
 
 两方同时修改时（应用和手工编辑），后写入的一方因版本不一致被拒绝，不会覆盖先写入的内容。
 
-### 历史与回滚
+### 备份、导出与导入
 
-每个生效过的版本都保存在配置文件旁边的 `history/` 目录中，并记录来源（应用、命令行、外部编辑、回滚、凭据轮换）。保留最近 50 个版本。
+配置每改动一次，配置文件旁边的 `history/` 目录中就留下一个版本：一个配置包（`.twconfig`），连同插件和应用的通用偏好，并记录来源（应用、命令行、外部编辑、导入、恢复、同步）。保留最近 10 个版本；凭据轮换不生成版本。版本中的控制面密钥一律打码。
 
 ```sh
 twcore check                      # 只校验配置，不启动任何服务
 twcore config show                # 打印当前配置及其版本
-twcore config history             # 列出历史版本，最新的在前
-twcore config rollback 3f9a2c     # 回滚到某个版本（写前几位即可）
+twcore backup list                # 列出备份版本，最新的在前
+twcore backup restore 1792315800000 --dry-run   # 恢复会改动什么
+twcore backup restore 1792315800000             # 恢复到某个版本
+twcore export -o all.twconfig     # 把全部配置导出为配置包
+twcore export --providers relay --no-secrets --encrypt -o relay.twconfig
+twcore import all.twconfig --dry-run            # 导入会做什么
 twcore config set /listen/gateway/port 8790 --int
 ```
 
-这些命令直接操作文件，因此 core 没有运行时也能使用，而那往往正是最需要回滚的时候。正在运行的 core 会像对待其他保存一样接收这些改动。
+恢复时保留本机设置（监听、控制面密钥、保留期限、同步设置）、ChatGPT 的登录，以及本机已接管的客户端正在使用的网关密钥。导入时加入本机没有的项目，与本机不同的项目逐项选择处理方式（`--on-conflict` 一次指定全部）。配置包不含本机设置与 ChatGPT 登录；未指定 `--no-secrets` 时其中以明文保存密钥，除非指定 `--encrypt`（口令在终端输入，或取自环境变量 `TWCORE_PASSPHRASE`）。以不含密钥的配置包覆盖本机项目时，只有目的地不变（协议、主机与端口，AWS 区域，OAuth 令牌端点，所走的出站代理，代理的地址）才沿用本机的密钥；目的地变了的、改名导入的上游以停用状态导入，填入密钥后再启用。
+
+这些命令直接操作文件，因此 core 没有运行时也能使用，而那往往正是最需要恢复的时候；配置完全无法读取时，恢复把整个版本写回，控制面密钥保持现在的值。正在运行的 core 会像对待其他保存一样接收这些改动。
 
 `twcore config set <路径> <值>` 修改文件中已经写出的一个值。路径中的列表项按其 `name` 定位（`/providers/anthropic/base_url`）；数字表示下标（`/routes/0/rules/1/to`）。值默认按字符串写入，`--int`、`--bool`、`--null` 另作指定。写入前先校验结果。要添加文件中还没有的字段，请直接编辑文件。
 
@@ -112,6 +118,7 @@ twcore config set /listen/gateway/port 8790 --int
 | `default_route` | 字符串 | — | 未指定路由的密钥走哪条路由。不写：名为 `default` 的路由；没有这条路由时走内置的故障转移。 |
 | `default_key` | 字符串 | — | 没有专用密钥的客户端使用哪一把。不写：名为 `default` 的那把，没有则取第一把。这把密钥不能停用。 |
 | `plugins` | 对象列表，见 [`plugins[]`](#cfg-plugins) | `[]` | 脚本插件，按运行的顺序。由应用安装，每个插件的代码和设置是本文件旁边的一个文件。 |
+| `sync` | 对象，见 [`sync`](#cfg-sync) | — | 多设备同步。属于本机设置：配置包和其他设备不会带走它，恢复备份时保留当前值。不写：不同步。 |
 <!-- /generated -->
 
 ### `listen`
@@ -164,7 +171,7 @@ listen:
 | `remote` | 对象，见 [`listen.control.remote`](#cfg-listen-control-remote) | — | 供另一台机器上的桌面应用连接的网络端口。它是本地通道之外额外开的，不取代本地通道。 |
 <!-- /generated -->
 
-`key` 缺失时，由 `twcore serve` 在控制通道开始监听之前写入；`twcore init` 生成的配置也带有它。凡是显示配置或写入配置历史的地方，这个字段一律打码；把打码值原样存回时保留原值。密钥缺失或格式不对（不是 64 个十六进制字符）时整份配置无效，因此无法把它换成一把容易猜到的短密钥。
+`key` 缺失时，由 `twcore serve` 在控制通道开始监听之前写入；`twcore init` 生成的配置也带有它。凡是显示配置或写入备份的地方，这个字段一律打码；把打码值原样存回时保留原值。密钥缺失或格式不对（不是 64 个十六进制字符）时整份配置无效，因此无法把它换成一把容易猜到的短密钥。
 
 ```sh
 twcore control-key            # 显示密钥，用于粘贴到桌面应用
@@ -236,9 +243,10 @@ clients:
 一把密钥的用量上限：每分钟、每小时、每天、每周或每月最多多少个请求、多少 token、多少美元。
 每一条只数其中一种；一把密钥可以有好几条，请求要通过每一条。
 
-`minute`、`hour` 是滚动的：最近 60 秒、最近 60 分钟。用满之后，下一个空位在
-`failover.slot_wait_secs`（默认 30 秒）之内空出来，请求就等它；等不到就拒绝。之后若还要等
-上游空出位置，用的是同一段时间里剩下的部分。`day`、`week`、`month` 按 twcore 所在机器的
+`minute`、`hour` 是滚动的：最近 60 秒、最近 60 分钟；写了 `every` 就是几个这样的单位，
+`{ per: hour, every: 5 }` 是最近 5 小时。用满之后，下一个空位在
+`failover.wait_secs`（默认 120 秒）之内空出来，请求就等它；等不到就拒绝。之后若还要等
+上游，用的是同一段时间里剩下的部分。`day`、`week`、`month` 按 twcore 所在机器的
 本地时区算，在零点、周一零点、每月一号零点重新开始；用满之后，到重新开始之前的请求一律拒绝。
 机器换了时区时，当前这一天、这一周、这个月的用量按新的时区从请求记录里重新加起来。
 
@@ -260,7 +268,8 @@ Responses 的 WebSocket 连接上，每个 `response.create` 各算一个请求�
 
 | 字段 | 类型 | 默认值 | 说明 |
 |---|---|---|---|
-| `per` | `minute` \| `hour` \| `day` \| `week` \| `month` | **必填** | 按多长一段时间算。`minute`、`hour` 是滚动的（最近 60 秒、最近 60 分钟）；`day`、`week`、`month` 在本地时间的零点、周一零点、每月一号零点重新算。 |
+| `per` | `minute` \| `hour` \| `day` \| `week` \| `month` | **必填** | 按多长一段时间算。`minute`、`hour` 是滚动的（最近 60 秒、最近 60 分钟，或者 `every` 个这样的单位）；`day`、`week`、`month` 在本地时间的零点、周一零点、每月一号零点重新算。 |
+| `every` | 整数 | — | 滚动窗口有几分钟、几小时：`{per: hour, every: 5}` 是最近 5 小时。`minute` 取 1 到 60，`hour` 取 1 到 24；`day`、`week`、`month` 不能写。不写：1。 |
 | `requests` | 整数 | — | 最多这么多个请求。数 token 的请求、网关自己答的、没有发到上游的不算。 |
 | `tokens` | 整数 | — | 最多这么多 token：未命中缓存的输入、写入缓存的和输出。 |
 | `cost` | 数字 | — | 最多花这么多美元，按每个请求记下的费用算；至少 0.01。没有价格的模型、`billing: free` 的上游算 0。 |
@@ -287,7 +296,7 @@ clients:
 | 字段 | 类型 | 默认值 | 说明 |
 |---|---|---|---|
 | `name` | 字符串 | **必填** | 上游的名字，不能重复，也不能和策略组同名。以 `__` 开头的名字保留给内置项。 |
-| `base_url` | 字符串 | **必填** | 接口地址，`http://` 或 `https://`，按服务商文档写到版本段为止（`https://api.anthropic.com`、`https://api.openai.com/v1`）。Bedrock 写所在区域的推理地址：`https://bedrock-runtime.<区域>.amazonaws.com`。 |
+| `base_url` | 字符串 | **必填** | 接口地址，`http://` 或 `https://`，按服务商文档写到版本段为止（`https://api.anthropic.com`、`https://api.openai.com/v1`）。Bedrock 写所在区域的推理地址：`https://bedrock-runtime.<区域>.amazonaws.com`。地址中不能有反斜杠，主机前不能写用户名或密码（凭据写在 `key` 或 `headers` 中）。 |
 | `key` | 字符串，可写 `${VAR}` | — | API 密钥，放进协议规定的请求头：`x-api-key`（Anthropic）、`Authorization: Bearer`（OpenAI，以及 Bedrock API Key）、`x-goog-api-key`（Gemini）。上游不需要密钥、或凭据写在 `headers` 里时不写。不能和 `oauth`、`aws` 同时写。 |
 | `headers` | 请求头名 → 值的映射 | `{}` | 额外的请求头，按书写顺序发送；值可以用 `${VAR}`，配置了 `oauth` 时可以用 `{{access_token}}`。最多 32 个。HTTP 或网关管理的请求头（`host`、`content-length`、`connection` 等）不能设置。 |
 | `oauth` | 对象，见 [`providers[].oauth`](#cfg-providers-oauth) | — | OAuth 凭据：用 refresh token 换取 access token。与 `key` 二选一。 |
@@ -301,7 +310,8 @@ clients:
 | `billing` | `per-token` \| `free` | `per-token` | `per-token`：费用为用量乘以所选价目表中的单价，订阅账号同样如此。`free`：费用记为 0。 |
 | `pricing` | 字符串 | — | `pricing.sheets` 中某张价目表的名字。不写：默认价目表。 |
 | `model_specs` | 映射： 模型 ID → [`providers[].model_specs.*`](#cfg-providers-model_specs) | `{}` | 手写这家上游某些模型的上下文窗口、输出上限、会不会推理、收不收图，按模型 ID 完全匹配。写了就优先于价目表，用于价目表里没有或写错的模型。 |
-| `max_concurrent` | 整数 | — | 同时发给这家的请求最多几个，取值 1 到 1000。满了的时候，留在这家的对话等空位，别的请求换下一家；等多久见 `failover.slot_wait_secs`。不写：不限。 |
+| `max_concurrent` | 整数 | — | 同时发给这家的请求最多几个，取值 1 到 1000。满了的时候，留在这家的对话等空位，别的请求换下一家；等多久见 `failover.wait_secs`。不写：不限。 |
+| `limits` | 对象列表，见 [`providers[].limits[]`](#cfg-providers-limits) | — | 这家上游的用量上限，照着它自己的限额写：每几分钟、每几小时、每天、每周或每月的请求数、token 数或费用。每一条都有余量才往这家发。滚动窗口满了，请求换下一家或者等它空出来；天、周、月用满了，到下一期之前请求换下一家。不写：不限。 |
 | `disabled` | 布尔 | `false` | 不参与路由，模型也不出现在模型列表里；配置原样保留。 |
 | `balance` | `auto` \| `off` \| `openrouter` \| `deepseek` \| `moonshot` \| `sub2api` \| `newapi` \| `thinkwatch` | `auto` | 从哪里读这家上游的余额，用它自己的密钥、走它自己的代理：`openrouter`、`deepseek`、`moonshot`、`sub2api`、`newapi`（New API 和 One API）或 `thinkwatch`（ThinkWatch 企业网关）。`auto`：OpenRouter、DeepSeek、Moonshot 按 `base_url` 识别；其他地址（Anthropic、OpenAI、Gemini 的官方地址除外）询问一次它是不是 Sub2API、ThinkWatch 企业网关或 New API 中转站，结果只保存在内存中。`off`：不读余额。ChatGPT、Z.ai 账号和 Bedrock 不读余额，与这里写什么无关。 |
 | `signed_in` | `zai` \| `bigmodel` | — | `key` 来自哪一家的账号登录：`zai`（Z.ai）或 `bigmodel`（BigModel）。在桌面端登录账号时写入，在桌面端更换密钥时删除。不影响请求的发送方式。不写：密钥是手动填写的。 |
@@ -341,7 +351,46 @@ Bedrock 上只为 AWS 列出支持提示缓存的 Claude 模型标注：Claude 3
 
 ChatGPT 账号上游（`protocol: chatgpt`）只接受桌面应用登录得到的凭据，不能手写。不支持 Claude 和 Google 的订阅登录，请使用 API 密钥。
 
-有的中转站和账号同时只接受几个请求，多出来的直接拒绝。`max_concurrent` 让网关守住这个数：请求发出时占用这家的一个位置，回答完整交给客户端、或者客户端断开时归还。这家满了的时候，为复用提示缓存而留在这家的对话等空位，别的请求直接换下一家。最多等多久由 `failover.slot_wait_secs` 决定。等待不算失败，这家不会因此停用。只计算 token 数的请求不占位置。Responses 的 WebSocket 连接上，每个 `response.create` 从发出起占一个位置，直到它的回答结束，密钥的 `max_concurrent` 也一样；空闲的连接不占位置。
+有的中转站和账号同时只接受几个请求，多出来的直接拒绝。`max_concurrent` 让网关守住这个数：请求发出时占用这家的一个位置，回答完整交给客户端、或者客户端断开时归还。这家满了的时候，为复用提示缓存而留在这家的对话等空位，别的请求直接换下一家。最多等多久由 `failover.wait_secs` 决定。等待不算失败，这家不会因此停用。只计算 token 数的请求不占位置。Responses 的 WebSocket 连接上，每个 `response.create` 从发出起占一个位置，直到它的回答结束，密钥的 `max_concurrent` 也一样；空闲的连接不占位置。
+
+#### `providers[].limits`
+
+一家上游的用量上限，照着这家自己的限额写：每几分钟、每几小时、每天、每周或每月最多多少个
+请求、多少 token、多少美元。写法和密钥的 `limits` 一样；一家上游可以有好几条，每一条都有
+余量才往这家发。
+
+每一次发到这家的尝试算一个请求，成功失败都算，这家回 429 的不算。token 和费用算在得到回答
+的那一次尝试上。只计算 token 数的请求不算。还在进行的尝试按输入的估算计入，记下之后换成
+实数。
+
+`minute`、`hour` 的窗口满了，这家和并发数满了一样被跳过：留在这家的对话等它空出余量，别的
+请求换下一家；候选都没有余量时，请求等最先空出来的那一家，最多等一个请求能等的时间（见
+`failover`）。`day`、`week`、`month` 用满之后，到下一期开始之前请求换下一家，不等它。满了
+不算失败，这家不会因此停用。重启之后，这一天、这一周、这个月的用量从请求记录里重新加起来，
+所以 `retention.row_days` 要留够那一期，和密钥的一样；分钟、小时的窗口从空的开始。
+
+<!-- generated: table providers[].limits[] -->
+<a id="cfg-providers-limits"></a>
+
+| 字段 | 类型 | 默认值 | 说明 |
+|---|---|---|---|
+| `per` | `minute` \| `hour` \| `day` \| `week` \| `month` | **必填** | 按多长一段时间算。`minute`、`hour` 是滚动的（最近 60 秒、最近 60 分钟，或者 `every` 个这样的单位）；`day`、`week`、`month` 在本地时间的零点、周一零点、每月一号零点重新算。 |
+| `every` | 整数 | — | 滚动窗口有几分钟、几小时：`{per: hour, every: 5}` 是最近 5 小时。`minute` 取 1 到 60，`hour` 取 1 到 24；`day`、`week`、`month` 不能写。不写：1。 |
+| `requests` | 整数 | — | 最多往这家发这么多个请求。每一次发到了这家的尝试都算，它回 429 的不算；数 token 的请求不算。 |
+| `tokens` | 整数 | — | 这家回答的请求最多用这么多 token：未命中缓存的输入、写入缓存的和输出。 |
+| `cost` | 数字 | — | 这家回答的请求最多花这么多美元，按每个请求记下的费用算；至少 0.01。没有价格的模型算 0，`billing: free` 时全都算 0。 |
+| `cache_reads` | 布尔 | `false` | 把读取缓存的 token 也算进去。只有 `tokens` 上限能写。 |
+<!-- /generated -->
+
+```yaml
+providers:
+  - name: relay
+    base_url: https://relay.example.com
+    key: sk-relay
+    limits:
+      - { per: hour, every: 5, requests: 200 }
+      - { per: week, cost: 50 }
+```
 
 #### `providers[].oauth`
 
@@ -795,8 +844,8 @@ security:
 ### `failover`
 
 上游失败后会停用一段时间，接下来的请求直接交给下一个候选。停用多久取决于上游
-给出的原因：余额不足要等充值，额度用完要等到上游说的重置时刻，限流通常几秒钟就
-过去。只有一个候选的请求不受影响。Responses 的 WebSocket 连接上，每个 `response.create`
+给出的原因：余额不足要等充值，额度用完要等到上游说的重置时刻。只有一个候选的请求
+不受影响。Responses 的 WebSocket 连接上，每个 `response.create`
 在这里和一个请求一样算：第一段内容到达之前因为上游出错而失败的，算作一次失败；上游
 拒绝或连不上的连接也一样。
 
@@ -827,12 +876,25 @@ failover:
   idle_timeout_secs: 600
 ```
 
-上游的并发数满了（`max_concurrent`）时，一个请求等空位合计最多 `slot_wait_secs`
-秒。等密钥的 `minute`、`hour` 上限也算在这段时间里，两样加起来不超过 `slot_wait_secs`。
-进行中的对话等它留在的那一家，到时还没有空位就换下一家，缓存在那边从头建；
-新的对话遇到满着的上游直接跳过。候选全满时，请求等先空出来的那一家；都没有空出来，
-客户端收到 429 和 `Retry-After`，说明上游都忙。如果有上游收到过这个请求并且失败了，
-客户端收到的是那次失败。
+上游回 429（限流）时不停用，而是暂停：上游给出了等待时间的（`retry-after-ms`、
+`Retry-After` 或错误正文里的等待时间；不到一秒的、`retry-after-ms` 不到一毫秒的当作没有
+给出）暂停那么久，没有给出的按这家连续被限流的次数
+暂停 5、10、20、40 秒，之后每次 60 秒；上游回了别的答复就重新计数。暂停最长
+`rate_limit_max_pause_secs` 秒，熔断和 `load-balance` 都不把它算作失败。收到 429 的
+请求换下一个候选，或者等暂停结束，客户端察觉不到。流式回答在内容之前报的限流也按 429
+处理；只有请求的最后一个候选、而且这家五分钟内没被限流过时，客户端才会收到这个错误（这家照样
+暂停）。暂停结束时先放一个请求过去，这家接受了它（流式回答要等到内容开始），其余的请求再
+跟上；这个请求没有得到答复、超时，或者遇到这家额度用完，其余的请求也照常发出。暂停只保留
+到 twcore 重启为止。
+
+一个请求等暂时不能发的上游合计最多 `wait_secs` 秒：并发数满了（`max_concurrent`）的、
+回了 429 正在暂停的、到了 `minute` 或 `hour` 用量上限的都算。等密钥的 `minute`、`hour`
+上限也算在这段时间里，几样加起来不超过 `wait_secs`。进行中的对话等它留在的那一家，到时
+还没有恢复就换下一家，缓存在那边从头建；新的对话遇到这样的上游直接跳过。用完了天、周、
+月用量上限的上游也跳过。没有候选了，请求等最先恢复的那一家；流式回答照上文先收到 `200`
+和保活，连接不会因此断开。都没有恢复，客户端收到 429，`Retry-After` 和 `retry-after-ms`
+是最先恢复的那一家还要多久；候选全都用完了这一期的，`Retry-After` 是最早的重置时刻，
+`x-should-retry` 是 `false`。如果有上游收到过这个请求并且失败了，客户端收到的是那次失败。
 
 <!-- generated: table failover -->
 <a id="cfg-failover"></a>
@@ -844,9 +906,9 @@ failover:
 | `max_pause_secs` | 整数 | `600` | 翻倍后的停用上限，单位秒，不小于 `pause_secs`。 |
 | `no_balance_pause_secs` | 整数 | `1800` | 上游报告余额不足时停用的秒数。 |
 | `quota_pause_secs` | 整数 | `3600` | 上游报告额度用完、但没有给出重置时间时停用的秒数。给出了重置时间的，停用到那一刻。 |
-| `rate_limit_max_pause_secs` | 整数 | `3600` | 被限流的上游按它给的 `Retry-After` 停用，最多这么多秒。没有 `Retry-After` 的按没有说明原因的失败计。 |
+| `rate_limit_max_pause_secs` | 整数 | `3600` | 上游回 429（限流）后暂停这家的最长秒数。上游给出了等待时间的（`retry-after-ms`、`Retry-After` 或错误正文里的等待时间）按它给的暂停；没有给出的，按这家连续被限流的次数退避：5、10、20、40 秒，之后每次 60 秒。暂停不算失败：请求在 `wait_secs` 之内等这家恢复，熔断也不计入。 |
 | `idle_timeout_secs` | 整数 | `300` | 上游多少秒没有发出内容，网关就不再等它。从请求发出的那一刻算起，每来一段内容重新计时：正文、推理、工具调用都算，心跳不算。整包（非流式）的回答从发出算到整份回来。还没有内容交给客户端时，这家上游记一次失败，请求换到下一家；没有下一家了，客户端收到超时错误。已经有内容交给客户端的，回答以一条错误收尾。取值 30 到 3600。 |
-| `slot_wait_secs` | 整数 | `30` | 一个请求合计最多等的秒数，从过了密钥自己的 `max_concurrent` 时算起：等密钥的 `minute`、`hour` 上限空出名额，和等并发数满了（`max_concurrent`）的上游空出位置，都算在里面。密钥的上限到时空不出来就拒绝；等不到上游的空位就换下一家，候选全满时回 429。`0`：不等。取值 0 到 300。 |
+| `wait_secs` | 整数 | `120` | 一个请求合计最多等的秒数，从过了密钥自己的 `max_concurrent` 时算起：等密钥的 `minute`、`hour` 上限空出名额，和等暂时不能发的上游 —— 并发数满了（`max_concurrent`）、回了 429 正在暂停、到了这家 `minute` 或 `hour` 的用量上限 —— 都算在里面。密钥的上限到时空不出来就拒绝。上游暂时不能发的先换下一家，没有下一家了就等最先恢复的那一家；留在某一家的对话等这一家。到时都没有恢复，客户端收到带 `Retry-After` 的 429。`0`：不等。取值 0 到 600。 |
 <!-- /generated -->
 
 ### `aliases`
@@ -914,7 +976,7 @@ groups:
 
 - `weights`（默认）：只按权重。
 - `latency`：越快的上游分得越多。快慢看典型的从发出请求到回答第一段内容的时间，与 `url-test` 使用同一份测量。比组内居中者快一倍的上游，权重乘以四；最多乘以十，最少乘以十分之一。
-- `health`：越少失败的上游分得越多。依据是最近 30 分钟内的最近 50 次请求：服务器错误、限流、额度或余额用尽、凭据被拒、超时和连接失败算作失败；请求本身导致的错误不算，客户端取消、手动中止、因并发数满了（`max_concurrent`）而跳过也不算；超过 `failover.idle_timeout_secs` 仍没有内容算作超时。经常失败的上游至少保留权重的二十分之一，仍会偶尔分到请求，以便发现它已经恢复；完全失败的上游照旧由 [`failover`](#cfg-failover) 暂停。
+- `health`：越少失败的上游分得越多。依据是最近 30 分钟内的最近 50 次请求：服务器错误、额度或余额用尽、凭据被拒、超时和连接失败算作失败；请求本身导致的错误不算，限流（429）、客户端取消、手动中止、因并发数满了（`max_concurrent`）或到了用量上限而跳过也不算；超过 `failover.idle_timeout_secs` 仍没有内容算作超时。经常失败的上游至少保留权重的二十分之一，仍会偶尔分到请求，以便发现它已经恢复；完全失败的上游照旧由 [`failover`](#cfg-failover) 暂停。
 - `latency-health`：两个系数相乘。
 
 快慢只在流式回答上测，从请求发给这家上游的那一刻算起：之前的等待、之前失败的上游都不算在内。因超过 `failover.idle_timeout_secs` 没有内容而被放弃的上游，按等满的那段时间计。Responses 的 WebSocket 连接上，每个 `response.create` 在快慢和成败上都算一个请求，快慢从上游开始回答它的那一刻算起。
@@ -1092,6 +1154,88 @@ export const manifest = {
     note: { type: "string", label: "Note", value: "用中文回答。" },
   },
 };
+```
+
+### `sync`
+
+多台设备（这台 Mac、一台笔记本、一台运行远程 core 的服务器）可以通过自选的同步位置保持同一份配置：由云盘在设备之间传送的文件夹、WebDAV 服务器或 S3 兼容存储。每次改动都按对象与其他设备自上次同步以来的改动合并；只有两台设备把同一对象的同一部分改成不同内容时才构成冲突，冲突在每台设备上显示，任一设备处理之后随之清除。开启同步、加入已有的同步和处理冲突在应用里进行（设置 → 同步与备份），服务器上用 `twcore sync enable`；本节记录的是结果。
+
+同步的内容即配置包带的内容：上游、出站代理、网关密钥、别名、分组、路由、价目表、安全规则、插件和全局设置，包括密钥。`listen`、`retention` 和 `sync` 本身留在本机，ChatGPT 账号的登录、OAuth 的令牌也一样。别的设备上登录着的上游在这台设备上停用着，在这台登录之后才启用；这不会让它在别的设备上停用。
+
+已有配置的设备加入时逐项合并，不一样的项目逐项选择；默认网关密钥例外：每个安装都会生成一把，加入的设备采用同步数据的值，本机已接管的客户端随之更新。
+
+开着加密时，不加密的版本一概不读。keyring 不见了、被换成更早的那一份，都不会关掉加密：应用会问要不要放回这台设备记着的那一份。同步位置读起来是空的时，要再看几次才提示，停不停止同步由你决定。
+
+<!-- generated: table sync -->
+<a id="cfg-sync"></a>
+
+| 字段 | 类型 | 默认值 | 说明 |
+|---|---|---|---|
+| `device_id` | 字符串 | **必填** | 开启同步时生成。同步位置上的文件名里出现的是它的前 8 个字符。 |
+| `device_name` | 字符串 | **必填** | 在每台参与同步的设备的设备列表里显示的名字。 |
+| `encrypt` | 布尔 | `true` | 以同步口令加密存到同步位置的内容。同一同步位置上的所有设备采用同一设置；在应用里更改，应用会重新上传最新版本。 |
+| `passphrase` | 字符串 | — | 同步口令，`encrypt` 开着时必填；关闭加密之后也留着：同步位置上写着「已关闭」的 keyring 要用它核对。和本文件里的其他密钥一样以明文保存。 |
+| `exclude` | 字符串列表 | `[]` | 不同步的上游，按名字：不上传，也不被其他设备的同名上游覆盖。引用它们的路由、别名、分组随之不同步。 |
+| `target` | 对象，见 [`sync.target`](#cfg-sync-target) | **必填** | 同步位置。`keyring`、`versions/`、`devices/` 直接放在它里面。 |
+<!-- /generated -->
+
+<!-- generated: table sync.target -->
+<a id="cfg-sync-target"></a>
+
+| 字段 | 类型 | 默认值 | 说明 |
+|---|---|---|---|
+| `type` | `folder` \| `webdav` \| `s3` | **必填** | 同步位置的种类；其余字段随之不同，见下面三张表。 |
+<!-- /generated -->
+
+<!-- generated: table sync.target (folder) -->
+<a id="cfg-sync-target-folder"></a>
+
+| 字段 | 类型 | 默认值 | 说明 |
+|---|---|---|---|
+| `type` | 字符串 | **必填** | `folder` |
+| `path` | 字符串 | **必填** | core 所在机器上的绝对路径：由 iCloud Drive、Dropbox、OneDrive、Syncthing 或 NAS 共享在设备之间传送的文件夹。 |
+| `proxy` | 字符串 | `direct` | 文件夹用不到。 |
+<!-- /generated -->
+
+<!-- generated: table sync.target (webdav) -->
+<a id="cfg-sync-target-webdav"></a>
+
+| 字段 | 类型 | 默认值 | 说明 |
+|---|---|---|---|
+| `type` | 字符串 | **必填** | `webdav` |
+| `url` | 字符串 | **必填** | 文件夹的 WebDAV 地址。`https://`，校验证书；`http://` 只用于本机和局域网。 |
+| `user` | 字符串 | `''` | 用户名。 |
+| `pass` | 字符串 | `''` | 密码，或者服务为 WebDAV 签发的应用密码。 |
+| `proxy` | 字符串 | `direct` | 访问同步位置的请求从哪里出去：`direct`（直连）、`system`（跟随系统代理），或者 `proxies` 里一个代理的名字。本机、内网的 `http://` 地址只能是 `direct`。 |
+<!-- /generated -->
+
+<!-- generated: table sync.target (s3) -->
+<a id="cfg-sync-target-s3"></a>
+
+| 字段 | 类型 | 默认值 | 说明 |
+|---|---|---|---|
+| `type` | 字符串 | **必填** | `s3` |
+| `endpoint` | 字符串 | **必填** | S3 端点。主机以 `amazonaws.com`、`aliyuncs.com`、`myqcloud.com` 结尾的，存储桶名放进域名；其余端点（Cloudflare R2、MinIO、IP 地址）放进路径。`http://` 只用于本机和局域网。 |
+| `region` | 字符串 | **必填** | 签名用的区域；Cloudflare R2 填 `auto`。 |
+| `bucket` | 字符串 | **必填** | 存储桶，建议设为私有。 |
+| `prefix` | 字符串 | `''` | 存储桶里的一个前缀（文件夹）。不能有 `..`，不以 `/` 开头。 |
+| `access_key_id` | 字符串 | **必填** | Access Key ID。 |
+| `secret_access_key` | 字符串 | **必填** | Secret Access Key。 |
+| `proxy` | 字符串 | `direct` | 访问同步位置的请求从哪里出去：`direct`（直连）、`system`（跟随系统代理），或者 `proxies` 里一个代理的名字。本机、内网的 `http://` 地址只能是 `direct`。 |
+<!-- /generated -->
+
+```yaml
+sync:
+  device_id: 3f9a2c1e-0b1d-4e2f-9a3b-5c6d7e8f9a0b
+  device_name: Mac mini
+  encrypt: true
+  passphrase: "correct horse battery staple"
+  exclude: [本机 Ollama]
+  target:
+    type: webdav
+    url: https://dav.example.com/dav/ThinkWatch
+    user: name@example.com
+    pass: "应用密码"
 ```
 
 ## 环境变量

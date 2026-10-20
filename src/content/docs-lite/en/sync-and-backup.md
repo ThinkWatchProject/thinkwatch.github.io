@@ -243,7 +243,7 @@ Each version records the version it was based on. A merge takes the last version
 
 | Item | Merge units |
 |---|---|
-| Upstream | Connection (service, address, protocol, authentication method, key, headers, outbound proxy, AWS settings); models (model list, the models it is limited to, models added by hand, specs); billing (billing mode, prices, price multiplier); other (concurrency limit, client identity forwarding, balance source, disabled state) |
+| Upstream | Connection (service, address, protocol, authentication method, key, headers, outbound proxy, AWS settings); models (model list, the models it is limited to, models added by hand, specs); billing (billing mode, prices, price multiplier); other (concurrency limit, usage limits, client identity forwarding, balance source, disabled state) |
 | Proxy, gateway key, alias, group, route, price sheet, custom security rule | The whole item |
 | Plugin | Script; settings; on or off |
 | Upstream order, route order, plugin order | One unit each |

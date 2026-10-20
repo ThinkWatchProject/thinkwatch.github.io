@@ -43,6 +43,12 @@ export type Balance = (typeof BALANCES)[number];
 export const BILLINGS = ["per-token", "free"] as const;
 export type Billing = (typeof BILLINGS)[number];
 
+export const LIMIT_PERS = ["minute", "hour", "day", "week", "month"] as const;
+export type LimitPer = (typeof LIMIT_PERS)[number];
+
+export const LIMIT_MEASURES = ["requests", "tokens", "cost"] as const;
+export type LimitMeasure = (typeof LIMIT_MEASURES)[number];
+
 /** Every parameter, in the order a link is written. */
 export const PARAMS = [
   "service",
@@ -63,6 +69,7 @@ export const PARAMS = [
   "headers",
   "client_identity",
   "concurrency",
+  "limits",
   "balance",
   "models",
   "models_only",
@@ -76,8 +83,32 @@ export type Param = (typeof PARAMS)[number];
 /** The parameters of the first version. A link with only these also opens in earlier versions of the app. */
 export const V1_PARAMS: readonly Param[] = ["name", "url", "protocol", "key", "models"];
 
-/** The first version of ThinkWatch Lite that reads the other parameters. */
+/** The first version of ThinkWatch Lite that reads the other parameters, unless `SINCE` names a later one. */
 export const V2_SINCE = "2026.10.16";
+
+/** Parameters added after V2_SINCE, with the first version of ThinkWatch Lite that reads them. */
+export const SINCE: Partial<Record<Param, string>> = { limits: "2026.10.26" };
+
+/** Compares two versions such as 2026.10.16, part by part. */
+const newer = (a: string, b: string) => {
+  const x = a.split(".").map(Number);
+  const y = b.split(".").map(Number);
+  for (let i = 0; i < Math.max(x.length, y.length); i++) {
+    if ((x[i] ?? 0) !== (y[i] ?? 0)) return (x[i] ?? 0) > (y[i] ?? 0);
+  }
+  return false;
+};
+
+/** The first version of ThinkWatch Lite that reads all of these parameters, or undefined when every version does. */
+export function sinceOf(params: readonly Param[]): string | undefined {
+  let since: string | undefined;
+  for (const p of params) {
+    if (V1_PARAMS.includes(p)) continue;
+    const v = SINCE[p] ?? V2_SINCE;
+    if (!since || newer(v, since)) since = v;
+  }
+  return since;
+}
 
 /**
  * Settings a link can never carry: the outbound proxy and what happens when it is
@@ -110,6 +141,11 @@ export const MAX_HEADERS = 16;
 export const MAX_HEADER_NAME = 64;
 export const MAX_HEADER_VALUE = 1024;
 export const MAX_CONCURRENCY = 1000;
+export const MAX_LIMITS = 16;
+/** The largest request or token count of a usage limit (fifteen digits) */
+export const MAX_LIMIT_COUNT = 999_999_999_999_999;
+/** The smallest cost limit, in millionths of a dollar ($0.01) */
+export const LIMIT_COST_MIN = 10_000;
 export const MAX_SPEC_TOKENS = 10_000_000;
 
 const APP_PREFIX = "thinkwatch://import?";
@@ -205,6 +241,7 @@ export function fieldsFor(service: Service, auth: Auth): Set<Param> {
   f.add("url");
   f.add("headers");
   f.add("concurrency");
+  f.add("limits");
   if (r.protocol !== null) f.add("protocol");
   if (r.clientIdentity) f.add("client_identity");
   if (auth === "key" && r.key) f.add("key");
@@ -235,6 +272,20 @@ export type Price = {
   cacheWrite1h: string;
 };
 
+/**
+ * A usage limit: at most `max` requests, tokens or millionths of a dollar per
+ * `every` minutes or hours, or per day, week or month.
+ */
+export type Limit = {
+  per: LimitPer;
+  /** Minutes or hours the window spans; 1 for a day, week or month */
+  every: number;
+  measure: LimitMeasure;
+  /** A count, or for cost millionths of a dollar */
+  max: number;
+  cacheReads: boolean;
+};
+
 /** A validated import: what the New upstream dialog is prefilled with. */
 export type ImportLink = {
   service: Service;
@@ -258,6 +309,7 @@ export type ImportLink = {
   headers: Header[];
   clientIdentity: boolean;
   concurrency?: number;
+  limits: Limit[];
   balance?: Balance;
   models: string[];
   modelsOnly?: string[];
@@ -266,8 +318,8 @@ export type ImportLink = {
   billing?: Billing;
   /** Present when the link makes a new price sheet */
   priceSheet?: { multiplier: string; prices: Price[] };
-  /** Uses a parameter that ThinkWatch Lite reads from V2_SINCE on */
-  v2: boolean;
+  /** The first version of ThinkWatch Lite that reads every parameter; absent when the first version's parameters suffice */
+  since?: string;
   /** The checked parameters, normalized, in link order: what the app is handed */
   params: [Param, string][];
 };
@@ -544,6 +596,86 @@ function checkPrices(v: string): Price[] | null {
   return out;
 }
 
+/** A decimal whole number from 1 to `max`, without a sign or leading zeros (the app's `whole`). */
+function whole(s: string, max: number): number | null {
+  if (!/^[1-9][0-9]*$/.test(s) || s.length > 15) return null;
+  const n = Number(s);
+  return n <= max ? n : null;
+}
+
+/** Dollars as written in a cost limit (`5`, `0.5`, up to six decimals) to millionths of a dollar. */
+function dollarsToMicros(s: string): number | null {
+  const m = /^(0|[1-9][0-9]{0,8})(?:\.([0-9]{1,6}))?$/.exec(s);
+  if (!m) return null;
+  return Number(m[1]) * 1_000_000 + Number((m[2] ?? "").padEnd(6, "0"));
+}
+
+/** Millionths of a dollar written as dollars: up to six decimals, without trailing zeros (`5`, `0.125`). */
+export function microsText(m: number): string {
+  const frac = String(m % 1_000_000)
+    .padStart(6, "0")
+    .replace(/0+$/, "");
+  const dollars = String(Math.floor(m / 1_000_000));
+  return frac ? `${dollars}.${frac}` : dollars;
+}
+
+/**
+ * Usage limits: entries separated by `;`, each `per|measure|max|every|cache_reads`.
+ * `every` (1 to 60 minutes, 1 to 24 hours) is for `minute` and `hour` only and is 1
+ * when empty; `cache_reads` is `y`, for `tokens` only. Empty fields at the end may be
+ * left out. No two entries with the same period, `every`, measure and `cache_reads`.
+ * Mirrors the app's `check_limits`.
+ */
+function checkLimits(v: string): Limit[] | null {
+  const entries = v.split(";");
+  if (entries.length > MAX_LIMITS) return null;
+  const out: Limit[] = [];
+  for (const e of entries) {
+    const f = e.split("|");
+    if (f.length < 3 || f.length > 5) return null;
+    const [per, measure, rawMax, rawEvery = "", rawCache = ""] = f as string[];
+    if (!includes(LIMIT_PERS, per!) || !includes(LIMIT_MEASURES, measure!)) return null;
+    const max =
+      measure === "cost"
+        ? (() => {
+            const m = dollarsToMicros(rawMax!);
+            return m !== null && m >= LIMIT_COST_MIN ? m : null;
+          })()
+        : whole(rawMax!, MAX_LIMIT_COUNT);
+    if (max === null) return null;
+    let every = 1;
+    if (rawEvery) {
+      const most = per === "minute" ? 60 : per === "hour" ? 24 : 0;
+      const n = most ? whole(rawEvery, most) : null;
+      if (n === null) return null;
+      every = n;
+    }
+    if (rawCache && !(rawCache === "y" && measure === "tokens")) return null;
+    const limit: Limit = { per, every, measure, max, cacheReads: rawCache === "y" };
+    if (
+      out.some(
+        (x) => x.per === limit.per && x.every === limit.every && x.measure === limit.measure && x.cacheReads === limit.cacheReads,
+      )
+    )
+      return null;
+    out.push(limit);
+  }
+  return out;
+}
+
+/** One usage limit as the app writes it: `every` 1 and cache reads off left empty, empty fields at the end dropped. */
+function limitText(l: Limit): string {
+  const f = [
+    l.per,
+    l.measure,
+    l.measure === "cost" ? microsText(l.max) : String(l.max),
+    l.every > 1 ? String(l.every) : "",
+    l.cacheReads ? "y" : "",
+  ];
+  while (f.length > 3 && f[f.length - 1] === "") f.pop();
+  return f.join("|");
+}
+
 function checkMultiplier(v: string): boolean {
   if (!/^\d{1,3}(\.\d{1,6})?$/.test(v)) return false;
   const n = Number(v);
@@ -745,6 +877,14 @@ function validateFor(
     concurrency = Number(rawConcurrency);
   }
 
+  let limits: Limit[] = [];
+  const rawLimits = get("limits");
+  if (rawLimits !== undefined) {
+    const l = checkLimits(rawLimits);
+    if (!l) return fail("invalid", "limits");
+    limits = l;
+  }
+
   const balance = get("balance");
   if (balance !== undefined && !includes(BALANCES, balance)) return fail("invalid", "balance");
 
@@ -797,6 +937,7 @@ function validateFor(
     else if (p === "headers") put(p, headers.map((h) => `${h.name}: ${h.value}`).join(LF));
     else if (p === "models") put(p, models.join(","));
     else if (p === "models_only") put(p, modelsOnly!.join(","));
+    else if (p === "limits") put(p, limits.map(limitText).join(";"));
     else put(p, v);
   }
 
@@ -826,13 +967,14 @@ function validateFor(
     headers,
     clientIdentity: clientIdentity === "on",
     concurrency,
+    limits,
     balance: balance as Balance | undefined,
     models,
     modelsOnly,
     specs,
     billing: billing as Billing | undefined,
     priceSheet,
-    v2: out.some(([p]) => !V1_PARAMS.includes(p)),
+    since: sinceOf(out.map(([p]) => p)),
     params: out,
   };
   if (APP_PREFIX.length + encode(link, unknown).length > MAX_LINK) return fail("tooLong");
