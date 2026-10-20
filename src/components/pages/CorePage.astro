@@ -56,7 +56,7 @@ const sourceCommands = [
 const serveLog = [
   '<span class="ok">ready</span> gateway 127.0.0.1:8788 · control socket',
   '<span class="dim">POST</span> /v1/messages claude-code → anthropic <span class="ok">200</span> 1.2 s',
-  '<span class="dim">POST</span> /v1/responses codex → chatgpt <span class="warn">429</span> → relay <span class="ok">200</span>',
+  '<span class="dim">POST</span> /v1/responses codex → chatgpt <span class="warn">429 paused 30s</span> → relay <span class="ok">200</span>',
 ];
 const eyebrow = "font-mono text-[11px] uppercase tracking-[0.08em] text-[var(--color-muted)] sm:text-[13px]";
 const label = "m-0 font-mono text-[13px] uppercase tracking-[0.08em] text-[var(--color-muted)]";
@@ -130,7 +130,7 @@ const fileLink = "break-all text-[var(--color-brand-1)] transition-colors hover:
           </article>
           <article class="nx-tile nx-span-2 nx-in">
             <ol class="viz hops" aria-hidden="true">
-              <li class="fail"><b>1</b>chatgpt<em>429</em></li>
+              <li class="held"><b>1</b>chatgpt<em>429 · paused 30s</em></li>
               <li class="ok"><b>2</b>relay<em>200</em></li>
             </ol>
             <h3 class="nx-h3">{c.does.items[1].title}</h3>
@@ -479,10 +479,11 @@ const fileLink = "break-all text-[var(--color-brand-1)] transition-colors hover:
     margin-left: auto;
     font-style: normal;
   }
-  .hops .fail {
-    animation: hop-fail 5s ease-in-out infinite;
+  /* 返回 429 的上游是暂停，不是失败：变淡，不划掉 */
+  .hops .held {
+    animation: hop-held 5s ease-in-out infinite;
   }
-  .hops .fail em {
+  .hops .held em {
     color: var(--color-accent);
   }
   .hops .ok {
@@ -491,15 +492,14 @@ const fileLink = "break-all text-[var(--color-brand-1)] transition-colors hover:
   .hops .ok em {
     color: #6ee7a8;
   }
-  @keyframes hop-fail {
+  @keyframes hop-held {
     0%,
     20% {
       opacity: 1;
     }
     30%,
     100% {
-      opacity: 0.45;
-      text-decoration: line-through;
+      opacity: 0.55;
     }
   }
   @keyframes hop-ok {
@@ -659,7 +659,7 @@ const fileLink = "break-all text-[var(--color-brand-1)] transition-colors hover:
   }
   @media (prefers-reduced-motion: reduce) {
     .rule,
-    .hops .fail,
+    .hops .held,
     .hops .ok,
     .swap .from,
     .swap .to,
