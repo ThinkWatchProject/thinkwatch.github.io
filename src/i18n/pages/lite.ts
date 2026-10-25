@@ -108,7 +108,7 @@ export const liteCopy = {
           lines: ["macOS 12 or later, Apple silicon", "Windows 10 21H2 or later, x64 or ARM64", "Linux, x86_64 or aarch64"],
         },
         { label: "Interface", lines: ["English and Simplified Chinese"] },
-        { label: "Updates", lines: ["Installed by the app itself; through Homebrew for a Homebrew installation"] },
+        { label: "Updates", lines: ["Installed by the app itself; through Homebrew for a Homebrew installation", "The gateway keeps serving during an update"] },
         { label: "License", lines: ["MIT, free and open source"] },
       ],
     },
@@ -142,7 +142,7 @@ export const liteCopy = {
         {
           id: "routing",
           title: "Routing by rule, with failover",
-          body: "Rules send requests to different upstreams by model, tools, images, extended thinking and more. When an upstream fails before the answer begins, the next one takes over, and each session stays on one upstream so its prompt cache keeps hitting. Auxiliary requests such as title generation and warm-ups can be answered locally without using any quota.",
+          body: "Rules send requests to different upstreams by model, tools, images, extended thinking and more, and can set the reasoning effort. When an upstream fails before the answer begins, the next one takes over, a brief failure is retried after a short wait, and each session stays on one upstream so its prompt cache keeps hitting. Auxiliary requests such as title generation and warm-ups can be answered locally without using any quota.",
           alt: "The Routing page: a map from keys through routes and groups to upstreams, and the routes with the rules each applies in order",
         },
         {
@@ -351,7 +351,7 @@ export const liteCopy = {
           lines: ["macOS 12 及以上（Apple silicon）", "Windows 10 21H2 及以上（x64、ARM64）", "Linux（x86_64、aarch64）"],
         },
         { label: "界面语言", lines: ["英文、简体中文"] },
-        { label: "更新", lines: ["应用自动更新；通过 Homebrew 安装的随 Homebrew 更新"] },
+        { label: "更新", lines: ["应用自动更新；通过 Homebrew 安装的随 Homebrew 更新", "更新期间网关照常转发请求"] },
         { label: "许可证", lines: ["MIT，免费开源"] },
       ],
     },
@@ -385,7 +385,7 @@ export const liteCopy = {
         {
           id: "routing",
           title: "按规则分流，失败自动换",
-          body: "按模型、工具、图片、扩展思考等条件把请求分给不同上游。回答开始前上游出错时自动换用下一个，同一会话固定使用同一上游，提示缓存保持有效。标题生成、预热等辅助请求可在本地应答，不占用额度。",
+          body: "按模型、工具、图片、扩展思考等条件把请求分给不同上游，并可指定推理强度。回答开始前上游出错时自动换用下一个，暂时出错时稍候重试，同一会话固定使用同一上游，提示缓存保持有效。标题生成、预热等辅助请求可在本地应答，不占用额度。",
           alt: "路由页：从密钥经路由与策略组到上游的链路图，下方逐条列出每条路由的规则",
         },
         {

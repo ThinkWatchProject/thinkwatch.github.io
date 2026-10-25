@@ -45,6 +45,25 @@ Before a request is sent upstream, it is checked against the rate limits and bud
 
 [`GET /v1/usage`](#get-v1usage) tells a client what its key has used and how much room its limits leave.
 
+### Temporary upstream failures
+
+When every route of a model has been tried and the last one failed for the moment before any of the answer reached the client, the request waits and is sent again instead of the error going straight back. A failure for the moment is a `500`, `502`, `503`, `504` or `529`; a connection that could not be made or broke before the answer's head; or a stream that broke off, or reported an overload or a server error (`overloaded_error`, `api_error`, `server_error`, `server_is_overloaded`, `slow_down`, Gemini `UNAVAILABLE`), before any content. The waits are 2, 4 and 8 seconds, then 16 seconds each time, each give or take 20%, or as long as the upstream said in `retry-after-ms` or `Retry-After` (a zero wait is ignored, and one shorter than 250 ms is taken as 250 ms).
+
+- A request goes again only to the routes that failed that way; a model with one route, and a stream, goes back to the same route. Each attempt is picked as before: the strategy, the circuit breaker, the route caps, session affinity and the provider holding a conversation's encrypted history all apply, and each failed attempt counts against its route's breaker.
+- Retries stop when the next wait would end later than `gateway.retry_wait_secs` (120 seconds by default, `0` for no retries) after the request arrived; an attempt already under way is not cut short. Clients and load balancers with a shorter timeout may give up first.
+- Rate limits and spent quota (`429`), refused credentials (`401`, `403`), any other 4xx, timeouts, the gateway's own limits, budgets and policies, a client that left, and a stream after part of its answer went out are never retried.
+- While a stream can still be sent again, what the upstream sends before any content (Anthropic `message_start` and `ping`, Responses `response.created` and `response.in_progress`, a Chat chunk with only the role) is held back and goes out with the first content. While it is held, and while the gateway waits to send again, the client receives an SSE comment (`: keep-alive`) after every 15 seconds without data, except Gemini clients; the status is `200`.
+- A non-streaming request's attempt is cut 2 seconds before the gateway's 120-second request timeout, counted from when the request reached the gateway port, and a retry starts only when its wait and another attempt as long as the last one fit before then. At the timeout the client gets the last upstream error, or `504` (`ProviderTimeout`) when there was none, with its `gateway_logs` row.
+- The `gateway_logs` row of a request that was sent again records `"retries": n` in its detail, whether it then succeeded or failed. The metric `gateway_provider_retry_total{provider}` counts the attempts sent again, by the provider they went to.
+
+### Reasoning effort
+
+**Reasoning** in the model editor (`models.reasoning_effort`) sets the reasoning of the requests sent to that model: `off` takes reasoning out of requests that have it on, and a level (`low`, `medium`, `high`, `xhigh`, `max`) changes the effort of requests whose reasoning is on. Requests without reasoning, such as title generation, go out unchanged, and so does every request while the setting is empty. The setting is written the way each hop's upstream format writes it: with `off`, OpenAI Chat and Responses upstreams receive `none`, Gemini 2.5 Flash a thinking budget of 0, and Anthropic and Bedrock upstreams no thinking; Gemini models that cannot stop thinking (2.5 Pro, Gemini 3) get no thinking configuration. The response cache keys on the request together with the setting.
+
+When an upstream answers `400` about the reasoning level, the request goes once more to the same route with the level the error names (the lowest one it lists when `none` was refused), or without one when it names none. This is not counted as a retry, though its time falls within the retry window. When that is answered, the choice is remembered in Redis per provider, upstream model and request format for 7 days, so later requests send what worked straight away; a provider's memory is cleared when its URL or credentials change, a route relearns its protocol, or the provider is deleted. A hop whose reasoning level was changed records `"effort": {asked, sent, reason}` on its `gateway_logs` row.
+
+This applies to every model, whether or not it has a reasoning setting, and cannot be turned off: when an upstream refuses the reasoning level a request carries, the request goes out once more with a level the upstream accepts, or without one, and the change is remembered for that provider and model for 7 days. The level sent can therefore differ from the one the caller asked for, in either direction.
+
 ### POST /v1/chat/completions
 
 OpenAI-compatible chat completions endpoint. Proxies requests to the configured upstream provider.

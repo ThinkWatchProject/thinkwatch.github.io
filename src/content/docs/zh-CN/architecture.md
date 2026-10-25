@@ -294,7 +294,7 @@ AI API 代理引擎。包含：
 - **`token_counter.rs`** —— 使用 `tiktoken-rs` 进行 Token 计数，用于用量跟踪和 TPM 限制。
 - **`cost_tracker.rs`** —— 基于数据库中模型定价的实时成本计算。
 - **`circuit_breaker.rs`** —— 按 Provider 的三态断路器（Closed/Open/HalfOpen），可配置 `failure_threshold` 和 `recovery_secs`。
-- **`retry.rs`** —— 针对瞬态故障（NetworkError、UpstreamRateLimited）的指数退避重试，可配置 `max_retries`、`initial_delay_ms`、`max_delay_ms` 和 `jitter`。
+- **`proxy/retry.rs`** —— 所有路由都在回答的任何内容发给客户端之前暂时失败（过载、服务端错误、连接中断）时重发请求，依次退避 2、4、8 秒，此后每次 16 秒，以 `gateway.retry_wait_secs` 为限。限流、凭据被拒和其他 4xx 不重试。
 
 ### mcp-gateway
 

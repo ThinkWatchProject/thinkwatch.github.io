@@ -38,6 +38,7 @@ ThinkWatch Lite 把 Claude Code 接到本机的网关上，网关再把每个请
 - **余额。**DeepSeek 上游，以及地址在 `api.moonshot.cn` 或 `api.moonshot.ai` 上的 Kimi 上游，在「额度 / 计费」列中显示账户余额。
 - **`/model` 列表**只显示名称含 `claude` 或 `anthropic` 的网关模型；其他模型需要输入名称，或用 `ANTHROPIC_CUSTOM_MODEL_OPTION` 加入一项。
 - **费用。**改写过模型名的请求按实际发出的模型计价。
+- **推理强度。**自 ThinkWatch Lite 2026.10.29 起，规则的「改写参数」中可以设置「推理」，例如设为 max，使 Claude Code 发往 GLM 的请求始终使用最高一档。已开启推理的请求改用这一档，生成标题等未开启推理的请求保持不变；上游不接受这一档时，网关改用它接受的档位重发一次并记住，请求详情中注明改动及原因。
 - **「还原…」**只恢复应用写入的字段，手动加入的模型变量仍留在 `settings.json` 中。
 
 相关文档：[功能详解](/zh-CN/docs/lite/features/)、[让 Codex 使用 Claude、Gemini 或只提供 Chat Completions 的中转](/zh-CN/docs/lite/codex-other-models/)、[让 Claude Desktop 使用第三方模型](/zh-CN/docs/lite/claude-desktop-third-party-models/)。

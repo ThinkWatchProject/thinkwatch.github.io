@@ -81,13 +81,13 @@ The app looks for a new version two minutes after it starts and once a day after
 
 When the automatic check finds a new version, the app lists it among the notices and posts a system notification. With **Notices** in Settings › General set to **In app only**, only the notice appears; with **Off**, neither does. The notice, the notification, the **Install Version** item in the menu bar or tray menu, and **Update to** in Settings › About open the update window; **Check for updates**, in the same menu or in Settings › About, opens it at once when there is a new version. What happens next depends on how the app was installed.
 
-**Downloaded from the releases page on macOS:** one press on the install button does the rest. The app downloads the update, verifies it against a key compiled into itself, waits for the requests the gateway is serving to finish — up to three minutes — then replaces itself and restarts. A task in the middle of a response is not cut off to make room for the update.
+**Downloaded from the releases page on macOS:** one press on the install button does the rest. The app downloads the update, verifies it against a key compiled into itself, then replaces itself and restarts. A task in the middle of a response is not cut off by the update (see below).
 
-**With the Windows installer:** the same single press. The app downloads the new installer, verifies it against the key compiled into itself, waits for the requests in flight to finish in the same way, then runs the installer, and the new version starts once it is done. The app is installed for all users, so Windows asks for administrator permission at every update; declining leaves the current version running.
+**With the Windows installer:** the same single press. The app downloads the new installer, verifies it against the key compiled into itself, then runs the installer, and the new version starts once it is done. The app is installed for all users, so Windows asks for administrator permission at every update; declining leaves the current version running.
 
-**The Windows portable copy:** the same single press, and no administrator permission is needed. The app downloads the new zip, verifies it against the key compiled into itself, waits for the requests in flight to finish, then replaces the two program files in its folder and restarts. If replacing them fails, the old files are put back and the current version keeps running.
+**The Windows portable copy:** the same single press, and no administrator permission is needed. The app downloads the new zip, verifies it against the key compiled into itself, then replaces the two program files in its folder and restarts. If replacing them fails, the old files are put back and the current version keeps running.
 
-**On Linux:** the same single press, and no password is asked for. The app downloads the new AppImage, verifies it against the key compiled into itself, waits for the requests in flight to finish, then replaces its own file and restarts. The AppImage has to be in a folder the user can write to.
+**On Linux:** the same single press, and no password is asked for. The app downloads the new AppImage, verifies it against the key compiled into itself, then replaces its own file and restarts. The AppImage has to be in a folder the user can write to.
 
 **Installed with Homebrew:** the window gives the command to copy, and the app never replaces itself. Homebrew records which version it put in `/Applications`; an app that overwrote it would be written back over by the next `brew upgrade`. A Homebrew installation is offered a new version only once the tap carries it, so the command always has something to install:
 
@@ -96,6 +96,8 @@ brew update && brew upgrade --cask thinkwatch-lite
 ```
 
 `brew update` comes first because `brew upgrade` refreshes taps at most once a day on its own.
+
+However the app was installed, an update does not interrupt the gateway: when the new version starts, the running gateway hands its port over to the new one, finishes the requests in flight and exits, so the port stays open and those requests complete. Meanwhile the requests in progress on the Overview page and in the menu bar include those the previous gateway is still finishing. A Homebrew upgrade is recognised and hands the gateway over in the same way as an in-app update, and so does **Restart Gateway** in the menu. After an update the window comes back as it was before. This applies from 2026.10.29: updating from an earlier version to 2026.10.29 still has the old version wait for the requests in flight to finish, up to three minutes, and then restart the gateway.
 
 ## Next steps
 

@@ -72,7 +72,7 @@ ThinkWatch Lite 未经 Apple 注册开发者签名，Windows 版本也未经代�
 
 ## ThinkWatch Lite 如何更新和卸载？
 
-ThinkWatch Lite 启动两分钟后检查一次新版本，此后每天检查一次。从 release 页面下载安装的，点击一次即可完成更新：应用校验下载的文件，等待进行中的请求结束后重新启动。通过 Homebrew 安装的，改用 Homebrew 更新：`brew update && brew upgrade --cask thinkwatch-lite`。
+ThinkWatch Lite 启动两分钟后检查一次新版本，此后每天检查一次。从 release 页面下载安装的，点击一次即可完成更新：应用校验下载的文件后重新启动。通过 Homebrew 安装的，改用 Homebrew 更新：`brew update && brew upgrade --cask thinkwatch-lite`。自 2026.10.29 起，两种方式都不中断网关：正在运行的网关把端口交给新版本，处理完进行中的请求后退出。
 
 卸载时先在「设置 › 完全卸载」中卸载，它会还原已接管的客户端、取消开机启动，并可同时删除数据目录；之后在 macOS 上把应用移到废纸篓，在 Linux 上删除 AppImage，在 Windows 绿色版上删除整个文件夹。Windows 安装版也可以通过系统卸载，卸载程序会先完成同样的还原。
 
