@@ -30,19 +30,19 @@ const jsonLd = [
         <h1 class="nx-h1 sp-h1 nx-rise" style="--d:1"><span class="nx-grad">{c.hero.title}</span></h1>
         <p class="nx-sub nx-rise" style="--d:2">{c.hero.sub}</p>
 
-        <!-- One tile per sponsor: logo, the sponsor's own tagline and description, and its site -->
+        <!-- One row per sponsor: its logo on its own black plate, then its tagline, description and site -->
         <div class="sp-list nx-rise" style="--d:3">
           {sponsors.map((s) => {
             const e = c.entries[s.name];
             return (
               <article class="nx-tile sp-card">
-                <a href={s.href} target="_blank" rel="noopener" class="sp-logo">
+                <a href={s.href} target="_blank" rel="sponsored noopener" class="sp-plate">
                   <img src={s.logo} alt={s.name} width={s.logoWidth / 3} height={s.logoHeight / 3} />
                 </a>
-                <h2 class="sp-tagline">{e.tagline}</h2>
-                <p class="nx-body">{e.body}</p>
-                <div class="nx-actions">
-                  <a href={s.href} target="_blank" rel="noopener" class="nx-pill">{e.visit}</a>
+                <div class="sp-content">
+                  <h2 class="sp-tagline">{e.tagline}</h2>
+                  <p class="nx-body">{e.body}</p>
+                  <a href={s.href} target="_blank" rel="sponsored noopener" class="nx-link sp-site">{e.visit}</a>
                 </div>
               </article>
             );
@@ -88,36 +88,61 @@ const jsonLd = [
     display: grid;
     gap: 12px;
   }
+  /* Plate and copy side by side, the plate on top on narrow screens */
   .sp-card {
-    padding: 36px;
+    display: grid;
+    padding: 0;
   }
-  @media (max-width: 639px) {
+  @media (min-width: 768px) {
     .sp-card {
-      padding: 26px 22px;
+      grid-template-columns: 300px minmax(0, 1fr);
     }
   }
-  .sp-logo {
-    display: inline-block;
+  /* The sponsor's own plate: its logo on black */
+  .sp-plate {
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-height: 140px;
+    padding: 24px;
+    background: radial-gradient(120% 90% at 50% 0%, rgba(255, 255, 255, 0.07), transparent 60%), #050505;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   }
-  .sp-logo img {
+  @media (min-width: 768px) {
+    .sp-plate {
+      border-bottom: 0;
+      border-right: 1px solid rgba(255, 255, 255, 0.08);
+    }
+  }
+  .sp-plate img {
     display: block;
-    width: 240px;
+    width: 210px;
     max-width: 100%;
     height: auto;
   }
+  .sp-content {
+    position: relative;
+    padding: 26px 32px 22px;
+  }
+  @media (max-width: 639px) {
+    .sp-content {
+      padding: 22px 22px 18px;
+    }
+  }
   .sp-tagline {
-    margin: 28px 0 0;
-    font-size: 22px;
+    margin: 0;
+    font-size: 20px;
     font-weight: 600;
     letter-spacing: -0.015em;
     color: #fff;
+    text-wrap: balance;
   }
   .sp-card .nx-body {
-    margin-top: 12px;
-    max-width: 560px;
+    margin-top: 8px;
+    max-width: 720px;
   }
-  .sp-card .nx-actions {
-    margin-top: 28px;
+  .sp-site {
+    margin-top: 4px;
   }
   .sp-become {
     display: flex;
