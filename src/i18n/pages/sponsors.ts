@@ -10,7 +10,7 @@ export interface Sponsor {
   href: string;
   /** A white logo on a transparent background, under public/sponsors */
   logo: string;
-  /** The logo's pixel size; it is shown at half of it or less */
+  /** The logo's pixel size; it is shown at a third of it or less */
   logoWidth: number;
   logoHeight: number;
 }
@@ -20,8 +20,8 @@ export const sponsors: Sponsor[] = [
     name: "VoyageAge",
     href: "https://www.voyageage.com",
     logo: "/sponsors/voyageage.png",
-    logoWidth: 720,
-    logoHeight: 108,
+    logoWidth: 1200,
+    logoHeight: 180,
   },
 ];
 

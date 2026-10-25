@@ -31,7 +31,7 @@ const link = (path: string) => ({ href: localePath(lang, path), "data-localize":
       </p>
       <p class="mt-3 text-[var(--color-muted)]">
         <Bi en={en.common.sponsors} zh={zh.common.sponsors} both={bilingual} />{sponsors.map((s) => (
-          <Fragment><a href={s.href} target="_blank" rel="noopener" class="underline decoration-white/20 underline-offset-[3px] hover:text-white">{s.name}</a> · </Fragment>
+          <Fragment><a href={s.href} target="_blank" rel="sponsored noopener" class="underline decoration-white/20 underline-offset-[3px] hover:text-white">{s.name}</a> · </Fragment>
         ))}<a {...link("/sponsors")} class="underline decoration-white/20 underline-offset-[3px] hover:text-white"><Bi en={en.common.sponsorsCta} zh={zh.common.sponsorsCta} both={bilingual} /></a>
       </p>
     </div>

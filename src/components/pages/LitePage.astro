@@ -162,8 +162,8 @@ const archLabel = { x64: "x64", arm64: "ARM64" } as const;
           <p class="sponsor rise" style="--d:3">
             <span>{ui.sponsors}</span>
             {sponsors.map((s) => (
-              <a class="sponsor-logo" href={s.href} target="_blank" rel="noopener">
-                <img src={s.logo} alt={s.name} width={s.logoWidth / 6} height={s.logoHeight / 6} />
+              <a class="sponsor-logo" href={s.href} target="_blank" rel="sponsored noopener">
+                <img src={s.logo} alt={s.name} width={s.logoWidth / 10} height={s.logoHeight / 10} />
               </a>
             ))}
             <a class="sponsor-cta" href={localePath(lang, "/sponsors")}>{ui.sponsorsCta}</a>
@@ -1019,11 +1019,6 @@ const archLabel = { x64: "x64", arm64: "ARM64" } as const;
   }
   .sponsor-logo {
     display: inline-flex;
-    opacity: 0.8;
-    transition: opacity 160ms;
-  }
-  .sponsor-logo:hover {
-    opacity: 1;
   }
   .sponsor-logo img {
     display: block;
