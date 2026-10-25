@@ -9,7 +9,6 @@ const links = {
   liteLicense: "https://github.com/ThinkWatchProject/ThinkWatch-Lite/blob/main/LICENSE",
   coreLicense: "https://github.com/ThinkWatchProject/ThinkWatch-Core/blob/main/LICENSE",
   sales: "mailto:fylorn@outlook.com",
-  salesLabel: "fylorn@outlook.com",
 } as const;
 
 const tierNumbers = [
@@ -132,7 +131,7 @@ export const pricingCopy = {
     contact: {
       title: "Commercial licensing",
       body: "If either free threshold is exceeded, a commercial license must be obtained before continuing production use of ThinkWatch Enterprise.",
-      label: links.salesLabel,
+      label: "Contact us",
       href: links.sales,
     },
   },
@@ -246,7 +245,7 @@ export const pricingCopy = {
     contact: {
       title: "商业授权",
       body: "超出任一免费阈值后，继续在生产环境使用 ThinkWatch 企业版之前须获取商业授权。",
-      label: links.salesLabel,
+      label: "联系我们",
       href: links.sales,
     },
   },

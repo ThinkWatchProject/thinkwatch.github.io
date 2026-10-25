@@ -114,6 +114,8 @@ export function pageSources(pathname: string): string[] {
       ];
     case "/pricing":
       return ["src/components/pages/PricingPage.astro", "src/i18n/pages/pricing.ts"];
+    case "/sponsors":
+      return ["src/components/pages/SponsorsPage.astro", "src/i18n/pages/sponsors.ts", "public/sponsors"];
     case "/changelog":
       return ["src/components/pages/ChangelogPage.astro", "src/i18n/pages/changelog.ts", "src/content/changelog"];
     case "/docs":
