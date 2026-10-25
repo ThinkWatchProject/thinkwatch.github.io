@@ -44,7 +44,7 @@ export const sponsorsCopy: Record<Lang, {
     hero: {
       eyebrow: "ThinkWatch Lite",
       title: "Sponsors",
-      sub: "The companies below sponsor the development of ThinkWatch Lite. ThinkWatch Lite remains free and open source under the MIT license.",
+      sub: "Thanks to the sponsors below for supporting the development of ThinkWatch Lite.",
     },
     entries: {
       VoyageAge: {
@@ -78,7 +78,7 @@ export const sponsorsCopy: Record<Lang, {
     hero: {
       eyebrow: "ThinkWatch Lite",
       title: "赞助商",
-      sub: "以下公司赞助 ThinkWatch Lite 的开发。ThinkWatch Lite 依然免费，以 MIT 许可证开源。",
+      sub: "感谢以下赞助商支持 ThinkWatch Lite 的开发。",
     },
     entries: {
       VoyageAge: {
