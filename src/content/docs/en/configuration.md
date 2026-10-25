@@ -545,6 +545,14 @@ Policies saved before 3.8.0 keep their behaviour: redaction rules replace with p
 
 Turn it on where a request that escapes its limits is worse than a refused one. `GET /v1/usage` answers `503` while the limits cannot be read, whichever way the setting is. In the console, the setting is **Fail closed when limits can't be checked** under Settings › Security › Rate Limiter.
 
+### Gateway
+
+| Setting                      | Default | Description                                  |
+| ---------------------------- | ------- | -------------------------------------------- |
+| `gateway.retry_wait_secs`    | `120`   | How long after a request arrives it may still be sent again, in seconds, from 0 to 600; `0` turns retries off. See [Temporary upstream failures](/docs/api-reference#temporary-upstream-failures) |
+
+In the console, the setting is **Retry window (seconds)** under Settings › Gateway › Routing strategy.
+
 ### Budget
 
 | Setting                      | Default | Description                                          |

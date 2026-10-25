@@ -46,7 +46,7 @@ export const coreCopy = {
         },
         {
           title: "Failover before the first byte",
-          body: "Until the first byte reaches the client, a failing upstream is replaced by the next one without the client noticing; after that point, the failure is reported. A failing upstream is paused for as long as its reason calls for: an exhausted balance, or a used-up quota until its reset. An upstream that answers 429 is paused for the wait it asks, without counting as a failure, and its requests go to the next upstream or wait for it.",
+          body: "Until the first byte reaches the client, a failing upstream is replaced by the next one, and a brief failure of every upstream is retried after a short wait, without the client noticing; after that point, the failure is reported. A failing upstream is paused for as long as its reason calls for: an exhausted balance, or a used-up quota until its reset. An upstream that answers 429 is paused for the wait it asks, without counting as a failure, and its requests go to the next upstream or wait for it.",
         },
         {
           title: "Cost accounting",
@@ -170,7 +170,7 @@ export const coreCopy = {
         },
         {
           title: "首字节前的故障转移",
-          body: "首字节到达客户端之前，出错的上游由下一个上游替换，客户端无从察觉；此后发生的故障如实报告。出错的上游按原因暂停：余额不足与额度用完（到重置时间为止）各有时长。返回 429 的上游按其要求的等待时间暂停，不计为失败，发给它的请求转到下一个上游或等待它恢复。",
+          body: "首字节到达客户端之前，出错的上游由下一个上游替换，所有上游都只是暂时出错时稍候重试，客户端无从察觉；此后发生的故障如实报告。出错的上游按原因暂停：余额不足与额度用完（到重置时间为止）各有时长。返回 429 的上游按其要求的等待时间暂停，不计为失败，发给它的请求转到下一个上游或等待它恢复。",
         },
         {
           title: "费用核算",

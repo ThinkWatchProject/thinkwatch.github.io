@@ -72,7 +72,7 @@ Its gateway can. ThinkWatch Core runs as a systemd service on Linux on x86_64 or
 
 ## How is ThinkWatch Lite updated and uninstalled?
 
-ThinkWatch Lite checks for a new version two minutes after it starts and once a day. Installed from the releases page, it updates itself with one press: it verifies the download and waits for the requests in progress to finish before restarting. A Homebrew installation updates through Homebrew instead, with `brew update && brew upgrade --cask thinkwatch-lite`.
+ThinkWatch Lite checks for a new version two minutes after it starts and once a day. Installed from the releases page, it updates itself with one press: it verifies the download and restarts. A Homebrew installation updates through Homebrew instead, with `brew update && brew upgrade --cask thinkwatch-lite`. From 2026.10.29, neither interrupts the gateway: the running gateway hands its port over to the new version, finishes the requests in progress and exits.
 
 To uninstall, run **Settings › Full uninstall** first, which restores connected clients, turns off launch at login and can delete the data directory; then move the app to the Trash on macOS, or delete the AppImage on Linux or the portable folder on Windows. The Windows installer can also be removed through the system, which does the same restoring first.
 

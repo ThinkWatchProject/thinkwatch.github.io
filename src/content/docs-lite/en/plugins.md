@@ -28,7 +28,7 @@ A request is routed first, on what the client sent: the routing rules, a rule's 
 3. If a plugin changed the request, the content filter checks it again, hidden-character rules included, and reports only what the plugins added. A block refuses the whole request; it is not tried on another upstream.
 4. The request is converted to the upstream's format if needed, Secrets & privacy applies, and it is sent.
 
-When an attempt fails and the request moves to another upstream, the hooks run again from the request as the client sent it, so changes made for one upstream never reach another. A retry to the same upstream, such as the one after a sign-in token is refreshed, reuses what the hooks produced.
+When an attempt fails and the request moves to another upstream, the hooks run again from the request as the client sent it, so changes made for one upstream never reach another. A retry after an upstream failed temporarily is a new attempt, and the hooks run again from the client's request as well. A resend to the same upstream, such as the one after a sign-in token is refreshed, reuses what the hooks produced.
 
 A plugin that changes the model renames only what is sent to the upstream of this attempt, like a routing rule's rename, and replaces any name a rule set. The request is not routed again and the upstream's model list is not checked again, but the models the key may use still apply: a model outside them refuses the request.
 

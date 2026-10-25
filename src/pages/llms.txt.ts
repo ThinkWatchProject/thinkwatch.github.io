@@ -30,7 +30,7 @@ ThinkWatch Lite runs a local AI API gateway on macOS (Apple silicon), Windows (x
 - After that, upstreams and models change inside the gateway; client configuration files are not edited again and clients do not restart.
 - Converts between the Anthropic Messages, OpenAI Chat Completions, OpenAI Responses and Gemini APIs, so Claude Code can use GPT or Gemini models and Codex can use upstreams that only offer Chat Completions.
 - Upstreams: API keys for Anthropic, OpenAI, Gemini, DeepSeek, Amazon Bedrock and any compatible API, relays such as OpenRouter, local models such as Ollama, and ChatGPT or Z.ai accounts signed in from the app.
-- Routing rules match on model, token count, tools, images and extended thinking, and can rewrite the model name. Strategy groups: in order (failover), round robin with session affinity, lowest latency, lowest cost, manual selection.
+- Routing rules match on model, token count, tools, images and extended thinking, and can rewrite the model name and the reasoning effort. Strategy groups: in order (failover), round robin with session affinity, lowest latency, lowest cost, manual selection.
 - Every request records its cost, tokens, cache hits, time to first token, generation speed, the rule it matched, each upstream it tried, and the full request and response.
 - Before a request leaves, API keys, tokens, private keys, ID numbers and card numbers can be replaced with placeholders, so a relay does not receive them. Tool calls that download and run code or send out credentials can be cut off mid-stream. MCP servers, skills and hooks are scanned.
 - Claude Pro and Max subscriptions cannot be used through the gateway; Claude Code needs an API key or a relay.

@@ -294,7 +294,7 @@ The AI API proxy engine. Contains:
 - **`token_counter.rs`** -- Token counting using `tiktoken-rs` for usage tracking and TPM enforcement.
 - **`cost_tracker.rs`** -- Real-time cost calculation based on model pricing from the database.
 - **`circuit_breaker.rs`** -- Three-state circuit breaker (Closed/Open/HalfOpen) per provider, with configurable `failure_threshold` and `recovery_secs`.
-- **`retry.rs`** -- Retry with exponential backoff for transient failures (NetworkError, UpstreamRateLimited), with configurable `max_retries`, `initial_delay_ms`, `max_delay_ms`, and `jitter`.
+- **`proxy/retry.rs`** -- Sends a request again when every route failed for the moment (an overload, a server error, a broken connection) before any of the answer reached the client, backing off 2, 4, 8, then 16 seconds within `gateway.retry_wait_secs`. Rate limits, refused credentials and other 4xx are not retried.
 
 ### mcp-gateway
 

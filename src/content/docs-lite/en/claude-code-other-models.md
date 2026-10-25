@@ -38,6 +38,7 @@ ThinkWatch Lite connects Claude Code to a gateway on the same computer, which fo
 - **Balance.** A DeepSeek upstream, and a Kimi upstream on `api.moonshot.cn` or `api.moonshot.ai`, shows the account balance in the Quota / billing column.
 - **The /model list** shows gateway models only when their names contain `claude` or `anthropic`. Other models are typed by name, or added as one entry with `ANTHROPIC_CUSTOM_MODEL_OPTION`.
 - **Cost.** A rewritten request is priced as the model actually sent.
+- **Reasoning effort.** From ThinkWatch Lite 2026.10.29, a rule can set **Reasoning** under **Parameter rewrites**, for example to max, so that the requests Claude Code sends to GLM always use the highest level. Requests with reasoning on are sent with that level, and those without it, such as title generation, are left as they are; when the upstream does not accept the level, the gateway resends once with one it accepts and remembers it, and the request details say what changed and why.
 - **Restore…** puts back only the fields the app wrote; model variables added by hand stay in `settings.json`.
 
 Related: [Features](/docs/lite/features/), [Use Codex with Claude, Gemini or a Chat Completions-only relay](/docs/lite/codex-other-models/), [Use Claude Desktop with third-party models](/docs/lite/claude-desktop-third-party-models/).
