@@ -13,7 +13,8 @@ import TwMark from "~/components/TwMark.astro";
 import Base from "~/layouts/Base.astro";
 import SiteHeader from "~/components/SiteHeader.astro";
 import SiteFooter from "~/components/SiteFooter.astro";
-import { getLang, localePath, sponsorHref, t } from "~/i18n";
+import { getLang, localePath, t } from "~/i18n";
+import { sponsors } from "~/i18n/pages/sponsors";
 import { liteCopy } from "~/i18n/pages/lite";
 import { formatSize, getLatestLiteRelease } from "~/lib/github";
 import { liteLd } from "~/lib/structured-data";
@@ -158,7 +159,15 @@ const archLabel = { x64: "x64", arm64: "ARM64" } as const;
             <LiteDownload />
             <a href="#install" class="ghost">{c.hero.ctaSecondary}</a>
           </div>
-          <p class="sponsor rise" style="--d:3">{ui.sponsors}<a href={sponsorHref}>{ui.sponsorsCta}</a></p>
+          <p class="sponsor rise" style="--d:3">
+            <span>{ui.sponsors}</span>
+            {sponsors.map((s) => (
+              <a class="sponsor-logo" href={s.href} target="_blank" rel="noopener">
+                <img src={s.logo} alt={s.name} width={s.logoWidth / 6} height={s.logoHeight / 6} />
+              </a>
+            ))}
+            <a class="sponsor-cta" href={localePath(lang, "/sponsors")}>{ui.sponsorsCta}</a>
+          </p>
         </div>
         <div class="hero-mark" aria-hidden="true">
           <div class="mark-halo"></div>
@@ -995,6 +1004,10 @@ const archLabel = { x64: "x64", arm64: "ARM64" } as const;
   }
   .sponsor {
     margin: 20px 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 18px;
     font-size: 14px;
     color: var(--color-dim);
   }
@@ -1004,14 +1017,27 @@ const archLabel = { x64: "x64", arm64: "ARM64" } as const;
       margin-top: 48px;
     }
   }
-  .sponsor a {
+  .sponsor-logo {
+    display: inline-flex;
+    opacity: 0.8;
+    transition: opacity 160ms;
+  }
+  .sponsor-logo:hover {
+    opacity: 1;
+  }
+  .sponsor-logo img {
+    display: block;
+    height: 18px;
+    width: auto;
+  }
+  .sponsor-cta {
     color: var(--color-muted);
     text-decoration: underline;
     text-decoration-color: rgba(255, 255, 255, 0.2);
     text-underline-offset: 3px;
     transition: color 160ms;
   }
-  .sponsor a:hover {
+  .sponsor-cta:hover {
     color: var(--color-text);
   }
   @media (max-width: 1023px) {

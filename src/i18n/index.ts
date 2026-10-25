@@ -3,7 +3,7 @@
 
 export type Lang = "en" | "zh-CN";
 
-/** Where the sponsor line on the Lite page and in the footer leads; the Lite README links to the same address */
+/** The address for sponsorship enquiries, on the /sponsors page; the Lite README links to the same address */
 export const sponsorHref = "mailto:fylorn@outlook.com?subject=ThinkWatch%20Lite%20Sponsorship";
 
 const dict = {
@@ -15,7 +15,7 @@ const dict = {
       copied: "Copied ✓",
       skipToContent: "Skip to content",
       sponsors: "Sponsors: ",
-      sponsorsCta: "Want to appear here?",
+      sponsorsCta: "Become a sponsor",
     },
 
     nav: {
@@ -247,7 +247,7 @@ const dict = {
       copied: "已复制 ✓",
       skipToContent: "跳转到正文",
       sponsors: "赞助商：",
-      sponsorsCta: "想出现在这里吗？",
+      sponsorsCta: "成为赞助商",
     },
 
     nav: {

@@ -1,0 +1,148 @@
+---
+// The /sponsors page: the sponsors of ThinkWatch Lite and how to become one.
+// Copy and the sponsor list live in src/i18n/pages/sponsors.ts.
+import Base from "~/layouts/Base.astro";
+import SiteHeader from "~/components/SiteHeader.astro";
+import SiteFooter from "~/components/SiteFooter.astro";
+import NeonMotion from "~/components/NeonMotion.astro";
+import { getLang, sponsorHref } from "~/i18n";
+import { sponsors, sponsorsCopy } from "~/i18n/pages/sponsors";
+import { breadcrumbs, webPage } from "~/lib/structured-data";
+
+const lang = getLang(Astro);
+const c = sponsorsCopy[lang];
+const reportHref = sponsorHref.replace("Sponsorship", "Sponsor%20Report");
+
+const jsonLd = [
+  webPage(lang, "/sponsors", c.meta.title, c.meta.description),
+  breadcrumbs(lang, "/sponsors", c.meta.breadcrumbHome, c.meta.breadcrumbPage),
+];
+---
+
+<Base title={c.meta.title} description={c.meta.description} jsonLd={jsonLd}>
+  <SiteHeader />
+  <main id="main">
+    <section class="nx-hero sp-hero">
+      <div class="nx-aurora" aria-hidden="true"><i></i><i></i><i></i></div>
+      <div class="nx-gridbg" aria-hidden="true"></div>
+      <div class="container-page">
+        <p class="nx-label nx-rise">{c.hero.eyebrow}</p>
+        <h1 class="nx-h1 sp-h1 nx-rise" style="--d:1"><span class="nx-grad">{c.hero.title}</span></h1>
+        <p class="nx-sub nx-rise" style="--d:2">{c.hero.sub}</p>
+
+        <!-- One tile per sponsor: logo, the sponsor's own tagline and description, and its site -->
+        <div class="sp-list nx-rise" style="--d:3">
+          {sponsors.map((s) => {
+            const e = c.entries[s.name];
+            return (
+              <article class="nx-tile sp-card">
+                <a href={s.href} target="_blank" rel="noopener" class="sp-logo">
+                  <img src={s.logo} alt={s.name} width={s.logoWidth / 3} height={s.logoHeight / 3} />
+                </a>
+                <h2 class="sp-tagline">{e.tagline}</h2>
+                <p class="nx-body">{e.body}</p>
+                <div class="nx-actions">
+                  <a href={s.href} target="_blank" rel="noopener" class="nx-pill">{e.visit}</a>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+
+    <!-- Where sponsors appear, and the contact -->
+    <section class="nx-section-tight nx-hairline">
+      <div class="container-page sp-become">
+        <div>
+          <h2 class="nx-h3">{c.become.title}</h2>
+          <p class="nx-body">{c.become.body}</p>
+          <p class="nx-body">{c.become.note}</p>
+        </div>
+        <a href={sponsorHref} class="nx-ghost sp-mail">{c.become.contactLabel}</a>
+      </div>
+    </section>
+
+    <!-- What the project does and does not answer for -->
+    <section id="disclaimer" class="nx-section-tight nx-hairline sp-disclaimer">
+      <div class="container-page">
+        <h2 class="nx-h3">{c.disclaimer.title}</h2>
+        {c.disclaimer.body.map((p) => <p class="nx-body">{p}</p>)}
+        <p class="nx-body">{c.disclaimer.report.lead}<a href={reportHref} class="sp-inline-link">{c.disclaimer.report.label}</a>{c.disclaimer.report.end}</p>
+      </div>
+    </section>
+  </main>
+  <SiteFooter />
+  <NeonMotion />
+</Base>
+
+<style>
+  .sp-hero {
+    padding-bottom: 72px;
+  }
+  .sp-h1 {
+    margin-top: 16px;
+  }
+  .sp-list {
+    margin-top: 44px;
+    display: grid;
+    gap: 12px;
+  }
+  .sp-card {
+    padding: 36px;
+  }
+  @media (max-width: 639px) {
+    .sp-card {
+      padding: 26px 22px;
+    }
+  }
+  .sp-logo {
+    display: inline-block;
+  }
+  .sp-logo img {
+    display: block;
+    width: 240px;
+    max-width: 100%;
+    height: auto;
+  }
+  .sp-tagline {
+    margin: 28px 0 0;
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    color: #fff;
+  }
+  .sp-card .nx-body {
+    margin-top: 12px;
+    max-width: 560px;
+  }
+  .sp-card .nx-actions {
+    margin-top: 28px;
+  }
+  .sp-become {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px 48px;
+  }
+  .sp-become > div {
+    max-width: 680px;
+  }
+  .sp-disclaimer {
+    scroll-margin-top: 5rem;
+  }
+  .sp-inline-link {
+    color: var(--color-text);
+    text-decoration: underline;
+    text-decoration-color: rgba(255, 255, 255, 0.25);
+    text-underline-offset: 3px;
+  }
+  .sp-inline-link:hover {
+    color: #fff;
+  }
+  .sp-disclaimer .nx-body {
+    max-width: 760px;
+    font-size: 14px;
+  }
+</style>
