@@ -12,9 +12,9 @@
 // alt text changes with it.
 
 const overviewAlt = {
-  en: "The Overview page for the last 7 days: notices that 11 requests failed, a suspicious tool call was cut off and 13 requests are unpriced; cards for 87.5M tokens, a cost of at least about $71.89, 92% cache hits, 1,400 requests, a 1.26 s median first token and 310 MB of traffic, each with the change against the prior 7 days and a chart or breakdown; and the statistics by model below",
+  en: "The Overview page for the last 7 days: 87.5M tokens, a cost of at least about $71.89, 1,400 requests, 92% cache hits, a 1.26 s median first token and 310 MB of traffic, each with the change against the prior 7 days, over a chart of tokens every 6 hours; below, where the tokens went by model and the quotas and balances the upstreams report",
   "zh-CN":
-    "概览页（最近 7 天）：提示 11 次请求失败、切断了 1 个可疑工具调用、13 条请求无法计价；token 87.5M、费用不低于约 $71.89、缓存命中 92%、请求 1,400 次、首 token 中位数 1.26 秒、流量 310 MB 六张卡片，各带与上一个 7 天的对比和趋势图或构成；下方是按模型的统计",
+    "概览页（最近 7 天）：token 87.5M、费用不低于约 $71.89、请求 1,400 次、缓存命中 92%、首 token 中位数 1.26 秒、流量 310 MB 六个指标，各带与上一个 7 天的对比，下面是每 6 小时一格的 token 曲线；再往下是按模型的去向，以及上游报告的额度与余额",
 } as const;
 
 export const liteCopy = {
