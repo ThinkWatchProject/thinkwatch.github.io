@@ -247,6 +247,7 @@ export const liteCopy = {
       },
       windows: {
         req: "Requires Windows 10 21H2 or later on x64 or ARM64.",
+        wingetBody: "Run this command in a terminal. WinGet selects the installer for your PC.",
         title: "Installer",
         body: "Installs the app for all users and keeps it up to date.",
         download: { x64: "Download for Windows (x64)", arm64: "Download for Windows (ARM64)" },
@@ -489,6 +490,7 @@ export const liteCopy = {
       },
       windows: {
         req: "需要 Windows 10 21H2 及以上，x64 或 ARM64。",
+        wingetBody: "在终端运行这条命令，WinGet 会选择适合这台电脑的安装程序。",
         title: "安装程序",
         body: "为所有用户安装，之后应用自动更新。",
         download: { x64: "下载 Windows 版（x64）", arm64: "下载 Windows 版（ARM64）" },

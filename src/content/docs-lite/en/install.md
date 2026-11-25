@@ -22,6 +22,16 @@ xattr -dr com.apple.quarantine "/Applications/ThinkWatch Lite.app"
 
 Without a terminal, the same takes one click after the first refused launch: System Settings › Privacy & Security › Open Anyway.
 
+## WinGet
+
+Open a terminal on Windows and run this command.
+
+```powershell
+winget install thinkwatch-lite
+```
+
+WinGet selects the x64 or ARM64 installer for your PC. Windows asks for administrator permission to install ThinkWatch Lite for all users.
+
 ## Windows: installer
 
 Download the installer for the machine's architecture from the [latest release](https://github.com/ThinkWatchProject/ThinkWatch-Lite/releases/latest): `ThinkWatch-Lite-<version>-windows-x64-setup.exe` for most PCs, or `ThinkWatch-Lite-<version>-windows-arm64-setup.exe` for a PC with an ARM processor. The [Lite page](/lite#install) links to both installers of the latest release. Check the download against the sha256 published beside it:
@@ -84,6 +94,14 @@ When the automatic check finds a new version, the app lists it among the notices
 **Downloaded from the releases page on macOS:** one press on the install button does the rest. The app downloads the update, verifies it against a key compiled into itself, then replaces itself and restarts. A task in the middle of a response is not cut off by the update (see below).
 
 **With the Windows installer:** the same single press. The app downloads the new installer, verifies it against the key compiled into itself, then runs the installer, and the new version starts once it is done. The app is installed for all users, so Windows asks for administrator permission at every update; declining leaves the current version running.
+
+You can also update the installed Windows app from a terminal with WinGet.
+
+```powershell
+winget upgrade thinkwatch-lite
+```
+
+A new release may appear on GitHub before WinGet lists it. To install it immediately, download the installer from the [Lite page](/lite#install).
 
 **The Windows portable copy:** the same single press, and no administrator permission is needed. The app downloads the new zip, verifies it against the key compiled into itself, then replaces the two program files in its folder and restarts. If replacing them fails, the old files are put back and the current version keeps running.
 
