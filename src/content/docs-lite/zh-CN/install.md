@@ -22,6 +22,16 @@ xattr -dr com.apple.quarantine "/Applications/ThinkWatch Lite.app"
 
 不使用终端时：首次打开被拒绝之后，在「系统设置 › 隐私与安全性」中点击「仍要打开」。
 
+## WinGet
+
+在 Windows 终端运行以下命令。
+
+```powershell
+winget install thinkwatch-lite
+```
+
+WinGet 会根据电脑的架构选择 x64 或 ARM64 安装程序。ThinkWatch Lite 会安装给所有用户，Windows 会请求管理员权限。
+
 ## Windows：安装程序
 
 从 [最新版本的 release 页面](https://github.com/ThinkWatchProject/ThinkWatch-Lite/releases/latest)下载与本机架构对应的安装程序：大多数电脑用 `ThinkWatch-Lite-<版本>-windows-x64-setup.exe`，ARM 处理器的电脑用 `ThinkWatch-Lite-<版本>-windows-arm64-setup.exe`。[Lite 页面](/zh-CN/lite#install)提供最新版本两个安装程序的下载链接。下载后与同页发布的 sha256 校验值核对：
@@ -84,6 +94,14 @@ curl -fsSL https://github.com/ThinkWatchProject/ThinkWatch-Lite/releases/latest/
 **在 macOS 上从 release 页面下载安装的**：点击一次安装按钮，其余步骤自动完成——下载更新包，用编译进应用的公钥验签，然后替换并重新启动。正在输出的任务不会因更新而中断（见下文）。
 
 **Windows 安装版**：同样点击一次即可。应用下载新版本的安装程序，用编译进应用的公钥验签，然后运行安装程序，安装完成后新版本自动启动。应用为所有用户安装，因此每次更新 Windows 都会请求管理员权限；拒绝则继续运行当前版本。
+
+Windows 安装版也可以在终端用 WinGet 更新。
+
+```powershell
+winget upgrade thinkwatch-lite
+```
+
+GitHub 发布新版后，WinGet 可能稍晚上架。想立即更新时，可以从 [Lite 官网](/zh-CN/lite#install)下载安装程序。
 
 **Windows 绿色版**：同样点击一次即可，不需要管理员权限。应用下载新版本的压缩包，用编译进应用的公钥验签，然后替换文件夹中的两个程序文件并重新启动；替换失败时换回原来的文件，继续运行当前版本。
 

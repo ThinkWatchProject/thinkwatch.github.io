@@ -46,6 +46,7 @@ const assetSize = (suffix: string) => {
   const name = assetName(suffix);
   return formatSize(name ? liteRelease!.sizes[name] : null);
 };
+const wingetInstall = "winget install thinkwatch-lite";
 const winArchs = ["x64", "arm64"] as const;
 const win = Object.fromEntries(
   winArchs.map((arch) => [
@@ -519,38 +520,51 @@ const archLabel = { x64: "x64", arm64: "ARM64" } as const;
 
           <div id="install-windows" role="tabpanel" aria-labelledby="install-tab-windows" class="install-panel" data-panel="windows">
             <p class="install-req">{c.install.windows.req}</p>
-            <div class="install-card">
-              <h3 class="install-card-title">{c.install.windows.title}</h3>
-              <p class="install-card-body">{c.install.windows.body}</p>
-              <div class="flex flex-wrap items-center gap-x-5 gap-y-2">
+            <div class="grid gap-4 lg:grid-cols-2">
+              <div class="install-card">
+                <div class="flex items-center gap-2.5">
+                  <h3 class="install-card-title">WinGet</h3>
+                  <span class="install-tag">{c.install.recommended}</span>
+                </div>
+                <p class="install-card-body">{c.install.windows.wingetBody}</p>
+                <div class="install-cmd">
+                  <code><span data-cmd>{wingetInstall}</span></code>
+                  <button type="button" class="copy-cmd" data-copy={wingetInstall} data-copied-label={ui.copied}>{ui.copy}</button>
+                </div>
+              </div>
+              <div class="install-card">
+                <h3 class="install-card-title">{c.install.windows.title}</h3>
+                <p class="install-card-body">{c.install.windows.body}</p>
+                <div class="flex flex-wrap items-center gap-x-5 gap-y-2">
+                  {winArchs.map((arch) => (
+                    <a href={win[arch].url} class="dl-button dl-primary" data-win-arch={arch} hidden={arch !== "x64"}>
+                      {c.install.windows.download[arch]}
+                    </a>
+                  ))}
+                  {winArchs.map((arch) => (
+                    <p class="install-meta" data-win-other={arch} hidden={arch === "x64"}>
+                      {c.install.other}<a href={win[arch].url}>{c.install.windows.otherLink[arch]}</a>
+                    </p>
+                  ))}
+                </div>
+                {liteVersion && (
+                  <p class="install-meta">
+                    <span>{c.install.version} {liteVersion}</span>
+                    {winArchs.map((arch) => win[arch].size && <Fragment>{" · "}<span>{archLabel[arch]} {win[arch].size}</span></Fragment>)}
+                    {winArchs.map((arch) =>
+                      win[arch].sha && <Fragment>{" · "}<a href={win[arch].sha}>{c.install.sha} ({archLabel[arch]})</a></Fragment>,
+                    )}
+                  </p>
+                )}
+                {/* The portable zips as one line under the installer, this machine's architecture first */}
                 {winArchs.map((arch) => (
-                  <a href={win[arch].url} class="dl-button dl-primary" data-win-arch={arch} hidden={arch !== "x64"}>
-                    {c.install.windows.download[arch]}
-                  </a>
-                ))}
-                {winArchs.map((arch) => (
-                  <p class="install-meta" data-win-other={arch} hidden={arch === "x64"}>
-                    {c.install.other}<a href={win[arch].url}>{c.install.windows.otherLink[arch]}</a>
+                  <p class="install-meta" data-winzip-arch={arch} hidden={arch !== "x64"}>
+                    {c.install.windows.portable}<span>{[arch, ...winArchs.filter((a) => a !== arch)].map((a, i) => (
+                      <Fragment>{i > 0 && " · "}<a href={winZip[a]}>{archLabel[a]}</a></Fragment>
+                    ))}</span>
                   </p>
                 ))}
               </div>
-              {liteVersion && (
-                <p class="install-meta">
-                  <span>{c.install.version} {liteVersion}</span>
-                  {winArchs.map((arch) => win[arch].size && <Fragment>{" · "}<span>{archLabel[arch]} {win[arch].size}</span></Fragment>)}
-                  {winArchs.map((arch) =>
-                    win[arch].sha && <Fragment>{" · "}<a href={win[arch].sha}>{c.install.sha} ({archLabel[arch]})</a></Fragment>,
-                  )}
-                </p>
-              )}
-              {/* The portable zips as one line under the installer, this machine's architecture first */}
-              {winArchs.map((arch) => (
-                <p class="install-meta" data-winzip-arch={arch} hidden={arch !== "x64"}>
-                  {c.install.windows.portable}<span>{[arch, ...winArchs.filter((a) => a !== arch)].map((a, i) => (
-                    <Fragment>{i > 0 && " · "}<a href={winZip[a]}>{archLabel[a]}</a></Fragment>
-                  ))}</span>
-                </p>
-              ))}
             </div>
             <p class="install-note">{c.install.windows.note}</p>
           </div>
