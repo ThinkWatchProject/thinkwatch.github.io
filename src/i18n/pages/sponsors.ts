@@ -17,6 +17,13 @@ export interface Sponsor {
 
 export const sponsors: Sponsor[] = [
   {
+    name: "Mozhenzhen",
+    href: "https://mozhenzhen.com/go/thinkwatch",
+    logo: "/sponsors/mozhenzhen.png",
+    logoWidth: 1648,
+    logoHeight: 500,
+  },
+  {
     name: "VoyageAge",
     href: "https://www.voyageage.com",
     logo: "/sponsors/voyageage.png",
@@ -47,6 +54,11 @@ export const sponsorsCopy: Record<Lang, {
       sub: "Thanks to the sponsors below for supporting the development of ThinkWatch Lite.",
     },
     entries: {
+      Mozhenzhen: {
+        tagline: "Before you pay for AI, check Mozhenzhen",
+        body: "Is a monthly subscription worth it, or would you spend less paying by the token? Look up your model on Mozhenzhen to compare official subscriptions, API rates, and bundles. It’s free to use, with over 350,000 listings across more than 2,000 models. If an API relay is new to you, you can read user reviews and model verification reports before you try it. You can also check prices and support terms for accounts, top-ups, and team seats, or browse the daily list of free credits and deals.",
+        visit: "Visit mozhenzhen.com",
+      },
       VoyageAge: {
         tagline: "One API. More models. Lower costs.",
         body: "VoyageAge brings leading AI models together through one OpenAI-compatible API. Built for developers, teams, and AI startups, it offers competitive pricing and pay-as-you-go billing, making it easier to integrate AI into your projects. Sign up for free trial credits and start building.",
@@ -81,6 +93,11 @@ export const sponsorsCopy: Record<Lang, {
       sub: "感谢以下赞助商支持 ThinkWatch Lite 的开发。",
     },
     entries: {
+      Mozhenzhen: {
+        tagline: "买 AI 前，先查模真真",
+        body: "同一个模型，开订阅还是按量调 API 划算？模真真是个免费的 AI 比价网站，收录了 2,000 多个模型、35 万多条报价。搜一下你常用的模型，就能把官方订阅、API 单价和各家的套餐放在一起比。遇到没用过的中转站，也可以先翻翻用户评价和模型验真报告。站里还能查账号、代充和团队席位的价格和售后，每天也会更新免费额度和优惠活动。",
+        visit: "访问 mozhenzhen.com",
+      },
       VoyageAge: {
         tagline: "一个 API，更多模型，更低成本。",
         body: "VoyageAge 通过一个兼容 OpenAI 的 API 汇集领先的 AI 模型。它面向开发者、团队和 AI 初创公司，价格具有竞争力，按量计费，让你更轻松地把 AI 集成到项目中。注册即可获得免费试用额度，立即开始构建。",
